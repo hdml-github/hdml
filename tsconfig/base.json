@@ -1,0 +1,23 @@
+{
+  "include": ["../packages/**/src/**/*.ts"],
+  "exclude": ["../packages/**/src/**/*.test.ts"],
+  "compilerOptions": {
+    "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
+    "emitDeclarationOnly": false,
+    "downlevelIteration": true,
+    "resolveJsonModule": true,
+    "noImplicitReturns": true,
+    "moduleResolution": "node",
+    "removeComments": false,
+    "declarationMap": false,
+    "importHelpers": true,
+    "stripInternal": true,
+    "skipLibCheck": true,
+    "declaration": false,
+    "incremental": true,
+    "composite": false,
+    "sourceMap": true,
+    "strict": true,
+    "noEmit": false
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "./esm.json",
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true
+  }
+}

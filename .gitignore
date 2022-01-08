@@ -1,0 +1,17 @@
+/packages/**/cert
+/packages/**/coverage
+/packages/**/docs
+/packages/**/flatc/flatc
+/packages/**/wasm
+/packages/**/build
+/packages/**/cjs
+/packages/**/dts
+/packages/**/esm
+/packages/**/tst
+/packages/**/tsconfig/*.tsbuildinfo
+/packages/**/node_modules
+/packages/**/npm-debug.log
+/.vscode
+/cert
+/node_modules
+npm-debug.log
