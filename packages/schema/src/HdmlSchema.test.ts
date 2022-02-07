@@ -25,7 +25,7 @@ describe("<ampl-schema>", () => {
   test("html structure", () => {
     root = schema.shadowRoot as ShadowRoot;
     expect(schema.nodeType).toBe(ELEMENT_NODE);
-    expect(schema.tagName).toBe("hdml-SCHEMA");
+    expect(schema.tagName).toBe("HDML-SCHEMA");
     expect(schema.outerHTML).toBe("<hdml-schema></hdml-schema>");
     expect(root).not.toBeNull();
     expect(root.innerHTML).toEqual("<!----><slot></slot>");

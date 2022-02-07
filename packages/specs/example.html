@@ -91,14 +91,14 @@
 
       <!-- Data batches -->
       <data-batches>
-        <csv-batch readonly rows>
+        <csv-batch rows>
           1, 1.0, true, null, "<!--"
           2, 2.0, false, null, "string"
           3, 3.0, true, null , "-->"
           4, 4.0, false, null, "www"
           5, 5.0, true, null, null
         </csv-batch>
-        <json-batch readonly columns>
+        <json-batch columns contenteditable>
           [
             [1, 2, 3, 4, 5],
             [1.0, 2.0, 3.0, 4.0, 5.0],
@@ -107,7 +107,7 @@
             ["<!--", "string", "-->", "www", null]
           ]
         </json-batch>
-        <json-batch readonly rows>
+        <json-batch rows>
           [
             [1, 1.0, true, null, "<!--"],
             [2, 2.0, false, null, "string"],

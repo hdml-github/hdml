@@ -7,7 +7,7 @@
     "access": "public"
   },
   "dependencies": {
-    "apache-arrow": "^6.0.1"
+    "apache-arrow": "^7.0.0"
   },
   "scripts": {
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",

@@ -18,7 +18,7 @@
     "compile_esm": "tsc -b ./tsconfig/esm.json",
     "compile_dts": "tsc -b ./tsconfig/dts.json",
     "compile_tst": "tsc -b ./tsconfig/tst.json",
-    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
+    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts && compile_tst",
     "test": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/schema/tst --coverageDirectory ./packages/schema/coverage",
     "build": "npm run lint && npm run compile_tst && npm run test -- --coverage && npm run docs && npm run compile_all"
   },

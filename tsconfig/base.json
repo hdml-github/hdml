@@ -12,7 +12,7 @@
     "declarationMap": false,
     "importHelpers": true,
     "stripInternal": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "declaration": false,
     "incremental": true,
     "composite": false,
