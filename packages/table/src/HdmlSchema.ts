@@ -1,17 +1,14 @@
 import { html, TemplateResult, LitElement } from "lit";
 import { Schema } from "@hdml/arrow";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 /**
  * hdml Schema component class.
  */
-export default class hdmlSchema extends LitElement {
+export default class HdmlSchema extends LitElement {
   /**
    * Compiled schema object.
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _schema: Schema<any>;
 
   /**
@@ -29,4 +26,4 @@ export default class hdmlSchema extends LitElement {
     return html`<slot></slot>`;
   }
 }
-customElements.define("hdml-schema", hdmlSchema);
+customElements.define("hdml-schema", HdmlSchema);

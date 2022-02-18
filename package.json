@@ -29,16 +29,15 @@
     "typescript": "^4.0.2"
   },
   "scripts": {
-    "lint": "lerna run lint --scope @hdml/schema",
-    "docs": "lerna run docs --scope @hdml/schema",
-    "compile_asc": "lerna run compile_asc --scope @hdml/schema",
-    "compile_gyp": "lerna run compile_gyp --scope @hdml/schema",
-    "compile_cjs": "lerna run compile_cjs --scope @hdml/schema",
-    "compile_esm": "lerna run compile_esm --scope @hdml/schema",
-    "compile_dts": "lerna run compile_dts --scope @hdml/schema",
-    "compile_tst": "lerna run compile_tst --scope @hdml/schema",
-    "compile_all": "lerna run compile_all --scope @hdml/schema",
-    "test": "lerna run test --scope @hdml/schema",
-    "build": "lerna run build --scope @hdml/schema"
+    "lint": "lerna run lint",
+    "docs": "lerna run docs",
+    "compile_asc": "lerna run compile_asc",
+    "compile_cjs": "lerna run compile_cjs",
+    "compile_esm": "lerna run compile_esm",
+    "compile_dts": "lerna run compile_dts",
+    "compile_tst": "lerna run compile_tst",
+    "compile_all": "lerna run compile_all",
+    "test": "lerna run test",
+    "build": "lerna run build"
   }
 }

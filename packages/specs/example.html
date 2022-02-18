@@ -46,10 +46,10 @@
   <body>
 
     <!-- Data -->
-    <hdml-data id='set' limit='10000'>
+    <hdml-table id='set' limit='10000'>
 
       <!-- Data schema -->
-      <data-fields>
+      <data-columns>
 
         <!-- int -->
         <int-8  id='field_2' nullable />
@@ -87,7 +87,7 @@
         <bit-data    id='field_1'  nullable />
         <utf8-data   id='field_16' nullable large />
         <binary-data id='field_17' nullable large />
-      </data-fields>
+      </data-columns>
 
       <!-- Data batches -->
       <data-batches>
@@ -121,7 +121,7 @@
         <arrow-batch mismatched disabled>base64?</arrow-batch>
       </data-batches>
 
-    </hdml-data>
+    </hdml-table>
 
     <!-- Frame -->
     <hdml-frame id='frame' from='set'>

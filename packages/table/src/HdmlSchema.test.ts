@@ -6,15 +6,15 @@
  * @license Apache-2.0
  */
 
-import hdmlSchema from "./HdmlSchema";
+import HdmlSchema from "./HdmlSchema";
 
 describe("<ampl-schema>", () => {
   const ELEMENT_NODE = 1;
-  let schema: hdmlSchema;
+  let schema: HdmlSchema;
   let root: ShadowRoot;
 
   beforeEach(() => {
-    schema = new hdmlSchema();
+    schema = new HdmlSchema();
     document.body.appendChild(schema);
   });
 

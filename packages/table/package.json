@@ -1,5 +1,5 @@
 {
-  "name": "@hdml/schema",
+  "name": "@hdml/table",
   "version": "0.0.0",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -18,8 +18,8 @@
     "compile_esm": "tsc -b ./tsconfig/esm.json",
     "compile_dts": "tsc -b ./tsconfig/dts.json",
     "compile_tst": "tsc -b ./tsconfig/tst.json",
-    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts && compile_tst",
-    "test": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/schema/tst --coverageDirectory ./packages/schema/coverage",
+    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
+    "test": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/table/tst --coverageDirectory ./packages/table/coverage",
     "build": "npm run lint && npm run compile_tst && npm run test -- --coverage && npm run docs && npm run compile_all"
   },
   "types": "dts/index.d.ts",
