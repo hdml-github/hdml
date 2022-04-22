@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@hdml/arrow": "0.0.0",
-    "lit": "^2.0.2"
+    "lit": "^2.2.2"
   },
   "scripts": {
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",

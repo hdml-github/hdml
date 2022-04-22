@@ -27,6 +27,19 @@ module.exports = {
   rules: {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/explicit-module-boundary-types": "error",
-    "@typescript-eslint/no-explicit-any": "error"
+    "@typescript-eslint/no-explicit-any": "error",
+    "max-len": [ "error", {
+      "code": 70,
+    }],
+    "prettier/prettier": ["error", {
+      "printWidth": 70,
+      "semi": true,
+      "trailingComma": 'all',
+      "tabWidth": 2,
+      "useTabs": false,
+      "bracketSpacing": true,
+      "arrowParens": 'always',
+      "jsxBracketSameLine": true,
+    }]
   },
 };
