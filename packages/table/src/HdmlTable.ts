@@ -21,10 +21,17 @@ export default class HdmlTable extends LitElement {
     },
   };
 
-  /**
-   * Maximum rows number.
-   */
-  public limit?: number;
+  private _limit?: number;
+
+  set limit(val: undefined | number | string) {
+    const oldVal = this._limit;
+    this._limit = parseInt(val as unknown as string);
+    this.requestUpdate("limit", oldVal);
+  }
+
+  get limit(): undefined | number {
+    return this._limit;
+  }
 
   /**
    * Class constructor.

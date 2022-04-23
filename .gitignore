@@ -4,8 +4,10 @@
 /packages/**/flatc/flatc
 /packages/**/wasm
 /packages/**/build
+/packages/**/bundle
 /packages/**/cjs
 /packages/**/dts
+/packages/**/es5
 /packages/**/esm
 /packages/**/tst
 /packages/**/tsconfig/*.tsbuildinfo

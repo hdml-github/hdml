@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /**
  * @fileoverview Package's export test suite definition.
  * @author Artem Lytvynov
