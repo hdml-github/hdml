@@ -4,7 +4,15 @@
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
-
+import {
+  afterAll,
+  beforeAll,
+  afterEach,
+  beforeEach,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 import HdmlTable from "./HdmlTable";
 
 describe("<hdml-table></hdml-table>", () => {

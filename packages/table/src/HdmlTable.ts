@@ -12,6 +12,10 @@ export default class HdmlTable extends LitElement {
       noAccessor: false,
       state: false,
     },
+
+    /**
+     * Maximum rows number.
+     */
     limit: {
       type: Number,
       attribute: true,

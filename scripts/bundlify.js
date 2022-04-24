@@ -5,7 +5,6 @@ const { rollup } = require('rollup');
 const rollupAlias = require('@rollup/plugin-alias');
 const rollupInject = require('@rollup/plugin-inject');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
-const { terser } = require('rollup-plugin-terser');
 
 const root = process.cwd();
 const pkg = require(`${root}/package.json`);
@@ -36,7 +35,6 @@ rollup({
       exclude: 'node_modules/**',
       modules: getInjectedModules(),
     }),
-    terser(),
   ],
 }).then(function (bundle) {
   return bundle.generate({

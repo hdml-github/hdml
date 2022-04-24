@@ -5,6 +5,15 @@
  * @license Apache-2.0
  */
 
+import {
+  afterAll,
+  beforeAll,
+  afterEach,
+  beforeEach,
+  expect,
+  jest,
+  test,
+} from "@jest/globals";
 import * as regular_import from "./index";
 
 describe("Package's export test suite", () => {

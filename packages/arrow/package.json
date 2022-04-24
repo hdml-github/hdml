@@ -20,8 +20,9 @@
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
     "bundlify": "node ../../scripts/bundlify.js",
     "closurify": "node ../../scripts/closurify.js",
-    "test": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/arrow/tst --coverageDirectory ./packages/arrow/coverage",
-    "build": "npm run lint && npm run compile_tst && npm run test -- --coverage && npm run compile_all && npm run docs"
+    "test:unit": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/arrow/tst --coverageDirectory ./packages/arrow/coverage",
+    "test:i9n": "cd ../.. && npm run test:i9n:run -- --spec ./integration/tests/arrow/*.spec.js",
+    "build": "npm run lint && npm run compile_tst && npm run test:unit -- --coverage && npm run compile_all && npm run bundlify && npm run closurify && npm run test:i9n && npm run docs"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",
