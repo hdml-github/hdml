@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 function testsuite() {
-  it('window properties', () => {
+  it('@hdml/table', () => {
     cy.window().then((window) => {
       expect(window['@hdml/table']).to.exist;
       expect(window['@hdml/table'].HdmlTable).to.exist;
@@ -11,7 +11,7 @@ function testsuite() {
   });
 }
 
-describe('window scope', () => {
+describe('bundle export', () => {
   context('regular bundle', () => {
     beforeEach(() => {
       cy.visit(

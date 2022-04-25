@@ -19,6 +19,7 @@
     "compile_dts": "tsc -b ./tsconfig/dts.json",
     "compile_tst": "tsc -b ./tsconfig/tst.json",
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
+    "compile_web": "npm run compile_esm && npm run bundlify && npm run closurify",
     "bundlify": "node ../../scripts/bundlify.js",
     "closurify": "node ../../scripts/closurify.js",
     "test:unit": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/table/tst --coverageDirectory ./packages/table/coverage",

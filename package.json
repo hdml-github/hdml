@@ -44,11 +44,12 @@
     "compile_dts": "lerna run compile_dts",
     "compile_tst": "lerna run compile_tst",
     "compile_all": "lerna run compile_all",
+    "compile_web": "lerna run compile_web",
     "bundlify": "lerna run bundlify",
     "closurify": "lerna run closurify",
     "test:unit": "lerna run test:unit",
     "test:i9n": "lerna run test:i9n",
-    "test:i9n:run": "cypress run --config-file ./.cypress.json  --spec ./integration/tests/table/*.spec.js",
+    "test:i9n:run": "cypress run --config-file ./.cypress.json",
     "test:i9n:debug": "cypress open --config-file ./.cypress.json",
     "build": "lerna run build"
   }

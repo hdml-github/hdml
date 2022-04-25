@@ -93,7 +93,7 @@ function testsuite() {
   });
 }
 
-describe('<hdml-table></hdml-table>', () => {
+describe('<hdml-table/>', () => {
   context('regular bundle', () => {
     beforeEach(() => {
       cy.visit(

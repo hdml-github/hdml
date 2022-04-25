@@ -1,10 +1,18 @@
+/**
+ * @fileoverview HdmlTable class definition and <hdml-table> custom
+ * element registration.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { html, TemplateResult, LitElement } from "lit";
 
 /**
  * HDML table component class.
  */
 export default class HdmlTable extends LitElement {
-  static properties = {
+  public static properties = {
     id: {
       type: String,
       attribute: true,
@@ -27,13 +35,13 @@ export default class HdmlTable extends LitElement {
 
   private _limit?: number;
 
-  set limit(val: undefined | number | string) {
+  public set limit(val: undefined | number | string) {
     const oldVal = this._limit;
     this._limit = parseInt(val as unknown as string);
     this.requestUpdate("limit", oldVal);
   }
 
-  get limit(): undefined | number {
+  public get limit(): undefined | number {
     return this._limit;
   }
 
@@ -45,9 +53,9 @@ export default class HdmlTable extends LitElement {
   }
 
   /**
-   * Render component.
+   * Component renderer.
    */
-  render(): TemplateResult<1> {
+  public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 }
