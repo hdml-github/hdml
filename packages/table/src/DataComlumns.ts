@@ -9,6 +9,22 @@
 import { html, TemplateResult, LitElement } from "lit";
 
 /**
+ * Returns parent <hdml-table/> component or null if there are no
+ * parent <hdml-table/> in the DOM-tree for the specified element.
+ */
+export function getParentTable(element: Element): null | Element {
+  if (element.parentElement) {
+    if (element.parentElement.tagName === "HDML-TABLE") {
+      return element.parentElement;
+    } else {
+      return getParentTable(element.parentElement);
+    }
+  } else {
+    return null;
+  }
+}
+
+/**
  * HDML <data-columns/> component class. This element responds for
  * grouping table's fields components. It should only be rendered
  * inside the <hdml-table /> component and only one <data-columns />
@@ -50,9 +66,11 @@ export default class DataColumns extends LitElement {
   }
 
   /**
-   * Associated <html-table/> component.
+   * Associated <hdml-table/> element.
    */
-  private _table: null | Element = null;
+  public get table(): null | Element {
+    return getParentTable(this);
+  }
 
   /**
    * Class constructor.
@@ -62,19 +80,22 @@ export default class DataColumns extends LitElement {
   }
 
   /**
-   * Returns parent <hdml-table/> component or null if there are no
-   * parent <hdml-table/> in the DOM-tree.
+   * Checks DOM-structure correctness. Disables component if there are
+   * some errors in surrounding structure.
    */
-  public getParentTable(element?: Element): null | Element {
-    element = element || this;
-    if (element.parentElement) {
-      if (element.parentElement.tagName === "HDML-TABLE") {
-        return element.parentElement;
-      } else {
-        return this.getParentTable(element.parentElement);
-      }
-    } else {
-      return null;
+  public assertDomStructure(): void {
+    if (this.table === null && !this._disabled) {
+      console.warn(
+        "Disabling. No associated <hdml-table/> component found in " +
+          "the DOM-tree.",
+      );
+      this.disabled = true;
+    }
+    if (
+      this.table &&
+      this.table.querySelectorAll("data-columns").length > 1
+    ) {
+      this.disabled = true;
     }
   }
 
@@ -83,20 +104,7 @@ export default class DataColumns extends LitElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    this._table = this.getParentTable();
-    if (this._table === null) {
-      console.warn(
-        "No associated <hdml-table/> component found in the " +
-          "DOM-tree.",
-      );
-      this.disabled = true;
-    }
-    if (
-      this._table &&
-      this._table.querySelectorAll("data-columns").length > 1
-    ) {
-      this.setAttribute("disabled", "");
-    }
+    this.assertDomStructure();
   }
 
   /**
@@ -108,15 +116,7 @@ export default class DataColumns extends LitElement {
     newVal: string,
   ): void {
     super.attributeChangedCallback(name, oldVal, newVal);
-    // if (name === "disabled") {
-    //   if (this._table === null) {
-    //     console.warn(
-    //       "No associated <hdml-table/> component found in the " +
-    //         "DOM-tree.",
-    //     );
-    //     this.disabled = true;
-    //   }
-    // }
+    this.assertDomStructure();
   }
 
   /**
