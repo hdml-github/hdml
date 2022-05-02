@@ -5,6 +5,5 @@
  * @license Apache-2.0
  */
 
-import HdmlTable from "./HdmlTable";
-import DataColumns from "./DataComlumns";
-export { HdmlTable, DataColumns };
+import HdmlTable from "./components/HdmlTable";
+export { HdmlTable };

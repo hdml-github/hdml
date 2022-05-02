@@ -1,4 +1,5 @@
 /integration/videos
+/integration/screenshots
 /packages/**/cert
 /packages/**/coverage
 /packages/**/docs

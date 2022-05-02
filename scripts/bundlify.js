@@ -3,7 +3,9 @@ const path = require('path');
 const tslib = require('tslib');
 const { rollup } = require('rollup');
 const rollupAlias = require('@rollup/plugin-alias');
+const rollupCommonjs = require('@rollup/plugin-commonjs');
 const rollupInject = require('@rollup/plugin-inject');
+const rollupJson = require('@rollup/plugin-json');
 const { nodeResolve } = require('@rollup/plugin-node-resolve');
 
 const root = process.cwd();
@@ -28,8 +30,12 @@ if (!fs.existsSync(target)) {
 rollup({
   input,
   plugins: [
+    rollupJson(),
     nodeResolve({
       jsnext: true,
+    }),
+    rollupCommonjs({
+      include: /node_modules/,
     }),
     rollupInject({
       exclude: 'node_modules/**',

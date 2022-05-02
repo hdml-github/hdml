@@ -1,13 +1,18 @@
 /// <reference types="cypress" />
 
+const { Warning } = require('../../../packages/messages');
+
 let warn;
 let warnNoTable;
+let warnDisabledAccessDenied;
 Cypress.on('window:load', (win) => {
   warn = cy.spy(win.console, "warn");
-  warnNoTable = warn.withArgs(
-    'Disabling. No associated <hdml-table/> component found in ' +
-          'the DOM-tree.',
-  ).as('warnNoTable');
+  warnNoTable = warn
+    .withArgs(Warning.NO_ASSOCIATED_TABLE)
+    .as('warnNoTable');
+  warnDisabledAccessDenied = warn
+    .withArgs(Warning.CANT_DISABLE_COLUMS)
+    .as('warnDisabledAccessDenied');
 });
 
 function testsuite() {
@@ -51,6 +56,7 @@ function testsuite() {
         .should('eq', true);
 
       expect(warnNoTable).to.be.called;
+      expect(warnDisabledAccessDenied).not.to.have.been.called;
     });
 
     it("'disabled' attribute can not be removed", () => {
@@ -71,6 +77,7 @@ function testsuite() {
         .should('eq', true);
 
       expect(warnNoTable).to.be.called;
+      expect(warnDisabledAccessDenied).not.to.have.been.called;
     });
   });
 
@@ -118,9 +125,10 @@ function testsuite() {
         .should('eq', false);
       
       expect(warnNoTable).not.to.have.been.called;
+      expect(warnDisabledAccessDenied).not.to.have.been.called;
     });
 
-    it("'disabled' attribute can be added", () => {
+    it("'disabled' attribute can not be added", () => {
       cy.get('data-columns')
         .invoke('prop', 'disabled')
         .should('eq', false);
@@ -131,13 +139,14 @@ function testsuite() {
 
       cy.get('data-columns')
         .invoke('attr', 'disabled', '')
-        .should('have.attr', 'disabled', 'disabled');
+        .should('have.attr', 'disabled', undefined);
 
       cy.get('data-columns')
         .invoke('prop', 'disabled')
-        .should('eq', true);
+        .should('eq', false);
 
       expect(warnNoTable).not.to.have.been.called;
+      expect(warnDisabledAccessDenied).to.be.called;
     });
   });
 }

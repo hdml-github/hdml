@@ -7,6 +7,7 @@
  */
 
 import { html, TemplateResult, LitElement } from "lit";
+import { Warnings } from "@hdml/messages";
 
 /**
  * Returns parent <hdml-table/> component or null if there are no
@@ -84,19 +85,22 @@ export default class DataColumns extends LitElement {
    * some errors in surrounding structure.
    */
   public assertDomStructure(): void {
-    if (this.table === null && !this._disabled) {
-      console.warn(
-        "Disabling. No associated <hdml-table/> component found in " +
-          "the DOM-tree.",
-      );
+    if (!this.table && !this._disabled) {
+      console.warn(Warning.NO_ASSOCIATED_TABLE);
       this.disabled = true;
+      return;
     }
-    if (
-      this.table &&
-      this.table.querySelectorAll("data-columns").length > 1
-    ) {
-      this.disabled = true;
+    if (this.table && this._disabled) {
+      console.warn(Warning.CANT_DISABLE_COLUMS);
+      this.disabled = false;
+      return;
     }
+    // if (
+    //   this.table &&
+    //   this.table.querySelectorAll("data-columns").length > 1
+    // ) {
+    //   this.disabled = true;
+    // }
   }
 
   /**
