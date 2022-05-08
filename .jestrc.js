@@ -14,6 +14,9 @@ module.exports = {
       tsconfig: {
         allowJs: true,
       },
+      diagnostics: {
+        ignoreCodes: [151001]
+      },
     },
   },
 };
