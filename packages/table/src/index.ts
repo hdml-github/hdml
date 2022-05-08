@@ -4,6 +4,3 @@
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
-
-import HdmlTable from "./components/HdmlTable";
-export { HdmlTable };
