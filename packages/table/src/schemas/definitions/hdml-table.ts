@@ -27,9 +27,9 @@ export default {
       minimum: 0,
       maximum: 1000000000,
     },
-    "data-columns": {
-      $ref: "data-columns",
-    },
+    // "data-columns": {
+    //   $ref: "data-columns",
+    // },
   },
 };
 

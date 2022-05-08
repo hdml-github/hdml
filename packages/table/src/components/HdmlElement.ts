@@ -1,5 +1,5 @@
 /**
- * @fileoverview BaseElement class definition.
+ * @fileoverview HdmlElement class definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -7,29 +7,26 @@
 
 import { html, TemplateResult, LitElement } from "lit";
 import getUid from "../helpers/getUid";
-import elementsParser from "../services/elementsParser";
 
 /**
- * Base class for HDML table's elements. Responds for the uniqueness
- * by providing unique identifier (BaseElement#uid) for the component.
+ * Base class for HDML elements. Responds for the uniqueness by
+ * providing unique identifier (BaseElement#uid) for the component.
  */
 export default class HdmlElement extends LitElement {
   private _uid = getUid();
 
+  /**
+   * Element unique identifier getter.
+   */
   public get uid(): string {
     return this._uid;
-  }
-
-  constructor() {
-    super();
   }
 
   /**
    * @override
    */
-  public async connectedCallback(): Promise<void> {
+  public connectedCallback(): void {
     super.connectedCallback();
-    await elementsParser.addElement(this);
   }
 
   /**
@@ -37,7 +34,6 @@ export default class HdmlElement extends LitElement {
    */
   public disconnectedCallback(): void {
     super.disconnectedCallback();
-    elementsParser.removeElement(this);
   }
 
   /**

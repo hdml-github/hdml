@@ -5,6 +5,7 @@ const { Warning } = require('../../../packages/messages');
 let warn;
 let warnNoTable;
 let warnDisabledAccessDenied;
+
 Cypress.on('window:load', (win) => {
   warn = cy.spy(win.console, "warn");
   warnNoTable = warn

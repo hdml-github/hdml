@@ -5,7 +5,7 @@
  * @license Apache-2.0
  */
 
-import Ajv from "ajv";
+import Ajv2020 from "ajv/dist/2020";
 
 import Int8 from "./definitions/types/int-8";
 import Int16 from "./definitions/types/int-16";
@@ -38,30 +38,30 @@ import BinaryData from "./definitions/types/binary-data";
 import DataColumns from "./definitions/data-columns";
 import HdmlTable, { HdmlTableSchema } from "./definitions/hdml-table";
 
-const schemas = new Ajv({
+const schemas = new Ajv2020({
   schemas: [
-    Int8,
-    Int16,
-    Int32,
-    Int64,
-    Uint8,
-    Uint16,
-    Uint32,
-    Uint64,
-    Float16,
-    Float32,
-    Float64,
-    Decimal128,
-    Decimal256,
-    Date32,
-    Date64,
-    Time32,
-    Time64,
-    TimeStamp,
-    BitData,
-    Utf8data,
-    BinaryData,
-    DataColumns,
+    // Int8,
+    // Int16,
+    // Int32,
+    // Int64,
+    // Uint8,
+    // Uint16,
+    // Uint32,
+    // Uint64,
+    // Float16,
+    // Float32,
+    // Float64,
+    // Decimal128,
+    // Decimal256,
+    // Date32,
+    // Date64,
+    // Time32,
+    // Time64,
+    // TimeStamp,
+    // BitData,
+    // Utf8data,
+    // BinaryData,
+    // DataColumns,
     HdmlTable,
   ],
 });
