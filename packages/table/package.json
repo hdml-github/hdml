@@ -6,31 +6,26 @@
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
-  "devDependencies": {
-    "@types/uuid": "^8.3.4"
-  },
   "dependencies": {
-    "@hdml/arrow": "0.0.0",
-    "@hdml/messages": "0.0.0",
     "ajv": "^8.11.0",
     "lit": "^2.2.2",
     "uuid": "^8.3.2"
   },
   "scripts": {
+    "dev": "../../node_modules/.bin/web-dev-server --config ../../.dev.config.js --open ./index.html",
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
     "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
     "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",
     "compile_cjs": "tsc -b ./tsconfig/cjs.json",
     "compile_esm": "tsc -b ./tsconfig/esm.json",
     "compile_dts": "tsc -b ./tsconfig/dts.json",
-    "compile_tst": "tsc -b ./tsconfig/tst.json",
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
     "compile_web": "npm run compile_esm && npm run bundlify && npm run closurify",
     "bundlify": "node ../../scripts/bundlify.js",
     "closurify": "node ../../scripts/closurify.js",
-    "test:unit": "../../node_modules/.bin/jest --config ../../.jestrc.js --env ./.jestenv.js --roots ./packages/table/tst --coverageDirectory ./packages/table/coverage",
-    "test:i9n": "cd ../.. && npm run test:i9n:run -- --spec ./integration/tests/table/*.spec.js",
-    "build": "npm run lint && npm run compile_tst && npm run test:unit -- --coverage && npm run compile_all && npm run bundlify && npm run closurify && npm run test:i9n && npm run docs"
+    "test": "../../node_modules/.bin/wtr --config ../../.test.config.js \"src/**/*.test.html\"",
+    "test:watch": "npm run test -- --watch",
+    "build": "npm run lint && npm run test -- --coverage && npm run compile_all && npm run bundlify && npm run closurify && npm run docs"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

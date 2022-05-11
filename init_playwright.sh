@@ -1,0 +1,1 @@
+sudo apt-get install gstreamer1.0-plugins-bad libenchant1c2a

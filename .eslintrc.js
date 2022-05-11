@@ -1,44 +1,41 @@
 module.exports = {
   ignorePatterns: [
-    '*.js',
-    '*.d.ts'
+    "*.js",
+    "*.d.ts",
   ],
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: 'tst.json',
-    tsconfigRootDir: './tsconfig',
+    ecmaVersion: "latest",
+    sourceType: "module",
+    project: "tst.json",
+    tsconfigRootDir: "./tsconfig",
     ecmaFeatures: {
-      impliedStrict: true,
-    },
+      impliedStrict: true
+    }
   },
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    'prettier',
-    'plugin:prettier/recommended',
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "prettier",
+    "plugin:prettier/recommended"
   ],
-  plugins: [
-    'filenames',
-    'prettier',
-  ],
+  plugins: ["filenames", "prettier"],
   rules: {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/explicit-module-boundary-types": "error",
     "@typescript-eslint/no-explicit-any": "error",
-    "max-len": [ "error", {
-      "code": 70,
+    "max-len": ["error", {
+      "code": 70
     }],
     "prettier/prettier": ["error", {
       "printWidth": 70,
       "semi": true,
-      "trailingComma": 'all',
+      "trailingComma": "all",
       "tabWidth": 2,
       "useTabs": false,
       "bracketSpacing": true,
-      "arrowParens": 'always',
+      "arrowParens": "always"
     }]
-  },
+  }
 };

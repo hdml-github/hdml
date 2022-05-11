@@ -1,4 +1,4 @@
 {
-  "extends": "./cjs.json",
+  "extends": "./esm.json",
   "exclude": []
 }
