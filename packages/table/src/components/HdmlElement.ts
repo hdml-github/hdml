@@ -5,8 +5,11 @@
  * @license Apache-2.0
  */
 
-import { html, TemplateResult, LitElement } from "lit";
+import { LitElement } from "lit";
+import Ajv, { Schema } from "ajv/lib/ajv";
 import getUid from "../helpers/getUid";
+
+const avg = new Ajv();
 
 /**
  * Base class for HDML elements. Responds for the uniqueness by
@@ -14,6 +17,7 @@ import getUid from "../helpers/getUid";
  */
 export default class HdmlElement extends LitElement {
   private _uid = getUid();
+  private _schema: Schema;
 
   /**
    * Element unique identifier getter.
@@ -23,23 +27,26 @@ export default class HdmlElement extends LitElement {
   }
 
   /**
-   * @override
+   * Class constructor.
    */
-  public connectedCallback(): void {
-    super.connectedCallback();
+  constructor(schema: Schema) {
+    super();
+    this._schema = schema;
   }
 
   /**
-   * @override
+   * Serialize element.
    */
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
+  public serialize(): { uid: string } {
+    return {
+      uid: this.uid,
+    };
   }
 
   /**
-   * Component renderer.
+   * Assert serialized element data.
    */
-  public render(): TemplateResult<1> {
-    return html`<slot></slot>`;
+  public assert(): boolean {
+    return avg.validate(this._schema, this.serialize());
   }
 }

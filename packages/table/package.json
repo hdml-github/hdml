@@ -12,7 +12,7 @@
     "uuid": "^8.3.2"
   },
   "scripts": {
-    "dev": "../../node_modules/.bin/web-dev-server --config ../../.dev.config.js --open ./index.html",
+    "dev": "../../node_modules/.bin/web-dev-server --config ../../.dev.config.js --open index.html",
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
     "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
     "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",

@@ -38,6 +38,8 @@ describe("Int8 component", () => {
       expect(elm.uid, "uid property defined").not.to.be.undefined;
       expect(uid.test(elm.uid), "uid property regexp").to.be.true;
       expect(elm.name, "name property").to.eq("");
+      expect(elm.getAttribute("name"), "attribute name").to.be
+        .undefined;
     });
   });
 });
