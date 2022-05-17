@@ -1,12 +1,60 @@
 <html>
   <head>
-    <script type="module" src="/src/index.ts"></script>
+    <script type="module" src="/bin/table.min.js"></script>
   </head>
   <body>
     <script type="module">
       import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
       runTests(async () => {
-        await import('./Int8.test.ts');
+
+        const uid = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
+
+        describe("Int8 component", () => {
+          before(async () => {
+            await customElements.whenDefined("int-8");
+          });
+
+          describe("<int-8/>", () => {
+            let element;
+
+            beforeEach(() => {
+              window.document.body.innerHTML = `<int-8/>`;
+              element = document.querySelector("int-8");
+            });
+
+            it("default values", () => {
+              expect(
+                element.nodeType,
+                "node type",
+              ).to.equal(1);
+              expect(
+                element.tagName,
+                "tag name",
+              ).to.equal("INT-8");
+              expect(
+                element.outerHTML,
+                "outer html",
+              ).to.equal("<int-8></int-8>");
+              expect(
+                element.uid,
+                "uid property defined",
+              ).not.to.be.undefined;
+              expect(
+                uid.test(element.uid),
+                "uid property regexp",
+              ).to.be.true;
+              expect(
+                element.name,
+                "name property",
+              ).to.eq("");
+              expect(
+                element.getAttribute("name"),
+                "attribute name",
+              ).to.be.null;
+            });
+          });
+        });
       });
     </script>
   </body>

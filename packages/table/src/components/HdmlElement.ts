@@ -6,10 +6,10 @@
  */
 
 import { LitElement } from "lit";
-import Ajv, { Schema } from "ajv/lib/ajv";
+import Ajv2020, { Schema } from "ajv/dist/2020";
 import getUid from "../helpers/getUid";
 
-const avg = new Ajv();
+const avg = new Ajv2020();
 
 /**
  * Base class for HDML elements. Responds for the uniqueness by
@@ -47,6 +47,15 @@ export default class HdmlElement extends LitElement {
    * Assert serialized element data.
    */
   public assert(): boolean {
-    return avg.validate(this._schema, this.serialize());
+    if (avg.validate(this._schema, this.serialize())) {
+      return true;
+    } else {
+      console.error(
+        `invalid ${
+          this.tagName
+        } component definition: ${JSON.stringify(this.serialize())}`,
+      );
+      return false;
+    }
   }
 }

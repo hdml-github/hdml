@@ -1,4 +1,3 @@
-const { esbuildPlugin } = require("@web/dev-server-esbuild");
 const { playwrightLauncher } = require("@web/test-runner-playwright");
 
 module.exports = {
@@ -11,7 +10,6 @@ module.exports = {
     report: true,
     reportDir: "./coverage"
   },
-  plugins: [esbuildPlugin({ ts: true })],
   browsers: [
     playwrightLauncher({
       product: "chromium",

@@ -32,6 +32,8 @@
     "lerna": "^4.0.0",
     "prettier": "^2.6.2",
     "rollup": "^2.73.0",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "rollup-plugin-terser": "^7.0.2",
     "ts-node": "^10.7.0",
     "tslib": "^2.4.0",
     "typedoc": "^0.22.15",
@@ -45,10 +47,9 @@
     "compile_cjs": "lerna run compile_cjs --scope @hdml/table",
     "compile_esm": "lerna run compile_esm --scope @hdml/table",
     "compile_dts": "lerna run compile_dts --scope @hdml/table",
+    "compile_bin": "lerna run compile_bin --scope @hdml/table",
+    "compile_dev": "lerna run compile_dev --scope @hdml/table",
     "compile_all": "lerna run compile_all --scope @hdml/table",
-    "compile_web": "lerna run compile_web --scope @hdml/table",
-    "bundlify": "lerna run bundlify --scope @hdml/table",
-    "closurify": "lerna run closurify --scope @hdml/table",
     "test": "lerna run test --scope @hdml/table",
     "build": "lerna run build --scope @hdml/table"
   }

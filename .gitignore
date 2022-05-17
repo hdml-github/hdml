@@ -6,7 +6,7 @@
 /packages/**/flatc/flatc
 /packages/**/wasm
 /packages/**/build
-/packages/**/bundle
+/packages/**/bin
 /packages/**/cjs
 /packages/**/dts
 /packages/**/es5

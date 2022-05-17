@@ -1,14 +1,13 @@
 export default {
-  $schema: "https://json-schema.org/draft/2020-12/schema",
-  $id: "int-8",
-  title: "int-8",
-  description: "HDML table int-8 field component.",
+  $id: "INT-8",
+  title: "INT-8",
+  description: "HDML table INT-8 field component.",
   type: "object",
   required: ["uid", "name", "nullable"],
   properties: {
     uid: {
       title: "uid",
-      description: "HDML table unique identifier.",
+      description: "HDML table field unique identifier.",
       type: "string",
       pattern:
         "^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]" +
