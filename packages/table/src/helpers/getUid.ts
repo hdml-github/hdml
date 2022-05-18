@@ -27,7 +27,7 @@ const stringsMap: Map<string, string> = new Map();
  * // => true
  * ```
  */
-export default function getUid(value?: string): string {
+export function getUid(value?: string): string {
   if (typeof value === "string") {
     if (!stringsMap.has(value)) {
       stringsMap.set(value, v5(value, ns).toString());

@@ -1,0 +1,129 @@
+/**
+ * @fileoverview SerializableElement class definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
+import Ajv2020, { Schema } from "ajv/dist/2020";
+import { UnifiedElement } from "./UnifiedElement";
+
+const avg = new Ajv2020();
+const _schema = {
+  $id: "ASSERTABLE",
+  title: "Default Assertable",
+  description: "Default assertable element schema.",
+  type: "object",
+  required: ["uid"],
+  properties: {
+    uid: {
+      title: "uid",
+      description: "Element unique identifier.",
+      type: "string",
+      pattern:
+        "^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]" +
+        "{3}-[0-9a-f]{12})|[0-9]+$",
+    },
+  },
+};
+
+export type ElementSchema = Schema & {
+  required: string[];
+  properties: {
+    [name: string]: {
+      title: string;
+      description: string;
+      type: string;
+      pattern: string;
+    };
+  };
+};
+
+/**
+ * SerializableElement class provides basic interface for the
+ * serialization and assertion for HDML elements.
+ */
+export class SerializableElement extends UnifiedElement {
+  private _schema: ElementSchema;
+
+  /**
+   * Element schema.
+   */
+  public get schema(): ElementSchema {
+    return this._schema;
+  }
+
+  /**
+   * Class constructor.
+   */
+  constructor(schema?: ElementSchema) {
+    super();
+    this._schema = schema || _schema;
+  }
+
+  /**
+   * Asserts appropriate piece of the element's schema and  serialized
+   * value of the element. Classes that extend SerializableElement
+   * should override this method to add assertion of the child element
+   * schema. Must only be called from the #serialize() method.
+   *
+   * @example
+   * ```typescript
+   * import { SerializableElement } from "./SerializableElement";
+   *
+   * class MyClass extends SerializableElement {
+   *   protected assertInternal(data: unknown): unknown {
+   *     // current cluss schema assertions
+   *     return super.assertInternal(data);
+   *   }
+   * }
+   *
+   * @throws
+   */
+  protected assertInternal(data: unknown): unknown {
+    if (!this.schema.properties.uid) {
+      throw new Error(
+        "invalid schema, `uid` property definition is missed",
+      );
+    }
+    if (!~this.schema.required.indexOf("uid")) {
+      throw new Error(
+        "invalid schema, `uid` property should be required",
+      );
+    }
+    if (!avg.validate(this.schema, data)) {
+      throw new Error(
+        `Assertion for the ${
+          this.tagName
+        } component failed. Serialized value:\n${JSON.stringify(
+          data,
+          undefined,
+          2,
+        )}\ndoesn't match to the conponent's schema: ${JSON.stringify(
+          data,
+          undefined,
+          2,
+        )}`,
+      );
+    }
+    return data;
+  }
+
+  /**
+   * Returns element's serialized representation. This method should
+   * be overriden by the child classes to return specific for the
+   * child objects.
+   */
+  protected serializeInternal(): unknown {
+    return { uid: this.uid };
+  }
+
+  /**
+   * Returns element's serialized representation based on the
+   * element's attributes and properties. Throws an Error if
+   * serialized object doesn't match to the element's schema.
+   */
+  public serialize(): unknown {
+    return this.assertInternal(this.serializeInternal());
+  }
+}

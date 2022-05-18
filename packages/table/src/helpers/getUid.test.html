@@ -1,0 +1,45 @@
+<html>
+  <head>
+    <script type="module" src="/bin/table.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      import { getUid } from "./getUid";
+      runTests(async () => {
+        const uid = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
+
+        describe("helpers/getUid", () => {
+          it("getUid() returns unique value", () => {
+            const val1 = getUid();
+            const val2 = getUid();
+            expect(val1).not.to.be.undefined;
+            expect(typeof val1).to.equal("string");
+            expect(uid.test(val1)).to.equal(true);
+            expect(val2).not.to.be.undefined;
+            expect(typeof val2).to.equal("string");
+            expect(uid.test(val2)).to.equal(true);
+            expect(val1 !== val2).to.equal(true);
+          });
+          it("getUid('string') returns unique for the string value", () => {
+            const val1 = getUid("string1");
+            const val2 = getUid("string1");
+            const val3 = getUid("string2");
+            expect(val1).not.to.be.undefined;
+            expect(typeof val1).to.equal("string");
+            expect(uid.test(val1)).to.equal(true);
+            expect(val2).not.to.be.undefined;
+            expect(typeof val2).to.equal("string");
+            expect(uid.test(val2)).to.equal(true);
+            expect(val3).not.to.be.undefined;
+            expect(typeof val3).to.equal("string");
+            expect(uid.test(val3)).to.equal(true);
+            expect(val1 === val2).to.equal(true);
+            expect(val1 !== val3).to.equal(true);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

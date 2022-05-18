@@ -7,7 +7,7 @@
 
 import { LitElement } from "lit";
 import Ajv2020, { Schema } from "ajv/dist/2020";
-import getUid from "../helpers/getUid";
+import { getUid } from "../helpers";
 
 const avg = new Ajv2020();
 

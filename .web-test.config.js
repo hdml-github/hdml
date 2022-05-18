@@ -1,4 +1,5 @@
 const { playwrightLauncher } = require("@web/test-runner-playwright");
+const { esbuildPlugin } = require("@web/dev-server-esbuild");
 
 module.exports = {
   concurrency: 10,
@@ -8,8 +9,16 @@ module.exports = {
   coverage: true,
   coverageConfig: {
     report: true,
-    reportDir: "./coverage"
+    reportDir: "./coverage",
+    // include: ["**/src/**/*.ts"],
+    // exclude: ["**node_modules**"],
   },
+  plugins: [
+    esbuildPlugin({
+      ts: true,
+      tsconfig: "./tsconfig/esm.json",
+    }),
+  ],
   browsers: [
     playwrightLauncher({
       product: "chromium",
