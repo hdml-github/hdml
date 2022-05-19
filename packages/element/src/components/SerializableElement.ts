@@ -10,9 +10,9 @@ import { UnifiedElement } from "./UnifiedElement";
 
 const avg = new Ajv2020();
 const _schema = {
-  $id: "ASSERTABLE",
-  title: "Default Assertable",
-  description: "Default assertable element schema.",
+  $id: "SERIALIZABLE",
+  title: "Serializable Element",
+  description: "Default serializable element schema.",
   type: "object",
   required: ["uid"],
   properties: {
@@ -81,18 +81,21 @@ export class SerializableElement extends UnifiedElement {
    * @throws
    */
   protected assertInternal(data: unknown): unknown {
+    let err = false;
     if (!this.schema.properties.uid) {
-      throw new Error(
+      console.error(
         "invalid schema, `uid` property definition is missed",
       );
+      err = true;
     }
     if (!~this.schema.required.indexOf("uid")) {
-      throw new Error(
+      console.error(
         "invalid schema, `uid` property should be required",
       );
+      err = true;
     }
     if (!avg.validate(this.schema, data)) {
-      throw new Error(
+      console.error(
         `Assertion for the ${
           this.tagName
         } component failed. Serialized value:\n${JSON.stringify(
@@ -105,8 +108,9 @@ export class SerializableElement extends UnifiedElement {
           2,
         )}`,
       );
+      err = true;
     }
-    return data;
+    return err ? false : data;
   }
 
   /**

@@ -12,9 +12,8 @@ const stringsMap: Map<string, string> = new Map();
 
 /**
  * Returns random session unique UUID-like string if `value` is not
- * specified. If string or function will be provided as a `value`
- * returns calculated UUID hash of this string/function, persistent
- * for the session.
+ * specified. If a `string` will be provided as a `value` returns
+ * calculated UUID hash of this string, persistent for the session.
  *
  * @example
  * ```TypeScript

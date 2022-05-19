@@ -19,6 +19,9 @@ export function add(element: UnifiedElement): void {
   elements.set(element.uid, element);
 }
 
+/**
+ * Returns unified element by its unique identifier.
+ */
 export function get(uid: string): UnifiedElement | undefined {
   return elements.get(uid);
 }

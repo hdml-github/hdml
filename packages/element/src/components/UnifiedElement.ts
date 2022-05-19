@@ -6,12 +6,11 @@
  */
 
 import { LitElement } from "lit";
-import { getUid } from "../helpers";
-import { UidElements } from "../services";
+import { Elements, getUid } from "../services";
 
 /**
  * Base class for the HDML elements. Responds for the uniqueness by
- * providing unique identifier (BaseElement#uid) for the component.
+ * providing unique identifier `UnifiedElement.uid` for the component.
  */
 export class UnifiedElement extends LitElement {
   private _uid = getUid();
@@ -35,14 +34,14 @@ export class UnifiedElement extends LitElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    UidElements.add(this);
+    Elements.add(this);
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
-    UidElements.remove(this);
+    Elements.remove(this);
     super.disconnectedCallback();
   }
 }

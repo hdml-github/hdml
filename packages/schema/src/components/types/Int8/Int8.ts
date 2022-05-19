@@ -12,7 +12,7 @@ import Int8Schema from "./Int8.schema";
 /**
  *
  */
-export default class Int8 extends HdmlElement {
+export class Int8 extends HdmlElement {
   /**
    * HDML Int8 field reactive properties.
    */

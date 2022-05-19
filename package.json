@@ -40,17 +40,17 @@
     "typescript": "^4.6.3"
   },
   "scripts": {
-    "dev": "lerna run dev --scope @hdml/table",
-    "lint": "lerna run lint --scope @hdml/table",
-    "docs": "lerna run docs --scope @hdml/table",
-    "compile_asc": "lerna run compile_asc --scope @hdml/table",
-    "compile_cjs": "lerna run compile_cjs --scope @hdml/table",
-    "compile_esm": "lerna run compile_esm --scope @hdml/table",
-    "compile_dts": "lerna run compile_dts --scope @hdml/table",
-    "compile_bin": "lerna run compile_bin --scope @hdml/table",
-    "compile_dev": "lerna run compile_dev --scope @hdml/table",
-    "compile_all": "lerna run compile_all --scope @hdml/table",
-    "test": "lerna run test --scope @hdml/table",
-    "build": "lerna run build --scope @hdml/table"
+    "dev": "lerna run dev --scope @hdml/element",
+    "lint": "lerna run lint --scope @hdml/element",
+    "docs": "lerna run docs --scope @hdml/element",
+    "compile_asc": "lerna run compile_asc --scope @hdml/element",
+    "compile_cjs": "lerna run compile_cjs --scope @hdml/element",
+    "compile_esm": "lerna run compile_esm --scope @hdml/element",
+    "compile_dts": "lerna run compile_dts --scope @hdml/element",
+    "compile_bin": "lerna run compile_bin --scope @hdml/element",
+    "compile_dev": "lerna run compile_dev --scope @hdml/element",
+    "compile_all": "lerna run compile_all --scope @hdml/element",
+    "test": "lerna run test --scope @hdml/element",
+    "build": "lerna run build --scope @hdml/element"
   }
 }

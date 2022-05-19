@@ -11,9 +11,9 @@ import {
 } from "./SerializableElement";
 
 const _schema = {
-  $id: "INT-8",
-  title: "INT-8",
-  description: "HDML table INT-8 field component.",
+  $id: "NAMED",
+  title: "Named Element",
+  description: "Default named element schema.",
   type: "object",
   required: ["uid", "name"],
   properties: {
@@ -40,6 +40,40 @@ const _schema = {
  */
 export class NamedElement extends SerializableElement {
   /**
+   * NamedElement reactive attributes.
+   */
+  public static properties = {
+    /**
+     * Element name.
+     */
+    name: {
+      type: String,
+      attribute: true,
+      reflect: true,
+      noAccessor: false,
+      state: false,
+    },
+  };
+
+  private _name: null | string = null;
+
+  /**
+   * Element name setter.
+   */
+  public set name(val: null | string) {
+    const old = this._name;
+    this._name = val;
+    this.requestUpdate("name", old);
+  }
+
+  /**
+   * Element name getter.
+   */
+  public get name(): null | string {
+    return this._name;
+  }
+
+  /**
    * Class constructor.
    */
   constructor(schema?: ElementSchema) {
@@ -50,16 +84,19 @@ export class NamedElement extends SerializableElement {
    * @override
    */
   protected assertInternal(data: unknown): unknown {
+    let err = false;
     if (!this.schema.properties.name) {
-      throw new Error(
-        "invalid schema, `name` property definition is missed",
+      console.error(
+        `invalid schema, "name" property definition is missed`,
       );
+      err = true;
     }
     if (!~this.schema.required.indexOf("uid")) {
-      throw new Error(
-        "invalid schema, `name` property should be required",
+      console.error(
+        `invalid schema, "name" property should be required`,
       );
+      err = true;
     }
-    return super.assertInternal(data);
+    return err ? false : super.assertInternal(data);
   }
 }
