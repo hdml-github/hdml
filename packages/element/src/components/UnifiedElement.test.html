@@ -13,8 +13,8 @@
       const UID = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
       
       runTests(async () => {
-        describe("getUid", () => {
-          it("getUid() returns unique value", () => {
+        describe("getUid function", () => {
+          it("returns unique value when it called without argument", () => {
             const val1 = getUid();
             const val2 = getUid();
             expect(val1).not.to.be.undefined;
@@ -26,7 +26,7 @@
             expect(val1 !== val2).to.equal(true);
           });
 
-          it("getUid('string') returns unique for the string value", () => {
+          it("returns valid constant token when it called with the string argument", () => {
             const val1 = getUid("string1");
             const val2 = getUid("string1");
             const val3 = getUid("string2");
@@ -63,7 +63,7 @@
               element = null;
             });
 
-            it("default values", () => {
+            it("must have a valid default values", () => {
               expect(
                 element.nodeType,
                 "node type",
@@ -86,7 +86,7 @@
               ).to.be.true;
             });
 
-            it("Elements service", () => {
+            it("must be accessable by the getElementByUid when it connected to the DOM-tree", () => {
               expect(
                 getElementByUid(element.uid),
                 "element added to the register"

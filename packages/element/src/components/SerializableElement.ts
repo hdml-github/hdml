@@ -27,6 +27,9 @@ const _schema = {
   },
 };
 
+/**
+ * Serializable element JSON-schema type.
+ */
 export type ElementSchema = Schema & {
   required: string[];
   properties: {
@@ -103,7 +106,7 @@ export class SerializableElement extends UnifiedElement {
           undefined,
           2,
         )}\ndoesn't match to the conponent's schema: ${JSON.stringify(
-          data,
+          this.schema,
           undefined,
           2,
         )}`,

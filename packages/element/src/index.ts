@@ -7,10 +7,20 @@
 
 import { Elements, getUid } from "./services/index";
 import { UnifiedElement } from "./components/UnifiedElement";
+import {
+  SerializableElement,
+  ElementSchema,
+} from "./components/SerializableElement";
 
 /**
  * Returns unified element by its unique identifier `element.uid`.
  */
 const getElementByUid = Elements.get;
 
-export { UnifiedElement, getUid, getElementByUid };
+export {
+  UnifiedElement,
+  SerializableElement,
+  ElementSchema,
+  getUid,
+  getElementByUid,
+};

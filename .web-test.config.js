@@ -4,7 +4,7 @@ const { esbuildPlugin } = require("@web/dev-server-esbuild");
 module.exports = {
   concurrency: 10,
   nodeResolve: {
-    exportConditions: ['development'],
+    exportConditions: ["development"],
   },
   coverage: true,
   coverageConfig: {
@@ -19,6 +19,7 @@ module.exports = {
       tsconfig: "./tsconfig/esm.json",
     }),
   ],
+  browserLogs: false,
   browsers: [
     playwrightLauncher({
       product: "chromium",
