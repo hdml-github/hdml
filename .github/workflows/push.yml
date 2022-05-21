@@ -28,7 +28,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
     steps:
       - name: Checkout
@@ -39,8 +39,8 @@ jobs:
           node-version: 16
       - name: Install development dependencies
         run: npm ci
-      - name: Install Playwright dependencies
-        run: npm i -D @playwright/test && npx playwright install
+      # - name: Install Playwright dependencies
+      #   run: npm i -D @playwright/test && npx playwright install
       - name: Bootstrap project
         run: lerna bootstrap
       - name: Build project
