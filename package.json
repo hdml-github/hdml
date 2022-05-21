@@ -41,17 +41,19 @@
     "typescript": "^4.6.3"
   },
   "scripts": {
-    "dev": "lerna run dev --scope @hdml/element",
-    "lint": "lerna run lint --scope @hdml/element",
-    "docs": "lerna run docs --scope @hdml/element",
-    "compile_asc": "lerna run compile_asc --scope @hdml/element",
-    "compile_cjs": "lerna run compile_cjs --scope @hdml/element",
-    "compile_esm": "lerna run compile_esm --scope @hdml/element",
-    "compile_dts": "lerna run compile_dts --scope @hdml/element",
-    "compile_bin": "lerna run compile_bin --scope @hdml/element",
-    "compile_dev": "lerna run compile_dev --scope @hdml/element",
-    "compile_all": "lerna run compile_all --scope @hdml/element",
-    "test": "lerna run test --scope @hdml/element",
-    "build": "lerna run build --scope @hdml/element"
+    "dev": "lerna run dev",
+    "lint": "lerna run lint",
+    "docs": "lerna run docs",
+    "compile_asc": "lerna run compile_asc",
+    "compile_cjs": "lerna run compile_cjs",
+    "compile_esm": "lerna run compile_esm",
+    "compile_dts": "lerna run compile_dts",
+    "compile_bin": "lerna run compile_bin",
+    "compile_dev": "lerna run compile_dev",
+    "compile_all": "lerna run compile_all",
+    "test": "lerna run test",
+    "test_dbg": "lerna run test_dbg",
+    "clear": "lerna run clear",
+    "build": "lerna run build"
   }
 }
