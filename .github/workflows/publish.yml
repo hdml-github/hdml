@@ -26,9 +26,7 @@ jobs:
         run: lerna bootstrap
       - name: Build project
         run: npm run build
-      - name: Configure project registry
-        run: echo https://registry.npmjs.org/:_authToken=$NPM_TOKEN > ~/.npmrc
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish project
-        run: lerna publish from-package --yes
+        run: lerna publish from-package --yes --no-verify-access
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
