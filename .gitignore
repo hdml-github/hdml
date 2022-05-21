@@ -1,12 +1,13 @@
 /integration/videos
 /integration/screenshots
+/packages_/
 /packages/**/cert
 /packages/**/coverage
 /packages/**/docs
 /packages/**/flatc/flatc
 /packages/**/wasm
 /packages/**/build
-/packages/**/bundle
+/packages/**/bin
 /packages/**/cjs
 /packages/**/dts
 /packages/**/es5

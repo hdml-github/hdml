@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+  <script src="/bin/element.min.js"></script>
+  <script>
+    const hdml = window['@hdml/element'];
+    customElements.define("unified-element", hdml.UnifiedElement);
+    customElements.define("serializable-element", hdml.SerializableElement);
+    customElements.define("named-element", hdml.NamedElement);
+  </script>
+</head>
+<html>
+  <body>
+    <unified-element></unified-element>
+    <serializable-element></serializable-element>
+    <named-element></named-element>
+    <named-element name="abc"></named-element>
+    <named-element name=" a b c "></named-element>
+  </body>
+</html>
