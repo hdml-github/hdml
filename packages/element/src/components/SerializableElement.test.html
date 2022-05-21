@@ -9,6 +9,7 @@
       import { createSandbox } from "sinon/pkg/sinon-esm.js";
 
       const SerializableElement = window['@hdml/element'].SerializableElement;
+      const serializableElementSchema = window['@hdml/element'].serializableElementSchema;
 
       runTests(async () => {
         describe("SerializableElement class", () => {
@@ -48,9 +49,9 @@
                 "schema property defined",
               ).not.to.be.undefined;
               expect(
-                typeof element.schema,
+                element.schema,
                 "schema property is an object",
-              ).to.equal("object");
+              ).to.deep.equal(serializableElementSchema);
             });
 
             it("must to be serializable by the default", () => {
@@ -73,27 +74,16 @@
         describe("InvalidElement class 1", () => {
           const sandbox = createSandbox();
           const _schema = {
+            ...serializableElementSchema,
             $id: "INVALID 1",
-            title: "Serializable Element",
-            description: "Default serializable element schema.",
-            type: "object",
             required: [],
-            properties: {
-              uid: {
-                title: "uid",
-                description: "Element unique identifier.",
-                type: "string",
-                pattern:
-                  "^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]" +
-                  "{3}-[0-9a-f]{12})|[0-9]+$",
-              },
-            },
           };
           class InvalidElement extends SerializableElement {
             constructor() {
               super(_schema);
             }
           }
+          
           before(async () => {
             customElements.define("invalid-element", InvalidElement);
             await customElements.whenDefined("invalid-element");
@@ -169,11 +159,8 @@
         describe("InvalidElement class 2", () => {
           const sandbox = createSandbox();
           const _schema = {
+            ...serializableElementSchema,
             $id: "INVALID 2",
-            title: "Serializable Element",
-            description: "Default serializable element schema.",
-            type: "object",
-            required: ["uid"],
             properties: {},
           };
           class InvalidElement extends SerializableElement {
@@ -257,20 +244,11 @@
         describe("ValidElement class", () => {
           const sandbox = createSandbox();
           const _schema = {
+            ...serializableElementSchema,
             $id: "VALID",
-            title: "Serializable Element",
-            description: "Default serializable element schema.",
-            type: "object",
-            required: ["uid", "test"],
+            required: [...serializableElementSchema.required, "test"],
             properties: {
-              uid: {
-                title: "uid",
-                description: "Element unique identifier.",
-                type: "string",
-                pattern:
-                  "^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]" +
-                  "{3}-[0-9a-f]{12})|[0-9]+$",
-              },
+              ...serializableElementSchema.properties,
               test: {
                 type: "string",
               },
@@ -354,7 +332,7 @@
                   { uid: element.uid },
                   undefined,
                   2,
-                )}\ndoesn't match to the conponent's schema: ${JSON.stringify(
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
                   _schema,
                   undefined,
                   2,
@@ -370,7 +348,7 @@
                   { uid: element.uid },
                   undefined,
                   2,
-                )}\ndoesn't match to the conponent's schema: ${JSON.stringify(
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
                   _schema,
                   undefined,
                   2,

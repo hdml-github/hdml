@@ -1,5 +1,6 @@
 /**
- * @fileoverview NamedElement class definition.
+ * @fileoverview `NamedElement` class definition, `namedElementSchema`
+ * definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -8,23 +9,20 @@
 import {
   SerializableElement,
   ElementSchema,
+  serializableElementSchema,
 } from "./SerializableElement";
 
-const _schema = {
+/**
+ * Named `hdml` element default `json-schema`.
+ */
+export const namedElementSchema = {
+  ...serializableElementSchema,
   $id: "NAMED",
   title: "Named Element",
   description: "Default named element schema.",
-  type: "object",
-  required: ["uid", "name"],
+  required: [...serializableElementSchema.required, "name"],
   properties: {
-    uid: {
-      title: "uid",
-      description: "HDML table field unique identifier.",
-      type: "string",
-      pattern:
-        "^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]" +
-        "{3}-[0-9a-f]{12})|[0-9]+$",
-    },
+    ...serializableElementSchema.properties,
     name: {
       title: "name",
       description: "Field name.",
@@ -35,16 +33,16 @@ const _schema = {
 };
 
 /**
- * NamedElement class provides a logic to deal with the name attribute
- * and ptoperty.
+ * `NamedElement` class provides a logic to deal with the `name`
+ * attribute and ptoperty.
  */
 export class NamedElement extends SerializableElement {
   /**
-   * NamedElement reactive attributes.
+   * `NamedElement` reactive attributes.
    */
   public static properties = {
     /**
-     * Element name.
+     * `hdml` element `name` attribtue.
      */
     name: {
       type: String,
@@ -55,21 +53,21 @@ export class NamedElement extends SerializableElement {
     },
   };
 
-  private _name: null | string = null;
+  private _name = "";
 
   /**
-   * Element name setter.
+   * `hdml` element `name` setter.
    */
-  public set name(val: null | string) {
+  public set name(val: string) {
     const old = this._name;
     this._name = val;
     this.requestUpdate("name", old);
   }
 
   /**
-   * Element name getter.
+   * `hdml` element `name` getter.
    */
-  public get name(): null | string {
+  public get name(): string {
     return this._name;
   }
 
@@ -77,7 +75,7 @@ export class NamedElement extends SerializableElement {
    * Class constructor.
    */
   constructor(schema?: ElementSchema) {
-    super(schema || _schema);
+    super(schema || namedElementSchema);
   }
 
   /**
@@ -87,16 +85,33 @@ export class NamedElement extends SerializableElement {
     let err = false;
     if (!this.schema.properties.name) {
       console.error(
-        `invalid schema, "name" property definition is missed`,
+        "invalid schema, `name` property definition is missed",
       );
       err = true;
     }
-    if (!~this.schema.required.indexOf("uid")) {
+    if (!~this.schema.required.indexOf("name")) {
       console.error(
-        `invalid schema, "name" property should be required`,
+        "invalid schema, `name` property should be required",
       );
       err = true;
     }
     return err ? false : super.assertInternal(data);
+  }
+
+  /**
+   * @override
+   */
+  protected serializeInternal(): unknown {
+    return { uid: this.uid, name: this.name };
+  }
+
+  /**
+   * @override
+   */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    if (!this.getAttribute("name")) {
+      console.warn("`name` attribute is required for:", this);
+    }
   }
 }

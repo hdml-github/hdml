@@ -1,0 +1,412 @@
+<html>
+  <head>
+    <script type="module" src="/bin/element.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      import { createSandbox } from "sinon/pkg/sinon-esm.js";
+
+      const NamedElement = window['@hdml/element'].NamedElement;
+      const namedElementSchema = window['@hdml/element'].namedElementSchema;
+
+      runTests(async () => {
+        describe("NamedElement class", () => {
+          before(async () => {
+            customElements.define("named-element", NamedElement);
+            await customElements.whenDefined("named-element");
+          });
+
+          describe("<named-element/>", () => {
+            const sandbox = createSandbox();
+            let element;
+
+            beforeEach(() => {
+              sandbox.spy(console, "warn");
+              sandbox.spy(console, "error");
+              window.document.body.innerHTML = `<named-element/>`;
+              element = document.querySelector("named-element");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+              element.remove();
+              element = null;
+            });
+
+            it("must have a valid default values", () => {
+              expect(
+                element.nodeType,
+                "node type",
+              ).to.equal(1);
+              expect(
+                element.tagName,
+                "tag name",
+              ).to.equal("NAMED-ELEMENT");
+              expect(
+                element.outerHTML,
+                "outer html",
+              ).to.equal("<named-element></named-element>");
+              expect(
+                element.getAttribute("name"),
+                "name attribute",
+              ).to.equal(null);
+              expect(
+                element.name,
+                "name property",
+              ).to.equal("");
+            });
+
+            it("must warn", () => {
+              expect(
+                console.warn.calledOnce,
+                "warn consoled"
+              ).to.be.true;
+              expect(
+                console.warn.getCall(0).args[0],
+                "warn message"
+              ).to.equal(
+                "`name` attribute is required for:"
+              );
+              expect(
+                console.warn.getCall(0).args[1],
+                "warn element"
+              ).to.equal(element);
+            });
+
+            it("must not to be serializable", () => {
+              expect(
+                () => {element.serialize()},
+                "serialize not throw",
+              ).not.to.throw();
+              expect(
+                element.serialize(),
+                "serialize returns false value",
+              ).to.equal(false);
+              expect(
+                console.error.calledTwice,
+                "error consoled twice"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                `Assertion for the ${
+                  element.tagName
+                } component failed. Serialized value:\n${JSON.stringify(
+                  { uid: element.uid, name: element.name },
+                  undefined,
+                  2,
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
+                  element.schema,
+                  undefined,
+                  2,
+                )}`,
+              );
+              expect(
+                console.error.getCall(1).args[0],
+                "error message"
+              ).to.equal(
+                `Assertion for the ${
+                  element.tagName
+                } component failed. Serialized value:\n${JSON.stringify(
+                  { uid: element.uid, name: element.name },
+                  undefined,
+                  2,
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
+                  element.schema,
+                  undefined,
+                  2,
+                )}`,
+              );
+            });
+          });
+          
+          describe("<named-element name=\" invalid name \"/>", () => {
+            const sandbox = createSandbox();
+            let element;
+
+            beforeEach(() => {
+              sandbox.spy(console, "warn");
+              sandbox.spy(console, "error");
+              window.document.body.innerHTML = `<named-element name=" invalid name "/>`;
+              element = document.querySelector("named-element");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+              element.remove();
+              element = null;
+            });
+
+            it("must have a valid default values", () => {
+              expect(
+                element.nodeType,
+                "node type",
+              ).to.equal(1);
+              expect(
+                element.tagName,
+                "tag name",
+              ).to.equal("NAMED-ELEMENT");
+              expect(
+                element.outerHTML,
+                "outer html",
+              ).to.equal("<named-element name=\" invalid name \"></named-element>");
+              expect(
+                element.getAttribute("name"),
+                "name attribute",
+              ).to.equal(" invalid name ");
+              expect(
+                element.name,
+                "name property",
+              ).to.equal(" invalid name ");
+            });
+
+            it("must not to warn", () => {
+              expect(
+                console.warn.called,
+                "no warns"
+              ).to.be.false;
+            });
+
+            it("must not to be serializable", () => {
+              expect(
+                () => {element.serialize()},
+                "serialize not throw",
+              ).not.to.throw();
+              expect(
+                element.serialize(),
+                "serialize returns false value",
+              ).to.equal(false);
+              expect(
+                console.error.calledTwice,
+                "error consoled twice"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                `Assertion for the ${
+                  element.tagName
+                } component failed. Serialized value:\n${JSON.stringify(
+                  { uid: element.uid, name: element.name },
+                  undefined,
+                  2,
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
+                  element.schema,
+                  undefined,
+                  2,
+                )}`,
+              );
+              expect(
+                console.error.getCall(1).args[0],
+                "error message"
+              ).to.equal(
+                `Assertion for the ${
+                  element.tagName
+                } component failed. Serialized value:\n${JSON.stringify(
+                  { uid: element.uid, name: element.name },
+                  undefined,
+                  2,
+                )}\ndoesn't match to the conponent's schema:\n${JSON.stringify(
+                  element.schema,
+                  undefined,
+                  2,
+                )}`,
+              );
+            });
+          });
+
+          describe("<named-element name=\"valid_name\"/>", () => {
+            const sandbox = createSandbox();
+            let element;
+
+            beforeEach(() => {
+              sandbox.spy(console, "warn");
+              sandbox.spy(console, "error");
+              window.document.body.innerHTML = `<named-element name="valid_name"/>`;
+              element = document.querySelector("named-element");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+              element.remove();
+              element = null;
+            });
+
+            it("must have a valid default values", () => {
+              expect(
+                element.nodeType,
+                "node type",
+              ).to.equal(1);
+              expect(
+                element.tagName,
+                "tag name",
+              ).to.equal("NAMED-ELEMENT");
+              expect(
+                element.outerHTML,
+                "outer html",
+              ).to.equal("<named-element name=\"valid_name\"></named-element>");
+              expect(
+                element.getAttribute("name"),
+                "name attribute",
+              ).to.equal("valid_name");
+              expect(
+                element.name,
+                "name property",
+              ).to.equal("valid_name");
+            });
+
+            it("must not to warn", () => {
+              expect(
+                console.warn.called,
+                "no warns"
+              ).to.be.false;
+            });
+
+            it("must to be serializable", () => {
+              expect(
+                () => {element.serialize()},
+                "serialize not throw",
+              ).not.to.throw();
+              expect(
+                element.serialize(),
+                "serialize returns valid value",
+              ).to.deep.equal({
+                uid: element.uid,
+                name: element.name,
+              });
+            });
+          });
+        });
+
+        describe("InvalidElement class 1", () => {
+          const sandbox = createSandbox();
+          const _schema = {
+            ...namedElementSchema,
+            $id: "INVALID-1",
+            required: ["uid"],
+          };
+          class InvalidElement extends NamedElement {
+            constructor() {
+              super(_schema);
+            }
+          }
+
+          before(async () => {
+            customElements.define("invalid-element-1", InvalidElement);
+            await customElements.whenDefined("invalid-element-1");
+          });
+
+          describe("<invalid-element-1/>", () => {
+            let element;
+
+            beforeEach(() => {
+              sandbox.spy(console, "error");
+              window.document.body.innerHTML = `<invalid-element-1/>`;
+              element = document.querySelector("invalid-element-1");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+              element.remove();
+              element = null;
+            });
+
+            it("must not to be serializable", () => {
+              expect(
+                () => {element.serialize()},
+                "serialize not throw",
+              ).not.to.throw();
+              expect(
+                element.serialize(),
+                "serialize returns false value",
+              ).to.equal(false);
+              expect(
+                console.error.calledTwice,
+                "error consoled twice"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                "invalid schema, `name` property should be required"
+              );
+              expect(
+                console.error.getCall(1).args[0],
+                "error message"
+              ).to.equal(
+                "invalid schema, `name` property should be required"
+              );
+            });
+          });
+        });
+
+        describe("InvalidElement class 2", () => {
+          const sandbox = createSandbox();
+          const _schema = {
+            ...namedElementSchema,
+            $id: "INVALID 2",
+            properties: {
+              uid: namedElementSchema.properties.uid,
+            },
+          };
+          class InvalidElement extends NamedElement {
+            constructor() {
+              super(_schema);
+            }
+          }
+
+          before(async () => {
+            customElements.define("invalid-element-2", InvalidElement);
+            await customElements.whenDefined("invalid-element-2");
+          });
+
+          describe("<invalid-element-2/>", () => {
+            let element;
+
+            beforeEach(() => {
+              sandbox.spy(console, "error");
+              window.document.body.innerHTML = `<invalid-element-2/>`;
+              element = document.querySelector("invalid-element-2");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+              element.remove();
+              element = null;
+            });
+
+            it("must not to be serializable", () => {
+              expect(
+                () => {element.serialize()},
+                "serialize not throw",
+              ).not.to.throw();
+              expect(
+                element.serialize(),
+                "serialize returns false value",
+              ).to.equal(false);
+              expect(
+                console.error.calledTwice,
+                "error consoled twice"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                "invalid schema, `name` property definition is missed"
+              );
+              expect(
+                console.error.getCall(1).args[0],
+                "error message"
+              ).to.equal(
+                "invalid schema, `name` property definition is missed"
+              );
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

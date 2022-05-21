@@ -1,5 +1,7 @@
 /**
- * @fileoverview SerializableElement class definition.
+ * @fileoverview `SerializableElement` class definition,
+ * `ElementSchema` type definition, `serializableElementSchema`
+ * definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -9,7 +11,11 @@ import Ajv2020, { Schema } from "ajv/dist/2020";
 import { UnifiedElement } from "./UnifiedElement";
 
 const avg = new Ajv2020();
-const _schema = {
+
+/**
+ * Serializable `hdml` element default `json-schema`.
+ */
+export const serializableElementSchema = {
   $id: "SERIALIZABLE",
   title: "Serializable Element",
   description: "Default serializable element schema.",
@@ -28,7 +34,7 @@ const _schema = {
 };
 
 /**
- * Serializable element JSON-schema type.
+ * Serializable element `json-schema` type.
  */
 export type ElementSchema = Schema & {
   required: string[];
@@ -43,14 +49,14 @@ export type ElementSchema = Schema & {
 };
 
 /**
- * SerializableElement class provides basic interface for the
- * serialization and assertion for HDML elements.
+ * `SerializableElement` class provides basic interface for the
+ * serialization and assertion of the `hdml` element.
  */
 export class SerializableElement extends UnifiedElement {
   private _schema: ElementSchema;
 
   /**
-   * Element schema.
+   * Element `json-schema` getter.
    */
   public get schema(): ElementSchema {
     return this._schema;
@@ -61,14 +67,14 @@ export class SerializableElement extends UnifiedElement {
    */
   constructor(schema?: ElementSchema) {
     super();
-    this._schema = schema || _schema;
+    this._schema = schema || serializableElementSchema;
   }
 
   /**
    * Asserts appropriate piece of the element's schema and  serialized
-   * value of the element. Classes that extend SerializableElement
+   * value of the element. Classes that extend `SerializableElement`
    * should override this method to add assertion of the child element
-   * schema. Must only be called from the #serialize() method.
+   * schema. Must only be called from the `serialize` method.
    *
    * @example
    * ```typescript
@@ -105,11 +111,9 @@ export class SerializableElement extends UnifiedElement {
           data,
           undefined,
           2,
-        )}\ndoesn't match to the conponent's schema: ${JSON.stringify(
-          this.schema,
-          undefined,
-          2,
-        )}`,
+          // eslint-disable-next-line prettier/prettier
+        )}\ndoesn't match to the conponent's schema:\n${
+          JSON.stringify(this.schema, undefined, 2)}`,
       );
       err = true;
     }
