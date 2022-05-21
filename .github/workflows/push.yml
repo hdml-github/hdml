@@ -39,7 +39,9 @@ jobs:
           node-version: 16
       - name: Install development dependencies
         run: npm ci
-      - name: Bootstrap packages
+      - name: Install Playwright dependencies
+        run: npm i -D @playwright/test && npx playwright install
+      - name: Bootstrap project
         run: lerna bootstrap
       - name: Build project
         run: npm run build
