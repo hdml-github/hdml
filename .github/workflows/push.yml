@@ -1,0 +1,45 @@
+name: Push and PR to master
+
+on:
+  push:
+    paths:
+      - '.github/workflows/push.yml'
+      - 'packages/**'
+      - '.eslintrc.js'
+      - '.rollup.config.js'
+      - '.web-test.config.js'
+      - 'lerna.json'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'README.md'
+    branches:
+      - 'master'
+  pull_request:
+    paths:
+      - '.github/workflows/push.yml'
+      - 'packages/**'
+      - '.eslintrc.js'
+      - '.rollup.config.js'
+      - '.web-test.config.js'
+      - 'lerna.json'
+      - 'package-lock.json'
+      - 'package.json'
+      - 'README.md'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install development dependencies
+        run: npm ci
+      - name: Bootstrap packages
+        run: lerna bootstrap
+      - name: Build project
+        run: npm run build
