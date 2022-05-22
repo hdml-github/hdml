@@ -1,7 +1,6 @@
 /coverage
 /docs
-/lib/tsconfig
-/lib/tst
+/tsconfig
 /src
 /tsconfig
 .eslintrc.js
@@ -9,4 +8,5 @@
 .npmignore
 .prettierrc.js
 .travis.yml
+index.html
 tsconfig.json
