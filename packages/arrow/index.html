@@ -3,8 +3,48 @@
   <head>
     <script src="/bin/arrow.min.js"></script>
     <script>
-      const hdml = window['@hdml/arrow'];
-      console.log(JSON.stringify(Object.keys(hdml), undefined, 2));
+      const {
+        Table,
+        Schema,
+        Field,
+        Data,
+        StructRow,
+        RecordBatch,
+        Int8,
+        makeBuilder,
+        tableFromJSON
+      } = window["@hdml/arrow"];
+
+      window.field = Field.new({
+        metadata: new Map([["field-key", "field-value"]]),
+        name: "field_1",
+        nullable: true,
+        type: new Int8(),
+      });
+      window.schema = new Schema(
+        [
+          window.field,
+        ],
+        new Map([["schema-key", "schema-value"]]),
+        null, // dictionaries
+      );
+      window.table1 = new Table(schema);
+      // window.builder = makeBuilder({
+      //   type: new Int8(),
+      //   nullValues: [null]
+      // });
+      // window.builder
+      //   .append(1)
+      //   .append(2)
+      //   .append(3)
+      //   .append(null);
+      // window.vector = window.builder.finish().toVector();
+      window.table2 = tableFromJSON([
+        { 'field_1': 1 },
+        { 'field_1': 2 },
+        { 'field_1': null }
+      ]);
+      console.log(RecordBatch);
     </script>
   </head>
   <body></body>

@@ -7,7 +7,7 @@
     "access": "public"
   },
   "dependencies": {
-    "apache-arrow": "^7.0.0"
+    "apache-arrow": "^8.0.0"
   },
   "scripts": {
     "dev": "../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open ./index.html",
