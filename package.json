@@ -54,6 +54,7 @@
     "test": "lerna run test",
     "test_dbg": "lerna run test_dbg",
     "clear": "lerna run clear",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "version": "lerna version"
   }
 }
