@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/database.min.js"></script>
+    <script>
+      const { arrow, perspective } = window["@hdml/database"];
+      const {
+        makeTable,
+        makeData,
+        RecordBatchWriter,
+        RecordBatchReader,
+        tableToIPC,
+        makeBuilder,
+        Builder,
+        Int8,
+        Uint16,
+        Int64,
+        Utf8,
+        Field,
+        Schema,
+        Data,
+        Table,
+        Struct,
+        RecordBatch,
+        tableFromIPC,
+      } = arrow;
+
+      async function start1() {
+        data = makeTable({ field_1: new Int8Array([null, 1, 2, 3]) })
+
+        writer = new RecordBatchWriter();
+        writer
+          .reset(undefined, data.schema)
+          .write(data);
+        buffer = writer.toUint8Array(true).buffer;
+        writer.close();
+
+        worker = perspective.worker();
+        table = await worker.table(buffer);
+        view = await table.view({ columns: ["field_1"] });
+      }
+      
+      async function start2() {
+        worker = perspective.worker();
+        data = makeTable({ field_1: new Int8Array([null, 1, 2, 3]) });
+        table = await worker.table(tableToIPC(data).buffer);
+        view = await table.view({ columns: ["field_1"] });
+      }
+      
+      async function start3() {
+        // TODO: https://github.com/trxcllnt/csv-to-arrow-js/blob/master/index.js
+
+        builder = makeBuilder({
+          type: new Int64(),
+          nullValues: [null, undefined],
+        });
+
+        builder
+          .append(0n)
+          .append(1n)
+          .append(2n)
+          .append(undefined)
+          .append(null);
+
+        vector = builder.toVector();
+
+        data = new Table([{ field_1: vector, field_2: vector }]);
+
+        worker = perspective.worker();
+        table = await worker.table(tableToIPC(data).buffer);
+        view = await table.view({ columns: ["field_1"] });
+        
+        subbuffer = await view.to_arrow();
+        subdata = tableFromIPC(subbuffer);
+      }
+      
+      start3();
+    </script>
+  </head>
+  <body></body>
+</html>

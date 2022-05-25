@@ -1,14 +1,14 @@
-# @hdml/arrow
+# @hdml/database
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Overview
 
-Re-export of the `Apache Arrow` library.
+Re-export of `@finos/perspective` and `apache-arrow` libraries.
 
 ## Packaging
 
-`@hdml/arrow` is written in `TypeScript`, and compiled to `ESM` and `CommonJS` module formats and `UMD` bundle. It also provide `*.d.ts` types definitions.
+`@hdml/database` is written in `TypeScript`, and compiled to `ESM` and `CommonJS` module formats and `UMD` bundle. It also provide `*.d.ts` types definitions.
 
 ## Supported Browsers and Platforms
 
