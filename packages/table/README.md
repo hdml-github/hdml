@@ -1,0 +1,13 @@
+# @hdml/table
+
+[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+
+## Overview
+
+## Packaging
+
+`@hdml/table` is written in `TypeScript`, and compiled to `ESM` and `CommonJS` module formats and `UMD` bundle. It also provide `*.d.ts` types definitions.
+
+## Supported Browsers and Platforms
+
+The bundles we compile support moderns browser (`Firefox`, `Chrome`, `Edge`, and `Safari`) and tested via `playwright`. We do not support `Internet Explorer` and `Node`.

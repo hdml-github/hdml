@@ -48,7 +48,7 @@ export class NamedElement extends SerializableElement {
       type: String,
       attribute: true,
       reflect: true,
-      noAccessor: false,
+      noAccessor: true,
       state: false,
     },
   };

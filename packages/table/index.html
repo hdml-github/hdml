@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/table.min.js"></script>
+    <script>
+      const hdml = window['@hdml/table'];
+      customElements.define("data-field", hdml.DataField);
+    </script>
+  </head>
+    <body>
+      <data-field
+        name="field"
+        type="decimal">
+      </data-field>
+    </body>
+</html>

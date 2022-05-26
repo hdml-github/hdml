@@ -7,151 +7,33 @@
     </script>
   </head>
   <body>
-
-    <!-- Schema -->
     <hdml-schema
-      name="schema_name">
+      name="daily_data"
+      index="product">
 
-      <!-- Columns -->
-      <data-columns>
+      <data-field
+        name="product"
+        type="utf-8">
+      </data-field>
 
-        <!-- int -->
-        <int-8
-          name="field_2"
-          nullable
-          null-values="null, undefined, 'n/a'">
-        </int-8>
+      <data-field
+        name="order_date"
+        type="timestamp"
+        unit="millisecond"
+        timezone="+02:00"
+        nullable="null, undefined, 'n/a'">
+      </data-field>
 
-        <int-16
-          name="field_2"
-          nullable>
-        </int-16>
+      <data-field
+        name="total_profit"
+        type="float-32">
+      </data-field>
 
-        <int-32
-          name="field_2"
-          nullable>
-        </int-32>
+      <data-field
+        name="quantity"
+        type="int-16">
+      </data-field>
 
-        <int-64
-          name="field_2"
-          nullable>
-        </int-64>
-
-        <!-- uint -->
-        <uint-8
-          name="field_3"
-          nullable>
-        </uint-8>
-        
-        <uint-16
-          name="field_3"
-          nullable>
-        </uint-16>
-
-        <uint-32
-          name="field_3"
-          nullable>
-        </uint-32>
-
-        <uint-64
-          name="field_3"
-          nullable>
-        </uint-64>
-
-        <!-- float -->
-        <float-16
-          name="field_4"
-          nullable>
-        </float-16>
-
-        <float-32
-          name="field_5"
-          nullable>
-        </float-32>
-
-        <float-64
-          name="field_6"
-          nullable>
-        </float-64>
-
-        <!-- decimal -->
-        <decimal-128
-          name="field_7"
-          nullable
-          precision="38"
-          scale="4">
-        </decimal-128>
-
-        <decimal-256
-          name="field_8"
-          nullable
-          precision="39"
-          scale="4">
-        </decimal-256>
-
-        <!-- date -->
-        <date-32
-          name="field_9"
-          nullable>
-        </date-32>
-
-        <date-64
-          name="field_10"
-          nullable>
-        </date-64>
-
-        <!-- time -->
-        <time-32
-          name="field_11"
-          nullable
-          unit="second">
-        </time-32>
-
-        <time-32
-          name="field_12"
-          nullable
-          unit="millisecond">
-        </time-32>
-
-        <time-64
-          name="field_13"
-          nullable
-          unit="microsecond">
-        </time-64>
-
-        <time-64
-          name="field_14"
-          nullable
-          unit="nanosecond">
-        </time-64>
-
-        <time-stamp
-          name="field_15"
-          nullable
-          unit="millisecond"
-          timezone="+02:00">
-        </time-stamp>
-
-        <!-- data -->
-        <bit-data
-          name="field_1"
-          nullable>
-        </bit-data>
-
-        <utf8-data
-          name="field_16"
-          nullable
-          large>
-        </utf8-data>
-
-        <binary-data
-          name="field_17"
-          nullable
-          large>
-        </binary-data>
-      </data-columns>
-
-      <!-- Metadata -->
     </hdml-schema>
   </body>
 </html>

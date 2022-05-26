@@ -12,8 +12,12 @@
         tableToIPC,
         makeBuilder,
         Builder,
+        DataType,
         Int8,
         Uint16,
+        Float32,
+        Float64,
+        Decimal,
         Int64,
         Utf8,
         Field,
@@ -51,14 +55,14 @@
         // TODO: https://github.com/trxcllnt/csv-to-arrow-js/blob/master/index.js
 
         builder = makeBuilder({
-          type: new Int64(),
+          type: new Float64(),
           nullValues: [null, undefined],
         });
 
         builder
-          .append(0n)
-          .append(1n)
-          .append(2n)
+          .append(0)
+          .append(1)
+          .append(2)
           .append(undefined)
           .append(null);
 
@@ -72,9 +76,42 @@
         
         subbuffer = await view.to_arrow();
         subdata = tableFromIPC(subbuffer);
+        console.log(
+          DataType.isFloat(subdata.batches[0].data.children[0])
+        )
       }
       
-      start3();
+      async function start4() {
+        field = new Field("field_1", new Int64(), true);
+        schema = new Schema([field]);
+        arrTable = new Table(schema);
+
+        worker = perspective.worker();
+        table = await worker.table(tableToIPC(arrTable).buffer, { index: "field_1" });
+
+        builder = makeBuilder({
+          type: new Int64(),
+          nullValues: [null, undefined],
+        });
+        builder
+          .append(0n)
+          .append(1n)
+          .append(1n)
+          .append(2n)
+          .append(undefined)
+          .append(null);
+        vector = builder.toVector();
+        arrTable = new Table([{ field_1: vector}]);
+        
+        table.update(tableToIPC(arrTable).buffer);
+
+        view = await table.view({ columns: ["field_1"] });
+        subbuffer = await view.to_arrow();
+        subdata = tableFromIPC(subbuffer);
+
+      }
+
+      start4();
     </script>
   </head>
   <body></body>

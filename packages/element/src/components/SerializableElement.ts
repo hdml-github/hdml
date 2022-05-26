@@ -43,7 +43,8 @@ export type ElementSchema = Schema & {
       title: string;
       description: string;
       type: string;
-      pattern: string;
+      pattern?: string;
+      enum?: string[];
     };
   };
 };
