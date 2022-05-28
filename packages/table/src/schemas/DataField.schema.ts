@@ -6,6 +6,7 @@
  */
 
 import { namedElementSchema } from "@hdml/element";
+import { metadata as meta } from "./MetaData.schema";
 
 /**
  * Array of a timezones.
@@ -607,6 +608,15 @@ const timezone = [
   "America/Caracas",
 ];
 
+const metadata = {
+  title: "meta",
+  description: "Field meta-data.",
+  type: "object",
+  patternProperties: {
+    "^[\\w\\-.]{1,64}": meta,
+  },
+};
+
 /**
  * Nullable property.
  */
@@ -623,6 +633,7 @@ const NullableSchema = {
   required: [...namedElementSchema.required, "type"],
   properties: {
     ...namedElementSchema.properties,
+    metadata,
     nullable,
     type: {
       title: "type",
@@ -660,6 +671,7 @@ const DecimalSchema = {
   ],
   properties: {
     ...namedElementSchema.properties,
+    metadata,
     nullable,
     type: {
       title: "type",
@@ -693,6 +705,7 @@ const DateSchema = {
   required: [...namedElementSchema.required, "type", "unit"],
   properties: {
     ...namedElementSchema.properties,
+    metadata,
     nullable,
     type: {
       title: "type",
@@ -716,6 +729,7 @@ const TimeSchema = {
   required: [...namedElementSchema.required, "type", "unit"],
   properties: {
     ...namedElementSchema.properties,
+    metadata,
     nullable,
     type: {
       title: "type",
@@ -739,6 +753,7 @@ const TimestampSchema = {
   required: [...namedElementSchema.required, "type", "unit"],
   properties: {
     ...namedElementSchema.properties,
+    metadata,
     nullable,
     type: {
       title: "type",
@@ -766,7 +781,6 @@ const TimestampSchema = {
  */
 export const DataFieldSchema = {
   ...namedElementSchema,
-  $id: "DATA-FIELD",
   title: "DataField Element",
   description: "DataField element schema.",
   type: "object",

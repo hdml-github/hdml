@@ -16,7 +16,6 @@ const avg = new Ajv2020();
  * Serializable `hdml` element default `json-schema`.
  */
 export const serializableElementSchema = {
-  $id: "SERIALIZABLE",
   title: "Serializable Element",
   description: "Default serializable element schema.",
   type: "object",

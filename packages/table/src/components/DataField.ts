@@ -5,13 +5,15 @@
  * @license Apache-2.0
  */
 
-import { NamedElement } from "@hdml/element";
+import { lit, NamedElement } from "@hdml/element";
+import { MetaData, MetaDataType } from "./MetaData";
 import { DataFieldSchema } from "../schemas/DataField.schema";
 
 export type DataFieldType = {
   uid: string;
   name: string;
   type: string;
+  metadata?: { [name: string]: MetaDataType };
   nullable?: string;
   scale?: number;
   precision?: number;
@@ -203,8 +205,24 @@ export class DataField extends NamedElement {
   /**
    * Class constructor.
    */
-  constructor() {
+  public constructor() {
     super(DataFieldSchema);
+  }
+
+  /**
+   * Returns metadata object.
+   */
+  private _getMetadata(): { [name: string]: MetaDataType } {
+    const metadata: { [name: string]: MetaDataType } = {};
+    this.querySelectorAll("data-field > meta-data").forEach(
+      (element) => {
+        if (element.parentNode === this) {
+          const meta = (element as MetaData).serialize();
+          if (meta) metadata[meta.name] = meta;
+        }
+      },
+    );
+    return metadata;
   }
 
   /**
@@ -223,6 +241,8 @@ export class DataField extends NamedElement {
     if (this.bitWidth === this.bitWidth) obj.bitWidth = this.bitWidth;
     if (this.precision === this.precision)
       obj.precision = this.precision;
+    if (Object.keys(this._getMetadata()).length > 0)
+      obj.metadata = this._getMetadata();
     return obj;
   }
 
@@ -241,8 +261,12 @@ export class DataField extends NamedElement {
     if (!this.getAttribute("type")) {
       console.warn("`type` attribute is required for:", this);
     }
-    this.dispatchEvent(
-      new Event("data-field-connected", { bubbles: true }),
-    );
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): lit.TemplateResult<1> {
+    return lit.html`<slot></slot>`;
   }
 }

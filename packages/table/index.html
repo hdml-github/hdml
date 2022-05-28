@@ -4,8 +4,8 @@
     <script src="/bin/table.min.js"></script>
     <script>
       const hdml = window['@hdml/table'];
-      customElements.define("data-field", hdml.DataField);
       customElements.define("hdml-schema", hdml.HdmlSchema);
+      customElements.define("data-field", hdml.DataField);
       customElements.define("meta-data", hdml.MetaData);
     </script>
   </head>
@@ -28,7 +28,7 @@
           type="utf-8">
           <meta-data
             name="description"
-            content="">
+            content="Product name.">
           </meta-data>
         </data-field>
 
@@ -56,10 +56,6 @@
         <data-field
           name="quantity"
           type="int-16">
-          <meta-data
-            name="description"
-            content="Daily total quantity.">
-          </meta-data>
         </data-field>
 
       </hdml-schema>

@@ -7,7 +7,6 @@
 
 import { NamedElement } from "@hdml/element";
 import { MetaDataSchema } from "../schemas/MetaData.schema";
-import { DatafieldConnected } from "../events";
 
 export type MetaDataType = {
   uid: string;
@@ -51,7 +50,7 @@ export class MetaData extends NamedElement {
   /**
    * Class constructor.
    */
-  constructor() {
+  public constructor() {
     super(MetaDataSchema);
   }
 
@@ -69,13 +68,17 @@ export class MetaData extends NamedElement {
   /**
    * @override
    */
+  public serialize(): false | MetaDataType {
+    return super.serialize() as false | MetaDataType;
+  }
+
+  /**
+   * @override
+   */
   public connectedCallback(): void {
     super.connectedCallback();
     if (!this.getAttribute("content")) {
       console.warn("`content` attribute is required for:", this);
     }
-    this.dispatchEvent(
-      new Event("meta-data-connected", { bubbles: true }),
-    );
   }
 }

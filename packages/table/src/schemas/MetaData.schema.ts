@@ -7,14 +7,8 @@
 
 import { namedElementSchema } from "@hdml/element";
 
-/**
- * `MetaData` element `json-schema`.
- */
-export const MetaDataSchema = {
-  ...namedElementSchema,
-  $id: "META-DATA",
-  title: "MetaData Element",
-  description: "MetaData element schema.",
+export const metadata = {
+  type: "object",
   required: [...namedElementSchema.required, "content"],
   properties: {
     ...namedElementSchema.properties,
@@ -25,4 +19,16 @@ export const MetaDataSchema = {
       minLength: 1,
     },
   },
+};
+
+/**
+ * `MetaData` element `json-schema`.
+ */
+export const MetaDataSchema = {
+  ...namedElementSchema,
+  title: "MetaData Element",
+  description: "MetaData element schema.",
+  type: "object",
+  required: metadata.required,
+  properties: metadata.properties,
 };

@@ -17,7 +17,6 @@ import {
  */
 export const namedElementSchema = {
   ...serializableElementSchema,
-  $id: "NAMED",
   title: "Named Element",
   description: "Default named element schema.",
   type: "object",

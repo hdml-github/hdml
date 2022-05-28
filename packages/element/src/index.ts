@@ -5,6 +5,7 @@
  * @license Apache-2.0
  */
 
+import * as lit from "lit";
 import { Elements, getUid } from "./services/index";
 import { UnifiedElement } from "./components/UnifiedElement";
 import {
@@ -23,6 +24,7 @@ import {
 const getElementByUid = Elements.get;
 
 export {
+  lit,
   UnifiedElement,
   SerializableElement,
   NamedElement,

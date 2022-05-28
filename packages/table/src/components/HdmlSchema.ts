@@ -6,15 +6,16 @@
  */
 
 import { debounce } from "debounce";
-import { NamedElement } from "@hdml/element";
+import { lit, NamedElement } from "@hdml/element";
 import { HdmlSchemaSchema } from "../schemas/HdmlSchema.schema";
-import { DatafieldConnected } from "../events";
-import { DataFieldType } from "./DataField";
+import { MetaData, MetaDataType } from "./MetaData";
+import { DataField, DataFieldType } from "./DataField";
 
 export type HdmlSchemaType = {
   uid: string;
   name: string;
   fields: { [name: string]: DataFieldType };
+  metadata?: { [name: string]: MetaDataType };
   index?: string;
 };
 
@@ -24,17 +25,16 @@ export class HdmlSchema extends NamedElement {
    */
   public static properties = {
     ...NamedElement.properties,
+    index: {
+      type: String,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+    },
   };
 
-  private _fields: { [name: string]: DataFieldType } = {};
   private _index = "";
-
-  /**
-   * Schema fields array getter.
-   */
-  public get fields(): { [name: string]: DataFieldType } {
-    return this._fields;
-  }
 
   /**
    * Index attribute/property setter.
@@ -55,19 +55,40 @@ export class HdmlSchema extends NamedElement {
   /**
    * Class constructor.
    */
-  constructor() {
+  public constructor() {
     super(HdmlSchemaSchema);
   }
 
   /**
-   * DataField connected event listener.
+   * Returns metadata object.
    */
-  private _datafieldConnectedListener(event: DatafieldConnected) {
-    event.stopPropagation();
-    const data = event.target.serialize();
-    if (data) {
-      this.fields[data.name] = data;
-    }
+  private _getMetadata(): { [name: string]: MetaDataType } {
+    const metadata: { [name: string]: MetaDataType } = {};
+    this.querySelectorAll("hdml-schema > meta-data").forEach(
+      (element) => {
+        if (element.parentNode === this) {
+          const meta = (element as MetaData).serialize();
+          if (meta) metadata[meta.name] = meta;
+        }
+      },
+    );
+    return metadata;
+  }
+
+  /**
+   * Returns fields object.
+   */
+  private _getFields(): { [name: string]: DataFieldType } {
+    const fields: { [name: string]: DataFieldType } = {};
+    this.querySelectorAll("hdml-schema > data-field").forEach(
+      (element) => {
+        if (element.parentNode === this) {
+          const field = (element as DataField).serialize();
+          if (field) fields[field.name] = field;
+        }
+      },
+    );
+    return fields;
   }
 
   /**
@@ -77,9 +98,11 @@ export class HdmlSchema extends NamedElement {
     const obj: HdmlSchemaType = {
       uid: this.uid,
       name: this.name,
-      fields: this.fields,
+      fields: this._getFields(),
     };
     if (this.index.length) obj.index = this.index;
+    if (Object.keys(this._getMetadata()).length > 0)
+      obj.metadata = this._getMetadata();
     return obj;
   }
 
@@ -88,9 +111,12 @@ export class HdmlSchema extends NamedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    this.addEventListener(
-      "data-field-connected",
-      this._datafieldConnectedListener,
-    );
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): lit.TemplateResult<1> {
+    return lit.html`<slot></slot>`;
   }
 }

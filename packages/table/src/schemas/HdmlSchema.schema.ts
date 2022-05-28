@@ -6,6 +6,7 @@
  */
 
 import { namedElementSchema } from "@hdml/element";
+import { metadata } from "./MetaData.schema";
 import { DataFieldSchema } from "./DataField.schema";
 
 /**
@@ -13,12 +14,19 @@ import { DataFieldSchema } from "./DataField.schema";
  */
 export const HdmlSchemaSchema = {
   ...namedElementSchema,
-  $id: "HDML-SCHEMA",
   title: "HdmlSchema Element",
   description: "HdmlSchema element schema.",
   required: [...namedElementSchema.required, "fields"],
   properties: {
     ...namedElementSchema.properties,
+    metadata: {
+      title: "meta",
+      description: "Schema meta-data.",
+      type: "object",
+      patternProperties: {
+        "^[\\w\\-.]{1,64}": metadata,
+      },
+    },
     fields: {
       title: "fields",
       description: "Schema fields object.",
