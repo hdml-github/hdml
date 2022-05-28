@@ -5,12 +5,66 @@
     <script>
       const hdml = window['@hdml/table'];
       customElements.define("data-field", hdml.DataField);
+      customElements.define("hdml-schema", hdml.HdmlSchema);
+      customElements.define("meta-data", hdml.MetaData);
     </script>
   </head>
-    <body>
-      <data-field
-        name="field"
-        type="decimal">
-      </data-field>
-    </body>
+  <body>
+
+    <hdml-schema
+      name="daily_data_schema_1"
+      index="product">
+
+      <hdml-schema
+        name="daily_data_schema"
+        index="product">
+        <meta-data
+          name="description"
+          content="Schema for daily sale report.">
+        </meta-data>
+
+        <data-field
+          name="product"
+          type="utf-8">
+          <meta-data
+            name="description"
+            content="">
+          </meta-data>
+        </data-field>
+
+        <data-field
+          name="order_date"
+          type="timestamp"
+          unit="millisecond"
+          timezone="Europe/Warsaw"
+          nullable="null, undefined, 'n/a'">
+          <meta-data
+            name="description"
+            content="Order date.">
+          </meta-data>
+        </data-field>
+
+        <data-field
+          name="total_profit"
+          type="float-32">
+          <meta-data
+            name="description"
+            content="Daily total profit.">
+          </meta-data>
+        </data-field>
+
+        <data-field
+          name="quantity"
+          type="int-16">
+          <meta-data
+            name="description"
+            content="Daily total quantity.">
+          </meta-data>
+        </data-field>
+
+      </hdml-schema>
+
+    </hdml-schema>
+
+  </body>
 </html>

@@ -20,6 +20,7 @@ export const namedElementSchema = {
   $id: "NAMED",
   title: "Named Element",
   description: "Default named element schema.",
+  type: "object",
   required: [...serializableElementSchema.required, "name"],
   properties: {
     ...serializableElementSchema.properties,

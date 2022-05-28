@@ -721,7 +721,7 @@ const TimeSchema = {
       title: "type",
       description: "Field type.",
       type: "string",
-      enum: ["date"],
+      enum: ["time"],
     },
     unit: {
       title: "unit",
@@ -744,7 +744,7 @@ const TimestampSchema = {
       title: "type",
       description: "Field type.",
       type: "string",
-      enum: ["date"],
+      enum: ["timestamp"],
     },
     unit: {
       title: "unit",
@@ -769,6 +769,7 @@ export const DataFieldSchema = {
   $id: "DATA-FIELD",
   title: "DataField Element",
   description: "DataField element schema.",
+  type: "object",
   oneOf: [
     NullableSchema,
     DecimalSchema,

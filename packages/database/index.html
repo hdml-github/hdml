@@ -82,36 +82,130 @@
       }
       
       async function start4() {
-        field = new Field("field_1", new Int64(), true);
-        schema = new Schema([field]);
-        arrTable = new Table(schema);
+        field_1 = new Field(
+          "field_1",
+          new Int64(),
+          true,
+          (new Map()).set("a", "b"),
+        );
+        field_2 = new Field(
+          "field_2",
+          new Utf8(),
+          true,
+          (new Map()).set("c", "d"),
+        );
+        schema = new Schema([
+          field_1,
+          field_2,
+        ]);
+        arrTable_1 = new Table(schema);
 
         worker = perspective.worker();
-        table = await worker.table(tableToIPC(arrTable).buffer, { index: "field_1" });
+        table = await worker.table(
+          tableToIPC(arrTable_1).buffer,
+          // { index: "field_1" },
+        );
 
-        builder = makeBuilder({
+        builder_1 = makeBuilder({
           type: new Int64(),
           nullValues: [null, undefined],
         });
-        builder
+        builder_1
           .append(0n)
           .append(1n)
-          .append(1n)
           .append(2n)
-          .append(undefined)
-          .append(null);
-        vector = builder.toVector();
-        arrTable = new Table([{ field_1: vector}]);
-        
-        table.update(tableToIPC(arrTable).buffer);
+          .append(3n)
+          .append(4n)
+          .append(5n)
+          .finish();
+        vector_1 = builder_1.toVector();
 
-        view = await table.view({ columns: ["field_1"] });
+        builder_2 = makeBuilder({
+          type: new Utf8(),
+          nullValues: [null, undefined],
+        });
+        builder_2
+          .append("z")
+          .append("x")
+          .append("y")
+          .append("w")
+          .append(undefined)
+          .append(null)
+          .finish();
+        vector_2 = builder_2.toVector();
+
+        arrTable_2 = new Table({
+          field_2: vector_2,
+          field_1: vector_1,
+        });
+        
+        table.update(tableToIPC(arrTable_2).buffer);
+
+        view = await table.view({
+          columns: [
+            "field_1",
+            "field_2",
+          ],
+        });
         subbuffer = await view.to_arrow();
         subdata = tableFromIPC(subbuffer);
-
       }
 
-      start4();
+      async function start5() {
+        field_1 = new Field(
+          "field_1",
+          new Int64(),
+          true,
+          (new Map()).set("a", "b"),
+        );
+        field_2 = new Field(
+          "field_2",
+          new Utf8(),
+          true,
+          (new Map()).set("c", "d"),
+        );
+        schema = new Schema(
+          [
+            field_1,
+            field_2,
+          ],
+          (new Map()).set("e", "f"),
+          null,
+        );
+        batch = new RecordBatch(schema, undefined);
+
+        builder_1 = makeBuilder({
+          type: new Int64(),
+          nullValues: [null, undefined],
+        });
+        builder_1
+          .append(0n)
+          .append(1n)
+          .append(2n)
+          .append(3n)
+          .append(4n)
+          .append(5n)
+          .finish();
+        vector_1 = builder_1.toVector();
+
+        builder_2 = makeBuilder({
+          type: new Utf8(),
+          nullValues: [null, undefined],
+        });
+        builder_2
+          .append("z")
+          .append("x")
+          .append("y")
+          .append("w")
+          .append(undefined)
+          .append(null)
+          .finish();
+        vector_2 = builder_2.toVector();
+
+        batch = batch.setChild("field_1", vector_1);
+        batch = batch.setChild("field_2", vector_2);
+      }
+      start5();
     </script>
   </head>
   <body></body>

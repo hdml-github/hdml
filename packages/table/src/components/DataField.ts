@@ -25,7 +25,7 @@ export type DataFieldType = {
  */
 export class DataField extends NamedElement {
   /**
-   * `DataField` reactive attributes.
+   * Reactive attributes.
    */
   public static properties = {
     ...NamedElement.properties,
@@ -89,7 +89,7 @@ export class DataField extends NamedElement {
   private _timezone = "";
 
   /**
-   * Data field type property setter.
+   * Type attribute/property setter.
    */
   public set type(val: string) {
     const old = this._type;
@@ -98,14 +98,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field type property getter.
+   * Type attribute/property getter.
    */
   public get type(): string {
     return this._type;
   }
 
   /**
-   * Data field nullable property setter.
+   * Nullable attribute/property setter.
    */
   public set nullable(val: string) {
     const old = this._nullable;
@@ -114,14 +114,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field nullable property getter.
+   * Nullable attribute/property getter.
    */
   public get nullable(): string {
     return this._nullable;
   }
 
   /**
-   * Data field scale property setter.
+   * Scale attribute/property setter.
    */
   public set scale(val: number) {
     const old = this._scale;
@@ -130,14 +130,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field scale property getter.
+   * Scale attribute/property getter.
    */
   public get scale(): number {
     return this._scale;
   }
 
   /**
-   * Data field precision property setter.
+   * Precision attribute/property setter.
    */
   public set precision(val: number) {
     const old = this._precision;
@@ -146,14 +146,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field precision property getter.
+   * Precision attribute/property getter.
    */
   public get precision(): number {
     return this._precision;
   }
 
   /**
-   * Data field bit width property setter.
+   * Bit width attribute/property setter.
    */
   public set bitWidth(val: number) {
     const old = this._bitWidth;
@@ -162,14 +162,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field bit width property getter.
+   * Bit width attribute/property getter.
    */
   public get bitWidth(): number {
     return this._bitWidth;
   }
 
   /**
-   * Data field unit property setter.
+   * Unit attribute/property setter.
    */
   public set unit(val: string) {
     const old = this._unit;
@@ -178,14 +178,14 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field unit property getter.
+   * Unit attribute/property getter.
    */
   public get unit(): string {
     return this._unit;
   }
 
   /**
-   * Data field timezone property setter.
+   * Timezone attribute/property setter.
    */
   public set timezone(val: string) {
     const old = this._timezone;
@@ -194,7 +194,7 @@ export class DataField extends NamedElement {
   }
 
   /**
-   * Data field timezone property getter.
+   * Timezone attribute/property getter.
    */
   public get timezone(): string {
     return this._timezone;
@@ -229,10 +229,20 @@ export class DataField extends NamedElement {
   /**
    * @override
    */
+  public serialize(): false | DataFieldType {
+    return super.serialize() as false | DataFieldType;
+  }
+
+  /**
+   * @override
+   */
   public connectedCallback(): void {
     super.connectedCallback();
     if (!this.getAttribute("type")) {
       console.warn("`type` attribute is required for:", this);
     }
+    this.dispatchEvent(
+      new Event("data-field-connected", { bubbles: true }),
+    );
   }
 }

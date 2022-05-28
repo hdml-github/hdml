@@ -7,7 +7,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@hdml/element": "0.0.0-alpha.1"
+    "@hdml/element": "0.0.0-alpha.1",
+    "debounce": "^1.2.1"
   },
   "scripts": {
     "dev": "../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open index.html",
