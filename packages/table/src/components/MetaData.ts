@@ -30,6 +30,7 @@ export class MetaData extends NamedElement {
   };
 
   private _content = "";
+  private _namedElement: null | NamedElement = null;
 
   /**
    * Content attribute/property setter.
@@ -66,6 +67,13 @@ export class MetaData extends NamedElement {
   }
 
   /**
+   * Link meta-data with data-field or hdml-schema.
+   */
+  public attachNamedElement(element: NamedElement): void {
+    this._namedElement = element;
+  }
+
+  /**
    * @override
    */
   public serialize(): false | MetaDataType {
@@ -79,6 +87,36 @@ export class MetaData extends NamedElement {
     super.connectedCallback();
     if (!this.getAttribute("content")) {
       console.warn("`content` attribute is required for:", this);
+    }
+    this.dispatchEvent(
+      new Event("meta-data-connected", { bubbles: true }),
+    );
+  }
+
+  /**
+   * @override
+   */
+  public attributechangedcallback(
+    name: string,
+    old: string,
+    value: string,
+  ): void {
+    super.attributeChangedCallback(name, old, value);
+    this.dispatchEvent(
+      new Event("meta-data-changed", { bubbles: false }),
+    );
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedcallback(): void {
+    super.disconnectedCallback();
+    if (this._namedElement) {
+      this._namedElement.dispatchEvent(
+        new Event("meta-data-disconnected", { bubbles: false }),
+      );
+      this._namedElement = null;
     }
   }
 }

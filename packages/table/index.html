@@ -36,8 +36,7 @@
           name="order_date"
           type="timestamp"
           unit="millisecond"
-          timezone="Europe/Warsaw"
-          nullable="null, undefined, 'n/a'">
+          timezone="Europe/Warsaw">
           <meta-data
             name="description"
             content="Order date.">
@@ -46,7 +45,8 @@
 
         <data-field
           name="total_profit"
-          type="float-32">
+          type="float-32"
+          nullable="null, undefined, 'n/a'">
           <meta-data
             name="description"
             content="Daily total profit.">

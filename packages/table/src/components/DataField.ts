@@ -8,6 +8,11 @@
 import { lit, NamedElement } from "@hdml/element";
 import { MetaData, MetaDataType } from "./MetaData";
 import { DataFieldSchema } from "../schemas/DataField.schema";
+import {
+  MetadataConnected,
+  MetadataChanged,
+  MetadataDisconnected,
+} from "../events";
 
 export type DataFieldType = {
   uid: string;
@@ -89,6 +94,7 @@ export class DataField extends NamedElement {
   private _bitWidth = NaN;
   private _unit = "";
   private _timezone = "";
+  private _hdmlSchema: null | NamedElement = null;
 
   /**
    * Type attribute/property setter.
@@ -226,6 +232,31 @@ export class DataField extends NamedElement {
   }
 
   /**
+   * MetadataConnected event listener.
+   */
+  private _metadataConnectedListener(event: MetadataConnected) {
+    event.stopPropagation();
+    event.target.attachNamedElement(this);
+  }
+
+  /**
+   * MetadataChanged event listener.
+   */
+  private _metadataChangedListener(event: MetadataChanged) {
+    event.stopPropagation();
+    this.dispatchEvent(
+      new Event("data-field-changed", { bubbles: false }),
+    );
+  }
+
+  /**
+   * MetadataDisonnected event listener.
+   */
+  private _metadataDisconnectedListener(event: MetadataDisconnected) {
+    event.stopPropagation();
+  }
+
+  /**
    * @override
    */
   protected serializeInternal(): DataFieldType {
@@ -247,6 +278,13 @@ export class DataField extends NamedElement {
   }
 
   /**
+   * Link data-field with hdml-schema.
+   */
+  public attachHdmlSchema(schema: NamedElement): void {
+    this._hdmlSchema = schema;
+  }
+
+  /**
    * @override
    */
   public serialize(): false | DataFieldType {
@@ -260,6 +298,60 @@ export class DataField extends NamedElement {
     super.connectedCallback();
     if (!this.getAttribute("type")) {
       console.warn("`type` attribute is required for:", this);
+    }
+    this.addEventListener(
+      "meta-data-connected",
+      this._metadataConnectedListener,
+    );
+    this.addEventListener(
+      "meta-data-changed",
+      this._metadataChangedListener,
+    );
+    this.addEventListener(
+      "meta-data-disconnected",
+      this._metadataDisconnectedListener,
+    );
+    this.dispatchEvent(
+      new Event("data-field-connected", { bubbles: true }),
+    );
+  }
+
+  /**
+   * @override
+   */
+  public attributechangedcallback(
+    name: string,
+    old: string,
+    value: string,
+  ): void {
+    super.attributeChangedCallback(name, old, value);
+    this.dispatchEvent(
+      new Event("data-field-changed", { bubbles: false }),
+    );
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedcallback(): void {
+    super.disconnectedCallback();
+    this.removeEventListener(
+      "meta-data-connected",
+      this._metadataConnectedListener,
+    );
+    this.removeEventListener(
+      "meta-data-changed",
+      this._metadataChangedListener,
+    );
+    this.removeEventListener(
+      "meta-data-disconnected",
+      this._metadataDisconnectedListener,
+    );
+    if (this._hdmlSchema) {
+      this._hdmlSchema.dispatchEvent(
+        new Event("data-field-disconnected", { bubbles: false }),
+      );
+      this._hdmlSchema = null;
     }
   }
 
