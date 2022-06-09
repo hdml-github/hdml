@@ -4,9 +4,7 @@
     <script src="/bin/table.min.js"></script>
     <script>
       const hdml = window['@hdml/table'];
-      customElements.define("hdml-schema", hdml.HdmlSchema);
-      customElements.define("data-field", hdml.DataField);
-      customElements.define("meta-data", hdml.MetaData);
+      hdml.defineDefaults();
     </script>
   </head>
   <body>
@@ -18,6 +16,7 @@
       <hdml-schema
         name="daily_data_schema"
         index="product">
+        
         <meta-data
           name="description"
           content="Schema for daily sale report.">

@@ -13,8 +13,7 @@
       runTests(async () => {
         describe("DataField class", () => {
           before(async () => {
-            customElements.define("data-field", hdml.DataField);
-            await customElements.whenDefined("data-field");
+            await hdml.defineDefaults();
           });
 
           describe("<data-field/>", () => {

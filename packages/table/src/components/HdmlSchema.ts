@@ -9,7 +9,12 @@ import { debounce } from "debounce";
 import { arrow } from "@hdml/database";
 import { lit, NamedElement } from "@hdml/element";
 import { HdmlSchemaSchema } from "../schemas/HdmlSchema.schema";
-import { getDataType } from "../services";
+import {
+  getDataType,
+  getHdmlSchemaTagName,
+  getDataFieldTagName,
+  getMetaDataTagName,
+} from "../services";
 import { MetaData, MetaDataType } from "./MetaData";
 import { DataField, DataFieldType } from "./DataField";
 import {
@@ -142,14 +147,14 @@ export class HdmlSchema extends NamedElement {
    */
   private _getFields(): { [name: string]: DataFieldType } {
     const fields: { [name: string]: DataFieldType } = {};
-    this.querySelectorAll("hdml-schema > data-field").forEach(
-      (element) => {
-        if (element.parentNode === this) {
-          const field = (element as DataField).serialize();
-          if (field) fields[field.name] = field;
-        }
-      },
-    );
+    this.querySelectorAll(
+      `${getHdmlSchemaTagName()} > ${getDataFieldTagName()}`,
+    ).forEach((element) => {
+      if (element.parentNode === this) {
+        const field = (element as DataField).serialize();
+        if (field) fields[field.name] = field;
+      }
+    });
     return fields;
   }
 

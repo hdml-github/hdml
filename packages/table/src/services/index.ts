@@ -8,3 +8,4 @@
 import { getDataType } from "./getDataType";
 
 export { getDataType };
+export * from "./elementsRegister";
