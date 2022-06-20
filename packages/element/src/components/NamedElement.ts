@@ -12,6 +12,8 @@ import {
   serializableElementSchema,
 } from "./SerializableElement";
 
+import { NameChanged } from "../events";
+
 /**
  * Named `hdml` element default `json-schema`.
  */
@@ -62,6 +64,14 @@ export class NamedElement extends SerializableElement {
     const old = this._name;
     this._name = val;
     this.requestUpdate("name", old);
+    this.dispatchEvent(
+      new CustomEvent<NameChanged>("name-changed", {
+        bubbles: true,
+        cancelable: true,
+        composed: false,
+        detail: { val, old },
+      }),
+    );
   }
 
   /**

@@ -6,7 +6,7 @@
  */
 
 import { LitElement } from "lit";
-import { Elements, getUid } from "../services";
+import { elements, getUid } from "../services";
 
 /**
  * Base class for the `hdml` elements. Responds for the uniqueness by
@@ -34,14 +34,14 @@ export class UnifiedElement extends LitElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    Elements.add(this);
+    elements.add(this);
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
-    Elements.remove(this);
+    elements.remove(this);
     super.disconnectedCallback();
   }
 }

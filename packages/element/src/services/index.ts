@@ -5,9 +5,9 @@
  * @license Apache-2.0
  */
 
-import { add, get, remove } from "./Elements";
+import { add, get, remove } from "./elements";
 import { getUid } from "./getUid";
 
-const Elements = { add, get, remove };
+const elements = { add, get, remove };
 
-export { getUid, Elements };
+export { getUid, elements };

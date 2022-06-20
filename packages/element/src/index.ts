@@ -6,7 +6,7 @@
  */
 
 import * as lit from "lit";
-import { Elements, getUid } from "./services/index";
+import { elements, getUid } from "./services/index";
 import { UnifiedElement } from "./components/UnifiedElement";
 import {
   SerializableElement,
@@ -17,17 +17,19 @@ import {
   NamedElement,
   namedElementSchema,
 } from "./components/NamedElement";
+import { NameChanged } from "./events";
 
 /**
  * Returns unified element by its unique identifier `element.uid`.
  */
-const getElementByUid = Elements.get;
+const getElementByUid = elements.get;
 
 export {
   lit,
   UnifiedElement,
   SerializableElement,
   NamedElement,
+  NameChanged,
   ElementSchema,
   serializableElementSchema,
   namedElementSchema,
