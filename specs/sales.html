@@ -40,24 +40,6 @@
           and extract(date from o.date) = current_date
           and o.product_id = p.id;">
       </data-query>
-      
-      <data-batches>
-        <csv-batch
-          date="..."
-          data="...">
-        </csv-batch>
-
-        <json-batch
-          date="..."
-          data="...">
-        </json-batch>
-
-        <arrow-batch
-          date="..."
-          data="...">
-        </arrow-batch>
-      </data-batches>
-    </hdml-data>
 
       <hdml-schema>
         <meta-data
@@ -90,6 +72,25 @@
       </hdml-schema>
 
       <hdml-data>
+        <data-batches>
+          
+          <csv-batch
+            date="..."
+            data="...">
+          </csv-batch>
+  
+          <json-batch
+            date="..."
+            data="...">
+          </json-batch>
+  
+          <arrow-batch
+            date="..."
+            data="...">
+          </arrow-batch>
+
+        </data-batches>
+      </hdml-data>
 
     </hdml-dataset>
 
