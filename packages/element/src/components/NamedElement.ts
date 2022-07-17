@@ -55,6 +55,14 @@ export class NamedElement extends SerializableElement {
     },
   };
 
+  /**
+   * Observed attributes list.
+   */
+  public static observedAttributes = ["name"];
+
+  /**
+   * Private field to store `name` property value.
+   */
   private _name = "";
 
   /**
@@ -64,14 +72,6 @@ export class NamedElement extends SerializableElement {
     const old = this._name;
     this._name = val;
     this.requestUpdate("name", old);
-    this.dispatchEvent(
-      new CustomEvent<NameChanged>("name-changed", {
-        bubbles: true,
-        cancelable: true,
-        composed: false,
-        detail: { val, old },
-      }),
-    );
   }
 
   /**
@@ -122,6 +122,27 @@ export class NamedElement extends SerializableElement {
     super.connectedCallback();
     if (!this.getAttribute("name")) {
       console.warn("`name` attribute is required for:", this);
+    }
+  }
+
+  /**
+   * @override
+   */
+  public attributeChangedCallback(
+    name: string,
+    old: string,
+    val: string,
+  ): void {
+    super.attributeChangedCallback(name, old, val);
+    if (name === "name") {
+      this.dispatchEvent(
+        new CustomEvent<NameChanged>("name-changed", {
+          bubbles: true,
+          cancelable: true,
+          composed: false,
+          detail: { val, old },
+        }),
+      );
     }
   }
 }

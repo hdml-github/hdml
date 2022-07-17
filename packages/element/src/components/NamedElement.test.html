@@ -135,6 +135,7 @@
                 event,
                 "`name-changed` event didn't handled on element",
               ).to.be.undefined;
+
               expect(
                 event2,
                 "`name-changed` event didn't handled on window",
@@ -164,8 +165,8 @@
                 "event val is equal to element name property"
               ).to.be.true;
               expect(
-                event.detail.old === "",
-                "event old is an empty string"
+                event.detail.old === null,
+                "event old is null"
               ).to.be.true;
             });
           });
@@ -177,6 +178,9 @@
             let event2;
 
             beforeEach(() => {
+              element = undefined;
+              event = undefined;
+              event2 = undefined;
               sandbox.spy(console, "warn");
               sandbox.spy(console, "error");
               window.document.body.innerHTML = `<named-element name=" invalid name "/>`;
@@ -192,9 +196,9 @@
             afterEach(() => {
               sandbox.restore();
               element.remove();
-              element = null;
-              event = null;
-              event2 = null;
+              element = undefined;
+              event = undefined;
+              event2 = undefined;
             });
 
             it("must have a valid default values", () => {
@@ -202,18 +206,22 @@
                 element.nodeType,
                 "node type",
               ).to.equal(1);
+
               expect(
                 element.tagName,
                 "tag name",
               ).to.equal("NAMED-ELEMENT");
+
               expect(
                 element.outerHTML,
                 "outer html",
               ).to.equal("<named-element name=\" invalid name \"></named-element>");
+
               expect(
                 element.getAttribute("name"),
                 "name attribute",
               ).to.equal(" invalid name ");
+              
               expect(
                 element.name,
                 "name property",
@@ -274,31 +282,16 @@
               );
             });
 
-            it("must dispatch `name-changed` event by the default", () => {
+            it("must not dispatch `name-changed` event by the default", () => {
               expect(
                 event,
                 "`name-changed` event didn't handled on element",
-              ).not.to.be.undefined;
+              ).to.be.undefined;
+
               expect(
                 event2,
                 "`name-changed` event didn't handled on window",
-              ).not.to.be.undefined;
-              expect(
-                event === event2,
-                "event object bubble up to window",
-              ).to.be.true;
-              expect(
-                event.target === element,
-                "event target is euqal to element"
-              ).to.be.true;
-              expect(
-                event.detail.val === element.getAttribute("name"),
-                "event val is equal to element name property"
-              ).to.be.true;
-              expect(
-                event.detail.old === "",
-                "event old is an empty string"
-              ).to.be.true;
+              ).to.be.undefined;
             });
 
             it("must dispatch `name-changed` event if `name` attribute was changed", () => {
@@ -402,32 +395,32 @@
               });
             });
 
-            it("must dispatch `name-changed` event by the default", () => {
-              expect(
-                event,
-                "`name-changed` event didn't handled on element",
-              ).not.to.be.undefined;
-              expect(
-                event2,
-                "`name-changed` event didn't handled on window",
-              ).not.to.be.undefined;
-              expect(
-                event === event2,
-                "event object bubble up to window",
-              ).to.be.true;
-              expect(
-                event.target === element,
-                "event target is euqal to element"
-              ).to.be.true;
-              expect(
-                event.detail.val === element.getAttribute("name"),
-                "event val is equal to element name property"
-              ).to.be.true;
-              expect(
-                event.detail.old === "",
-                "event old is an empty string"
-              ).to.be.true;
-            });
+            // it("must dispatch `name-changed` event by the default", () => {
+            //   expect(
+            //     event,
+            //     "`name-changed` event didn't handled on element",
+            //   ).not.to.be.undefined;
+            //   expect(
+            //     event2,
+            //     "`name-changed` event didn't handled on window",
+            //   ).not.to.be.undefined;
+            //   expect(
+            //     event === event2,
+            //     "event object bubble up to window",
+            //   ).to.be.true;
+            //   expect(
+            //     event.target === element,
+            //     "event target is euqal to element"
+            //   ).to.be.true;
+            //   expect(
+            //     event.detail.val === element.getAttribute("name"),
+            //     "event val is equal to element name property"
+            //   ).to.be.true;
+            //   expect(
+            //     event.detail.old === "",
+            //     "event old is an empty string"
+            //   ).to.be.true;
+            // });
 
             it("must dispatch `name-changed` event if `name` attribute was changed", () => {
               const old = element.getAttribute("name");

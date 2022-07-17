@@ -10,10 +10,20 @@
     </script>
   </head>
     <body>
-      <unified-element></unified-element>
-      <serializable-element></serializable-element>
-      <named-element></named-element>
-      <named-element name="abc"></named-element>
-      <named-element name=" a b c "></named-element>
+      <!-- <unified-element></unified-element>
+      <serializable-element></serializable-element> -->
+      <!-- <named-element id="1"></named-element>
+      <named-element id="2" name="abc"></named-element> -->
+      <!-- <named-element id="3" name=" a b c "></named-element> -->
+      <script>
+        window.document.body.innerHTML = `<named-element id="3" name=" invalid name "/>`;
+        element = document.getElementById("3");
+        window.addEventListener("name-changed", (evt) => {
+          console.log(evt);
+        });
+        element.addEventListener("name-changed", (evt) => {
+          console.log(evt);
+        });
+      </script>
     </body>
 </html>
