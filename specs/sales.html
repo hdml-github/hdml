@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Daily Sales</title>
+    <script src="bin/hdml.min.js"></script>
+  </head>
+  <body>
+
+    <hdml-source
+      name="mysqldb"
+      type="jdbc"
+      url="jdbc:mysql://127.0.0.1"
+      user="user"
+      pass="Qwerty!123">
+    </hdml-source>
+
+    <hdml-source
+      name="postgresdb"
+      type="jdbc"
+      url="jdbc:postgresql://127.0.0.1/mydatabase"
+      user="user"
+      pass="Qwerty!123">
+    </hdml-source>
+
+    <hdml-dataset
+      name="sales"
+      limit="10000">
+
+      <data-query
+        ansi-sql="
+        select
+          p.product as product,
+          o.date as date,
+          o.profit as profit,
+          o.quantity as quantity
+        from
+          mysqldb.reports.orders as o,
+          postgresdb.lookups.products as p
+        where 1 = 1
+          and extract(date from o.date) = current_date
+          and o.product_id = p.id;">
+      </data-query>
+      
+      <data-batches>
+        <csv-batch
+          date="..."
+          data="...">
+        </csv-batch>
+
+        <json-batch
+          date="..."
+          data="...">
+        </json-batch>
+
+        <arrow-batch
+          date="..."
+          data="...">
+        </arrow-batch>
+      </data-batches>
+    </hdml-data>
+
+      <hdml-schema>
+        <meta-data
+          name="description"
+          content="Schema for the sales report.">
+        </meta-data>
+        
+        <data-field
+          name="product"
+          type="utf-8">
+        </data-field>
+
+        <data-field
+          name="date"
+          type="timestamp"
+          unit="millisecond"
+          timezone="+02:00"
+          nullable="null, undefined, 'n/a'">
+        </data-field>
+
+        <data-field
+          name="profit"
+          type="float-32">
+        </data-field>
+
+        <data-field
+          name="quantity"
+          type="int-16">
+        </data-field>
+      </hdml-schema>
+
+      <hdml-data>
+
+    </hdml-dataset>
+
+    <hdml-frame
+      name="frame"
+      from="sales">
+
+      <data-fields>
+        <data-field
+          name="product"
+          field="product"/>
+        <data-field
+          name="total_quantity"
+          field="quantity"
+          agg="sum"/>
+        <data-field
+          name="average_profit"
+          field="profit"
+          agg="avg"/>
+        <data-field
+          name="average_price"
+          expr="[average_profit]/[total_quantity]"/>
+      </data-fields>
+
+      <group-by>
+        <data-field field="product"/>
+      </group-by>
+
+      <split-by>
+        <data-field field="date"/>
+      </split-by>
+
+      <filter-by>
+        <search-expr
+          field="average_price" 
+          op=">"
+          value="0"/>
+      </filter-by>
+
+    </hdml-frame>
+
+  </body>
+</html>
