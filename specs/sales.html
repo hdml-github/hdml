@@ -6,25 +6,25 @@
   </head>
   <body>
 
-    <hdml-source
-      name="mysqldb"
-      type="jdbc"
-      url="jdbc:mysql://127.0.0.1"
-      user="user"
-      pass="Qwerty!123">
-    </hdml-source>
-
-    <hdml-source
-      name="postgresdb"
-      type="jdbc"
-      url="jdbc:postgresql://127.0.0.1/mydatabase"
-      user="user"
-      pass="Qwerty!123">
-    </hdml-source>
-
     <hdml-dataset
       name="sales"
       limit="10000">
+
+      <data-source
+        name="mysqldb"
+        type="jdbc"
+        url="jdbc:mysql://127.0.0.1"
+        user="user"
+        pass="Qwerty!123">
+      </data-source>
+  
+      <data-source
+        name="postgresdb"
+        type="jdbc"
+        url="jdbc:postgresql://127.0.0.1/mydatabase"
+        user="user"
+        pass="Qwerty!123">
+      </data-source>
 
       <data-query
         ansi-sql="
@@ -41,7 +41,7 @@
           and o.product_id = p.id;">
       </data-query>
 
-      <hdml-schema>
+      <data-schema>
         <meta-data
           name="description"
           content="Schema for the sales report.">
@@ -69,28 +69,26 @@
           name="quantity"
           type="int-16">
         </data-field>
-      </hdml-schema>
+      </data-schema>
 
-      <hdml-data>
-        <data-batches>
-          
-          <csv-batch
-            date="..."
-            data="...">
-          </csv-batch>
-  
-          <json-batch
-            date="..."
-            data="...">
-          </json-batch>
-  
-          <arrow-batch
-            date="..."
-            data="...">
-          </arrow-batch>
+      <data-batches>
 
-        </data-batches>
-      </hdml-data>
+        <csv-batch
+          date="..."
+          data="...">
+        </csv-batch>
+
+        <json-batch
+          date="..."
+          data="...">
+        </json-batch>
+
+        <arrow-batch
+          date="..."
+          data="...">
+        </arrow-batch>
+
+      </data-batches>
 
     </hdml-dataset>
 
