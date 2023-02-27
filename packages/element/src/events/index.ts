@@ -17,7 +17,7 @@ export interface NameChanged {
   /**
    * Old value.
    */
-  old: string;
+  old: null | string;
 }
 
 declare global {

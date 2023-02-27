@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="458px" preserveAspectRatio="none" style="width:993px;height:458px;background:#FFFFFF;" version="1.1" viewBox="0 0 993 458" width="993px" zoomAndPan="magnify"><defs/><g><!--MD5=[52148342b2d7794690abc2d87ff05146]
+cluster client_device--><g id="cluster_client_device"><polygon fill="none" points="740,77,750,67,976,67,976,231,966,241,740,241,740,77" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="966" x2="976" y1="77" y2="67"/><line style="stroke:#181818;stroke-width:1.0;" x1="740" x2="966" y1="77" y2="77"/><line style="stroke:#181818;stroke-width:1.0;" x1="966" x2="966" y1="77" y2="241"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="89" x="809.5" y="92.9951">client#uuid</text></g><!--MD5=[ce970c6b293acd6216e4a557beb4af79]
+cluster client_process--><g id="cluster_client_process"><polygon fill="none" points="764,125,774,115,952,115,952,207,942,217,764,217,764,125" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="942" x2="952" y1="125" y2="115"/><line style="stroke:#181818;stroke-width:1.0;" x1="764" x2="942" y1="125" y2="125"/><line style="stroke:#181818;stroke-width:1.0;" x1="942" x2="942" y1="125" y2="217"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="112" x="798" y="140.9951">client process</text></g><!--MD5=[4f5d2a83ead1bc68d80ec5add831d806]
+cluster worker_device--><g id="cluster_worker_device"><polygon fill="none" points="16,77,26,67,716,67,716,231,706,241,16,241,16,77" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="706" x2="716" y1="77" y2="67"/><line style="stroke:#181818;stroke-width:1.0;" x1="16" x2="706" y1="77" y2="77"/><line style="stroke:#181818;stroke-width:1.0;" x1="706" x2="706" y1="77" y2="241"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="103" x="310.5" y="92.9951">worker#uuid</text></g><!--MD5=[a397374c5318042611bb166b0751dfe6]
+cluster worker_process_1--><g id="cluster_worker_process_1"><polygon fill="none" points="550,125,560,115,692,115,692,207,682,217,550,217,550,125" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="682" x2="692" y1="125" y2="115"/><line style="stroke:#181818;stroke-width:1.0;" x1="550" x2="682" y1="125" y2="125"/><line style="stroke:#181818;stroke-width:1.0;" x1="682" x2="682" y1="125" y2="217"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="64" x="585" y="140.9951">process</text></g><!--MD5=[74f81429dfee5c4a682bf3b2fcea3878]
+cluster worker_process_2--><g id="cluster_worker_process_2"><polygon fill="none" points="384,125,394,115,526,115,526,207,516,217,384,217,384,125" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="516" x2="526" y1="125" y2="115"/><line style="stroke:#181818;stroke-width:1.0;" x1="384" x2="516" y1="125" y2="125"/><line style="stroke:#181818;stroke-width:1.0;" x1="516" x2="516" y1="125" y2="217"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="64" x="419" y="140.9951">process</text></g><!--MD5=[33eee71eeb53ca772f4fec4b535e754d]
+cluster worker_process_3--><g id="cluster_worker_process_3"><polygon fill="none" points="220,125,230,115,360,115,360,207,350,217,220,217,220,125" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="350" x2="360" y1="125" y2="115"/><line style="stroke:#181818;stroke-width:1.0;" x1="220" x2="350" y1="125" y2="125"/><line style="stroke:#181818;stroke-width:1.0;" x1="350" x2="350" y1="125" y2="217"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="64" x="254" y="140.9951">process</text></g><!--MD5=[fe5b094a5fb846e19f5ab119a908e295]
+cluster worker_process_4--><g id="cluster_worker_process_4"><polygon fill="none" points="40,125,50,115,196,115,196,207,186,217,40,217,40,125" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="186" x2="196" y1="125" y2="115"/><line style="stroke:#181818;stroke-width:1.0;" x1="40" x2="186" y1="125" y2="125"/><line style="stroke:#181818;stroke-width:1.0;" x1="186" x2="186" y1="125" y2="217"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="64" x="82" y="140.9951">process</text></g><!--MD5=[3203434df3cf06fba2d329bbdd2cd450]
+cluster gateway_device--><g id="cluster_gateway_device"><polygon fill="none" points="526,349,536,339,716,339,716,431,706,441,526,441,526,349" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="706" x2="716" y1="349" y2="339"/><line style="stroke:#181818;stroke-width:1.0;" x1="526" x2="706" y1="349" y2="349"/><line style="stroke:#181818;stroke-width:1.0;" x1="706" x2="706" y1="349" y2="441"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="113" x="560.5" y="364.9951">gateway#uuid</text></g><!--MD5=[393f2e898073b9121278011d08261da2]
+entity hdml_doc--><g id="elem_hdml_doc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="104" x="780" y="155"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="864" y="160"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="862" y="162"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="862" y="166"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="64" x="795" y="187.9951">hdml doc</text></g><!--MD5=[703a6d1ae3fd4ec06535e5e8f8ecfeb4]
+entity hdml_auth--><g id="elem_hdml_auth"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="109" x="566.5" y="155"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="655.5" y="160"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="653.5" y="162"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="653.5" y="166"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69" x="581.5" y="187.9951">hdml auth</text></g><!--MD5=[f271f3dcfab6bdd19fae9dc76c36c3ee]
+entity hdml_host--><g id="elem_hdml_host"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="109" x="400.5" y="155"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="489.5" y="160"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="487.5" y="162"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="487.5" y="166"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="69" x="415.5" y="187.9951">hdml host</text></g><!--MD5=[6a7c6f66f891bd8eb9c2c6cc877c5227]
+entity hdml_watcher--><g id="elem_hdml_watcher"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="90" x="254" y="155"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="324" y="160"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="322" y="162"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="322" y="166"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="269" y="187.9951">hdml fs</text></g><!--MD5=[b6b76ba3e3a298b6a698ecc85a2f84f8]
+entity query_runner--><g id="elem_query_runner"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="124" x="56" y="155"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="160" y="160"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="158" y="162"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="158" y="166"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="84" x="71" y="187.9951">hdml runner</text></g><!--MD5=[d9d48276ac5ba2766975bfea8f387fab]
+entity gateway_process--><g id="elem_gateway_process"><polygon fill="#F1F1F1" points="542.5,389,552.5,379,699.5,379,699.5,415.2969,689.5,425.2969,542.5,425.2969,542.5,389" style="stroke:#181818;stroke-width:0.5;"/><line style="stroke:#181818;stroke-width:0.5;" x1="689.5" x2="699.5" y1="389" y2="379"/><line style="stroke:#181818;stroke-width:0.5;" x1="542.5" x2="689.5" y1="389" y2="389"/><line style="stroke:#181818;stroke-width:0.5;" x1="689.5" x2="689.5" y1="389" y2="425.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="117" x="557.5" y="411.9951">gateway process</text></g><!--MD5=[be5dab21b16d01ec4bb318e06a0d5ac7]
+entity data_storage--><g id="elem_data_storage"><path d="M64.5,16 C64.5,6 118,6 118,6 C118,6 171.5,6 171.5,16 L171.5,41.2969 C171.5,51.2969 118,51.2969 118,51.2969 C118,51.2969 64.5,51.2969 64.5,41.2969 L64.5,16 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M64.5,16 C64.5,26 118,26 118,26 C118,26 171.5,26 171.5,16 " fill="none" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="87" x="74.5" y="42.9951">data storage</text></g><!--MD5=[293437d60d5a8e92156ac57a780321b4]
+entity hdml_fs--><g id="elem_hdml_fs"><rect fill="#F1F1F1" height="36.2969" rx="35" ry="35" style="stroke:#181818;stroke-width:0.5;" width="70" x="264" y="10.5"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="274" y="33.4951">hdml.fs</text></g><!--MD5=[799e9543975076390d2a6ceafec8df6c]
+entity queue--><g id="elem_queue"><path d="M427.5,277 L482.5,277 C487.5,277 487.5,290.1484 487.5,290.1484 C487.5,290.1484 487.5,303.2969 482.5,303.2969 L427.5,303.2969 C422.5,303.2969 422.5,290.1484 422.5,290.1484 C422.5,290.1484 422.5,277 427.5,277 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M482.5,277 C477.5,277 477.5,290.1484 477.5,290.1484 C477.5,303.2969 482.5,303.2969 482.5,303.2969 " fill="none" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="45" x="427.5" y="294.9951">queue</text></g><!--MD5=[cad5951fae8ca9b18bc4f5a96192c0b3]
+entity hdml_http--><g id="elem_hdml_http"><ellipse cx="781" cy="290" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="28" x="767" y="319.9951">http</text></g><!--MD5=[6e605600335dfde14e75b0e4f825e43a]
+entity hdml_ws--><g id="elem_hdml_ws"><ellipse cx="621" cy="290" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="79" x="581.5" y="319.9951">WebSocket</text></g><!--MD5=[6caf69947bc4207b2a3c8cbbc36bc4c0]
+link data_storage to query_runner--><g id="link_data_storage_query_runner"><path d="M118,51.26 C118,74.98 118,113.3 118,141.41 " fill="none" id="data_storage-to-query_runner" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="118,154.66,122,148.66,118,142.66,114,148.66,118,154.66" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[1381dfb171c6e72034f067f44ee47595]
+link hdml_fs to hdml_watcher--><g id="link_hdml_fs_hdml_watcher"><path d="M299,46.71 C299,69.8 299,111.38 299,141.36 " fill="none" id="hdml_fs-to-hdml_watcher" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="299,154.62,303,148.62,299,142.62,295,148.62,299,154.62" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[d71475f78b4c9472b4b9e742f6c49d27]
+reverse link hdml_auth to queue--><g id="link_hdml_auth_queue"><path d="M582.35,209.14 C565.4,221.92 545.05,236.68 526,249 C510.44,259.06 492.21,269.3 478.12,276.9 " fill="none" id="hdml_auth-backto-queue" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="592.96,201.07,585.763,201.5206,583.4109,208.3374,590.6079,207.8867,592.96,201.07" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[4d7c560abea3d6711e51ac71050df040]
+reverse link hdml_host to queue--><g id="link_hdml_host_queue"><path d="M455,214.56 C455,236.05 455,262.08 455,276.97 " fill="none" id="hdml_host-backto-queue" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="455,201.26,451,207.26,455,213.26,459,207.26,455,201.26" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[7dfd23b907fc6a49eed29ac693dea5f8]
+reverse link hdml_watcher to queue--><g id="link_hdml_watcher_queue"><path d="M333.28,209.56 C348.36,222.38 366.58,237.06 384,249 C399.05,259.32 416.96,269.4 431.03,276.85 " fill="none" id="hdml_watcher-backto-queue" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="323.39,201.03,325.3275,207.9759,332.4843,208.859,330.5468,201.9131,323.39,201.03" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[caf93c52671b763917aac9fc7566e3bb]
+reverse link query_runner to queue--><g id="link_query_runner_queue"><path d="M160.13,208.43 C182.37,222.68 210.66,238.86 238,249 C300.86,272.31 379.18,282.45 422.45,286.52 " fill="none" id="query_runner-backto-queue" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="149.09,201.2,151.9181,207.8334,159.129,207.7741,156.3009,201.1407,149.09,201.2" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[687b5a8164ee7a0afadbbc3e367a92a1]
+link queue to gateway_process--><g id="link_queue_gateway_process"><path d="M473.4,303.19 C498.12,319.58 542.86,349.22 576.63,371.6 " fill="none" id="queue-to-gateway_process" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="587.61,378.87,584.8183,372.2212,577.6072,372.241,580.3989,378.8898,587.61,378.87" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[ab476d2fa542d24fdfe380eae60da5f4]
+link hdml_doc to hdml_http--><g id="link_hdml_doc_hdml_http"><path d="M821.68,201.26 C812.05,222.02 797.89,252.58 789.07,271.6 " fill="none" id="hdml_doc-to-hdml_http" style="stroke:#181818;stroke-width:1.0;"/><path d="M793.7469,281.6316 A9,9 0 0 0 778.4069 274.5052" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[ac418a9b50ea47ae91db0918458c70c2]
+link hdml_http to gateway_process--><g id="link_hdml_http_gateway_process"><path d="M771.94,297.23 C749.46,312.68 690.28,353.37 653.05,378.97 " fill="none" id="hdml_http-gateway_process" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[6e9b11fe632f71829be91dffb9c1eff0]
+link hdml_doc to hdml_ws--><g id="link_hdml_doc_hdml_ws"><path d="M789.55,201.13 C743.53,225.12 672.22,262.3 639.08,279.58 " fill="none" id="hdml_doc-to-hdml_ws" style="stroke:#181818;stroke-width:1.0;"/><path d="M636.7274,290.3382 A9,9 0 0 0 628.9125 275.3374" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[40607676873fa76f317cec51e75bf588]
+link hdml_host to hdml_ws--><g id="link_hdml_host_hdml_ws"><path d="M483.04,201.07 C501.63,215.34 526.78,233.98 550,249 C567.37,260.24 588.07,271.69 602.62,279.44 " fill="none" id="hdml_host-to-hdml_ws" style="stroke:#181818;stroke-width:1.0;"/><path d="M612.8174,275.2527 A9,9 0 0 0 604.9355 290.2185" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[028013cb9199b41a24257e34509a606c]
+link hdml_auth to hdml_ws--><g id="link_hdml_auth_hdml_ws"><path d="M621,201.26 C621,221.74 621,251.73 621,270.81 " fill="none" id="hdml_auth-to-hdml_ws" style="stroke:#181818;stroke-width:1.0;"/><path d="M629.4572,277.7818 A9,9 0 0 0 612.5428 277.7818" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[6552a4fc027834ac7f9b5c05424f41a2]
+link hdml_ws to gateway_process--><g id="link_hdml_ws_gateway_process"><path d="M621,299.27 C621,315.96 621,354.16 621,378.71 " fill="none" id="hdml_ws-gateway_process" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[33968b9923464cd811b5b4751ab63d41]
+@startuml hdml_deployment
+  node "client#uuid" as client_device {
+    node "client process" as client_process {
+      component "hdml doc" as hdml_doc
+    }
+  }
+
+  node "worker#uuid" as worker_device {
+    node "process" as worker_process_1 {
+      component "hdml auth" as hdml_auth
+    }
+    node "process" as worker_process_2 {
+      component "hdml host" as hdml_host
+    }
+    node "process" as worker_process_3 {
+      component "hdml fs" as hdml_watcher
+    }
+    node "process" as worker_process_4 {
+      component "hdml runner" as query_runner
+    }
+  }
+
+  database "data storage" as data_storage
+  data_storage - -* query_runner
+
+  storage "hdml.fs" as hdml_fs
+  hdml_fs - -* hdml_watcher
+
+  node "gateway#uuid" as gateway_device {
+    node "gateway process" as gateway_process
+  }
+
+  queue "queue" as queue
+  hdml_auth *- - queue
+  hdml_host *- - queue
+  hdml_watcher *- - queue
+  query_runner *- - queue
+  queue - -* gateway_process
+
+  interface "http" as hdml_http
+  hdml_doc - -( hdml_http
+  hdml_http - - gateway_process
+
+  interface "WebSocket" as hdml_ws
+  hdml_doc - -( hdml_ws
+  hdml_host - -( hdml_ws
+  hdml_auth - -( hdml_ws
+  hdml_ws - - gateway_process
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 10:01:30 PDT 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

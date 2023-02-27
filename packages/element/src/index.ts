@@ -6,33 +6,35 @@
  */
 
 import * as lit from "lit";
-import { elements, getUid } from "./services/index";
-import { UnifiedElement } from "./components/UnifiedElement";
+import { getUid } from "./helpers/index";
 import {
-  SerializableElement,
+  UnifiedElement,
+  UnifiedElementSchema,
   ElementSchema,
-  serializableElementSchema,
-} from "./components/SerializableElement";
-import {
-  NamedElement,
-  namedElementSchema,
-} from "./components/NamedElement";
-import { NameChanged } from "./events";
-
-/**
- * Returns unified element by its unique identifier `element.uid`.
- */
-const getElementByUid = elements.get;
+} from "./components/UnifiedElement";
+import { IoElement } from "./components/IoElement";
+// import {
+//   SerializableElement,
+//   ElementSchema,
+//   serializableElementSchema,
+// } from "./components/SerializableElement";
+// import {
+//   NamedElement,
+//   namedElementSchema,
+// } from "./components/NamedElement";
+// import { NameChanged } from "./events";
 
 export {
   lit,
-  UnifiedElement,
-  SerializableElement,
-  NamedElement,
-  NameChanged,
-  ElementSchema,
-  serializableElementSchema,
-  namedElementSchema,
   getUid,
-  getElementByUid,
+  ElementSchema,
+  UnifiedElement,
+  UnifiedElementSchema,
+  IoElement,
+  // SerializableElement,
+  // NamedElement,
+  // NameChanged,
+  // ElementSchema,
+  // serializableElementSchema,
+  // namedElementSchema,
 };

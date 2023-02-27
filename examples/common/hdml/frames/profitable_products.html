@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Product Profit Data Model</title>
+    <script src="https://cdn.example.com/hdml.min.js"></script>
+  </head>
+  <body>
+    <data-io
+      name="data.io"
+      tenant="common"
+      token="gwkcc9k31daqq9909hdshk1==">
+    </data-io>
+
+    <data-frame
+      name="profitable_products"
+      from="hdml://data.io/frames/product_profit.html?data-frame=product_profit"
+      cache-control="max-age=600">
+
+      <data-fields>
+        <data-field origin="code"/>
+        <data-field origin="name"/>
+        <data-field origin="date"/>
+        <data-field origin="total_quantity"/>
+        <data-field origin="total_price"/>
+        <data-field origin="total_cost"/>
+        <data-field origin="profit"/>
+      </data-fields>
+
+      <filter-by>
+        <logical-or>
+          <search-expr
+            clause="total_price > total_cost" />
+          <search-filter
+            field="profit"
+            more-than="0"/>
+        </logical-or>
+      </filter-by>
+
+    </data-frame>
+  </body>
+</html>

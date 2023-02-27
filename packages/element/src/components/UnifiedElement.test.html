@@ -8,49 +8,101 @@
       import { expect } from "@esm-bundle/chai";
 
       const getUid = window['@hdml/element'].getUid;
-      const getElementByUid = window['@hdml/element'].getElementByUid;
       const UnifiedElement = window['@hdml/element'].UnifiedElement;
+      const UnifiedElementSchema = window['@hdml/element'].UnifiedElementSchema;
       const UID = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
       
       runTests(async () => {
-        describe("getUid function", () => {
-          it("returns unique value when it called without argument", () => {
-            const val1 = getUid();
-            const val2 = getUid();
-            expect(val1).not.to.be.undefined;
-            expect(typeof val1).to.equal("string");
-            expect(UID.test(val1)).to.equal(true);
-            expect(val2).not.to.be.undefined;
-            expect(typeof val2).to.equal("string");
-            expect(UID.test(val2)).to.equal(true);
-            expect(val1 !== val2).to.equal(true);
-          });
-
-          it("returns valid constant token when it called with the string argument", () => {
-            const val1 = getUid("string1");
-            const val2 = getUid("string1");
-            const val3 = getUid("string2");
-            expect(val1).not.to.be.undefined;
-            expect(typeof val1).to.equal("string");
-            expect(UID.test(val1)).to.equal(true);
-            expect(val2).not.to.be.undefined;
-            expect(typeof val2).to.equal("string");
-            expect(UID.test(val2)).to.equal(true);
-            expect(val3).not.to.be.undefined;
-            expect(typeof val3).to.equal("string");
-            expect(UID.test(val3)).to.equal(true);
-            expect(val1 === val2).to.equal(true);
-            expect(val1 !== val3).to.equal(true);
-          });
-        });
-
         describe("UnifiedElement class", () => {
           before(async () => {
             customElements.define("unified-element", UnifiedElement);
             await customElements.whenDefined("unified-element");
           });
 
-          describe("<unified-element/>", () => {
+          describe("UnifiedElement schema", () => {
+            it("must be specified by the default or if it was specified in the constructor", () => {
+              let element = new UnifiedElement();
+              expect(
+                element.schema,
+                "default schema specified",
+              ).to.deep.equal(UnifiedElementSchema);
+
+              element = new UnifiedElement({
+                properties: { uid: "id" },
+                required: ["uid"],
+              });
+              expect(
+                element.schema,
+                "correct schema specified",
+              ).to.deep.equal({
+                properties: { uid: "id" },
+                required: ["uid"],
+              });
+            });
+
+            it("must be null if wrong schema was specified in the constructor", () => {
+              let element = new UnifiedElement({});
+              expect(
+                element.schema,
+                "default schema specified",
+              ).to.be.null;
+
+              element = new UnifiedElement({ properties: "id" });
+              expect(
+                element.schema,
+                "default schema specified",
+              ).to.be.null;
+              element = new UnifiedElement({ properties: { id: "id" } });
+
+              expect(
+                element.schema,
+                "default schema specified",
+              ).to.be.null;
+
+              element = new UnifiedElement({ properties: { uid: "id" } });
+              expect(
+                element.schema,
+                "default schema specified",
+              ).to.be.null;
+            });
+
+            it("must assert data as expected", () => {
+              let element = new UnifiedElement();
+              expect(
+                element.assertDataInternal({}),
+                "wrong object return false",
+              ).to.be.false;
+              expect(
+                element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" }),
+                "correct object returns true",
+              ).to.be.true;
+
+              element = new UnifiedElement({});
+              expect(
+                element.assertDataInternal({}),
+                "wrong schema returns false on assertion of wrong object",
+              ).to.be.false;
+              expect(
+                element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" }),
+                "wrong schema returns false on assertion of correct object",
+              ).to.be.false;
+
+              element = new UnifiedElement({
+                properties: { uid: "id" },
+                required: ["uid"],
+              });
+              expect(
+                () => {element.assertDataInternal({})},
+                "wrong schema throws on assertion of wrong object",
+              ).to.throw();
+              expect(
+                () => {element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" })},
+                "wrong schema throws on assertion of correct object",
+                ).to.throw();
+            });
+          });
+
+          describe("<unified-element/> tag", () => {
             let element;
 
             beforeEach(() => {
@@ -84,23 +136,6 @@
                 UID.test(element.uid),
                 "uid property regexp",
               ).to.be.true;
-            });
-
-            it("must be accessable by the getElementByUid when it connected to the DOM-tree", () => {
-              expect(
-                getElementByUid(element.uid),
-                "element added to the register"
-              ).to.equal(element);
-              element.remove();
-              expect(
-                getElementByUid(element.uid),
-                "element added to the register"
-              ).to.be.undefined;
-              window.document.body.appendChild(element);
-              expect(
-                getElementByUid(element.uid),
-                "element added to the register"
-              ).to.equal(element);
             });
           });
         });

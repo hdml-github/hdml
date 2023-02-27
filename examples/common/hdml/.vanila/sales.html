@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Daily Sales</title>
+    <script src="bin/hdml.min.js"></script>
+  </head>
+  <body>
+    <data-io
+      name="data1.io"
+      tenant="common"
+      token="gwkcc9k31daqq9909hdshk1==">
+    </data-io>
+
+    <data-model
+      name="sales"
+      from="hdml://data1.io">
+
+      <data-table
+        name="codes"
+        type="json|csv"
+        origin="[
+          [1, 1000],
+          [2, 2000],
+          [3, 3000]
+        ]"
+        origin="
+          1, 1000
+          2, 2000
+          3, 3000
+        ">
+        <data-field
+          name="id"
+          type="uint-16"/>
+        <data-field
+          name="code"
+          type="uint-64"
+          origin="product_code"/>
+      </data-table>
+
+      <data-table
+        name="products"
+        type="table"
+        origin="ds1.products.products">
+        <data-field
+          name="id"
+          type="unit-16"
+          nullable/>
+        <data-field
+          name="name"
+          type="utf-8"/>
+        <data-field
+          name="description"
+          type="utf-8"/>
+      </data-table>
+
+      <data-table
+        name="orders"
+        type="query"
+        origin="
+          select
+            product_id,
+            quantity,
+            price,
+            cost,
+            date
+          from ds2.orders.orders
+          where 1 = 1">
+        <data-field
+          name="pid"
+          type="uint-16"
+          origin="product_id"/>
+        <data-field
+          name="quantity"
+          type="uint-16"/>
+        <data-field
+          name="price"
+          type="float-32"/>
+        <data-field
+          name="cost"
+          type="float-32"/>
+        <data-field
+          name="date"
+          type="timestamp"
+          unit="millisecond"
+          timezone="+02:00"
+          nullable/>
+      </data-table>
+
+      <inner-join
+        left="products"
+        right="codes">
+        <logical-and>
+          <on-keys
+            left="id"
+            right="id">
+          </on-keys>
+        </logical-and>
+      </inner-join>
+
+      <left-join
+        left="orders"
+        right="products">
+        <logical-or>
+          <on-keys
+            left="pid"
+            right="id">
+          </on-keys>
+        </logical-or>
+      </left-join>
+
+    </data-model>
+
+    <data-frame
+      name="product_profit"
+      from="data-model=sales"
+      limit="10000">
+
+      <data-fields>
+        <data-field
+          name="code"
+          origin="codes.code"/>
+        <data-field
+          name="name"
+          origin="products.name"/>
+        <data-field
+          name="date"
+          clause="date_trunc('day', sales.date)"/>
+        <data-field
+          name="total_quantity"
+          origin="orders.quantity"
+          agg="sum"/>
+        <data-field
+          name="total_price"
+          origin="orders.price"
+          agg="sum"/>
+        <data-field
+          name="total_cost"
+          origin="orders.cost"
+          agg="sum"/>
+        <data-field
+          name="profit"
+          type="float-32"
+          clause="total_price - total_cost"/>
+      </data-fields>
+
+      <group-by>
+        <data-field name="product"/>
+        <data-field name="date"/>
+      </group-by>
+
+      <split-by>
+        <data-field name="date"/>
+      </split-by>
+
+      <sort-by>
+        <data-field name="code" desc/>
+      </sort-by>
+
+    </data-frame>
+
+    <data-frame
+      name="profitable_products"
+      from="hdml://data1.io/sales.hdml?data-frame=product_profit"
+      cache-control="max-age=600">
+
+      <data-fields>
+        <data-field origin="code"/>
+        <data-field origin="name"/>
+        <data-field origin="date"/>
+        <data-field origin="total_quantity"/>
+        <data-field origin="total_price"/>
+        <data-field origin="total_cost"/>
+        <data-field origin="profit"/>
+      </data-fields>
+
+      <filter-by>
+        <logical-or>
+          <search-expr
+            clause="total_price > total_cost" />
+          <search-filter
+            field="profit"
+            more-than="0"/>
+        </logical-or>
+      </filter-by>
+
+    </data-frame>
+  </body>
+</html>

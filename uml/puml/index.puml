@@ -1,0 +1,97 @@
+@startuml hdml_deployment
+  node "client#uuid" as client_device {
+    node "client process" as client_process {
+      component "hdml doc" as hdml_doc
+    }
+  }
+
+  node "worker#uuid" as worker_device {
+    node "process" as worker_process_1 {
+      component "hdml auth" as hdml_auth
+    }
+    node "process" as worker_process_2 {
+      component "hdml host" as hdml_host
+    }
+    node "process" as worker_process_3 {
+      component "hdml fs" as hdml_watcher
+    }
+    node "process" as worker_process_4 {
+      component "hdml runner" as query_runner
+    }
+  }
+
+  database "data storage" as data_storage
+  data_storage --* query_runner
+
+  storage "hdml.fs" as hdml_fs
+  hdml_fs --* hdml_watcher
+
+  node "gateway#uuid" as gateway_device {
+    node "gateway process" as gateway_process
+  }
+
+  queue "queue" as queue
+  hdml_auth *-- queue
+  hdml_host *-- queue
+  hdml_watcher *-- queue
+  query_runner *-- queue
+  queue --* gateway_process
+
+  interface "http" as hdml_http
+  hdml_doc --( hdml_http
+  hdml_http -- gateway_process
+
+  interface "WebSocket" as hdml_ws
+  hdml_doc --( hdml_ws
+  hdml_host --( hdml_ws
+  hdml_auth --( hdml_ws
+  hdml_ws -- gateway_process
+@enduml
+
+@startuml hdml_fs
+  storage "hdml.fs" {
+    folder "root" {
+      folder "common" as com {
+        file ".env" as com_env
+        folder "hdml" as com_hdml {
+          file "sales.hdml" as com_sales
+          file "ecommerce.hdml" as com_ecom
+          com_sales -[hidden]- com_ecom
+        }
+        folder "keys" as com_keys {
+          file "key" as com_key
+          file "key.pub" as com_pub
+          com_key -[hidden]- com_pub
+        }
+        folder "middlewares" as com_mws {
+          file "auth.js" as com_auth
+          file "hdml.js" as com_patch
+          com_auth -[hidden]- com_patch
+        }
+
+        com_env -[hidden]- com_key
+        com_env -[hidden]- com_auth
+        com_env -[hidden]- com_sales
+      }
+    }
+  }
+@enduml
+
+@startuml auth_js
+  start
+  :tenant: string, token: string/
+  partition auth {
+    :const env: Env = await readEnv(tenant);|
+    :const key: string = await readKey(env, tenant);|
+    :const user: User = await auth(env, key, token);|
+  }
+  :user/
+  end
+@enduml
+
+@startuml hdml_js
+  start
+  :env: Env, user: any, hdml: HDMLDocument/
+  :await hdml(env, user, hdml);|
+  end
+@enduml

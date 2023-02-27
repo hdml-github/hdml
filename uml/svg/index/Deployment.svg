@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="863px" preserveAspectRatio="none" style="width:434px;height:863px;background:#FFFFFF;" version="1.1" viewBox="0 0 434 863" width="434px" zoomAndPan="magnify"><defs/><g><rect fill="none" height="26.2969" id="_title" style="stroke:none;stroke-width:1.0;" width="104" x="158" y="5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="94" x="163" y="22.9951">Deployment</text><!--MD5=[ff6afba9dc7c9016f0d84273cb6c6547]
+cluster hdml_io--><g id="cluster_hdml_io"><polygon fill="none" points="16,237.2969,26,227.2969,417,227.2969,417,767.2969,407,777.2969,16,777.2969,16,237.2969" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="407" x2="417" y1="237.2969" y2="227.2969"/><line style="stroke:#181818;stroke-width:1.0;" x1="16" x2="407" y1="237.2969" y2="237.2969"/><line style="stroke:#181818;stroke-width:1.0;" x1="407" x2="407" y1="237.2969" y2="777.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="57" x="184" y="253.292">hdml.io</text></g><!--MD5=[80619740e90c2dda6cdc058cf78582d1]
+entity GatewaySvc--><g id="elem_GatewaySvc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="123" x="154.5" y="267.2969"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="257.5" y="272.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="255.5" y="274.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="255.5" y="278.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="83" x="169.5" y="300.292">GatewaySvc</text></g><!--MD5=[3d5b3b33ddac8729f4afe0ab0f8b6b0f]
+entity AuthAPI--><g id="elem_AuthAPI"><ellipse cx="92" cy="402.2969" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="63.5" y="432.292">Auth API</text></g><!--MD5=[842601888e0acc3a23d18196eaf04a2b]
+entity AuthSvc--><g id="elem_AuthSvc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="96" x="32" y="491.2969"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="108" y="496.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="106" y="498.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="106" y="502.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56" x="47" y="524.292">AuthSvc</text></g><!--MD5=[a368ebbfcb40a253cf3f4c3407f7fab3]
+entity PluginAPI--><g id="elem_PluginAPI"><ellipse cx="216" cy="402.2969" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="67" x="182.5" y="432.292">Plugin API</text></g><!--MD5=[c9d3a3e3053509ae561de22da24de5ca]
+entity PluginSvc--><g id="elem_PluginSvc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="106" x="163" y="491.2969"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="249" y="496.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="247" y="498.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="247" y="502.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="66" x="178" y="524.292">PluginSvc</text></g><!--MD5=[e4e475f877d9d04a7ff5d80e07f039c4]
+entity ExecAPI--><g id="elem_ExecAPI"><ellipse cx="341" cy="402.2969" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="58" x="312" y="432.292">Exec API</text></g><!--MD5=[f69ba4f250664717910dd774e1357632]
+entity ExecSvc--><g id="elem_ExecSvc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="97" x="304.5" y="491.2969"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="381.5" y="496.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="379.5" y="498.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="379.5" y="502.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="57" x="319.5" y="524.292">ExecSvc</text></g><!--MD5=[a7aa228c02dbfb671ede4e58f4625ffd]
+entity FSAPI--><g id="elem_FSAPI"><ellipse cx="216" cy="626.2969" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="42" x="195" y="656.292">FS API</text></g><!--MD5=[3938556d85ccf3c41413e1f939d31ca1]
+entity FSSvc--><g id="elem_FSSvc"><rect fill="#F1F1F1" height="46.2969" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="81" x="175.5" y="715.2969"/><rect fill="#F1F1F1" height="10" style="stroke:#181818;stroke-width:0.5;" width="15" x="236.5" y="720.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="234.5" y="722.2969"/><rect fill="#F1F1F1" height="2" style="stroke:#181818;stroke-width:0.5;" width="4" x="234.5" y="726.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="41" x="190.5" y="748.292">FSSvc</text></g><!--MD5=[4a65e84059005d12693a083370a06717]
+entity client--><g id="elem_client"><polygon fill="#F1F1F1" points="177.5,53.2969,187.5,43.2969,254.5,43.2969,254.5,79.5938,244.5,89.5938,177.5,89.5938,177.5,53.2969" style="stroke:#181818;stroke-width:0.5;"/><line style="stroke:#181818;stroke-width:0.5;" x1="244.5" x2="254.5" y1="53.2969" y2="43.2969"/><line style="stroke:#181818;stroke-width:0.5;" x1="177.5" x2="244.5" y1="53.2969" y2="53.2969"/><line style="stroke:#181818;stroke-width:0.5;" x1="244.5" x2="244.5" y1="53.2969" y2="89.5938"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="37" x="192.5" y="76.292">client</text></g><!--MD5=[dd3878050c20f00468da85ee0f72c60e]
+entity hdml_rest--><g id="elem_hdml_rest"><ellipse cx="216" cy="178.2969" fill="#F1F1F1" rx="8" ry="8" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="62" x="185" y="208.292">REST API</text></g><!--MD5=[293437d60d5a8e92156ac57a780321b4]
+entity hdml_fs--><g id="elem_hdml_fs"><rect fill="#F1F1F1" height="36.2969" rx="35" ry="35" style="stroke:#181818;stroke-width:0.5;" width="70" x="181" y="821.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="50" x="191" y="844.292">hdml.fs</text></g><!--MD5=[3974ed087447697bd2605e3d07710811]
+link client to hdml_rest--><g id="link_client_hdml_rest"><path d="M216,89.5569 C216,110.0369 216,140.0269 216,159.1069 " fill="none" id="client-to-hdml_rest" style="stroke:#181818;stroke-width:1.0;"/><path d="M224.4572,166.0787 A9,9 0 0 0 207.5428 166.0787" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[7e594073f7296117be697325c7db1e5f]
+link hdml_rest to GatewaySvc--><g id="link_hdml_rest_GatewaySvc"><path d="M216,187.5669 C216,204.2569 216,242.4569 216,267.0069 " fill="none" id="hdml_rest-GatewaySvc" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[556afa6ac18c8ee59888dd7582e19658]
+link AuthAPI to AuthSvc--><g id="link_AuthAPI_AuthSvc"><path d="M91.1,411.5669 C89.28,428.2569 85.11,466.4569 82.43,491.0069 " fill="none" id="AuthAPI-AuthSvc" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[e7ee9e746e3cdd074b229580f72f5ec4]
+link GatewaySvc to AuthAPI--><g id="link_GatewaySvc_AuthAPI"><path d="M190.91,313.5569 C166.42,335.2869 129.85,367.7269 108.72,386.4669 " fill="none" id="GatewaySvc-to-AuthAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M109.0912,397.4479 A9,9 0 0 0 97.8779 384.7845" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[b23975bb2e507924d3d2607478d9f2f8]
+link PluginAPI to PluginSvc--><g id="link_PluginAPI_PluginSvc"><path d="M216,411.5669 C216,428.2569 216,466.4569 216,491.0069 " fill="none" id="PluginAPI-PluginSvc" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[120a574f9b2e09a40a182420ec1454c4]
+link GatewaySvc to PluginAPI--><g id="link_GatewaySvc_PluginAPI"><path d="M216,313.5569 C216,334.0369 216,364.0269 216,383.1069 " fill="none" id="GatewaySvc-to-PluginAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M224.4572,390.0787 A9,9 0 0 0 207.5428 390.0787" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[832476680e389044938691772c67c3ea]
+link ExecAPI to ExecSvc--><g id="link_ExecAPI_ExecSvc"><path d="M341.9,411.5669 C343.72,428.2569 347.89,466.4569 350.57,491.0069 " fill="none" id="ExecAPI-ExecSvc" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[af3b96facfbc3ec6b5ecf66d190e97cf]
+link GatewaySvc to ExecAPI--><g id="link_GatewaySvc_ExecAPI"><path d="M241.3,313.5569 C265.98,335.2869 302.85,367.7269 324.15,386.4669 " fill="none" id="GatewaySvc-to-ExecAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M335.0083,384.7713 A9,9 0 0 0 323.8462 397.4798" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[04b09e5258e1a68248d018b78a2207ae]
+link FSAPI to FSSvc--><g id="link_FSAPI_FSSvc"><path d="M216,635.5669 C216,652.2569 216,690.4569 216,715.0069 " fill="none" id="FSAPI-FSSvc" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[54c5b24b6fed523b680a26346b908bea]
+link AuthSvc to FSAPI--><g id="link_AuthSvc_FSAPI"><path d="M107.52,537.5569 C134.91,559.7169 176.08,593.0069 199.02,611.5669 " fill="none" id="AuthSvc-to-FSAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M209.7775,609.3829 A9,9 0 0 0 199.1524 622.5436" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[d0b1d085ce1f34135898d3ec773702a2]
+link PluginSvc to FSAPI--><g id="link_PluginSvc_FSAPI"><path d="M216,537.5569 C216,558.0369 216,588.0269 216,607.1069 " fill="none" id="PluginSvc-to-FSAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M224.4572,614.0787 A9,9 0 0 0 207.5428 614.0787" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[9a45b31c6bdb18317f0cf72835bebe42]
+link ExecSvc to FSAPI--><g id="link_ExecSvc_FSAPI"><path d="M325.28,537.5569 C297.68,559.7169 256.21,593.0069 233.1,611.5669 " fill="none" id="ExecSvc-to-FSAPI" style="stroke:#181818;stroke-width:1.0;"/><path d="M232.9031,622.5676 A9,9 0 0 0 222.3191 609.3738" fill="none" style="stroke:#181818;stroke-width:1.5;"/></g><!--MD5=[b8fb01731507ecba56b3331c7de90b66]
+reverse link FSSvc to hdml_fs--><g id="link_FSSvc_hdml_fs"><path d="M216,774.8969 C216,790.6469 216,808.4469 216,821.1669 " fill="none" id="FSSvc-backto-hdml_fs" style="stroke:#181818;stroke-width:1.0;"/><polygon fill="#181818" points="216,761.7569,212,767.7569,216,773.7569,220,767.7569,216,761.7569" style="stroke:#181818;stroke-width:1.0;"/></g><!--MD5=[f273aa7ffb0e6a37ee2e9d553cead02d]
+@startuml Deployment
+  title Deployment
+
+  node "client" as client
+  interface "REST API" as hdml_rest
+  client - -( hdml_rest
+
+  node "hdml.io" as hdml_io {
+    component "GatewaySvc" as GatewaySvc
+    hdml_rest - - GatewaySvc
+    
+    interface "Auth API" as AuthAPI
+    component "AuthSvc" as AuthSvc
+    AuthAPI - - AuthSvc
+    GatewaySvc - -( AuthAPI
+
+    interface "Plugin API" as PluginAPI
+    component "PluginSvc" as PluginSvc
+    PluginAPI - - PluginSvc
+    GatewaySvc - -( PluginAPI
+
+    interface "Exec API" as ExecAPI
+    component "ExecSvc" as ExecSvc
+    ExecAPI - - ExecSvc
+    GatewaySvc - -( ExecAPI
+
+    interface "FS API" as FSAPI
+    component "FSSvc" as FSSvc
+    FSAPI - - FSSvc
+    AuthSvc - -( FSAPI
+    PluginSvc - -( FSAPI
+    ExecSvc - -( FSAPI
+  }
+  
+  storage "hdml.fs" as hdml_fs
+  FSSvc *- - hdml_fs
+
+  ' interface "JDBC API" as executor_jdbc
+  ' hdml_io - -( executor_jdbc
+
+  ' interface "REST API" as executor_rest
+  ' hdml_io - -( executor_rest
+
+  ' node "executor" as executor
+  ' executor_jdbc - - executor
+  ' executor_rest - - executor
+
+  ' database "datasource" as datasource
+  ' executor "1" o- - "0..*" datasource
+
+  ' database "cache" as cache
+  ' executor "1" *- - "1" cache
+@enduml
+
+@startuml Deployment
+  title Deployment
+
+  node "client" as client
+  interface "REST API" as hdml_rest
+  client - -( hdml_rest
+
+  node "hdml.io" as hdml_io {
+    component "GatewaySvc" as GatewaySvc
+    hdml_rest - - GatewaySvc
+    
+    interface "Auth API" as AuthAPI
+    component "AuthSvc" as AuthSvc
+    AuthAPI - - AuthSvc
+    GatewaySvc - -( AuthAPI
+
+    interface "Plugin API" as PluginAPI
+    component "PluginSvc" as PluginSvc
+    PluginAPI - - PluginSvc
+    GatewaySvc - -( PluginAPI
+
+    interface "Exec API" as ExecAPI
+    component "ExecSvc" as ExecSvc
+    ExecAPI - - ExecSvc
+    GatewaySvc - -( ExecAPI
+
+    interface "FS API" as FSAPI
+    component "FSSvc" as FSSvc
+    FSAPI - - FSSvc
+    AuthSvc - -( FSAPI
+    PluginSvc - -( FSAPI
+    ExecSvc - -( FSAPI
+  }
+  
+  storage "hdml.fs" as hdml_fs
+  FSSvc *- - hdml_fs
+
+
+
+
+
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 10:01:30 PDT 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

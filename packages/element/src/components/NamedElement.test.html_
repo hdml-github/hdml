@@ -169,6 +169,35 @@
                 "event old is null"
               ).to.be.true;
             });
+
+            it("must dispatch `name-changed` event if `name` property was changed", async () => {
+              element.name = "name";
+              await element.updateComplete;
+              expect(
+                event,
+                "`name-changed` event has been handled on element",
+              ).not.to.be.undefined;
+              expect(
+                event2,
+                "`name-changed` event has been handled on window",
+              ).not.to.be.undefined;
+              expect(
+                event === event2,
+                "event object bubble up to window",
+              ).to.be.true;
+              expect(
+                event.target === element,
+                "event target is euqal to element"
+              ).to.be.true;
+              expect(
+                event.detail.val === element.getAttribute("name"),
+                "event val is equal to element name property"
+              ).to.be.true;
+              expect(
+                event.detail.old === null,
+                "event old is null"
+              ).to.be.true;
+            });
           });
           
           describe("tag with invalid `name` attribute", () => {
@@ -282,16 +311,31 @@
               );
             });
 
-            it("must not dispatch `name-changed` event by the default", () => {
+            it("must dispatch `name-changed` event by the default", () => {
               expect(
                 event,
-                "`name-changed` event didn't handled on element",
+                "`name-changed` event has been handled on element",
               ).to.be.undefined;
-
               expect(
                 event2,
-                "`name-changed` event didn't handled on window",
-              ).to.be.undefined;
+                "`name-changed` event has been handled on window",
+              ).not.to.be.undefined;
+              expect(
+                event === event2,
+                "event object bubble up to window",
+              ).to.be.true;
+              expect(
+                event.target === element,
+                "event target is euqal to element"
+              ).to.be.true;
+              expect(
+                event.detail.val === element.getAttribute("name"),
+                "event val is equal to element name property"
+              ).to.be.true;
+              expect(
+                event.detail.old === old,
+                "event old is equal to element's old name property"
+              ).to.be.true;
             });
 
             it("must dispatch `name-changed` event if `name` attribute was changed", () => {
