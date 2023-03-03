@@ -1,0 +1,13 @@
+/coverage
+/docs
+/tsconfig
+/fbs
+/src
+/tsconfig
+.eslintrc.js
+.jestrc.js
+.npmignore
+.prettierrc.js
+.travis.yml
+index.html
+tsconfig.json
