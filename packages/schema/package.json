@@ -7,7 +7,6 @@
     "access": "public"
   },
   "dependencies": {
-    "uuid": "^9.0.0",
     "flatbuffers": "^23.1.21"
   },
   "scripts": {
