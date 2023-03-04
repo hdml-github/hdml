@@ -5,15 +5,16 @@
     <script src="https://cdn.example.com/hdml.min.js"></script>
   </head>
   <body>
-    <data-io
+    <data-host
       name="data.io"
       tenant="common"
       token="gwkcc9k31daqq9909hdshk1==">
-    </data-io>
+    </data-host>
 
     <data-frame
       name="product_profit"
-      from="hdml://data.io/models/sales.html?data-model=sales"
+      host="data.io"
+      source="/models/sales.html?data-model=sales"
       limit="50000">
 
       <data-fields>
@@ -25,6 +26,8 @@
           origin="products.name"/>
         <data-field
           name="date"
+          type="date"
+          unit="second"
           clause="date_trunc('day', sales.date)"/>
         <data-field
           name="total_quantity"
@@ -61,7 +64,8 @@
 
     <data-frame
       name="profitable_products"
-      from="data-frame=product_profit"
+      host="data.io"
+      source="?data-frame=product_profit"
       cache-control="max-age=600">
 
       <data-fields>

@@ -1,0 +1,15 @@
+/**
+ * @fileoverview JoinType enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// JoinType enum.
+enum JoinType: byte {
+  Inner,
+  Left,
+  Right,
+}

@@ -1,0 +1,16 @@
+/**
+ * @fileoverview TableType enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// TableType enum.
+enum TableType: byte {
+  Json,
+  Csv,
+  Table,
+  Query,
+}

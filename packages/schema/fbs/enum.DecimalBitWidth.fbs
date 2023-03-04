@@ -1,0 +1,14 @@
+/**
+ * @fileoverview DecimalBitWidth enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// DecimalBitWidth enum.
+enum DecimalBitWidth: byte {
+  _128,
+  _256,
+}

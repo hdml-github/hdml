@@ -1,10 +1,14 @@
 /**
+ * @fileoverview DataType enums definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache2.0
  */
 
-enum Type: byte {
+namespace enum;
+
+/// DataType enum.
+enum DataType: byte {
   Int8,
   Int16,
   Int32,
@@ -16,6 +20,10 @@ enum Type: byte {
   Float16,
   Float32,
   Float64,
+  Decimal,
+  Date,
+  Time,
+  Timestamp,
   Binary,
-  Utf8
+  Utf8,
 }

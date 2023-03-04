@@ -1,0 +1,25 @@
+/**
+ * @fileoverview FilterName enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// FilterName enum.
+enum FilterName: byte {
+  Equals,
+  NotEquals,
+  Contains,
+  NotContains,
+  StartsWith,
+  EndsWith,
+  Greater,
+  GreaterEqual,
+  Less,
+  LessEqual,
+  IsNull,
+  IsNotNull,
+  Between,
+}

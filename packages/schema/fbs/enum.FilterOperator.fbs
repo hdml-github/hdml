@@ -1,0 +1,15 @@
+/**
+ * @fileoverview FilterOperator enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// FilterOperator enum.
+enum FilterOperator: byte {
+  Or,
+  And,
+  None,
+}

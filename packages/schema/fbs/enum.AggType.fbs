@@ -1,0 +1,19 @@
+/**
+ * @fileoverview AggType enums definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// AggType enum.
+enum AggType: byte {
+  Count,
+  CountDistinct,
+  CountDistinctApprox,
+  Sum,
+  Avg,
+  Min,
+  Max,
+}

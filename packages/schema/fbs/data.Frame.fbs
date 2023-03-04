@@ -1,0 +1,25 @@
+/**
+ * @fileoverview Data frame types definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./data.Field.fbs";
+include "./data.FilterClause.fbs";
+
+namespace data;
+
+/// Data frame type.
+table Frame {
+  name: string;
+  host: string;
+  source: string;
+  limit: ulong;
+  fields: [data.Field];
+  filter: data.FilterClause;
+  group_by: [data.Field];
+  split_by: [data.Field];
+  sort_by: [data.Field];
+  children: [Frame];
+}

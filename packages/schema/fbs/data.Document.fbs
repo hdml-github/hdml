@@ -1,0 +1,20 @@
+/**
+ * @fileoverview Data document types definition.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./data.Model.fbs";
+include "./data.Frame.fbs";
+
+namespace data;
+
+/// Data document type.
+table Document {
+  name: string;
+  tenant: string;
+  token: string;
+  model: data.Model;
+  frames: [data.Frame];
+}
