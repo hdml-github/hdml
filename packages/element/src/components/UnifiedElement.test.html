@@ -9,132 +9,40 @@
 
       const getUid = window['@hdml/element'].getUid;
       const UnifiedElement = window['@hdml/element'].UnifiedElement;
-      const UnifiedElementSchema = window['@hdml/element'].UnifiedElementSchema;
       const UID = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
       
       runTests(async () => {
-        describe("UnifiedElement class", () => {
+        describe("Unified element", () => {
           before(async () => {
             customElements.define("unified-element", UnifiedElement);
             await customElements.whenDefined("unified-element");
           });
 
-          describe("UnifiedElement schema", () => {
-            it("must be specified by the default or if it was specified in the constructor", () => {
-              let element = new UnifiedElement();
-              expect(
-                element.schema,
-                "default schema specified",
-              ).to.deep.equal(UnifiedElementSchema);
-
-              element = new UnifiedElement({
-                properties: { uid: "id" },
-                required: ["uid"],
-              });
-              expect(
-                element.schema,
-                "correct schema specified",
-              ).to.deep.equal({
-                properties: { uid: "id" },
-                required: ["uid"],
-              });
-            });
-
-            it("must be null if wrong schema was specified in the constructor", () => {
-              let element = new UnifiedElement({});
-              expect(
-                element.schema,
-                "default schema specified",
-              ).to.be.null;
-
-              element = new UnifiedElement({ properties: "id" });
-              expect(
-                element.schema,
-                "default schema specified",
-              ).to.be.null;
-              element = new UnifiedElement({ properties: { id: "id" } });
-
-              expect(
-                element.schema,
-                "default schema specified",
-              ).to.be.null;
-
-              element = new UnifiedElement({ properties: { uid: "id" } });
-              expect(
-                element.schema,
-                "default schema specified",
-              ).to.be.null;
-            });
-
-            it("must assert data as expected", () => {
-              let element = new UnifiedElement();
-              expect(
-                element.assertDataInternal({}),
-                "wrong object return false",
-              ).to.be.false;
-              expect(
-                element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" }),
-                "correct object returns true",
-              ).to.be.true;
-
-              element = new UnifiedElement({});
-              expect(
-                element.assertDataInternal({}),
-                "wrong schema returns false on assertion of wrong object",
-              ).to.be.false;
-              expect(
-                element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" }),
-                "wrong schema returns false on assertion of correct object",
-              ).to.be.false;
-
-              element = new UnifiedElement({
-                properties: { uid: "id" },
-                required: ["uid"],
-              });
-              expect(
-                () => {element.assertDataInternal({})},
-                "wrong schema throws on assertion of wrong object",
-              ).to.throw();
-              expect(
-                () => {element.assertDataInternal({ uid: "00000000-0000-0000-0000-000000000000" })},
-                "wrong schema throws on assertion of correct object",
-                ).to.throw();
-            });
-          });
-
-          describe("<unified-element/> tag", () => {
-            let element;
-
-            beforeEach(() => {
-              window.document.body.innerHTML = `<unified-element/>`;
-              element = document.querySelector("unified-element");
-            });
-
-            afterEach(() => {
-              element.remove();
-              element = null;
-            });
-
-            it("must have a valid default values", () => {
-              expect(
-                element.nodeType,
-                "node type",
-              ).to.equal(1);
-              expect(
-                element.tagName,
-                "tag name",
-              ).to.equal("UNIFIED-ELEMENT");
-              expect(
-                element.outerHTML,
-                "outer html",
-              ).to.equal("<unified-element></unified-element>");
+          describe("instantiated in script", () => {
+            it("must contain a valid `uid` property", () => {
+              const element = new UnifiedElement();
               expect(
                 element.uid,
-                "uid property defined",
+                "uid property is undefined",
               ).not.to.be.undefined;
               expect(
                 UID.test(element.uid),
-                "uid property regexp",
+                "uid property is invalid",
+              ).to.be.true;
+            });
+          });
+
+          describe("instantiated in HTML", () => {
+            it("must contain a valid `uid` property", () => {
+              window.document.body.innerHTML = `<unified-element/>`;
+              const element = document.querySelector("unified-element");
+              expect(
+                element.uid,
+                "uid property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                UID.test(element.uid),
+                "uid property is invalid",
               ).to.be.true;
             });
           });

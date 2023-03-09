@@ -7,12 +7,8 @@
 
 import * as lit from "lit";
 import { getUid } from "./helpers/index";
-import {
-  UnifiedElement,
-  UnifiedElementSchema,
-  ElementSchema,
-} from "./components/UnifiedElement";
-import { IoElement } from "./components/IoElement";
+import { UnifiedElement } from "./components/UnifiedElement";
+import { HostElement } from "./components/HostElement";
 // import {
 //   SerializableElement,
 //   ElementSchema,
@@ -27,10 +23,8 @@ import { IoElement } from "./components/IoElement";
 export {
   lit,
   getUid,
-  ElementSchema,
   UnifiedElement,
-  UnifiedElementSchema,
-  IoElement,
+  HostElement,
   // SerializableElement,
   // NamedElement,
   // NameChanged,

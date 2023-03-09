@@ -1,7 +1,6 @@
 /coverage
 /docs
 /tsconfig
-/fbs
 /src
 /tsconfig
 .eslintrc.js

@@ -9,6 +9,7 @@ namespace enum;
 
 /// JoinType enum.
 enum JoinType: byte {
+  Cross,
   Inner,
   Left,
   Right,

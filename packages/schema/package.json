@@ -13,7 +13,7 @@
     "dev": "../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open index.html",
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
     "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
-    "compile_fbs": "flatc --ts --ts-flat-files -o ./src/.fbs -I ./fbs ./fbs/*.fbs",
+    "compile_fbs": "flatc --ts --ts-flat-files -o ./src/.fbs -I ./src/schema/fbs ./src/schema/fbs/*.fbs",
     "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",
     "compile_cjs": "tsc -b ./tsconfig/cjs.json",
     "compile_esm": "tsc -b ./tsconfig/esm.json",

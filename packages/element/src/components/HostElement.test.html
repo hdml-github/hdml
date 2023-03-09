@@ -1,0 +1,252 @@
+<html>
+  <head>
+    <script type="module" src="/bin/element.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      import { createSandbox } from "sinon/pkg/sinon-esm.js";
+
+      const HostElement = window['@hdml/element'].HostElement;
+      
+      runTests(async () => {
+        describe("Host element", () => {
+
+          before(async () => {
+            customElements.define("host-element", HostElement);
+            await customElements.whenDefined("host-element");
+          });
+
+          describe("instantiated in script", () => {
+            const sandbox = createSandbox();
+
+            beforeEach(() => {
+              sandbox.spy(console, "error");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+            });
+
+            it("must contain an empty `name` property", () => {
+              const element = new HostElement();
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property value is not empty",
+              ).to.equal("");
+            });
+
+            it("must ignore an incorrect `name` property values", () => {
+              const element = new HostElement();
+              element.name = "*/#$";
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is undefined",
+              ).to.equal("");
+              expect(
+                console.error.calledOnce,
+                "error consoled not once"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                "The `name` property value \"*/#$\" doesn't match " +
+                "an element schema. Skipped."
+              )
+            });
+
+            it("must set a correct `name` property values", () => {
+              const element = new HostElement();
+              element.name = "hdml.io";
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is not set",
+              ).to.equal("hdml.io");
+            });
+          });
+
+          describe("instantiated in HTML", () => {
+            const sandbox = createSandbox();
+            
+            beforeEach(() => {
+              sandbox.spy(console, "warn");
+              sandbox.spy(console, "error");
+            });
+
+            afterEach(() => {
+              sandbox.restore();
+            });
+
+            it("must contain an empty `name` property", () => {
+              window.document.body.innerHTML = `<host-element/>`;
+              const element = document.querySelector("host-element");
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is not empty",
+              ).to.equal("");
+
+              element.remove();
+            });
+
+            it("`name` attribute must equal to `null`", () => {
+              window.document.body.innerHTML = `<host-element/>`;
+              const element = document.querySelector("host-element");
+              const attribute = element.getAttribute("name");
+
+              expect(
+                attribute,
+                "name attribute is undefined",
+              ).not.to.be.undefined;
+              expect(
+                attribute,
+                "name attribute is not null",
+              ).to.equal(null);
+
+              element.remove();
+            });
+
+            it("must ignore an incorrect `name` property values", async () => {
+              window.document.body.innerHTML = `<host-element/>`;
+              const element = document.querySelector("host-element");
+              element.name = "*/#$";
+              await element.updateComplete;
+              const attribute = element.getAttribute("name");
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is undefined",
+              ).to.equal("");
+              expect(
+                attribute,
+                "name attribute is undefined",
+              ).not.to.be.undefined;
+              expect(
+                attribute,
+                "name attribute is not null",
+              ).to.equal(null);
+              expect(
+                console.error.calledOnce,
+                "error consoled not once"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                "The `name` property value \"*/#$\" doesn't match " +
+                  "an element schema. Skipped."
+              )
+            });
+
+            it("must ignore an incorrect `name` attribute values", async () => {
+              window.document.body.innerHTML = `<host-element name="*/#$"/>`;
+              const element = document.querySelector("host-element");
+              const attribute = element.getAttribute("name");
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is undefined",
+              ).to.equal("");
+              expect(
+                attribute,
+                "name attribute is undefined",
+              ).not.to.be.undefined;
+              expect(
+                attribute,
+                "name attribute is not null",
+              ).to.equal(null);
+              expect(
+                console.error.calledOnce,
+                "error consoled not once"
+              ).to.be.true;
+              expect(
+                console.error.getCall(0).args[0],
+                "error message"
+              ).to.equal(
+                "The `name` property value \"*/#$\" doesn't match " +
+                  "an element schema. Skipped."
+              )
+            });
+
+            it("must set a correct `name` property values", async () => {
+              window.document.body.innerHTML = `<host-element/>`;
+              const element = document.querySelector("host-element");
+              element.name = "hdml.io";
+              await element.updateComplete;
+              const attribute = element.getAttribute("name");
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is not set",
+              ).to.equal("hdml.io");
+              expect(
+                attribute,
+                "name attribute is undefined",
+              ).not.to.be.undefined;
+              expect(
+                attribute,
+                "name attribute is not set",
+              ).to.equal("hdml.io");
+            });
+
+            it("must set a correct `name` attribute values", async () => {
+              window.document.body.innerHTML = `<host-element name="hdml.io"/>`;
+              const element = document.querySelector("host-element");
+              const attribute = element.getAttribute("name");
+
+              expect(
+                element.name,
+                "name property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                element.name,
+                "name property is not set",
+              ).to.equal("hdml.io");
+              expect(
+                attribute,
+                "name attribute is undefined",
+              ).not.to.be.undefined;
+              expect(
+                attribute,
+                "name attribute is not set",
+              ).to.equal("hdml.io");
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
