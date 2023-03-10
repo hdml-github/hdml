@@ -1,0 +1,63 @@
+<html>
+  <head>
+    <script type="module" src="/bin/element.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      import { createSandbox } from "sinon/pkg/sinon-esm.js";
+
+      const runAttrTestSuite = window['@hdml/element'].runAttrTestSuite;
+      const ModelElement = window['@hdml/element'].ModelElement;
+      
+      runTests(async () => {
+        describe("Model element", () => {
+          before(async () => {
+            customElements.define("tested-element", ModelElement);
+            await customElements.whenDefined("tested-element");
+          });
+
+          // name
+          runAttrTestSuite(
+            ModelElement,
+            { name: "name", valid: "tenant_1", invalid: "tenant-1" },
+            { name: "name", valid: "tenant_1", invalid: "tenant-1" },
+          );
+          runAttrTestSuite(
+            ModelElement,
+            { name: "name", valid: "1_tenant", invalid: "1-tenant" },
+            { name: "name", valid: "1_tenant", invalid: "1-tenant" },
+          );
+          runAttrTestSuite(
+            ModelElement,
+            { name: "name", valid: "_tenant_", invalid: "-tenant-" },
+            { name: "name", valid: "_tenant_", invalid: "-tenant-" },
+          );
+
+          // host
+          runAttrTestSuite(
+            ModelElement,
+            { name: "host", valid: "hdml.io", invalid: "*/#$" },
+            { name: "host", valid: "hdml.io", invalid: "*/#$" },
+          );
+          runAttrTestSuite(
+            ModelElement,
+            { name: "host", valid: "s.hdml.io", invalid: "1.hdml.io" },
+            { name: "host", valid: "s.hdml.io", invalid: "1.hdml.io" },
+          );
+          runAttrTestSuite(
+            ModelElement,
+            { name: "host", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+            { name: "host", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+          );
+          runAttrTestSuite(
+            ModelElement,
+            { name: "host", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
+            { name: "host", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

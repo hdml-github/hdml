@@ -5,8 +5,9 @@
  * JoinType enum.
  */
 export enum JoinType {
-  Inner = 0,
-  Left = 1,
-  Right = 2
+  Cross = 0,
+  Inner = 1,
+  Left = 2,
+  Right = 3
 }
 

@@ -5,7 +5,8 @@
  * @license Apache-2.0
  */
 
+import { signature } from "./signature";
 import { getUid } from "./getUid";
 import { runAttrTestSuite } from "./runAttrTestSuite";
 
-export { getUid, runAttrTestSuite };
+export { signature, getUid, runAttrTestSuite };

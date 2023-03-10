@@ -127,7 +127,7 @@ static getSizePrefixedRootAsJoin(bb:flatbuffers.ByteBuffer, obj?:Join):Join {
 
 type():JoinType {
   const offset = this.bb!.__offset(this.bb_pos, 4);
-  return offset ? this.bb!.readInt8(this.bb_pos + offset) : JoinType.Inner;
+  return offset ? this.bb!.readInt8(this.bb_pos + offset) : JoinType.Cross;
 }
 
 left():string|null
@@ -154,7 +154,7 @@ static startJoin(builder:flatbuffers.Builder) {
 }
 
 static addType(builder:flatbuffers.Builder, type:JoinType) {
-  builder.addFieldInt8(0, type, JoinType.Inner);
+  builder.addFieldInt8(0, type, JoinType.Cross);
 }
 
 static addLeft(builder:flatbuffers.Builder, leftOffset:flatbuffers.Offset) {

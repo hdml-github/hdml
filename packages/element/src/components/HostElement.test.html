@@ -19,38 +19,52 @@
             await customElements.whenDefined("tested-element");
           });
 
+          // name
           runAttrTestSuite(
             HostElement,
             // property
-            {
-              name: "name",
-              valid: "hdml.io",
-              invalid: "*/#$",
-            },
+            { name: "name", valid: "hdml.io", invalid: "*/#$" },
             // attribute
-            {
-              name: "name",
-              valid: "hdml.io",
-              invalid: "*/#$",
-            },
+            { name: "name", valid: "hdml.io", invalid: "*/#$" },
+          );
+          runAttrTestSuite(
+            HostElement,
+            { name: "name", valid: "s.hdml.io", invalid: "1.hdml.io" },
+            { name: "name", valid: "s.hdml.io", invalid: "1.hdml.io" },
+          );
+          runAttrTestSuite(
+            HostElement,
+            { name: "name", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+            { name: "name", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+          );
+          runAttrTestSuite(
+            HostElement,
+            { name: "name", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
+            { name: "name", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
           );
 
-
-
+          // tenant
           runAttrTestSuite(
             HostElement,
-            // property
-            {
-              name: "name",
-              valid: "hdml.io",
-              invalid: 100,
-            },
-            // attribute
-            {
-              name: "name",
-              valid: "hdml.io",
-              invalid: "*/#$",
-            },
+            { name: "tenant", valid: "tenant_1", invalid: "1_tenant" },
+            { name: "tenant", valid: "tenant_1", invalid: "1_tenant" },
+          );
+          runAttrTestSuite(
+            HostElement,
+            { name: "tenant", valid: "tenant-1", invalid: "tenant 1" },
+            { name: "tenant", valid: "tenant-1", invalid: "tenant 1" },
+          );
+          runAttrTestSuite(
+            HostElement,
+            { name: "tenant", valid: "tenant-1_0", invalid: "_tenant-1" },
+            { name: "tenant", valid: "tenant-1_0", invalid: "_tenant-1" },
+          );
+
+          // token
+          runAttrTestSuite(
+            HostElement,
+            { name: "token", valid: "token./=+-1", invalid: "token 1" },
+            { name: "token", valid: "token./=+-1", invalid: "token\\" },
           );
         });
       });
