@@ -3,6 +3,7 @@
   "exclude": ["../packages/**/src/**/*.test.ts"],
   "compilerOptions": {
     "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
+    "allowSyntheticDefaultImports": true,
     "emitDeclarationOnly": false,
     "downlevelIteration": true,
     "resolveJsonModule": true,

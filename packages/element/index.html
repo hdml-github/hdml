@@ -5,24 +5,13 @@
     <script>
       const hdml = window['@hdml/element'];
       customElements.define("unified-element", hdml.UnifiedElement);
-      customElements.define("serializable-element", hdml.SerializableElement);
-      customElements.define("named-element", hdml.NamedElement);
+      customElements.define("host-element", hdml.HostElement);
     </script>
   </head>
     <body>
+      <host-element></host-element>
       <script>
-        window.addEventListener("name-changed", (evt) => {
-          console.log(evt);
-        });
-      </script>
-      <named-element id="3" name=" a b c "></named-element>
-      <script>
-        document.getElementById("3").addEventListener("name-changed", (evt) => {
-          console.log(evt);
-        });
-      </script>
-      <script>
-        elm = document.getElementById("3")
+        elm = document.querySelector('host-element');
       </script>
     </body>
 </html>

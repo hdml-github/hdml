@@ -6,5 +6,6 @@
  */
 
 import { getUid } from "./getUid";
+import { runAttrTestSuite } from "./runAttrTestSuite";
 
-export { getUid };
+export { getUid, runAttrTestSuite };

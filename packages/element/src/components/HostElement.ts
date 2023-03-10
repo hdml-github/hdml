@@ -33,13 +33,13 @@ export class HostElement extends UnifiedElement {
   /**
    * A `name` private property.
    */
-  private _name = "";
+  private _name: null | string = null;
 
   /**
    * A `name` setter.
    */
-  public set name(val: string) {
-    if (HOST_NAME_REGEXP.test(val)) {
+  public set name(val: null | string) {
+    if (val === null || val === "" || HOST_NAME_REGEXP.test(val)) {
       const old = this._name;
       this._name = val;
       this.requestUpdate("name", old);
@@ -48,14 +48,20 @@ export class HostElement extends UnifiedElement {
         `The \`name\` property value "${val}" doesn't match an ` +
           "element schema. Skipped.",
       );
-      this.removeAttribute("name");
+      if (this.getAttribute("name") === val) {
+        if (this._name === null) {
+          this.removeAttribute("name");
+        } else {
+          this.setAttribute("name", this._name);
+        }
+      }
     }
   }
 
   /**
    * A `name` getter.
    */
-  public get name(): string {
+  public get name(): null | string {
     return this._name;
   }
 }

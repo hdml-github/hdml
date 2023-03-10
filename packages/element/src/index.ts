@@ -6,7 +6,7 @@
  */
 
 import * as lit from "lit";
-import { getUid } from "./helpers/index";
+import { getUid, runAttrTestSuite } from "./helpers/index";
 import { UnifiedElement } from "./components/UnifiedElement";
 import { HostElement } from "./components/HostElement";
 // import {
@@ -25,6 +25,7 @@ export {
   getUid,
   UnifiedElement,
   HostElement,
+  runAttrTestSuite,
   // SerializableElement,
   // NamedElement,
   // NameChanged,
