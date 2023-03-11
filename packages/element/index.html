@@ -4,14 +4,29 @@
     <script src="/bin/element.min.js"></script>
     <script>
       const hdml = window['@hdml/element'];
-      customElements.define("unified-element", hdml.UnifiedElement);
-      customElements.define("host-element", hdml.HostElement);
+      hdml.defineDefaults();
     </script>
   </head>
     <body>
-      <host-element></host-element>
+      <data-model
+        name="sales1"
+        host="data.io">
+      </data-model>
+
+      <data-host
+        name="data.io"
+        tenant="common"
+        token="gwkcc9k31daqq9909hdshk1==">
+      </data-host>
+
+      <data-model
+        name="sales2"
+        host="data.io">
+      </data-model>
+
       <script>
-        elm = document.querySelector('host-element');
+        host = document.querySelector(hdml.getHostTag());
+        model = document.querySelector(hdml.getModelTag());
       </script>
     </body>
 </html>

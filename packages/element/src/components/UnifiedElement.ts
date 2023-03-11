@@ -6,7 +6,8 @@
  */
 
 import { LitElement } from "lit";
-import { signature, getUid } from "../helpers";
+import { signature } from "../helpers/signature";
+import { getUid } from "../helpers/getUid";
 
 /**
  * Base class for the `hdml` elements. Responds for the uniqueness by

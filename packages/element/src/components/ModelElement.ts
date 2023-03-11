@@ -5,8 +5,10 @@
  * @license Apache-2.0
  */
 
+import { html, TemplateResult } from "lit";
 import { UnifiedElement } from "./UnifiedElement";
-import { HOST_NAME_REGEXP } from "./HostElement";
+import { HOST_NAME_REGEXP, HostElement } from "./HostElement";
+import { getHostTag } from "../helpers/elementsRegister";
 
 export const MODEL_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
 
@@ -109,5 +111,52 @@ export class ModelElement extends UnifiedElement {
    */
   public get host(): null | string {
     return this._host;
+  }
+
+  /**
+   * @override
+   */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this._requestUpdates(this.host);
+  }
+
+  /**
+   * @override
+   */
+  public attributeChangedCallback(
+    name: string,
+    old: string,
+    value: string,
+  ): void {
+    super.attributeChangedCallback(name, old, value);
+    this._requestUpdates(old);
+    this._requestUpdates(value);
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._requestUpdates(this.host);
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): TemplateResult<1> {
+    return html`<slot></slot>`;
+  }
+
+  private _requestUpdates(name: null | string): void {
+    if (name) {
+      const host = <HostElement>(
+        document.querySelector(`${getHostTag()}[name="${name}"]`)
+      );
+      if (host) {
+        host.requestUpdates();
+      }
+    }
   }
 }

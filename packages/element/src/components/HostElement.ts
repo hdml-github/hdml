@@ -5,7 +5,11 @@
  * @license Apache-2.0
  */
 
+import { html, TemplateResult } from "lit";
+import { signature } from "../helpers/signature";
+import { getModelTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
+import { ModelElement } from "./ModelElement";
 
 export const HOST_NAME_REGEXP =
   /^(?:[a-z])+[a-z0-9]*(?:[-_.][a-z0-9]+)*\.[a-z]{2,6}$/;
@@ -160,5 +164,91 @@ export class HostElement extends UnifiedElement {
    */
   public get token(): null | string {
     return this._token;
+  }
+
+  private _modelElements: Map<ModelElement, unknown> = new Map();
+
+  public get modelElements(): IterableIterator<ModelElement> {
+    return this._modelElements.keys();
+  }
+
+  /**
+   * @override
+   */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this.requestUpdates();
+  }
+
+  /**
+   * Updates map of model components related to the current host.
+   */
+  public requestUpdates(): void {
+    console.log("requestUpdates");
+    if (!this.name) {
+      this._modelElements.clear();
+    } else {
+      // cleanup
+      const models = this._modelElements.keys();
+      let iter = models.next();
+      while (!iter.done) {
+        const model = iter.value;
+        model.updateComplete
+          .then(() => {
+            if (!model.isConnected || this.name !== model.host) {
+              this._modelElements.delete(model);
+            }
+          })
+          .catch((reason) => {
+            console.error(reason);
+          });
+        iter = models.next();
+      }
+
+      // update
+      document
+        .querySelectorAll(`${getModelTag()}[host="${this.name}"]`)
+        .forEach((model) => {
+          if (!this._assertSignature(<ModelElement>model)) {
+            console.error("Invalid signature for model:", model);
+          } else if (!this._modelElements.has(<ModelElement>model)) {
+            this._modelElements.set(<ModelElement>model, {});
+          }
+        });
+    }
+  }
+
+  /**
+   * Assert component to be signed by the root HDML package to avoid
+   * some security gaps.
+   */
+  private _assertSignature(component: UnifiedElement): boolean {
+    return component[signature] === component.uid;
+  }
+
+  /**
+   * @override
+   */
+  public attributeChangedCallback(
+    name: string,
+    old: string,
+    value: string,
+  ): void {
+    super.attributeChangedCallback(name, old, value);
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+    //
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): TemplateResult<1> {
+    return html`<slot></slot>`;
   }
 }
