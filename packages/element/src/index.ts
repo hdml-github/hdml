@@ -13,6 +13,7 @@ import {
   defineModel,
   getHostTag,
   getModelTag,
+  getTableTag,
 } from "./helpers/elementsRegister";
 import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
@@ -27,6 +28,7 @@ export {
   defineModel,
   getHostTag,
   getModelTag,
+  getTableTag,
   runAttrTestSuite,
   UnifiedElement,
   HostElement,

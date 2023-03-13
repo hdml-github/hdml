@@ -7,12 +7,16 @@
 
 import { HostElement } from "../components/HostElement";
 import { ModelElement } from "../components/ModelElement";
+import { TableElement } from "../components/TableElement";
 
 let hostDefined = false;
 let hostTag = "data-host";
 
 let modelDefined = false;
 let modelTag = "data-model";
+
+let tableDefined = false;
+let tableTag = "data-table";
 
 /**
  * Define HostElement component tag name and register custom element.
@@ -49,10 +53,27 @@ export async function defineModel(
 }
 
 /**
+ * Define TableElement component tag name and register custom element.
+ */
+export async function defineTable(
+  tagName?: string,
+  Constructor?: new () => TableElement,
+): Promise<void> {
+  if (!tableDefined) {
+    tableDefined = true;
+    if (tagName) {
+      tableTag = tagName;
+    }
+    customElements.define(tableTag, Constructor || TableElement);
+    await customElements.whenDefined(tableTag);
+  }
+}
+
+/**
  * Define HDML tags with the defaults names and components.
  */
 export async function defineDefaults(): Promise<void> {
-  await Promise.all([defineHost(), defineModel()]);
+  await Promise.all([defineHost(), defineModel(), defineTable()]);
 }
 
 /**
@@ -67,4 +88,11 @@ export function getHostTag(): string {
  */
 export function getModelTag(): string {
   return modelTag;
+}
+
+/**
+ * Returns registered TableElement tag name.
+ */
+export function getTableTag(): string {
+  return tableTag;
 }

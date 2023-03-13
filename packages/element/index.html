@@ -22,11 +22,19 @@
       <data-model
         name="sales2"
         host="data.io">
+
+        <data-table
+          name="codes"
+          type="table"
+          source="ds1.products.products">
+        </data-table>
+
       </data-model>
 
       <script>
         host = document.querySelector(hdml.getHostTag());
         model = document.querySelector(hdml.getModelTag());
+        table = document.querySelector(hdml.getTableTag());
       </script>
     </body>
 </html>

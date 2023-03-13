@@ -9,6 +9,7 @@
   "dependencies": {
     "lit": "^2.6.1",
     "uuid": "^8.3.2",
+    "throttle-debounce": "^5.0.0",
     "papaparse": "^5.4.0"
   },
   "scripts": {

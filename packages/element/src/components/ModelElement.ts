@@ -49,6 +49,11 @@ export class ModelElement extends UnifiedElement {
   private _name: null | string = null;
 
   /**
+   * A `host` private property.
+   */
+  private _host: null | string = null;
+
+  /**
    * A `name` setter.
    */
   public set name(val: null | string) {
@@ -77,11 +82,6 @@ export class ModelElement extends UnifiedElement {
   public get name(): null | string {
     return this._name;
   }
-
-  /**
-   * A `host` private property.
-   */
-  private _host: null | string = null;
 
   /**
    * A `host` setter.
@@ -130,7 +130,6 @@ export class ModelElement extends UnifiedElement {
     value: string,
   ): void {
     super.attributeChangedCallback(name, old, value);
-    this._requestUpdates(old);
     this._requestUpdates(value);
   }
 
@@ -142,13 +141,6 @@ export class ModelElement extends UnifiedElement {
     this._requestUpdates(this.host);
   }
 
-  /**
-   * Component template.
-   */
-  public render(): TemplateResult<1> {
-    return html`<slot></slot>`;
-  }
-
   private _requestUpdates(name: null | string): void {
     if (name) {
       const host = <HostElement>(
@@ -158,5 +150,12 @@ export class ModelElement extends UnifiedElement {
         host.requestUpdates();
       }
     }
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): TemplateResult<1> {
+    return html`<slot></slot>`;
   }
 }

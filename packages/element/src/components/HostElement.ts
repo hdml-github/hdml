@@ -6,6 +6,7 @@
  */
 
 import { html, TemplateResult } from "lit";
+import { debounce } from "throttle-debounce";
 import { signature } from "../helpers/signature";
 import { getModelTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
@@ -67,6 +68,23 @@ export class HostElement extends UnifiedElement {
   private _name: null | string = null;
 
   /**
+   * A `tenant` private property.
+   */
+  private _tenant: null | string = null;
+
+  /**
+   * A `token` private property.
+   */
+  private _token: null | string = null;
+
+  private _debouncer: null | debounce<() => void> = null;
+
+  private _modelElements: Map<
+    ModelElement,
+    { observer: MutationObserver }
+  > = new Map();
+
+  /**
    * A `name` setter.
    */
   public set name(val: null | string) {
@@ -95,11 +113,6 @@ export class HostElement extends UnifiedElement {
   public get name(): null | string {
     return this._name;
   }
-
-  /**
-   * A `tenant` private property.
-   */
-  private _tenant: null | string = null;
 
   /**
    * A `tenant` setter.
@@ -132,11 +145,6 @@ export class HostElement extends UnifiedElement {
   }
 
   /**
-   * A `token` private property.
-   */
-  private _token: null | string = null;
-
-  /**
    * A `token` setter.
    */
   public set token(val: null | string) {
@@ -166,8 +174,6 @@ export class HostElement extends UnifiedElement {
     return this._token;
   }
 
-  private _modelElements: Map<ModelElement, unknown> = new Map();
-
   public get modelElements(): IterableIterator<ModelElement> {
     return this._modelElements.keys();
   }
@@ -177,53 +183,10 @@ export class HostElement extends UnifiedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    this._debouncer = debounce(10, () => {
+      this._updateModels();
+    });
     this.requestUpdates();
-  }
-
-  /**
-   * Updates map of model components related to the current host.
-   */
-  public requestUpdates(): void {
-    console.log("requestUpdates");
-    if (!this.name) {
-      this._modelElements.clear();
-    } else {
-      // cleanup
-      const models = this._modelElements.keys();
-      let iter = models.next();
-      while (!iter.done) {
-        const model = iter.value;
-        model.updateComplete
-          .then(() => {
-            if (!model.isConnected || this.name !== model.host) {
-              this._modelElements.delete(model);
-            }
-          })
-          .catch((reason) => {
-            console.error(reason);
-          });
-        iter = models.next();
-      }
-
-      // update
-      document
-        .querySelectorAll(`${getModelTag()}[host="${this.name}"]`)
-        .forEach((model) => {
-          if (!this._assertSignature(<ModelElement>model)) {
-            console.error("Invalid signature for model:", model);
-          } else if (!this._modelElements.has(<ModelElement>model)) {
-            this._modelElements.set(<ModelElement>model, {});
-          }
-        });
-    }
-  }
-
-  /**
-   * Assert component to be signed by the root HDML package to avoid
-   * some security gaps.
-   */
-  private _assertSignature(component: UnifiedElement): boolean {
-    return component[signature] === component.uid;
   }
 
   /**
@@ -242,7 +205,76 @@ export class HostElement extends UnifiedElement {
    */
   public disconnectedCallback(): void {
     super.disconnectedCallback();
-    //
+    this._debouncer && this._debouncer.cancel();
+    this._cleanupModels();
+  }
+
+  /**
+   * Request host updates.
+   */
+  public requestUpdates(): void {
+    this._debouncer && this._debouncer();
+  }
+
+  /**
+   * Updates the map of model components related to the current host.
+   */
+  private _updateModels(): void {
+    this._cleanupModels();
+    if (this.name) {
+      document
+        .querySelectorAll(`${getModelTag()}[host="${this.name}"]`)
+        .forEach((model) => {
+          if (!this._assertSignature(<ModelElement>model)) {
+            console.error("Invalid signature for the model:", model);
+          } else if (!this._modelElements.has(<ModelElement>model)) {
+            const observer = new MutationObserver((mutations) => {
+              for (const mutation of mutations) {
+                if (mutation.type === "attributes") {
+                  if (mutation.attributeName === "host") {
+                    this._cleanupModels();
+                  } else if (mutation.attributeName === "name") {
+                    // TODO compile
+                  }
+                }
+              }
+            });
+            observer.observe(model, { attributes: true });
+            this._modelElements.set(<ModelElement>model, {
+              observer,
+            });
+          }
+        });
+    }
+  }
+
+  /**
+   * Cleanup the map of model components.
+   */
+  private _cleanupModels(): void {
+    const models = this._modelElements.keys();
+    let iter = models.next();
+    while (!iter.done) {
+      const model = iter.value;
+      if (
+        !this.isConnected ||
+        !this.name ||
+        !model.isConnected ||
+        this.name !== model.host
+      ) {
+        this._modelElements.get(model)?.observer.disconnect();
+        this._modelElements.delete(model);
+      }
+      iter = models.next();
+    }
+  }
+
+  /**
+   * Assert component to be signed by the root HDML package to avoid
+   * some security gaps.
+   */
+  private _assertSignature(component: UnifiedElement): boolean {
+    return component[signature] === component.uid;
   }
 
   /**
