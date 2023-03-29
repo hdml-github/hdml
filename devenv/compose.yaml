@@ -1,0 +1,55 @@
+version: "2.2"
+services:
+
+  trino:
+    container_name: hdml-trino
+    image: trinodb/trino
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./catalog:/etc/trino/catalog
+    depends_on:
+      - postgres
+      - mysql
+    links:
+      - postgres
+      - mysql
+    restart: always
+
+  postgres:
+    container_name: hdml-postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=hdml
+      - POSTGRES_USER=hdml
+      - POSTGRES_PASSWORD=hdml
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+    restart: always
+
+  mysql:
+    # ALTER USER 'root'@'localhost' IDENTIFIED BY 'hdml';
+    # CREATE USER 'hdml' IDENTIFIED BY 'hdml';
+    # GRANT ALL PRIVILEGES ON *.* TO 'hdml';
+    container_name: hdml-mysql
+    image: mysql/mysql-server:8.0
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./.data/mysql:/var/lib/mysql
+    restart: always
+
+  mongo:
+    container_name: hdml-mongo
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: hdml
+      MONGO_INITDB_ROOT_PASSWORD: hdml
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./.data/mongo:/data/db
+    restart: always
