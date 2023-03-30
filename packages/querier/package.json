@@ -1,0 +1,34 @@
+{
+  "name": "@hdml/querier",
+  "version": "0.0.0-alpha.1",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
+    "@nestjs/platform-express": "^9.0.0",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.5.5"
+  },
+  "scripts": {
+    "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
+    "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
+    "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",
+    "compile_cjs": "tsc -b ./tsconfig/cjs.json",
+    "compile_esm": "tsc -b ./tsconfig/esm.json",
+    "compile_dts": "tsc -b ./tsconfig/dts.json",
+    "compile_bin": "../../node_modules/.bin/rollup --config ../../.rollup.config.js",
+    "compile_dev": "npm run compile_esm && npm run compile_bin",
+    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_bin && npm run compile_dts",
+    "test": "",
+    "test_dbg": "",
+    "clear": "rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
+    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs"
+  },
+  "types": "dts/index.d.ts",
+  "module": "esm/index.js",
+  "main": "cjs/index.js"
+}

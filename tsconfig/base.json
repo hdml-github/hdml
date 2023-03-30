@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
     "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
     "emitDeclarationOnly": false,
     "downlevelIteration": true,
     "resolveJsonModule": true,
@@ -13,7 +14,7 @@
     "declarationMap": false,
     "importHelpers": true,
     "stripInternal": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "declaration": false,
     "incremental": true,
     "composite": false,
