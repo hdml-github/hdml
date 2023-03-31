@@ -5,6 +5,7 @@
     "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "emitDeclarationOnly": false,
     "downlevelIteration": true,
     "resolveJsonModule": true,
