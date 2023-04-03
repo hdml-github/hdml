@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@finos/perspective": "^1.3.13",
-    "apache-arrow": "^8.0.0"
+    "apache-arrow": "^11.0.0"
   },
   "scripts": {
     "dev": "../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open ./index.html",

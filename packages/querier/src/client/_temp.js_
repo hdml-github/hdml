@@ -1,0 +1,185 @@
+Client.prototype.statementResource = function (opts) {
+  const client = this;
+  let columns = null;
+
+  if (
+    (opts.schema || this.schema) &&
+    !(opts.catalog || this.catalog)
+  ) {
+    throw {
+      message:
+        "Catalog not specified; catalog is required if schema is specified",
+    };
+  }
+  if (!opts.success && !opts.callback)
+    throw {
+      message:
+        "callback function 'success' (or 'callback') not specified",
+    };
+
+  const header = Object.assign({}, opts.headers);
+  if (opts.catalog || this.catalog) {
+    header[client.headers.CATALOG] = opts.catalog || this.catalog;
+  }
+  if (opts.schema || this.schema) {
+    header[client.headers.SCHEMA] = opts.schema || this.schema;
+  }
+  if (opts.prepares) {
+    header[client.headers.PREPARE] = opts.prepares
+      .map(
+        (s, index) => "query" + index + "=" + encodeURIComponent(s),
+      )
+      .join(",");
+  }
+
+  if (opts.session) header[client.headers.SESSION] = opts.session;
+  if (opts.timezone) header[client.headers.TIME_ZONE] = opts.timezone;
+
+  const fetch_info = opts.info || false;
+
+  const cancel_checker = opts.cancel;
+  const state_callback = opts.state;
+  const columns_callback = opts.columns;
+  const data_callback = opts.data;
+  const success_callback = opts.success || opts.callback;
+  const error_callback = opts.error || opts.callback;
+
+  const enable_verbose_state_callback =
+    this.enableVerboseStateCallback || false;
+
+  const req = {
+    method: "POST",
+    path: "/v1/statement",
+    headers: header,
+    body: opts.query,
+    user: opts.user,
+  };
+  client.request(req, function (err, code, data) {
+    if (err || code !== 200 || (data && data.error)) {
+      if (error_callback) {
+        let message =
+          "execution error" +
+          (data && data.length > 0 ? ":" + data : "");
+        if (data && data.error && data.error.message)
+          message = data.error.message;
+        error_callback({
+          message: message,
+          error: err || data.error,
+          code: code,
+        });
+      }
+      return;
+    }
+    if (!data.id || !data.nextUri || !data.infoUri) {
+      let error_message = null;
+      if (!data.id)
+        error_message =
+          "query id missing in response for POST /v1/statement";
+      else if (!data.nextUri)
+        error_message =
+          "nextUri missing in response for POST /v1/statement";
+      else if (!data.infoUri)
+        error_message =
+          "infoUri missing in response for POST /v1/statement";
+      error_callback({ message: error_message, data: data });
+      return;
+    }
+    let last_state = null;
+    const firstNextUri = data.nextUri; // TODO: check the cases without nextUri for /statement ?
+    var fetch_next = function (next_uri) {
+      if (cancel_checker && cancel_checker()) {
+        client.request(
+          { method: "DELETE", path: next_uri },
+          function (error, code, data) {
+            if (error || code !== 204) {
+              error_callback({
+                message:
+                  "query fetch canceled, but Presto query cancel may fail",
+                error: error,
+                code: code,
+              });
+            } else {
+              error_callback({
+                message: "query fetch canceled by operation",
+              });
+            }
+          },
+        );
+        return;
+      }
+      client.request(next_uri, function (error, code, response) {
+        if (error || response.error) {
+          error_callback(error || response.error);
+          return;
+        }
+
+        if (
+          state_callback &&
+          (last_state !== response.stats.state ||
+            enable_verbose_state_callback)
+        ) {
+          state_callback(null, response.id, response.stats);
+          last_state = response.stats.state;
+        }
+
+        if (columns_callback && response.columns && !columns) {
+          columns = response.columns;
+          columns_callback(null, columns);
+        }
+
+        const fetchNextWithTimeout = function (uri, checkInterval) {
+          setTimeout(function () {
+            fetch_next(uri);
+          }, checkInterval);
+        };
+
+        /* presto-main/src/main/java/com/facebook/presto/execution/QueryState.java
+         * QUEUED, PLANNING, STARTING, RUNNING, FINISHED, CANCELED, FAILED
+         */
+        if (
+          response.stats.state === "QUEUED" ||
+          response.stats.state === "PLANNING" ||
+          response.stats.state === "STARTING" ||
+          (response.stats.state === "RUNNING" && !response.data)
+        ) {
+          fetchNextWithTimeout(
+            response.nextUri,
+            client.checkInterval,
+          );
+          return;
+        }
+
+        if (data_callback && response.data) {
+          data_callback(
+            null,
+            response.data,
+            response.columns,
+            response.stats,
+          );
+        }
+
+        if (response.nextUri) {
+          fetchNextWithTimeout(
+            response.nextUri,
+            client.checkInterval,
+          );
+          return;
+        }
+
+        const finishedStats = response.stats;
+
+        if (fetch_info && response.infoUri) {
+          client.request(
+            response.infoUri,
+            function (error, code, response) {
+              success_callback(null, finishedStats, response);
+            },
+          );
+        } else {
+          success_callback(null, finishedStats);
+        }
+      });
+    };
+    fetch_next(firstNextUri);
+  });
+};

@@ -1,4 +1,13 @@
-export type Column = {
+export type State =
+  | "QUEUED"
+  | "PLANNING"
+  | "STARTING"
+  | "RUNNING"
+  | "FINISHED"
+  | "CANCELED"
+  | "FAILED";
+
+export type DataColumn = {
   name: string;
   type: string;
   typeSignature: {
@@ -10,17 +19,17 @@ export type Column = {
   };
 };
 
-export type Row = Array<null | number | string>;
+export type DataRow = Array<null | number | string>;
 
-export interface TrinoResponse {
+export interface DataResponse {
   id: string;
   infoUri: string;
   partialCancelUri?: string;
   nextUri?: string;
-  columns?: Array<Column>;
-  data?: Array<Row>;
+  columns?: Array<DataColumn>;
+  data?: Array<DataRow>;
   stats: {
-    state: "QUEUED" | "FAILED" | "RUNNING" | "FINISHED";
+    state: State;
     queued: boolean;
     scheduled: boolean;
     nodes: number;
