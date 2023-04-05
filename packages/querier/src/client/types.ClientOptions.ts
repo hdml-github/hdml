@@ -13,7 +13,6 @@ export type ClientOptions = {
   schema?: string;
   source?: string;
   checkInterval?: number;
-  enableVerboseStateCallback?: boolean;
   jsonParser?: {
     parse: (data: string) => object;
     stringify: (data: object) => string;

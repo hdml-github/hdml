@@ -1,25 +1,33 @@
+import { createWriteStream } from "fs";
 import { Injectable } from "@nestjs/common";
-import { Client } from "../client/Client";
+import * as arrow from "apache-arrow";
+// import { QueryStream } from "../client/QueryStream";
+import { QueryStreamWriter } from "../client/QueryStreamWriter";
 
 @Injectable()
 export class QueryV1Service {
   public async execute(statement: string): Promise<void> {
-    const client = new Client({
-      engine: "trino",
-      user: "hdml",
+    // return new Promise((resolve) => {
+    //   const query = new QueryStream(statement, {});
+    //   query.on("schema", (schema: arrow.Schema) => {
+    //     console.log(schema);
+    //   });
+    //   query.on("data", (data: string) => {
+    //     const buff = Buffer.from(data, "base64");
+    //     const uin8 = new Uint8Array(buff);
+    //     const table = arrow.tableFromIPC(uin8);
+    //     console.log(table.toString());
+    //   });
+    //   query.on("end", () => {
+    //     resolve(undefined);
+    //   });
+    // });
+    return new Promise((resolve) => {
+      new QueryStreamWriter(
+        statement,
+        createWriteStream("query.arrow"),
+      );
+      setTimeout(resolve, 5000);
     });
-    const done = await client.execute(statement, {
-      cancelFn: () => false,
-      stateFn: (state) => {
-        console.log("state", state);
-      },
-      colsFn: (cols) => {
-        console.log("cols", cols);
-      },
-      dataFn: (data) => {
-        console.log("data", data);
-      },
-    });
-    console.log("done", done);
   }
 }

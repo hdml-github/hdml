@@ -10,7 +10,9 @@
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
+    "apache-arrow": "^11.0.0",
     "reflect-metadata": "^0.1.13",
+    "json-bigint": "^1.0.0",
     "needle": "^3.2.0",
     "rxjs": "^7.5.5"
   },

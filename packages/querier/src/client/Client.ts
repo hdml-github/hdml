@@ -89,13 +89,28 @@ export class Client {
   }
 
   /**
-   * Fetches active cluster nodes. Failed nodes are not supported.
-   * @throws
+   * Returns status of an engine cluster.
    */
-  public async getNodesInfo(): Promise<unknown> {
+  public async getClusterInfo(): Promise<unknown> {
     const [code, data] = await this.request({
       method: "GET",
-      path: "/v1/node",
+      path: "/v1/cluster",
+    });
+    if (code === 200) {
+      return data;
+    } else {
+      throw new Error(`Cluster info API failed: ${code || "0"}.`);
+    }
+  }
+
+  /**
+   * Fetches active or failed cluster nodes.
+   * @throws
+   */
+  public async getNodesInfo(failed: boolean): Promise<unknown> {
+    const [code, data] = await this.request({
+      method: "GET",
+      path: `/v1/node${failed ? "/failed" : ""}`,
     });
     if (code === 200) {
       return data;
@@ -202,19 +217,11 @@ export class Client {
     }
 
     let state = data.stats.state;
-    let result = await this.fetchNext(data.nextUri, 0);
-    let cancel = await this.processFetchResult(
-      state,
-      result,
-      options.cancelFn,
-      options.stateFn,
-      options.colsFn,
-      options.dataFn,
-    );
+    let cancel = await this.processResult(null, { state });
 
-    while (!cancel && result.next) {
-      result = await this.fetchNext(result.next, this._checkInterval);
-      cancel = await this.processFetchResult(
+    if (!cancel) {
+      let result = await this.fetchNext(data.nextUri, 0);
+      cancel = await this.processResult(
         state,
         result,
         options.cancelFn,
@@ -222,9 +229,23 @@ export class Client {
         options.colsFn,
         options.dataFn,
       );
-      state = result.state;
-    }
 
+      while (!cancel && result.next) {
+        result = await this.fetchNext(
+          result.next,
+          this._checkInterval,
+        );
+        cancel = await this.processResult(
+          state,
+          result,
+          options.cancelFn,
+          options.stateFn,
+          options.colsFn,
+          options.dataFn,
+        );
+        state = result.state;
+      }
+    }
     return !cancel;
   }
 
@@ -357,8 +378,8 @@ export class Client {
    * Processes data fetched from an engine.
    * @throws
    */
-  private async processFetchResult(
-    state: State,
+  private async processResult(
+    state: null | State,
     res: {
       state: State;
       next?: string;
