@@ -1,6 +1,6 @@
 import { Readable } from "stream";
 import * as arrow from "apache-arrow";
-import { Client } from "./Client";
+import { Client } from "./client.Client";
 import { DataColumn, DataRow, State } from "./types.Response";
 
 export class QueryStream extends Readable {
