@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
 import { QueryController } from "./QueryController";
-import { QueryV1Service } from "./QueryService.v1";
+import { QueryServiceV1 } from "./QueryServiceV1";
 
 @Module({
   controllers: [QueryController],
-  providers: [QueryV1Service],
+  providers: [QueryServiceV1],
 })
 export class QueryModule {}

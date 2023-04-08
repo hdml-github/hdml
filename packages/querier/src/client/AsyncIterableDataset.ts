@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as arrow from "apache-arrow";
 import { FlatClient } from "./client.FlatClient";
 import {
@@ -7,7 +8,9 @@ import {
   State,
 } from "./types.Response";
 
-export class QueryAsyncIterable {
+export class AsyncIterableDataset
+  implements AsyncIterable<arrow.RecordBatch>
+{
   private _client: null | FlatClient = null;
   private _promise: null | Promise<DataResponse> = null;
   private _next: null | string = null;
@@ -21,16 +24,10 @@ export class QueryAsyncIterable {
       engine: "trino",
       source: "hdml-query-async-iterable",
     });
-
-    // arrow.RecordBatchFileWriter
-    // arrow.RecordBatchStreamWriter
-
     this._promise = this._client.post(statement, {});
   }
 
-  async *[Symbol.asyncIterator](): AsyncGenerator<
-    undefined | arrow.Table
-  > {
+  async *[Symbol.asyncIterator](): AsyncGenerator<arrow.RecordBatch> {
     let res: DataResponse;
     if (this._promise) {
       res = await this._promise;
@@ -45,7 +42,17 @@ export class QueryAsyncIterable {
         this._schema = this._parseColumns(res.columns);
       }
       if (res.data) {
-        yield this._parseData(res.data);
+        const batch = this._parseBatch(res.data);
+        // if (batch) {
+        //   yield batch;
+        // }
+        // Test for multiple batch processing.
+        for (let i = 0; i < res.data.length; i++) {
+          const batch = this._parseBatch([res.data[i]]);
+          if (batch) {
+            yield batch;
+          }
+        }
       }
     }
   }
@@ -89,9 +96,7 @@ export class QueryAsyncIterable {
     }
   }
 
-  private _parseData(data: DataRow[]) {
-    // https://stackoverflow.com/questions/51409288/can-i-deserialize-
-    // a-dictionary-of-dataframes-in-the-arrow-js-implementation
+  private _parseTable(data: DataRow[]) {
     if (this._schema) {
       const builders: arrow.Builder[] = [];
       data.forEach((row) => {
@@ -108,30 +113,46 @@ export class QueryAsyncIterable {
       });
 
       const vectors: { [field: string]: arrow.Vector } = {};
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const children: arrow.Data<any>[][] = [];
       builders.forEach((builder, i) => {
         builder.finish();
         const name = <string>this._schema?.fields[i].name;
         const vector = builder.toVector();
         vectors[name] = vector;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        children.push(vector.data);
       });
-
-      const _data = arrow.makeData({
-        type: new arrow.Struct(this._schema.fields),
-        length: data.length,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        children,
-      });
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const batch = new arrow.RecordBatch(this._schema, _data);
       const table = new arrow.Table(vectors);
       return table;
+    }
+    return;
+  }
+
+  private _parseBatch(data: DataRow[]) {
+    if (this._schema) {
+      const builders: arrow.Builder[] = [];
+      data.forEach((row) => {
+        row.forEach((val, i) => {
+          if (!builders[i]) {
+            builders[i] = arrow.makeBuilder({
+              type: <arrow.DataType>this._schema?.fields[i].type,
+              nullValues: [null, undefined],
+            });
+          }
+          const builder = builders[i];
+          builder.append(val);
+        });
+      });
+
+      const vectors: {
+        [field: string]: arrow.Data<arrow.DataType<arrow.Type, any>>;
+      } = {};
+      builders.forEach((builder, i) => {
+        builder.finish();
+        const name = <string>this._schema?.fields[i].name;
+        const vector = builder.toVector();
+        vectors[name] = <arrow.Data<arrow.DataType<arrow.Type, any>>>(
+          (<unknown>vector)
+        );
+      });
+      return new arrow.RecordBatch(vectors);
     }
     return;
   }
