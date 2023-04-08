@@ -43,16 +43,16 @@ export class AsyncIterableDataset
       }
       if (res.data) {
         const batch = this._parseBatch(res.data);
-        // if (batch) {
-        //   yield batch;
-        // }
-        // Test for multiple batch processing.
-        for (let i = 0; i < res.data.length; i++) {
-          const batch = this._parseBatch([res.data[i]]);
-          if (batch) {
-            yield batch;
-          }
+        if (batch) {
+          yield batch;
         }
+        // Test for multiple batch processing.
+        // for (let i = 0; i < res.data.length; i++) {
+        //   const batch = this._parseBatch([res.data[i]]);
+        //   if (batch) {
+        //     yield batch;
+        //   }
+        // }
       }
     }
   }
