@@ -8,22 +8,22 @@ import {Model as Model} from './data.Model_generated.js';
 /**
  * Data document type.
  */
-export class Document {
+export class Doc {
   bb: flatbuffers.ByteBuffer|null = null;
   bb_pos = 0;
-  __init(i:number, bb:flatbuffers.ByteBuffer):Document {
+  __init(i:number, bb:flatbuffers.ByteBuffer):Doc {
   this.bb_pos = i;
   this.bb = bb;
   return this;
 }
 
-static getRootAsDocument(bb:flatbuffers.ByteBuffer, obj?:Document):Document {
-  return (obj || new Document()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+static getRootAsDoc(bb:flatbuffers.ByteBuffer, obj?:Doc):Doc {
+  return (obj || new Doc()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
-static getSizePrefixedRootAsDocument(bb:flatbuffers.ByteBuffer, obj?:Document):Document {
+static getSizePrefixedRootAsDoc(bb:flatbuffers.ByteBuffer, obj?:Doc):Doc {
   bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
-  return (obj || new Document()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+  return (obj || new Doc()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 }
 
 name():string|null
@@ -62,7 +62,7 @@ framesLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
-static startDocument(builder:flatbuffers.Builder) {
+static startDoc(builder:flatbuffers.Builder) {
   builder.startObject(5);
 }
 
@@ -98,7 +98,7 @@ static startFramesVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
-static endDocument(builder:flatbuffers.Builder):flatbuffers.Offset {
+static endDoc(builder:flatbuffers.Builder):flatbuffers.Offset {
   const offset = builder.endObject();
   return offset;
 }

@@ -1,6 +1,6 @@
 {
   "extends": "../../../tsconfig/dts.json",
-  "include": ["../src/**/*.ts", "../src/.fbs/*.ts"],
+  "include": ["../src/**/*.ts"],
   "compilerOptions": {
     "rootDir": "../src",
     "baseUrl": "../src",

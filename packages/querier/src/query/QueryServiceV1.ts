@@ -59,7 +59,7 @@ export class QueryServiceV1 {
    * chunk.
    * @param statement SQL statement
    */
-  public async executeChunk(statement: string): Promise<void> {
+  public async executeChunk(statement: string): Promise<string> {
     // Run query, prepare stream:
     const dataset = new AsyncIterableDataset(statement);
     const datasetStream = new stream.PassThrough();
@@ -79,5 +79,7 @@ export class QueryServiceV1 {
 
     // Logging table:
     console.log(table.schema, table.toString());
+
+    return table.toString();
   }
 }

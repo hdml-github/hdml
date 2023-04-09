@@ -351,7 +351,7 @@ type(obj?:Type):Type|null {
 
 agg():AggType {
   const offset = this.bb!.__offset(this.bb_pos, 14);
-  return offset ? this.bb!.readInt8(this.bb_pos + offset) : AggType.Count;
+  return offset ? this.bb!.readInt8(this.bb_pos + offset) : AggType.None;
 }
 
 asc():boolean {
@@ -384,7 +384,7 @@ static addType(builder:flatbuffers.Builder, typeOffset:flatbuffers.Offset) {
 }
 
 static addAgg(builder:flatbuffers.Builder, agg:AggType) {
-  builder.addFieldInt8(5, agg, AggType.Count);
+  builder.addFieldInt8(5, agg, AggType.None);
 }
 
 static addAsc(builder:flatbuffers.Builder, asc:boolean) {

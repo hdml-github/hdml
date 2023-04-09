@@ -11,7 +11,7 @@ include "./data.Frame.fbs";
 namespace data;
 
 /// Data document type.
-table Document {
+table Doc {
   name: string;
   tenant: string;
   token: string;

@@ -9,6 +9,7 @@ namespace enum;
 
 /// AggType enum.
 enum AggType: byte {
+  None = 0,
   Count,
   CountDistinct,
   CountDistinctApprox,

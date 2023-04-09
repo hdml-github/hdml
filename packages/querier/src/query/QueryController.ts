@@ -8,7 +8,7 @@ export class QueryController {
   constructor(private readonly queryService: QueryServiceV1) {}
 
   @Post()
-  async statement(@Req() req: Request): Promise<void> {
+  async statement(@Req() req: Request): Promise<string> {
     if (req.readable) {
       const buff = await rawbody(req);
       const stmt = buff.toString().trim();

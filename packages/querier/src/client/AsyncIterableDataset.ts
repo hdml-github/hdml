@@ -37,7 +37,7 @@ export class AsyncIterableDataset
     while (this._next) {
       res = <DataResponse>await this._client?.fetch(this._next);
       this._next = res.nextUri || null;
-      this._stateHandler(res.stats.state);
+      this._stateHandler(res);
       if (!this._schema && res.columns) {
         this._schema = this._parseColumns(res.columns);
       }
@@ -57,20 +57,20 @@ export class AsyncIterableDataset
     }
   }
 
-  private _stateHandler(state: State) {
-    switch (state) {
+  private _stateHandler(res: DataResponse) {
+    switch (res.stats.state) {
       case "STARTING":
       case "QUEUED":
       case "PLANNING":
       case "RUNNING":
-        console.log("state", state);
+        console.log("state", res.stats.state);
         break;
       case "FINISHED":
-        console.log("state", state);
+        console.log("state", res.stats.state);
         break;
       case "FAILED":
       case "CANCELED":
-        console.log("state", state);
+        console.log("state", res.stats.state, res.error);
         break;
     }
   }
@@ -89,6 +89,8 @@ export class AsyncIterableDataset
     switch (col.type) {
       case "varchar":
         return new arrow.Utf8();
+      case "integer":
+        return new arrow.Uint32();
       case "bigint":
         return new arrow.Uint32();
       default:
