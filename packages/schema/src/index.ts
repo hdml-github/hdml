@@ -19,8 +19,11 @@ import {
   DocumentData,
   DecimalOptsData,
   DateOptsData,
+  FieldData,
+  TableData,
   TimeOptsData,
   TimestampOptsData,
+  TypeData,
 } from "./Document";
 
 export {
@@ -35,6 +38,9 @@ export {
   DocumentData,
   DecimalOptsData,
   DateOptsData,
+  FieldData,
+  TableData,
   TimeOptsData,
   TimestampOptsData,
+  TypeData,
 };
