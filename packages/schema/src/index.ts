@@ -17,6 +17,7 @@ import {
 import {
   Document,
   DocumentData,
+  ModelData,
   DecimalOptsData,
   DateOptsData,
   FieldData,
@@ -39,6 +40,7 @@ export {
   DecimalOptsData,
   DateOptsData,
   FieldData,
+  ModelData,
   TableData,
   TimeOptsData,
   TimestampOptsData,

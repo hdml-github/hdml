@@ -1,5 +1,6 @@
 import {
   type Document,
+  type ModelData,
   type TableData,
   type FieldData,
   TableType,
@@ -7,30 +8,56 @@ import {
 } from "@hdml/schema";
 
 export function orchestrate(document: Document): string {
-  let sql = "";
-  const model = document.model;
-  if (model) {
-    const tables = model.tables;
-    tables.forEach((table: TableData) => {
+  if (document.model) {
+    return getModelSQL(document.model);
+  }
+  return "";
+}
+
+export function getModelSQL(model: ModelData): string {
+  const tables = model.tables
+    .map((table: TableData) => {
       switch (table.type) {
         case TableType.Table:
-          sql = getTableSQL(table);
-          break;
+          return getModelTableSQL(table);
         case TableType.Query:
-          break;
+          return "";
         case TableType.Csv:
-          break;
+          return "";
         case TableType.Json:
-          break;
+          return "";
       }
-    });
-  }
+    })
+    .join(",\n");
+  let sql = "\twith\n";
+  sql = sql + `${tables}\n`;
+  sql = sql + "\t\tselect\n";
+  sql =
+    sql +
+    model.tables
+      .sort((a, b) =>
+        a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
+      )
+      .map((t) =>
+        t.fields
+          .map(
+            (f) =>
+              `\t\t\t` +
+              `"${t.name}"."${f.name}" as "${t.name}.${f.name}"`,
+          )
+          .join(",\n"),
+      )
+      .join(",\n");
+  sql = sql + "\n\t\tfrom\n";
+  sql =
+    sql + model.tables.map((t) => `\t\t\t"${t.name}"`).join(",\n");
   return sql;
 }
 
-export function getTableSQL(table: TableData): string {
+export function getModelTableSQL(table: TableData): string {
   const fields = table.fields
-    .map((field: FieldData) => getTableFieldSQL(field))
+    .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+    .map((field: FieldData) => getModelTableFieldSQL(field))
     .join(",\n");
   let sql = `\t\t"${table.name}" as (\n`;
   sql = sql + "\t\t\tselect\n";
@@ -41,7 +68,7 @@ export function getTableSQL(table: TableData): string {
   return sql;
 }
 
-export function getTableFieldSQL(field: FieldData): string {
+export function getModelTableFieldSQL(field: FieldData): string {
   const name = field.name;
   const origin = field.origin || field.name;
   let sql: string;
