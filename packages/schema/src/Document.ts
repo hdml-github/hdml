@@ -121,8 +121,8 @@ export class Document {
   private _builder: Builder;
   private _document: Doc;
 
-  public get buffer(): Buffer {
-    return Buffer.from(this._buffer.bytes());
+  public get buffer(): Uint8Array {
+    return this._buffer.bytes();
   }
 
   public get name(): string {

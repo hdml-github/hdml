@@ -5,6 +5,36 @@
  * @license Apache-2.0
  */
 
-import { Document } from "./Document";
+import {
+  TableType,
+  AggType,
+  DateUnit,
+  TimeUnit,
+  TimeZone,
+  DataType,
+  DecimalBitWidth,
+} from "./Enums";
+import {
+  Document,
+  DocumentData,
+  DecimalOptsData,
+  DateOptsData,
+  TimeOptsData,
+  TimestampOptsData,
+} from "./Document";
 
-export { Document };
+export {
+  TableType,
+  AggType,
+  DateUnit,
+  TimeUnit,
+  TimeZone,
+  DataType,
+  DecimalBitWidth,
+  Document,
+  DocumentData,
+  DecimalOptsData,
+  DateOptsData,
+  TimeOptsData,
+  TimestampOptsData,
+};
