@@ -140,37 +140,10 @@ export class Document {
   public get model(): undefined | ModelData {
     const model = this._document.model(new Model());
     if (model) {
-      const tables: TableData[] = [];
-      for (let i = 0; i < model.tablesLength(); i++) {
-        const table = model.tables(i, new Table());
-        if (table) {
-          const fields: FieldData[] = [];
-          for (let j = 0; j < table.fieldsLength(); j++) {
-            const field = table.fields(j, new Field());
-            if (field) {
-              fields.push({
-                name: field.name() || "",
-                clause: field.clause() || undefined,
-                origin: field.origin() || undefined,
-                description: field.description() || undefined,
-                agg: field.agg(),
-                asc: field.asc(),
-                type: this._parseType(field.type(new Type())),
-              });
-            }
-          }
-          tables.push({
-            name: table.name() || "",
-            type: table.type(),
-            source: table.source() || "",
-            fields,
-          });
-        }
-      }
       return {
         name: model.name() || "",
         host: model.host() || "",
-        tables,
+        tables: this._parseTables(model),
       };
     }
     return;
@@ -359,6 +332,41 @@ export class Document {
       data.unit,
       data.timezone,
     );
+  }
+
+  private _parseTables(model: Model): TableData[] {
+    const tables: TableData[] = [];
+    for (let i = 0; i < model.tablesLength(); i++) {
+      const table = model.tables(i, new Table());
+      if (table) {
+        tables.push({
+          name: table.name() || "",
+          type: table.type(),
+          source: table.source() || "",
+          fields: this._parseFields(table),
+        });
+      }
+    }
+    return tables;
+  }
+
+  private _parseFields(table: Table): FieldData[] {
+    const fields: FieldData[] = [];
+    for (let j = 0; j < table.fieldsLength(); j++) {
+      const field = table.fields(j, new Field());
+      if (field) {
+        fields.push({
+          name: field.name() || "",
+          clause: field.clause() || undefined,
+          origin: field.origin() || undefined,
+          description: field.description() || undefined,
+          agg: field.agg(),
+          asc: field.asc(),
+          type: this._parseType(field.type(new Type())),
+        });
+      }
+    }
+    return fields;
   }
 
   private _parseType(type: null | Type): TypeData | undefined {
