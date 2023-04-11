@@ -41,6 +41,24 @@ const data: DocumentData = {
             origin: "table_name",
           },
           {
+            name: "full",
+            clause:
+              `concat("table_catalog", '-', ` +
+              `"table_schema", '-', "table_name")`,
+          },
+          {
+            name: "hash",
+            clause:
+              `concat("table_catalog", '-', ` +
+              `"table_schema", '-', "table_name")`,
+            type: {
+              type: DataType.Binary,
+              options: {
+                nullable: false,
+              },
+            },
+          },
+          {
             name: "type",
             origin: "table_type",
           },
@@ -48,8 +66,9 @@ const data: DocumentData = {
       },
       {
         name: "columns",
-        type: TableType.Table,
-        source: "tenant_postgres.information_schema.columns",
+        type: TableType.Query,
+        source:
+          "select * from tenant_postgres.information_schema.columns",
         fields: [
           {
             name: "catalog",

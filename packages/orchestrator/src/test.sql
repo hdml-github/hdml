@@ -2,13 +2,16 @@ with "frame" as (
   with "model" as (
     with
       "t1" as (
+        with "_t1" as (
+          select * from "tenant_postgres"."information_schema"."tables"
+        )
         select
           "table_catalog" as "catalog",
           "table_schema" as "schema",
           "table_name" as "table",
           "table_type" as "type"
         from
-          "tenant_postgres"."information_schema"."tables"
+          "_t1"
       ),
       "t2" as (
         select 
