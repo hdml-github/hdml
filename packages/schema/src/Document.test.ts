@@ -1,11 +1,10 @@
 import {
-  Document,
-  DocumentData,
   DecimalOptsData,
   DateOptsData,
   TimeOptsData,
   TimestampOptsData,
-} from "./Document";
+} from "./TableHelper";
+import { Document, DocumentData } from "./Document";
 import {
   TableType,
   AggType,
@@ -115,6 +114,7 @@ describe("Document schema", () => {
           ],
         },
       ],
+      joins: [],
     },
   };
   let document1: Document;

@@ -13,19 +13,22 @@ import {
   TimeZone,
   DataType,
   DecimalBitWidth,
+  JoinType,
+  FilterName,
+  FilterType,
+  FilterOperator,
 } from "./Enums";
 import {
-  Document,
-  DocumentData,
-  ModelData,
+  CommonOptsData,
   DecimalOptsData,
   DateOptsData,
-  FieldData,
-  TableData,
   TimeOptsData,
   TimestampOptsData,
   TypeData,
-} from "./Document";
+  FieldData,
+  TableData,
+} from "./TableHelper";
+import { Document, DocumentData, ModelData } from "./Document";
 
 export {
   TableType,
@@ -37,6 +40,7 @@ export {
   DecimalBitWidth,
   Document,
   DocumentData,
+  CommonOptsData,
   DecimalOptsData,
   DateOptsData,
   FieldData,
@@ -45,4 +49,8 @@ export {
   TimeOptsData,
   TimestampOptsData,
   TypeData,
+  FilterName,
+  FilterType,
+  FilterOperator,
+  JoinType,
 };
