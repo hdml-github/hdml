@@ -1,7 +1,6 @@
 import { ByteBuffer, Builder } from "flatbuffers";
 import { Doc } from "./.fbs/data.Doc_generated";
 import { Model } from "./.fbs/data.Model_generated";
-
 import { TableHelper, TableData } from "./TableHelper";
 import { JoinHelper, JoinData } from "./JoinHelper";
 
@@ -51,7 +50,7 @@ export class Document {
         name: model.name() || "",
         host: model.host() || "",
         tables: this._table.parseTables(model),
-        joins: [],
+        joins: this._join.parseJoins(model),
       };
     }
     return;
@@ -61,7 +60,6 @@ export class Document {
     this._builder = new Builder(1024);
     this._table = new TableHelper(this._builder);
     this._join = new JoinHelper(this._builder);
-
     if (data instanceof Uint8Array) {
       this._buffer = new ByteBuffer(data);
       this._document = Doc.getRootAsDoc(this._buffer);
@@ -70,13 +68,11 @@ export class Document {
       const tenant = this._builder.createString(data.tenant);
       const token = this._builder.createString(data.token);
       const model = this._bufferizeModel(data.model);
-
       Doc.startDoc(this._builder);
       Doc.addName(this._builder, name);
       Doc.addTenant(this._builder, tenant);
       Doc.addToken(this._builder, token);
       Doc.addModel(this._builder, model);
-
       this._builder.finish(Doc.endDoc(this._builder));
       this._buffer = new ByteBuffer(this._builder.asUint8Array());
       this._document = Doc.getRootAsDoc(this._buffer);
@@ -88,16 +84,13 @@ export class Document {
     const host = this._builder.createString(data.host);
     const tables_ = this._table.bufferizeTables(data.tables);
     const tables = Model.createTablesVector(this._builder, tables_);
-
     const joins_ = this._join.bufferizeJoins(data.joins);
     const joins = Model.createJoinsVector(this._builder, joins_);
-
     Model.startModel(this._builder);
     Model.addName(this._builder, name);
     Model.addHost(this._builder, host);
     Model.addTables(this._builder, tables);
     Model.addJoins(this._builder, joins);
-
     return Model.endModel(this._builder);
   }
 }

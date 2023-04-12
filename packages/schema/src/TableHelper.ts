@@ -10,7 +10,6 @@ import {
   DecimalOpts,
   CommonOpts,
 } from "./.fbs/data.Field_generated";
-
 import {
   TableType,
   AggType,
@@ -112,13 +111,11 @@ export class TableHelper {
     const source = this._builder.createString(data.source);
     const offsets = this.bufferizeFields(data.fields);
     const fields = Table.createFieldsVector(this._builder, offsets);
-
     Table.startTable(this._builder);
     Table.addName(this._builder, name);
     Table.addSource(this._builder, source);
     Table.addType(this._builder, data.type);
     Table.addFields(this._builder, fields);
-
     return Table.endTable(this._builder);
   }
 
@@ -138,7 +135,6 @@ export class TableHelper {
       ? this._builder.createString(data.description)
       : false;
     const type = data.type ? this.bufferizeType(data.type) : false;
-
     Field.startField(this._builder);
     Field.addName(this._builder, name);
     if (origin) {
