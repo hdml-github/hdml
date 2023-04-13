@@ -81,6 +81,11 @@ export class JoinHelper {
   }
 
   public bufferizeFilterClause(data: FilterClauseData): number {
+    const filters_ = this.bufferizeFilters(data.filters);
+    const filters = FilterClause.createFiltersVector(
+      this._builder,
+      filters_,
+    );
     const children_ = this.bufferizeFiltersClauses(data.children);
     const children = FilterClause.createChildrenVector(
       this._builder,
@@ -88,6 +93,7 @@ export class JoinHelper {
     );
     FilterClause.startFilterClause(this._builder);
     FilterClause.addType(this._builder, data.type);
+    FilterClause.addFilters(this._builder, filters);
     FilterClause.addChildren(this._builder, children);
     return FilterClause.endFilterClause(this._builder);
   }
@@ -229,7 +235,7 @@ export class JoinHelper {
         };
         return data;
       case FilterOpts.NamedOpts:
-        opts = filter.options(new KeysOpts());
+        opts = filter.options(new NamedOpts());
         data = {
           name: (<NamedOpts>opts).name(),
           field: <string>(<NamedOpts>opts).field(),

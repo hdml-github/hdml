@@ -13,6 +13,10 @@ import {
   TimeZone,
   DataType,
   DecimalBitWidth,
+  JoinType,
+  FilterOperator,
+  FilterType,
+  FilterName,
 } from "./Enums";
 
 describe("Document schema", () => {
@@ -114,11 +118,74 @@ describe("Document schema", () => {
           ],
         },
       ],
-      joins: [],
+      joins: [
+        {
+          type: JoinType.Inner,
+          left: "table1",
+          right: "table2",
+          filter: {
+            type: FilterOperator.Or,
+            filters: [
+              {
+                type: FilterType.Expr,
+                options: {
+                  clause: '"field1" = "field1"',
+                },
+              },
+              {
+                type: FilterType.Keys,
+                options: {
+                  left: "field1",
+                  right: "field1",
+                },
+              },
+              {
+                type: FilterType.Named,
+                options: {
+                  name: FilterName.IsNotNull,
+                  field: "field1",
+                  values: [],
+                },
+              },
+            ],
+            children: [
+              {
+                type: FilterOperator.And,
+                filters: [
+                  {
+                    type: FilterType.Expr,
+                    options: {
+                      clause: '"field1" = "field1"',
+                    },
+                  },
+                  {
+                    type: FilterType.Keys,
+                    options: {
+                      left: "field1",
+                      right: "field1",
+                    },
+                  },
+                  {
+                    type: FilterType.Named,
+                    options: {
+                      name: FilterName.IsNotNull,
+                      field: "field1",
+                      values: [],
+                    },
+                  },
+                ],
+                children: [],
+              },
+            ],
+          },
+        },
+      ],
     },
   };
+
   let document1: Document;
   let document2: Document;
+
   it("must be constructible and parsable", () => {
     document1 = new Document(documentData);
     document2 = new Document(document1.buffer);
@@ -295,6 +362,49 @@ describe("Document schema", () => {
             }
           }
         }
+      });
+    });
+
+    documentData.model.joins.forEach((join, i) => {
+      const join1 = document1.model?.joins[i];
+      const join2 = document2.model?.joins[i];
+
+      expect(join.type).toEqual(join1?.type);
+      expect(join.left).toEqual(join1?.left);
+      expect(join.right).toEqual(join1?.right);
+
+      expect(join.type).toEqual(join2?.type);
+      expect(join.left).toEqual(join2?.left);
+      expect(join.right).toEqual(join2?.right);
+
+      const clause = join.filter;
+      const clause1 = join1?.filter;
+      const clause2 = join2?.filter;
+
+      expect(clause.type).toEqual(clause1?.type);
+      expect(clause.type).toEqual(clause2?.type);
+
+      clause.filters.forEach((filter, j) => {
+        expect(filter.type).toEqual(clause1?.filters[j].type);
+        expect(filter.options).toEqual(clause1?.filters[j].options);
+
+        expect(filter.type).toEqual(clause2?.filters[j].type);
+        expect(filter.options).toEqual(clause2?.filters[j].options);
+      });
+
+      const child = clause.children[0];
+      const child1 = clause1?.children[0];
+      const child2 = clause2?.children[0];
+
+      expect(child.type).toEqual(child1?.type);
+      expect(child.type).toEqual(child2?.type);
+
+      child.filters.forEach((filter, j) => {
+        expect(filter.type).toEqual(child1?.filters[j].type);
+        expect(filter.options).toEqual(child1?.filters[j].options);
+
+        expect(filter.type).toEqual(child2?.filters[j].type);
+        expect(filter.options).toEqual(child2?.filters[j].options);
       });
     });
   });

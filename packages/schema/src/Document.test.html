@@ -5,7 +5,7 @@
   <body>
     <script type="module">
       import { runTests } from '@web/test-runner-mocha';
-      import { expect } from "@esm-bundle/chai";
+      import { expect, assert } from "@esm-bundle/chai";
       const {
         TableType,
         AggType,
@@ -20,6 +20,10 @@
         DateOptsData,
         TimeOptsData,
         TimestampOptsData,
+        JoinType,
+        FilterOperator,
+        FilterType,
+        FilterName,
       } = window['@hdml/schema'];
       
       runTests(async () => {
@@ -122,7 +126,68 @@
                   ],
                 },
               ],
-              joins: [],
+              joins: [
+                {
+                  type: JoinType.Inner,
+                  left: "table1",
+                  right: "table2",
+                  filter: {
+                    type: FilterOperator.Or,
+                    filters: [
+                      {
+                        type: FilterType.Expr,
+                        options: {
+                          clause: '"field1" = "field1"',
+                        },
+                      },
+                      {
+                        type: FilterType.Keys,
+                        options: {
+                          left: "field1",
+                          right: "field1",
+                        },
+                      },
+                      {
+                        type: FilterType.Named,
+                        options: {
+                          name: FilterName.IsNotNull,
+                          field: "field1",
+                          values: [],
+                        },
+                      },
+                    ],
+                    children: [
+                      {
+                        type: FilterOperator.And,
+                        filters: [
+                          {
+                            type: FilterType.Expr,
+                            options: {
+                              clause: '"field1" = "field1"',
+                            },
+                          },
+                          {
+                            type: FilterType.Keys,
+                            options: {
+                              left: "field1",
+                              right: "field1",
+                            },
+                          },
+                          {
+                            type: FilterType.Named,
+                            options: {
+                              name: FilterName.IsNotNull,
+                              field: "field1",
+                              values: [],
+                            },
+                          },
+                        ],
+                        children: [],
+                      },
+                    ],
+                  },
+                },
+              ],
             },
           };
           let document1;
@@ -307,6 +372,49 @@
                     }
                   }
                 }
+              });
+            });
+
+            documentData.model.joins.forEach((join, i) => {
+              const join1 = document1.model?.joins[i];
+              const join2 = document2.model?.joins[i];
+
+              expect(join.type).to.equal(join1?.type);
+              expect(join.left).to.equal(join1?.left);
+              expect(join.right).to.equal(join1?.right);
+
+              expect(join.type).to.equal(join2?.type);
+              expect(join.left).to.equal(join2?.left);
+              expect(join.right).to.equal(join2?.right);
+
+              const clause = join.filter;
+              const clause1 = join1?.filter;
+              const clause2 = join2?.filter;
+
+              expect(clause.type).to.equal(clause1?.type);
+              expect(clause.type).to.equal(clause2?.type);
+
+              clause.filters.forEach((filter, j) => {
+                expect(filter.type).to.equal(clause1?.filters[j].type);
+                assert.deepEqual(filter.options, clause1?.filters[j].options);
+
+                expect(filter.type).to.equal(clause2?.filters[j].type);
+                assert.deepEqual(filter.options, clause2?.filters[j].options);
+              });
+
+              const child = clause.children[0];
+              const child1 = clause1?.children[0];
+              const child2 = clause2?.children[0];
+
+              expect(child.type).to.equal(child1?.type);
+              expect(child.type).to.equal(child2?.type);
+
+              child.filters.forEach((filter, j) => {
+                expect(filter.type).to.equal(child1?.filters[j].type);
+                assert.deepEqual(filter.options, clause1?.filters[j].options);
+
+                expect(filter.type).to.equal(child2?.filters[j].type);
+                assert.deepEqual(filter.options, clause2?.filters[j].options);
               });
             });
           });
