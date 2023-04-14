@@ -12,6 +12,9 @@ import {
   TimeZone,
   DataType,
   DecimalBitWidth,
+  JoinType,
+  FilterOperator,
+  FilterType,
 } from "@hdml/schema";
 import { orchestrate } from "./orchestrate";
 
@@ -109,6 +112,59 @@ const data: DocumentData = {
             origin: "data_type",
           },
         ],
+      },
+    ],
+    joins: [
+      {
+        type: JoinType.Inner,
+        left: "tables",
+        right: "columns",
+        filter: {
+          type: FilterOperator.And,
+          filters: [
+            {
+              type: FilterType.Keys,
+              options: {
+                left: "catalog",
+                right: "catalog",
+              },
+            },
+            {
+              type: FilterType.Keys,
+              options: {
+                left: "schema",
+                right: "schema",
+              },
+            },
+            {
+              type: FilterType.Keys,
+              options: {
+                left: "table",
+                right: "table",
+              },
+            },
+          ],
+          children: [
+            {
+              type: FilterOperator.Or,
+              filters: [
+                {
+                  type: FilterType.Expr,
+                  options: {
+                    clause: `"columns"."table" = 'applicable_roles'`,
+                  },
+                },
+                {
+                  type: FilterType.Expr,
+                  options: {
+                    clause: `"columns"."table" = 'tables'`,
+                  },
+                },
+              ],
+              children: [],
+            },
+          ],
+        },
       },
     ],
   },

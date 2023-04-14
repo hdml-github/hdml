@@ -11,6 +11,10 @@ namespace enum;
 enum JoinType: byte {
   Cross,
   Inner,
+  Full,
   Left,
   Right,
+  FullOuter,
+  LeftOuter,
+  RightOuter,
 }

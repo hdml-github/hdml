@@ -7,7 +7,11 @@
 export enum JoinType {
   Cross = 0,
   Inner = 1,
-  Left = 2,
-  Right = 3
+  Full = 2,
+  Left = 3,
+  Right = 4,
+  FullOuter = 5,
+  LeftOuter = 6,
+  RightOuter = 7
 }
 
