@@ -1,5 +1,5 @@
 import { Builder } from "flatbuffers";
-import { Join, Model } from "./.fbs/data.Model_generated";
+import { Join, Model } from "../.fbs/data.Model_generated";
 import {
   FilterClause,
   Filter,
@@ -7,13 +7,13 @@ import {
   ExprOpts,
   KeysOpts,
   NamedOpts,
-} from "./.fbs/data.FilterClause_generated";
+} from "../.fbs/data.FilterClause_generated";
 import {
   FilterName,
   FilterOperator,
   FilterType,
   JoinType,
-} from "./Enums";
+} from "../Enums";
 
 export type ExprOptsData = {
   clause: string;
@@ -54,7 +54,7 @@ export type JoinData = {
   type: JoinType;
   left: string;
   right: string;
-  filter: FilterClauseData;
+  clause: FilterClauseData;
 };
 
 export class JoinHelper {
@@ -67,12 +67,12 @@ export class JoinHelper {
   public bufferizeJoin(data: JoinData): number {
     const left = this._builder.createString(data.left);
     const right = this._builder.createString(data.right);
-    const clause = this.bufferizeFilterClause(data.filter);
+    const clause = this.bufferizeFilterClause(data.clause);
     Join.startJoin(this._builder);
     Join.addType(this._builder, data.type);
     Join.addLeft(this._builder, left);
     Join.addRight(this._builder, right);
-    Join.addFilter(this._builder, clause);
+    Join.addClause(this._builder, clause);
     return Join.endJoin(this._builder);
   }
 
@@ -167,7 +167,7 @@ export class JoinHelper {
       if (!join) {
         throw new Error("Invalid join.");
       }
-      const clause = join.filter(new FilterClause());
+      const clause = join.clause(new FilterClause());
       if (!clause) {
         throw new Error("Invalid filter clause.");
       }
@@ -175,7 +175,7 @@ export class JoinHelper {
         type: join.type(),
         left: join.left() || "",
         right: join.right() || "",
-        filter: this.parseFilterClause(clause),
+        clause: this.parseFilterClause(clause),
       });
     }
     return joins;

@@ -1,5 +1,5 @@
 import { Builder } from "flatbuffers";
-import { Table, Model } from "./.fbs/data.Model_generated";
+import { Table, Model } from "../.fbs/data.Model_generated";
 import {
   Field,
   Type,
@@ -9,7 +9,7 @@ import {
   DateOpts,
   DecimalOpts,
   CommonOpts,
-} from "./.fbs/data.Field_generated";
+} from "../.fbs/data.Field_generated";
 import {
   TableType,
   AggType,
@@ -18,7 +18,7 @@ import {
   TimeZone,
   DataType,
   DecimalBitWidth,
-} from "./Enums";
+} from "../Enums";
 
 export type CommonOptsData = {
   nullable: boolean;

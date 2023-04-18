@@ -119,7 +119,7 @@ const data: DocumentData = {
         type: JoinType.Inner,
         left: "tables",
         right: "columns",
-        filter: {
+        clause: {
           type: FilterOperator.And,
           filters: [
             {

@@ -25,7 +25,7 @@ table Join {
   type: enum.JoinType;
   left: string;
   right: string;
-  filter: data.FilterClause;
+  clause: data.FilterClause;
 }
 
 /// Data model type.

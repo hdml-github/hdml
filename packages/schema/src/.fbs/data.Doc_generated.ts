@@ -52,14 +52,9 @@ model(obj?:Model):Model|null {
   return offset ? (obj || new Model()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-frames(index: number, obj?:Frame):Frame|null {
+frames(obj?:Frame):Frame|null {
   const offset = this.bb!.__offset(this.bb_pos, 12);
-  return offset ? (obj || new Frame()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
-}
-
-framesLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 12);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+  return offset ? (obj || new Frame()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 static startDoc(builder:flatbuffers.Builder) {
@@ -84,18 +79,6 @@ static addModel(builder:flatbuffers.Builder, modelOffset:flatbuffers.Offset) {
 
 static addFrames(builder:flatbuffers.Builder, framesOffset:flatbuffers.Offset) {
   builder.addFieldOffset(4, framesOffset, 0);
-}
-
-static createFramesVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (let i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]!);
-  }
-  return builder.endVector();
-}
-
-static startFramesVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
 }
 
 static endDoc(builder:flatbuffers.Builder):flatbuffers.Offset {

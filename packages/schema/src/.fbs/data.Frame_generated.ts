@@ -4,6 +4,41 @@ import * as flatbuffers from 'flatbuffers';
 
 import {Field as Field} from './data.Field_generated.js';
 import {FilterClause as FilterClause} from './data.FilterClause_generated.js';
+import {Model as Model} from './data.Model_generated.js';
+
+/**
+ * Type options union.
+ */
+export enum Parent {
+  NONE = 0,
+  Frame = 1,
+  data_Model = 2
+}
+
+export function unionToParent(
+  type: Parent,
+  accessor: (obj:Frame|Model) => Frame|Model|null
+): Frame|Model|null {
+  switch(Parent[type]) {
+    case 'NONE': return null; 
+    case 'Frame': return accessor(new Frame())! as Frame;
+    case 'data_Model': return accessor(new Model())! as Model;
+    default: return null;
+  }
+}
+
+export function unionListToParent(
+  type: Parent, 
+  accessor: (index: number, obj:Frame|Model) => Frame|Model|null, 
+  index: number
+): Frame|Model|null {
+  switch(Parent[type]) {
+    case 'NONE': return null; 
+    case 'Frame': return accessor(index, new Frame())! as Frame;
+    case 'data_Model': return accessor(index, new Model())! as Model;
+    default: return null;
+  }
+}
 
 /**
  * Data frame type.
@@ -97,18 +132,18 @@ sortByLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
-children(index: number, obj?:Frame):Frame|null {
+parentType():Parent {
   const offset = this.bb!.__offset(this.bb_pos, 22);
-  return offset ? (obj || new Frame()).__init(this.bb!.__indirect(this.bb!.__vector(this.bb_pos + offset) + index * 4), this.bb!) : null;
+  return offset ? this.bb!.readUint8(this.bb_pos + offset) : Parent.NONE;
 }
 
-childrenLength():number {
-  const offset = this.bb!.__offset(this.bb_pos, 22);
-  return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
+parent<T extends flatbuffers.Table>(obj:any):any|null {
+  const offset = this.bb!.__offset(this.bb_pos, 24);
+  return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
 }
 
 static startFrame(builder:flatbuffers.Builder) {
-  builder.startObject(10);
+  builder.startObject(11);
 }
 
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
@@ -195,20 +230,12 @@ static startSortByVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
-static addChildren(builder:flatbuffers.Builder, childrenOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(9, childrenOffset, 0);
+static addParentType(builder:flatbuffers.Builder, parentType:Parent) {
+  builder.addFieldInt8(9, parentType, Parent.NONE);
 }
 
-static createChildrenVector(builder:flatbuffers.Builder, data:flatbuffers.Offset[]):flatbuffers.Offset {
-  builder.startVector(4, data.length, 4);
-  for (let i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]!);
-  }
-  return builder.endVector();
-}
-
-static startChildrenVector(builder:flatbuffers.Builder, numElems:number) {
-  builder.startVector(4, numElems, 4);
+static addParent(builder:flatbuffers.Builder, parentOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(10, parentOffset, 0);
 }
 
 static endFrame(builder:flatbuffers.Builder):flatbuffers.Offset {

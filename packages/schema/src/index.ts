@@ -27,8 +27,9 @@ import {
   TypeData,
   FieldData,
   TableData,
-} from "./TableHelper";
-import { Document, DocumentData, ModelData } from "./Document";
+} from "./helpers/TableHelper";
+import { ModelData } from "./helpers/ModelHelper";
+import { Document, DocumentData } from "./Document";
 
 export {
   TableType,

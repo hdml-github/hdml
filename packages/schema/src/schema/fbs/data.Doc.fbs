@@ -16,5 +16,5 @@ table Doc {
   tenant: string;
   token: string;
   model: data.Model;
-  frames: [data.Frame];
+  frames: data.Frame;
 }

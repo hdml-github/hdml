@@ -144,7 +144,7 @@ right(optionalEncoding?:any):string|Uint8Array|null {
   return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
 }
 
-filter(obj?:FilterClause):FilterClause|null {
+clause(obj?:FilterClause):FilterClause|null {
   const offset = this.bb!.__offset(this.bb_pos, 10);
   return offset ? (obj || new FilterClause()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
@@ -165,8 +165,8 @@ static addRight(builder:flatbuffers.Builder, rightOffset:flatbuffers.Offset) {
   builder.addFieldOffset(2, rightOffset, 0);
 }
 
-static addFilter(builder:flatbuffers.Builder, filterOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(3, filterOffset, 0);
+static addClause(builder:flatbuffers.Builder, clauseOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(3, clauseOffset, 0);
 }
 
 static endJoin(builder:flatbuffers.Builder):flatbuffers.Offset {

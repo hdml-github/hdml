@@ -3,7 +3,7 @@ import {
   DateOptsData,
   TimeOptsData,
   TimestampOptsData,
-} from "./TableHelper";
+} from "./helpers/TableHelper";
 import { Document, DocumentData } from "./Document";
 import {
   TableType,
@@ -123,7 +123,7 @@ describe("Document schema", () => {
           type: JoinType.Inner,
           left: "table1",
           right: "table2",
-          filter: {
+          clause: {
             type: FilterOperator.Or,
             filters: [
               {
@@ -377,9 +377,9 @@ describe("Document schema", () => {
       expect(join.left).toEqual(join2?.left);
       expect(join.right).toEqual(join2?.right);
 
-      const clause = join.filter;
-      const clause1 = join1?.filter;
-      const clause2 = join2?.filter;
+      const clause = join.clause;
+      const clause1 = join1?.clause;
+      const clause2 = join2?.clause;
 
       expect(clause.type).toEqual(clause1?.type);
       expect(clause.type).toEqual(clause2?.type);

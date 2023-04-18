@@ -229,7 +229,7 @@ export function getModelJoinSQL(
     sql = sql + "\t\ton (\n";
     sql =
       sql +
-      getModelFilterClauseSQL(join.left, join.right, join.filter);
+      getModelFilterClauseSQL(join.left, join.right, join.clause);
     sql = sql + "\t\t)\n";
   }
   return sql;

@@ -65,7 +65,7 @@
     <data-frame
       name="profitable_products"
       host="data.io"
-      source="?data-frame=product_profit"
+      source="/frames/product_all.html?data-frame=product_profit"
       cache-control="max-age=600">
 
       <data-fields>
@@ -81,10 +81,10 @@
       <filter-by>
         <logical-or>
           <search-expr
-            clause="total_price > total_cost" />
+            clause='"total_price" > "total_cost"' />
           <search-filter
             field="profit"
-            more-than="0"/>
+            more-than='0, "a", cast("2023.01.01" as date)'/>
         </logical-or>
       </filter-by>
 
