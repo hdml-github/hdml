@@ -52,7 +52,7 @@ model(obj?:Model):Model|null {
   return offset ? (obj || new Model()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
-frames(obj?:Frame):Frame|null {
+frame(obj?:Frame):Frame|null {
   const offset = this.bb!.__offset(this.bb_pos, 12);
   return offset ? (obj || new Frame()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
@@ -77,8 +77,8 @@ static addModel(builder:flatbuffers.Builder, modelOffset:flatbuffers.Offset) {
   builder.addFieldOffset(3, modelOffset, 0);
 }
 
-static addFrames(builder:flatbuffers.Builder, framesOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(4, framesOffset, 0);
+static addFrame(builder:flatbuffers.Builder, frameOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(4, frameOffset, 0);
 }
 
 static endDoc(builder:flatbuffers.Builder):flatbuffers.Offset {

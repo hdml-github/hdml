@@ -26,8 +26,8 @@ import {
   TimestampOptsData,
   TypeData,
   FieldData,
-  TableData,
-} from "./helpers/TableHelper";
+} from "./helpers/FieldHelper";
+import { TableData } from "./helpers/TableHelper";
 import { ModelData } from "./helpers/ModelHelper";
 import { Document, DocumentData } from "./Document";
 

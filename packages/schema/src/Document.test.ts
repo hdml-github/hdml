@@ -3,7 +3,7 @@ import {
   DateOptsData,
   TimeOptsData,
   TimestampOptsData,
-} from "./helpers/TableHelper";
+} from "./helpers/FieldHelper";
 import { Document, DocumentData } from "./Document";
 import {
   TableType,
@@ -181,6 +181,228 @@ describe("Document schema", () => {
         },
       ],
     },
+    frame: {
+      name: "Test Frame",
+      host: "hostname",
+      source: "parent",
+      limit: 1000,
+      fields: [
+        {
+          name: "field1",
+          origin: "origin1",
+          clause: "clause1",
+          description: "description1",
+          agg: AggType.Count,
+        },
+        {
+          name: "field2",
+          origin: "origin2",
+          clause: "clause2",
+          description: "description2",
+          agg: AggType.Avg,
+        },
+      ],
+      filterBy: {
+        type: FilterOperator.Or,
+        filters: [
+          {
+            type: FilterType.Expr,
+            options: {
+              clause: '"field1" = "field1"',
+            },
+          },
+          {
+            type: FilterType.Keys,
+            options: {
+              left: "field1",
+              right: "field1",
+            },
+          },
+          {
+            type: FilterType.Named,
+            options: {
+              name: FilterName.IsNotNull,
+              field: "field1",
+              values: [],
+            },
+          },
+        ],
+        children: [
+          {
+            type: FilterOperator.And,
+            filters: [
+              {
+                type: FilterType.Expr,
+                options: {
+                  clause: '"field1" = "field1"',
+                },
+              },
+              {
+                type: FilterType.Keys,
+                options: {
+                  left: "field1",
+                  right: "field1",
+                },
+              },
+              {
+                type: FilterType.Named,
+                options: {
+                  name: FilterName.IsNotNull,
+                  field: "field1",
+                  values: [],
+                },
+              },
+            ],
+            children: [],
+          },
+        ],
+      },
+      groupBy: [
+        {
+          name: "field1",
+          origin: "origin1",
+          clause: "clause1",
+          description: "description1",
+          agg: AggType.Count,
+        },
+      ],
+      splitBy: [
+        {
+          name: "field2",
+          origin: "origin2",
+          clause: "clause2",
+          description: "description2",
+          agg: AggType.Avg,
+        },
+      ],
+      sortBy: [
+        {
+          name: "field1",
+          origin: "origin1",
+          clause: "clause1",
+          description: "description1",
+          asc: true,
+        },
+        {
+          name: "field2",
+          origin: "origin2",
+          clause: "clause2",
+          description: "description2",
+          asc: false,
+        },
+      ],
+      parent: {
+        name: "Test Frame",
+        host: "hostname",
+        source: "parent",
+        limit: 1000,
+        fields: [
+          {
+            name: "field1",
+            origin: "origin1",
+            clause: "clause1",
+            description: "description1",
+            agg: AggType.Count,
+          },
+          {
+            name: "field2",
+            origin: "origin2",
+            clause: "clause2",
+            description: "description2",
+            agg: AggType.Avg,
+          },
+        ],
+        filterBy: {
+          type: FilterOperator.Or,
+          filters: [
+            {
+              type: FilterType.Expr,
+              options: {
+                clause: '"field1" = "field1"',
+              },
+            },
+            {
+              type: FilterType.Keys,
+              options: {
+                left: "field1",
+                right: "field1",
+              },
+            },
+            {
+              type: FilterType.Named,
+              options: {
+                name: FilterName.IsNotNull,
+                field: "field1",
+                values: [],
+              },
+            },
+          ],
+          children: [
+            {
+              type: FilterOperator.And,
+              filters: [
+                {
+                  type: FilterType.Expr,
+                  options: {
+                    clause: '"field1" = "field1"',
+                  },
+                },
+                {
+                  type: FilterType.Keys,
+                  options: {
+                    left: "field1",
+                    right: "field1",
+                  },
+                },
+                {
+                  type: FilterType.Named,
+                  options: {
+                    name: FilterName.IsNotNull,
+                    field: "field1",
+                    values: [],
+                  },
+                },
+              ],
+              children: [],
+            },
+          ],
+        },
+        groupBy: [
+          {
+            name: "field1",
+            origin: "origin1",
+            clause: "clause1",
+            description: "description1",
+            agg: AggType.Count,
+          },
+        ],
+        splitBy: [
+          {
+            name: "field2",
+            origin: "origin2",
+            clause: "clause2",
+            description: "description2",
+            agg: AggType.Avg,
+          },
+        ],
+        sortBy: [
+          {
+            name: "field1",
+            origin: "origin1",
+            clause: "clause1",
+            description: "description1",
+            asc: true,
+          },
+          {
+            name: "field2",
+            origin: "origin2",
+            clause: "clause2",
+            description: "description2",
+            asc: false,
+          },
+        ],
+      },
+    },
   };
 
   let document1: Document;
@@ -189,6 +411,8 @@ describe("Document schema", () => {
   it("must be constructible and parsable", () => {
     document1 = new Document(documentData);
     document2 = new Document(document1.buffer);
+
+    // console.log(JSON.stringify(document2.frame, undefined, 2));
 
     expect(documentData.name).toEqual(document1.name);
     expect(documentData.name).toEqual(document2.name);

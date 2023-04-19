@@ -4,41 +4,6 @@ import * as flatbuffers from 'flatbuffers';
 
 import {Field as Field} from './data.Field_generated.js';
 import {FilterClause as FilterClause} from './data.FilterClause_generated.js';
-import {Model as Model} from './data.Model_generated.js';
-
-/**
- * Type options union.
- */
-export enum Parent {
-  NONE = 0,
-  Frame = 1,
-  data_Model = 2
-}
-
-export function unionToParent(
-  type: Parent,
-  accessor: (obj:Frame|Model) => Frame|Model|null
-): Frame|Model|null {
-  switch(Parent[type]) {
-    case 'NONE': return null; 
-    case 'Frame': return accessor(new Frame())! as Frame;
-    case 'data_Model': return accessor(new Model())! as Model;
-    default: return null;
-  }
-}
-
-export function unionListToParent(
-  type: Parent, 
-  accessor: (index: number, obj:Frame|Model) => Frame|Model|null, 
-  index: number
-): Frame|Model|null {
-  switch(Parent[type]) {
-    case 'NONE': return null; 
-    case 'Frame': return accessor(index, new Frame())! as Frame;
-    case 'data_Model': return accessor(index, new Model())! as Model;
-    default: return null;
-  }
-}
 
 /**
  * Data frame type.
@@ -97,7 +62,7 @@ fieldsLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
-filter(obj?:FilterClause):FilterClause|null {
+filterBy(obj?:FilterClause):FilterClause|null {
   const offset = this.bb!.__offset(this.bb_pos, 14);
   return offset ? (obj || new FilterClause()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
@@ -132,18 +97,13 @@ sortByLength():number {
   return offset ? this.bb!.__vector_len(this.bb_pos + offset) : 0;
 }
 
-parentType():Parent {
+parent(obj?:Frame):Frame|null {
   const offset = this.bb!.__offset(this.bb_pos, 22);
-  return offset ? this.bb!.readUint8(this.bb_pos + offset) : Parent.NONE;
-}
-
-parent<T extends flatbuffers.Table>(obj:any):any|null {
-  const offset = this.bb!.__offset(this.bb_pos, 24);
-  return offset ? this.bb!.__union(obj, this.bb_pos + offset) : null;
+  return offset ? (obj || new Frame()).__init(this.bb!.__indirect(this.bb_pos + offset), this.bb!) : null;
 }
 
 static startFrame(builder:flatbuffers.Builder) {
-  builder.startObject(11);
+  builder.startObject(10);
 }
 
 static addName(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset) {
@@ -178,8 +138,8 @@ static startFieldsVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
-static addFilter(builder:flatbuffers.Builder, filterOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(5, filterOffset, 0);
+static addFilterBy(builder:flatbuffers.Builder, filterByOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(5, filterByOffset, 0);
 }
 
 static addGroupBy(builder:flatbuffers.Builder, groupByOffset:flatbuffers.Offset) {
@@ -230,12 +190,8 @@ static startSortByVector(builder:flatbuffers.Builder, numElems:number) {
   builder.startVector(4, numElems, 4);
 }
 
-static addParentType(builder:flatbuffers.Builder, parentType:Parent) {
-  builder.addFieldInt8(9, parentType, Parent.NONE);
-}
-
 static addParent(builder:flatbuffers.Builder, parentOffset:flatbuffers.Offset) {
-  builder.addFieldOffset(10, parentOffset, 0);
+  builder.addFieldOffset(9, parentOffset, 0);
 }
 
 static endFrame(builder:flatbuffers.Builder):flatbuffers.Offset {
