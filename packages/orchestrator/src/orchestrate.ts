@@ -3,22 +3,51 @@ import {
   type ModelData,
   type TableData,
   type FieldData,
+  type FilterClauseData,
+  type JoinData,
   TableType,
   DataType,
   JoinType,
   FilterType,
   FilterOperator,
+  FrameData,
 } from "@hdml/schema";
-import {
-  FilterClauseData,
-  JoinData,
-} from "@hdml/schema/dts/JoinHelper";
+
+const t = "  ";
 
 export function orchestrate(document: Document): string {
-  if (document.model) {
+  if (!document.model) {
+    throw new Error("Model is missing.");
+  }
+  if (document.frame) {
+    return getFrameSQL(document.frame, document.model, 0);
+  } else {
     return getModelSQL(document.model);
   }
-  return "";
+}
+
+export function getFrameSQL(
+  frame: FrameData,
+  model: ModelData,
+  level = 0,
+): string {
+  const pre = t.repeat(level);
+  let sql = "";
+  if (level > 0) {
+    sql = sql + `${pre}with "${frame.name}" as (\n`;
+  }
+  if (frame.parent) {
+    sql = sql + getFrameSQL(frame.parent, model, level + 1);
+  } else {
+    sql = sql + `${pre}${t}with "${model.name}" as (\n`;
+    sql = sql + getModelSQL(model);
+    sql = sql + `${pre}${t})\n`;
+  }
+  if (level > 0) {
+    sql = sql + `${pre})\n`;
+  }
+  // frame.fields.map((field) => {});
+  return sql;
 }
 
 export function getModelSQL(model: ModelData): string {
@@ -54,7 +83,7 @@ export function getModelSQL(model: ModelData): string {
           .map(
             (f) =>
               `\t\t\t` +
-              `"${t.name}"."${f.name}" as "${t.name}.${f.name}"`,
+              `"${t.name}"."${f.name}" as "${t.name}_${f.name}"`,
           )
           .join(",\n"),
       )
@@ -69,7 +98,9 @@ export function getModelSQL(model: ModelData): string {
     const path = getModelJoinsPath(model.joins);
     sql =
       sql +
-      model.joins.map((j, i) => getModelJoinSQL(path, j, i)).join();
+      model.joins
+        .map((join, i) => getModelJoinSQL(path, join, i))
+        .join();
   }
 
   return sql;

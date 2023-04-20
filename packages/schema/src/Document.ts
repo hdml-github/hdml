@@ -11,8 +11,8 @@ export type DocumentData =
       name: string;
       tenant: string;
       token: string;
-      model: ModelData;
-      frame: FrameData;
+      model?: ModelData;
+      frame?: FrameData;
     };
 
 export class Document {
@@ -65,14 +65,24 @@ export class Document {
       const name = this._builder.createString(data.name);
       const tenant = this._builder.createString(data.tenant);
       const token = this._builder.createString(data.token);
-      const model = this._model.bufferizeModel(data.model);
-      const frame = this._frame.bufferizeFrame(data.frame);
+      let model: undefined | number;
+      if (data.model) {
+        model = this._model.bufferizeModel(data.model);
+      }
+      let frame: undefined | number;
+      if (data.frame) {
+        frame = this._frame.bufferizeFrame(data.frame);
+      }
       Doc.startDoc(this._builder);
       Doc.addName(this._builder, name);
       Doc.addTenant(this._builder, tenant);
       Doc.addToken(this._builder, token);
-      Doc.addModel(this._builder, model);
-      Doc.addFrame(this._builder, frame);
+      if (model) {
+        Doc.addModel(this._builder, model);
+      }
+      if (frame) {
+        Doc.addFrame(this._builder, frame);
+      }
       this._builder.finish(Doc.endDoc(this._builder));
       this._buffer = new ByteBuffer(this._builder.asUint8Array());
       this._document = Doc.getRootAsDoc(this._buffer);

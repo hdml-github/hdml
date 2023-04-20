@@ -23,7 +23,7 @@ const data: DocumentData = {
   tenant: "common",
   token: "sometokenhere",
   model: {
-    name: "Database info.",
+    name: "model",
     host: "hostname",
     tables: [
       {
@@ -167,6 +167,76 @@ const data: DocumentData = {
         },
       },
     ],
+  },
+  frame: {
+    name: "query",
+    host: "hostname",
+    source: "frame",
+    limit: 1000,
+    fields: [
+      {
+        name: "catalog",
+      },
+      {
+        name: "schema",
+      },
+      {
+        name: "table",
+      },
+      {
+        name: "column",
+        agg: AggType.Count,
+      },
+    ],
+    groupBy: [
+      {
+        name: "catalog",
+      },
+      {
+        name: "schema",
+      },
+      {
+        name: "table",
+      },
+    ],
+    parent: {
+      name: "frame",
+      host: "hostname",
+      source: "model",
+      limit: 1000,
+      fields: [
+        {
+          name: "catalog",
+          origin: "columns_catalog",
+        },
+        {
+          name: "schema",
+          origin: "columns_schema",
+        },
+        {
+          name: "table",
+          origin: "columns_table",
+        },
+        {
+          name: "column",
+          origin: "columns_column",
+        },
+      ],
+      groupBy: [
+        {
+          name: "catalog",
+        },
+        {
+          name: "schema",
+        },
+        {
+          name: "table",
+        },
+        {
+          name: "column",
+        },
+      ],
+    },
   },
 };
 

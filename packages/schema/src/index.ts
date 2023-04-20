@@ -27,8 +27,11 @@ import {
   TypeData,
   FieldData,
 } from "./helpers/FieldHelper";
+import { FilterClauseData } from "./helpers/FilterHelper";
 import { TableData } from "./helpers/TableHelper";
+import { JoinData } from "./helpers/JoinHelper";
 import { ModelData } from "./helpers/ModelHelper";
+import { FrameData } from "./helpers/FrameHelper";
 import { Document, DocumentData } from "./Document";
 
 export {
@@ -54,4 +57,7 @@ export {
   FilterType,
   FilterOperator,
   JoinType,
+  FilterClauseData,
+  JoinData,
+  FrameData,
 };

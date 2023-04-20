@@ -423,20 +423,20 @@ describe("Document schema", () => {
     expect(documentData.token).toEqual(document1.token);
     expect(documentData.token).toEqual(document2.token);
 
-    expect(documentData.model.name).toEqual(document1.model?.name);
-    expect(documentData.model.name).toEqual(document2.model?.name);
+    expect(documentData.model?.name).toEqual(document1.model?.name);
+    expect(documentData.model?.name).toEqual(document2.model?.name);
 
-    expect(documentData.model.host).toEqual(document1.model?.host);
-    expect(documentData.model.host).toEqual(document2.model?.host);
+    expect(documentData.model?.host).toEqual(document1.model?.host);
+    expect(documentData.model?.host).toEqual(document2.model?.host);
 
-    expect(documentData.model.tables.length).toEqual(
+    expect(documentData.model?.tables.length).toEqual(
       document1.model?.tables.length,
     );
-    expect(documentData.model.tables.length).toEqual(
+    expect(documentData.model?.tables.length).toEqual(
       document2.model?.tables.length,
     );
 
-    documentData.model.tables.forEach((table, i) => {
+    documentData.model?.tables.forEach((table, i) => {
       expect(table.name).toEqual(document1.model?.tables[i].name);
       expect(table.name).toEqual(document2.model?.tables[i].name);
 
@@ -589,7 +589,7 @@ describe("Document schema", () => {
       });
     });
 
-    documentData.model.joins.forEach((join, i) => {
+    documentData.model?.joins.forEach((join, i) => {
       const join1 = document1.model?.joins[i];
       const join2 = document2.model?.joins[i];
 
