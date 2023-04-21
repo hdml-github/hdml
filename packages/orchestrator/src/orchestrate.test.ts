@@ -184,7 +184,8 @@ const data: DocumentData = {
         name: "table",
       },
       {
-        name: "column",
+        name: "columns_count",
+        origin: "column",
         agg: AggType.Count,
       },
     ],
