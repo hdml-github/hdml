@@ -15,6 +15,7 @@ table Frame {
   name: string;
   host: string;
   source: string;
+  offset: ulong;
   limit: ulong;
   fields: [data.Field];
   filter_by: data.FilterClause;

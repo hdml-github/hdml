@@ -9,6 +9,6 @@ export function orchestrate(document: Document): string {
   if (document.frame) {
     return getFrameSQL(document.frame, document.model, 0);
   } else {
-    return getModelSQL(document.model);
+    return getModelSQL(document.model, 0);
   }
 }

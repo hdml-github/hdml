@@ -18,23 +18,24 @@ export function getFilterClauseSQL(
   switch (clause.type) {
     case FilterOperator.And:
       sql = sql + `${pre}1 = 1\n`;
-      op = `${pre}and`;
+      op = `${pre}and `;
       break;
     case FilterOperator.Or:
       sql = sql + `${pre}1 != 1\n`;
-      op = `${pre}or`;
+      op = `${pre}or `;
       break;
     case FilterOperator.None:
     default:
+      op = `${pre}`;
       break;
   }
   sql =
     sql +
     clause.filters
-      .map((f) => `${op} ${getFilter(f, left, right)}\n`)
+      .map((f) => `${op}${getFilter(f, left, right)}\n`)
       .join("");
   clause.children.forEach((child) => {
-    sql = sql + `${op} (\n`;
+    sql = sql + `${op}(\n`;
     sql = sql + getFilterClauseSQL(child, level + 1, left, right);
     sql = sql + `${pre})\n`;
   });

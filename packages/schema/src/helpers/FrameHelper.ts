@@ -8,6 +8,7 @@ export type FrameData = {
   name: string;
   host: string;
   source: string;
+  offset: number;
   limit: number;
   fields: FieldData[];
   filterBy?: FilterClauseData;
@@ -60,6 +61,7 @@ export class FrameHelper {
     Frame.addHost(this._builder, host);
     Frame.addSource(this._builder, source);
     Frame.addLimit(this._builder, BigInt(data.limit));
+    Frame.addOffset(this._builder, BigInt(data.offset));
     Frame.addFields(this._builder, fields);
     if (clause) {
       Frame.addFilterBy(this._builder, clause);
@@ -87,6 +89,7 @@ export class FrameHelper {
       host: <string>frame.host(),
       source: <string>frame.source(),
       limit: Number(frame.limit()),
+      offset: Number(frame.offset()),
       fields: this._field.parseFields(
         frame.fields.bind(frame),
         frame.fieldsLength(),

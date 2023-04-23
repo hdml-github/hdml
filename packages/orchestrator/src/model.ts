@@ -2,18 +2,16 @@ import {
   type ModelData,
   type TableData,
   type FieldData,
-  type FilterClauseData,
   type JoinData,
   TableType,
   JoinType,
-  FilterType,
-  FilterOperator,
 } from "@hdml/schema";
-
 import { getTableFieldSQL } from "./fields";
 import { getFilterClauseSQL } from "./filter";
+import { t } from "./const";
 
-export function getModelSQL(model: ModelData): string {
+export function getModelSQL(model: ModelData, level = 0): string {
+  const pre = t.repeat(level);
   const tablesList = model.tables
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .filter((t) => isModelTableJoined(model, t));
@@ -23,7 +21,7 @@ export function getModelSQL(model: ModelData): string {
       switch (table.type) {
         case TableType.Table:
         case TableType.Query:
-          return getModelTableSQL(table);
+          return getModelTableSQL(table, level + 2);
         case TableType.Csv:
           return "";
         case TableType.Json:
@@ -33,20 +31,20 @@ export function getModelSQL(model: ModelData): string {
     .join(",\n");
 
   // subqueries
-  let sql = "\twith\n";
+  let sql = `${pre}${t}with\n`;
   sql = sql + `${tables}\n`;
 
   // select clause
-  sql = sql + "\t\tselect\n";
+  sql = sql + `${pre}${t}select\n`;
   sql =
     sql +
     tablesList
-      .map((t) =>
-        t.fields
+      .map((tbl) =>
+        tbl.fields
           .map(
             (f) =>
-              `\t\t\t` +
-              `"${t.name}"."${f.name}" as "${t.name}_${f.name}"`,
+              `${pre}${t}${t}` +
+              `"${tbl.name}"."${f.name}" as "${tbl.name}_${f.name}"`,
           )
           .join(",\n"),
       )
@@ -54,15 +52,18 @@ export function getModelSQL(model: ModelData): string {
 
   // from clause
   if (model.joins.length === 0) {
-    sql = sql + "\n\t\tfrom\n";
+    sql = sql + `\n${pre}${t}from\n`;
     sql =
-      sql + tablesList.map((t) => `\t\t\t"${t.name}"`).join(",\n");
+      sql +
+      tablesList
+        .map((tbl) => `${pre}${t}${t}"${tbl.name}"`)
+        .join(",\n");
   } else {
     const path = getModelJoinsPath(model.joins);
     sql =
       sql +
       model.joins
-        .map((join, i) => getModelJoinSQL(path, join, i))
+        .map((join, i) => getModelJoinSQL(path, join, i, level))
         .join();
   }
 
@@ -84,26 +85,37 @@ export function isModelTableJoined(
   return res;
 }
 
-export function getModelTableSQL(table: TableData): string {
+export function getModelTableSQL(
+  table: TableData,
+  level = 0,
+): string {
+  const pre = t.repeat(level);
   const source =
     table.type === TableType.Table ? table.source : `_${table.name}`;
-
   const fields = table.fields
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    .map((field: FieldData) => `\t\t\t\t${getTableFieldSQL(field)}`)
+    .map(
+      (field: FieldData) =>
+        `${pre}${t}${t}${getTableFieldSQL(field)}`,
+    )
     .join(",\n");
 
-  let sql = `\t\t"${table.name}" as (\n`;
+  let sql = `${pre}"${table.name}" as (\n`;
   sql =
     sql +
     (table.type === TableType.Query
-      ? `\t\t\twith ${source} as (${table.source})\n`
+      ? `${pre}${t}with ${source} as (\n` +
+        `${table.source
+          .split("\n")
+          .map((r) => `${pre}${t}${t}${r}`)
+          .join("\n")}\n` +
+        `${pre}${t})\n`
       : "");
-  sql = sql + "\t\t\tselect\n";
+  sql = sql + `${pre}${t}select\n`;
   sql = sql + `${fields}\n`;
-  sql = sql + "\t\t\tfrom\n";
-  sql = sql + `\t\t\t\t${source}\n`;
-  sql = sql + "\t\t)";
+  sql = sql + `${pre}${t}from\n`;
+  sql = sql + `${pre}${t}${t}${source}\n`;
+  sql = sql + `${pre})`;
   return sql;
 }
 
@@ -126,7 +138,9 @@ export function getModelJoinSQL(
   path: string[],
   join: JoinData,
   i: number,
+  level = 0,
 ): string {
+  const pre = t.repeat(level);
   let sql = "";
   let type = "";
   switch (join.type) {
@@ -157,52 +171,20 @@ export function getModelJoinSQL(
       break;
   }
   if (i === 0) {
-    sql = sql + `\n\t\tfrom "${join.left}"\n`;
+    sql = sql + `\n${pre}${t}from "${join.left}"\n`;
   }
-  sql = sql + `\t\t${type} "${path[i]}"\n`;
+  sql = sql + `${pre}${t}${type} "${path[i]}"\n`;
   if (join.type !== JoinType.Cross) {
-    sql = sql + "\t\ton (\n";
+    sql = sql + `${pre}${t}on (\n`;
     sql =
-      sql + getFilterClauseSQL(join.clause, 7, join.left, join.right);
-    sql = sql + "\t\t)\n";
+      sql +
+      getFilterClauseSQL(
+        join.clause,
+        level + 2,
+        join.left,
+        join.right,
+      );
+    sql = sql + `${pre}${t})\n`;
   }
-  return sql;
-}
-
-export function getModelFilterClauseSQL(
-  left: string,
-  right: string,
-  clause: FilterClauseData,
-  level = 0,
-): string {
-  let sql = "";
-  let op = "";
-  const t = "\t\t\t" + "\t".repeat(level);
-  if (clause.type === FilterOperator.And) {
-    sql = sql + `${t}1 = 1\n`;
-    op = `${t}and`;
-  } else if (clause.type === FilterOperator.Or) {
-    sql = sql + `${t}1 != 1\n`;
-    op = `${t}or`;
-  }
-  clause.filters.forEach((filter) => {
-    switch (filter.type) {
-      case FilterType.Keys:
-        sql =
-          sql +
-          `${op} "${left}"."${filter.options.left}" =` +
-          `"${right}"."${filter.options.right}"\n`;
-        break;
-      case FilterType.Expr:
-        sql = sql + `${op} ${filter.options.clause}\n`;
-        break;
-    }
-  });
-  clause.children.forEach((child) => {
-    sql = sql + `${op} (\n`;
-    sql =
-      sql + getModelFilterClauseSQL(left, right, child, level + 1);
-    sql = sql + `${t})\n`;
-  });
   return sql;
 }

@@ -172,7 +172,8 @@ const data: DocumentData = {
     name: "query",
     host: "hostname",
     source: "frame",
-    limit: 1000,
+    offset: 1,
+    limit: 1,
     fields: [
       {
         name: "catalog",
@@ -184,12 +185,41 @@ const data: DocumentData = {
         name: "table",
       },
       {
-        name: "columns_count",
-        origin: "column",
-        agg: AggType.Count,
+        name: "sum",
+        origin: "count",
+        agg: AggType.Sum,
       },
     ],
+    filterBy: {
+      type: FilterOperator.And,
+      filters: [
+        {
+          type: FilterType.Expr,
+          options: {
+            clause: `"catalog" = 'tenant_postgres'`,
+          },
+        },
+        {
+          type: FilterType.Expr,
+          options: {
+            clause: `"schema" = 'information_schema'`,
+          },
+        },
+      ],
+      children: [],
+    },
     groupBy: [
+      {
+        name: "catalog",
+      },
+      {
+        name: "schema",
+      },
+      {
+        name: "table",
+      },
+    ],
+    sortBy: [
       {
         name: "catalog",
       },
@@ -204,6 +234,7 @@ const data: DocumentData = {
       name: "frame",
       host: "hostname",
       source: "model",
+      offset: 0,
       limit: 1000,
       fields: [
         {
@@ -221,6 +252,11 @@ const data: DocumentData = {
         {
           name: "column",
           origin: "columns_column",
+        },
+        {
+          name: "count",
+          origin: "columns_column",
+          agg: AggType.Count,
         },
       ],
       groupBy: [

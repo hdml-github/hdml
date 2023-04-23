@@ -186,6 +186,7 @@ describe("Document schema", () => {
       host: "hostname",
       source: "parent",
       limit: 1000,
+      offset: 0,
       fields: [
         {
           name: "field1",
@@ -296,6 +297,7 @@ describe("Document schema", () => {
         host: "hostname",
         source: "parent",
         limit: 1000,
+        offset: 0,
         fields: [
           {
             name: "field1",
