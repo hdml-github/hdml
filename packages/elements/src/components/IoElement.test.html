@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <script type="module" src="/bin/elements.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      import { createSandbox } from "sinon/pkg/sinon-esm.js";
+
+      const { runAttrTestSuite, IoElement } = window['@hdml/elements'];
+      
+      runTests(async () => {
+        describe("IoElement", () => {
+
+          before(async () => {
+            customElements.define("tested-element", IoElement);
+            await customElements.whenDefined("tested-element");
+          });
+
+          // name
+          runAttrTestSuite(
+            IoElement,
+            // property
+            { name: "name", valid: "hdml.io", invalid: "*/#$" },
+            // attribute
+            { name: "name", valid: "hdml.io", invalid: "*/#$" },
+          );
+          runAttrTestSuite(
+            IoElement,
+            { name: "name", valid: "s.hdml.io", invalid: "1.hdml.io" },
+            { name: "name", valid: "s.hdml.io", invalid: "1.hdml.io" },
+          );
+          runAttrTestSuite(
+            IoElement,
+            { name: "name", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+            { name: "name", valid: "s.hdml.io", invalid: "a.hdml.io1" },
+          );
+          runAttrTestSuite(
+            IoElement,
+            { name: "name", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
+            { name: "name", valid: "s.h-d_m-l.io", invalid: "a.hdml.ioioioio" },
+          );
+
+          // tenant
+          runAttrTestSuite(
+            IoElement,
+            { name: "tenant", valid: "tenant_1", invalid: "1_tenant" },
+            { name: "tenant", valid: "tenant_1", invalid: "1_tenant" },
+          );
+          runAttrTestSuite(
+            IoElement,
+            { name: "tenant", valid: "tenant-1", invalid: "tenant 1" },
+            { name: "tenant", valid: "tenant-1", invalid: "tenant 1" },
+          );
+          runAttrTestSuite(
+            IoElement,
+            { name: "tenant", valid: "tenant-1_0", invalid: "_tenant-1" },
+            { name: "tenant", valid: "tenant-1_0", invalid: "_tenant-1" },
+          );
+
+          // token
+          runAttrTestSuite(
+            IoElement,
+            { name: "token", valid: "token./=+-1", invalid: "token 1" },
+            { name: "token", valid: "token./=+-1", invalid: "token\\" },
+          );
+        });
+      });
+    </script>
+  </body>
+</html>

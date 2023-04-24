@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/elements.min.js"></script>
+    <script>
+      const hdml = window['@hdml/elements'];
+      hdml.defineDefaults();
+    </script>
+  </head>
+    <body>
+      <hdml-io
+        name="hdml.io"
+        host="http://localhost:3000"
+        tenant="common"
+        token="gwkcc9k31daqq9909hdshk1==">
+      </hdml-io>
+
+      <script>
+        io = document.querySelector(hdml.getIoTag());
+      </script>
+    </body>
+</html>
