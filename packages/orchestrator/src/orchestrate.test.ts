@@ -228,6 +228,7 @@ const data: DocumentData = {
       },
       {
         name: "table",
+        asc: false,
       },
     ],
     parent: {

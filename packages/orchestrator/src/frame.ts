@@ -72,7 +72,7 @@ export function getFrameSQL(
         .map((field) => {
           for (let i = 0; i < frame.fields.length; i++) {
             if (field.name === frame.fields[i].name) {
-              return `${i + 1}`;
+              return `${i + 1}${field.asc ? "" : " desc"}`;
             }
           }
           throw new Error("Invalid `sortBy` configuration.");
