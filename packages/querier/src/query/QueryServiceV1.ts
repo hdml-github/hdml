@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as stream from "stream";
 import * as arrow from "apache-arrow";
-import { Injectable } from "@nestjs/common";
+import { Injectable, StreamableFile } from "@nestjs/common";
 import { AsyncIterableDataset } from "../client/AsyncIterableDataset";
 
 @Injectable()
@@ -81,5 +81,20 @@ export class QueryServiceV1 {
     console.log(table.schema, table.toString());
 
     return table.toString();
+  }
+
+  /**
+   * Executes SQL statement, saves resultset to a stream chunk by
+   * chunk.
+   * @param statement SQL statement
+   */
+  public async executeBin(
+    statement: string,
+  ): Promise<StreamableFile> {
+    const dataset = new AsyncIterableDataset(statement);
+    const datasetWriter = new arrow.RecordBatchStreamWriter();
+    const stream = datasetWriter.toNodeStream();
+    await datasetWriter.writeAll(dataset);
+    return new StreamableFile(stream);
   }
 }

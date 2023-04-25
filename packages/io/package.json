@@ -1,5 +1,5 @@
 {
-  "name": "@hdml/elements",
+  "name": "@hdml/io",
   "version": "0.0.0-alpha.1",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -8,15 +8,17 @@
   },
   "dependencies": {
     "@hdml/schema": "0.0.0-alpha.1",
+    "@hdml/orchestrator": "0.0.0-alpha.1",
+    "@nestjs/platform-express": "^9.0.0",
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
     "apache-arrow": "^11.0.0",
-    "lit": "^2.6.1",
-    "uuid": "^8.3.2",
-    "throttle-debounce": "^5.0.0",
-    "papaparse": "^5.4.0",
-    "whatwg-fetch": "^3.6.2"
+    "reflect-metadata": "^0.1.13",
+    "json-bigint": "^1.0.0",
+    "needle": "^3.2.0",
+    "rxjs": "^7.5.5"
   },
   "scripts": {
-    "dev": "clear && npm run compile_esm && npm run compile_bin && ../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open index.html",
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
     "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
     "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",
@@ -26,10 +28,11 @@
     "compile_bin": "../../node_modules/.bin/rollup --config ../../.rollup.config.js",
     "compile_dev": "npm run compile_esm && npm run compile_bin",
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_bin && npm run compile_dts",
-    "test": "../../node_modules/.bin/wtr --config ../../.web-test.config.js \"src/**/*.test.html\"",
-    "test_dbg": "PWDEBUG=console npm run test",
+    "test": "",
+    "test_dbg": "",
     "clear": "rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
-    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs"
+    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
+    "svc": "clear && npm run compile_cjs && node ./cjs/bootstrap"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

@@ -8,6 +8,8 @@
 import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
+import { Document } from "@hdml/schema";
+import * as arrow from "apache-arrow";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,
@@ -15,6 +17,8 @@ import {
   IO_TOKEN_REGEXP,
 } from "../helpers/constants";
 import { UnifiedElement } from "./UnifiedElement";
+
+import { data } from "./TestQuery";
 
 /**
  * `IoElement` class.
@@ -228,129 +232,26 @@ export class IoElement extends UnifiedElement {
 
   private async fetchData(): Promise<void> {
     console.log("fetching");
+    const doc = new Document(data);
     try {
       const response = await fetch(this._host || "localhost", {
         method: "POST",
-        mode: "no-cors",
+        mode: "cors",
         redirect: "follow",
         cache: "no-cache",
         headers: {
           Accept: "text/html; charset=utf-8",
           "Content-Type": "text/html; charset=utf-8",
         },
-        body: `
-        with "frame" as (
-          with "model" as (
-            with
-              "columns" as (
-                with _columns as (
-                  select * from
-                  tenant_postgres.information_schema.columns
-                )
-                select
-                  "table_catalog" as "catalog",
-                  "column_name" as "column",
-                  "column_default" as "default",
-                  "is_nullable" as "nullable",
-                  try_cast(
-                    "ordinal_position" as integer
-                  ) as "position",
-                  "table_schema" as "schema",
-                  "table_name" as "table",
-                  "data_type" as "type"
-                from
-                  _columns
-              ),
-              "tables" as (
-                select
-                  "table_catalog" as "catalog",
-                  concat(
-                    "table_catalog",
-                    '-',
-                    "table_schema",
-                    '-',
-                    "table_name"
-                  ) as "full",
-                  try_cast(
-                    concat(
-                      "table_catalog",
-                      '-',
-                      "table_schema",
-                      '-',
-                      "table_name"
-                    ) as varbinary
-                  ) as "hash",
-                  "table_schema" as "schema",
-                  "table_name" as "table",
-                  "table_type" as "type"
-                from
-                  tenant_postgres.information_schema.tables
-              )
-            select
-              "columns"."catalog" as "columns_catalog",
-              "columns"."column" as "columns_column",
-              "columns"."default" as "columns_default",
-              "columns"."nullable" as "columns_nullable",
-              "columns"."position" as "columns_position",
-              "columns"."schema" as "columns_schema",
-              "columns"."table" as "columns_table",
-              "columns"."type" as "columns_type",
-              "tables"."catalog" as "tables_catalog",
-              "tables"."full" as "tables_full",
-              "tables"."hash" as "tables_hash",
-              "tables"."schema" as "tables_schema",
-              "tables"."table" as "tables_table",
-              "tables"."type" as "tables_type"
-            from "tables"
-            inner join "columns"
-            on (
-              1 = 1
-              and "tables"."catalog" ="columns"."catalog"
-              and "tables"."schema" ="columns"."schema"
-              and "tables"."table" ="columns"."table"
-              and (
-                1 != 1
-                or "columns"."table" = 'applicable_roles'
-                or "columns"."table" = 'tables'
-              )
-            )
-          )
-          select
-            "columns_catalog" as "catalog",
-            "columns_column" as "column",
-            count("columns_column") as "count",
-            "columns_schema" as "schema",
-            "columns_table" as "table"
-          from
-            "model"
-          group by
-            1, 4, 5, 2
-          offset 0
-          limit 1000
-        )
-        select
-          "catalog" as "catalog",
-          "schema" as "schema",
-          sum("count") as "sum",
-          "table" as "table"
-        from
-          "frame"
-        where
-          1 = 1
-          and "catalog" = 'tenant_postgres'
-          and "schema" = 'information_schema'
-        group by
-          1, 2, 4
-        order by
-          1, 2, 4 desc
-        offset 0
-        limit 100`,
+        body: doc.buffer,
       });
       if (!response.ok) {
         throw new Error("Network response was not OK");
       }
-      const data = await response.blob();
-      console.log(data);
+      const buffer = await response.arrayBuffer();
+      const array = new Uint8Array(buffer);
+      const table = arrow.tableFromIPC(array);
+      console.log(table.toString());
     } catch (err) {
       console.error(err);
     }
