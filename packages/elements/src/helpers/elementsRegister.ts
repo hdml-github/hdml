@@ -6,12 +6,13 @@
  */
 
 import { IoElement } from "../components/IoElement";
+import { ModelElement } from "../components/ModelElement";
 
 let ioDefined = false;
 let ioTag = "hdml-io";
 
 /**
- * Define IoElement component tag name and register custom element.
+ * Define `IoElement` component tag name and register custom element.
  */
 export async function defineIo(
   tagName?: string,
@@ -28,15 +29,43 @@ export async function defineIo(
 }
 
 /**
- * Define HDML tags with the defaults names and components.
- */
-export async function defineDefaults(): Promise<void> {
-  await Promise.all([defineIo()]);
-}
-
-/**
- * Returns registered IoElement tag name.
+ * Returns registered `IoElement` tag name.
  */
 export function getIoTag(): string {
   return ioTag;
+}
+
+let modelDefined = false;
+let modelTag = "hdml-model";
+
+/**
+ * Define `ModelElement` component tag name and register custom
+ * element.
+ */
+export async function defineModel(
+  tagName?: string,
+  Constructor?: new () => ModelElement,
+): Promise<void> {
+  if (!modelDefined) {
+    modelDefined = true;
+    if (tagName) {
+      modelTag = tagName;
+    }
+    customElements.define(modelTag, Constructor || ModelElement);
+    await customElements.whenDefined(modelTag);
+  }
+}
+
+/**
+ * Returns registered `ModelElement` tag name.
+ */
+export function getModelTag(): string {
+  return modelTag;
+}
+
+/**
+ * Define `hdml` tags with the defaults names and components.
+ */
+export async function defineDefaults(): Promise<void> {
+  await Promise.all([defineIo(), defineModel()]);
 }

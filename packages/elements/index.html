@@ -8,6 +8,11 @@
     </script>
   </head>
     <body>
+      <hdml-model
+        name="sales1">
+        <!-- Model here -->
+      </hdml-model>
+
       <hdml-io
         name="hdml.io"
         host="http://localhost:2000"
@@ -15,8 +20,14 @@
         token="gwkcc9k31daqq9909hdshk1==">
       </hdml-io>
 
+      <hdml-model
+        name="sales2">
+        <!-- Model here -->
+      </hdml-model>
+
       <script>
         io = document.querySelector(hdml.getIoTag());
+        model = document.querySelector(hdml.getModelTag());
       </script>
     </body>
 </html>

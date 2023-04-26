@@ -10,7 +10,9 @@ import { getUid } from "./helpers/getUid";
 import {
   defineDefaults,
   defineIo,
+  defineModel,
   getIoTag,
+  getModelTag,
 } from "./helpers/elementsRegister";
 import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
@@ -21,7 +23,9 @@ export {
   getUid,
   defineDefaults,
   defineIo,
+  defineModel,
   getIoTag,
+  getModelTag,
   runAttrTestSuite,
   UnifiedElement,
   IoElement,

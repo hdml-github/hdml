@@ -17,6 +17,7 @@ import {
   IO_TOKEN_REGEXP,
 } from "../helpers/constants";
 import { UnifiedElement } from "./UnifiedElement";
+import { IModelTarget, ModelElement } from "./ModelElement";
 
 import { data } from "./TestQuery";
 
@@ -218,16 +219,46 @@ export class IoElement extends UnifiedElement {
     return this._token;
   }
 
+  public constructor() {
+    super();
+    this.listenHdmlElements();
+  }
+
   /**
    * @override
    */
   public connectedCallback(): void {
-    console.log("connected");
     super.connectedCallback();
+
     this._debouncer = debounce(10, async () => {
       await this.fetchData();
     });
     this._debouncer();
+  }
+
+  private listenHdmlElements(): void {
+    document.body.addEventListener(
+      "hdml-model-connected",
+      (event: CustomEvent<IModelTarget>) => {
+        const model = event.detail.hdmlTarget;
+        console.log("hdml-model-connected", model);
+
+        model.addEventListener(
+          "hdml-model-changed",
+          (event: CustomEvent<IModelTarget>) => {
+            const model = event.detail.hdmlTarget;
+            console.log("hdml-model-changed", model);
+          },
+        );
+      },
+    );
+    document.body.addEventListener(
+      "hdml-model-disconnected",
+      (event: CustomEvent<IModelTarget>) => {
+        const model = event.detail.hdmlTarget;
+        console.log("hdml-model-disconnected", model);
+      },
+    );
   }
 
   private async fetchData(): Promise<void> {

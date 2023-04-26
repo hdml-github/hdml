@@ -33,3 +33,8 @@ export const IO_TENANT_REGEXP =
  * `IoElement` token RegExp.
  */
 export const IO_TOKEN_REGEXP = /^([a-zA-Z0-9_.\-+/=]*)$/;
+
+/**
+ * `ModelElement` name RegExp.
+ */
+export const MODEL_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
