@@ -1,5 +1,5 @@
 /**
- * @fileoverview The `HostElement` class types definition.
+ * @fileoverview The `IoElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -8,21 +8,23 @@
 import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
-import { Document } from "@hdml/schema";
 import * as arrow from "apache-arrow";
+import { Document, DocumentData } from "@hdml/schema";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,
   IO_TENANT_REGEXP,
   IO_TOKEN_REGEXP,
 } from "../helpers/constants";
+import { getModelTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import { IModelTarget, ModelElement } from "./ModelElement";
+import { ModelEventDetail, ModelElement } from "./ModelElement";
+import "../events";
 
 import { data } from "./TestQuery";
 
 /**
- * `IoElement` class.
+ * The `IoElement` class.
  */
 export class IoElement extends UnifiedElement {
   /**
@@ -95,9 +97,16 @@ export class IoElement extends UnifiedElement {
   private _token: null | string = null;
 
   /**
-   * Debouncer to delay `hdml`-elements
+   * Attached `hdml-model` elements map.
    */
-  private _debouncer: null | debounce<() => void> = null;
+  private _models: Map<string, ModelElement> = new Map();
+
+  /**
+   * Query debouncer.
+   */
+  private _debouncer: null | debounce<
+    (q: null | DocumentData) => Promise<void>
+  > = null;
 
   /**
    * A `name` setter.
@@ -219,9 +228,11 @@ export class IoElement extends UnifiedElement {
     return this._token;
   }
 
+  /**
+   * Class constructor.
+   */
   public constructor() {
     super();
-    this.listenHdmlElements();
   }
 
   /**
@@ -229,41 +240,147 @@ export class IoElement extends UnifiedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-
-    this._debouncer = debounce(10, async () => {
-      await this.fetchData();
+    this._watchModels();
+    this._debouncer = debounce(50, async (q: null | DocumentData) => {
+      await this._fetchData(q);
     });
-    this._debouncer();
   }
 
-  private listenHdmlElements(): void {
-    document.body.addEventListener(
-      "hdml-model-connected",
-      (event: CustomEvent<IModelTarget>) => {
-        const model = event.detail.hdmlTarget;
-        console.log("hdml-model-connected", model);
+  /**
+   * @override
+   */
+  public attributeChangedCallback(
+    name: string,
+    old: string,
+    value: string,
+  ): void {
+    super.attributeChangedCallback(name, old, value);
+  }
 
-        model.addEventListener(
-          "hdml-model-changed",
-          (event: CustomEvent<IModelTarget>) => {
-            const model = event.detail.hdmlTarget;
-            console.log("hdml-model-changed", model);
-          },
-        );
-      },
+  /**
+   * @override
+   */
+  public disconnectedCallback(): void {
+    super.disconnectedCallback();
+    this._unwatchModels();
+    this._debouncer && this._debouncer.cancel();
+  }
+
+  /**
+   * Component template.
+   */
+  public render(): TemplateResult<1> {
+    return html`<slot></slot>`;
+  }
+
+  /**
+   * Starts watching for the `hdml-model` elements changes.
+   */
+  private _watchModels(): void {
+    document.querySelectorAll(getModelTag()).forEach((model) => {
+      this._attachModel(<ModelElement>model);
+    });
+    document.body.addEventListener(
+      "hdml-model:connected",
+      this._modelConnectedListener,
     );
     document.body.addEventListener(
-      "hdml-model-disconnected",
-      (event: CustomEvent<IModelTarget>) => {
-        const model = event.detail.hdmlTarget;
-        console.log("hdml-model-disconnected", model);
-      },
+      "hdml-model:disconnected",
+      this._modelDisconnectedListener,
     );
   }
 
-  private async fetchData(): Promise<void> {
+  /**
+   * Stops watching for the `hdml-model` elements changes.
+   */
+  private _unwatchModels(): void {
+    document.body.removeEventListener(
+      "hdml-model:connected",
+      this._modelConnectedListener,
+    );
+    document.body.removeEventListener(
+      "hdml-model:disconnected",
+      this._modelDisconnectedListener,
+    );
+    this._models.forEach((model) => {
+      this._detachModel(model);
+    });
+    this._models.clear();
+  }
+
+  /**
+   * The `hdml-model:connected` event listener.
+   */
+  private _modelConnectedListener = (
+    event: CustomEvent<ModelEventDetail>,
+  ) => {
+    const model = event.detail.model;
+    this._attachModel(model);
+  };
+
+  /**
+   * The `hdml-model:disconnected` event listener.
+   */
+  private _modelDisconnectedListener = (
+    event: CustomEvent<ModelEventDetail>,
+  ) => {
+    const model = event.detail.model;
+    this._detachModel(model);
+  };
+
+  /**
+   * The `hdml-model:changed` event listener.
+   */
+  private _modelChangedListener = (
+    event: CustomEvent<ModelEventDetail>,
+  ) => {
+    const model = event.detail.model;
+    this._processModel(model);
+  };
+
+  /**
+   * Attaches `hdml-model` element to the models map.
+   */
+  private _attachModel(model: ModelElement) {
+    if (!this._models.has(model.uid)) {
+      this._models.set(model.uid, model);
+      model.addEventListener(
+        "hdml-model:changed",
+        this._modelChangedListener,
+      );
+      this._processModel(model);
+    }
+  }
+
+  /**
+   * Detaches `hdml-model` element from the models map.
+   */
+  private _detachModel(model: ModelElement) {
+    if (this._models.has(model.uid)) {
+      model.removeEventListener(
+        "hdml-model:changed",
+        this._modelChangedListener,
+      );
+      this._models.delete(model.uid);
+    }
+  }
+
+  /**
+   * Processes the `model`.
+   */
+  private _processModel(model: ModelElement) {
+    this._debouncer &&
+      this._debouncer({
+        name: "Test HDML Document.",
+        tenant: "common",
+        token: "sometokenhere",
+        model: model.toJSON(),
+      });
+  }
+
+  private async _fetchData(q: null | DocumentData): Promise<void> {
     console.log("fetching");
-    const doc = new Document(data);
+    const doc = new Document(q || data);
     try {
       const response = await fetch(this._host || "localhost", {
         method: "POST",
@@ -286,31 +403,5 @@ export class IoElement extends UnifiedElement {
     } catch (err) {
       console.error(err);
     }
-  }
-
-  /**
-   * @override
-   */
-  public attributeChangedCallback(
-    name: string,
-    old: string,
-    value: string,
-  ): void {
-    super.attributeChangedCallback(name, old, value);
-  }
-
-  /**
-   * @override
-   */
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-    this._debouncer && this._debouncer.cancel();
-  }
-
-  /**
-   * Component template.
-   */
-  public render(): TemplateResult<1> {
-    return html`<slot></slot>`;
   }
 }

@@ -5,12 +5,17 @@
  * @license Apache-2.0
  */
 
-import { IModelTarget } from "./components/ModelElement";
+import { ModelEventDetail } from "./components/ModelElement";
+import { TableEventDetail } from "./components/TableElement";
 
 declare global {
   interface HTMLElementEventMap {
-    "hdml-model-connected": CustomEvent<IModelTarget>;
-    "hdml-model-changed": CustomEvent<IModelTarget>;
-    "hdml-model-disconnected": CustomEvent<IModelTarget>;
+    "hdml-model:connected": CustomEvent<ModelEventDetail>;
+    "hdml-model:changed": CustomEvent<ModelEventDetail>;
+    "hdml-model:disconnected": CustomEvent<ModelEventDetail>;
+
+    "hdml-table:connected": CustomEvent<TableEventDetail>;
+    "hdml-table:changed": CustomEvent<TableEventDetail>;
+    "hdml-table:disconnected": CustomEvent<TableEventDetail>;
   }
 }

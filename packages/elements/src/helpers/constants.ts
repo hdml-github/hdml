@@ -38,3 +38,18 @@ export const IO_TOKEN_REGEXP = /^([a-zA-Z0-9_.\-+/=]*)$/;
  * `ModelElement` name RegExp.
  */
 export const MODEL_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
+
+/**
+ * The `TableElement` `name` attribute RegExp.
+ */
+export const TABLE_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
+
+/**
+ * The `TableElement` `type` attribute RegExp.
+ */
+export const TABLE_TYPE_REGEXP = /^json|csv|table|query$/;
+
+/**
+ * The `TableElement` `source` attribute RegExp.
+ */
+export const TABLE_SOURCE_REGEXP = /.*/;

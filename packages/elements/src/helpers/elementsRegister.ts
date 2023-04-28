@@ -7,6 +7,11 @@
 
 import { IoElement } from "../components/IoElement";
 import { ModelElement } from "../components/ModelElement";
+import { TableElement } from "../components/TableElement";
+
+/** *****************************************************************
+ * IoElement - <hdml-io/>                                           *
+ * ******************************************************************/
 
 let ioDefined = false;
 let ioTag = "hdml-io";
@@ -34,6 +39,10 @@ export async function defineIo(
 export function getIoTag(): string {
   return ioTag;
 }
+
+/** *****************************************************************
+ * ModelElement - <hdml-model/>                                     *
+ * ******************************************************************/
 
 let modelDefined = false;
 let modelTag = "hdml-model";
@@ -63,9 +72,45 @@ export function getModelTag(): string {
   return modelTag;
 }
 
+/** *****************************************************************
+ * TableElement - <hdml-table/>                                     *
+ * ******************************************************************/
+
+let tableDefined = false;
+let tableTag = "hdml-table";
+
+/**
+ * Define `TableElement` component tag name and register custom
+ * element.
+ */
+export async function defineTable(
+  tagName?: string,
+  Constructor?: new () => TableElement,
+): Promise<void> {
+  if (!tableDefined) {
+    tableDefined = true;
+    if (tagName) {
+      tableTag = tagName;
+    }
+    customElements.define(tableTag, Constructor || TableElement);
+    await customElements.whenDefined(tableTag);
+  }
+}
+
+/**
+ * Returns registered `TableElement` tag name.
+ */
+export function getTableTag(): string {
+  return tableTag;
+}
+
+/** *****************************************************************
+ * Export                                                           *
+ * ******************************************************************/
+
 /**
  * Define `hdml` tags with the defaults names and components.
  */
 export async function defineDefaults(): Promise<void> {
-  await Promise.all([defineIo(), defineModel()]);
+  await Promise.all([defineIo(), defineModel(), defineTable()]);
 }

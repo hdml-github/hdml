@@ -22,7 +22,19 @@
 
       <hdml-model
         name="sales2">
-        <!-- Model here -->
+
+        <hdml-table
+          name="tables"
+          type="table"
+          source="tenant_postgres.information_schema.tables">
+        </hdml-table>
+
+        <hdml-table
+          name="columns"
+          type="query"
+          source="select * from tenant_postgres.information_schema.columns">
+        </hdml-table>
+
       </hdml-model>
 
       <script>

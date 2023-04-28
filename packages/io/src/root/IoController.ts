@@ -30,6 +30,7 @@ export class IoController {
       const buff = await rawbody(req);
       const doc = new Document(buff);
       const sql = orchestrate(doc);
+      console.log(sql);
       const response = await fetch("http://localhost:3000", {
         method: "POST",
         mode: "cors",

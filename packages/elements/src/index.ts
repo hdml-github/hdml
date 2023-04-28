@@ -17,6 +17,8 @@ import {
 import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
 import { IoElement } from "./components/IoElement";
+import { ModelElement } from "./components/ModelElement";
+import { TableElement } from "./components/TableElement";
 
 export {
   lit,
@@ -29,4 +31,6 @@ export {
   runAttrTestSuite,
   UnifiedElement,
   IoElement,
+  ModelElement,
+  TableElement,
 };
