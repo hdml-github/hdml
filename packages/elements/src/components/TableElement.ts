@@ -16,7 +16,7 @@ import { getModelTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 
 /**
- * An `hdml-model` element event detail interface.
+ * An `hdml-table` element event detail interface.
  */
 export interface TableEventDetail {
   table: TableElement;
@@ -171,7 +171,7 @@ export class TableElement extends UnifiedElement {
    * A `source` getter.
    */
   public get source(): null | string {
-    return this._source;
+    return this._source ? this._source.replaceAll("`", '"') : null;
   }
 
   /**

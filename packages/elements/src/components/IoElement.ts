@@ -21,8 +21,6 @@ import { UnifiedElement } from "./UnifiedElement";
 import { ModelEventDetail, ModelElement } from "./ModelElement";
 import "../events";
 
-import { data } from "./TestQuery";
-
 /**
  * The `IoElement` class.
  */
@@ -105,7 +103,7 @@ export class IoElement extends UnifiedElement {
    * Query debouncer.
    */
   private _debouncer: null | debounce<
-    (q: null | DocumentData) => Promise<void>
+    (q: DocumentData) => Promise<void>
   > = null;
 
   /**
@@ -241,7 +239,7 @@ export class IoElement extends UnifiedElement {
   public connectedCallback(): void {
     super.connectedCallback();
     this._watchModels();
-    this._debouncer = debounce(50, async (q: null | DocumentData) => {
+    this._debouncer = debounce(50, async (q: DocumentData) => {
       await this._fetchData(q);
     });
   }
@@ -378,9 +376,9 @@ export class IoElement extends UnifiedElement {
       });
   }
 
-  private async _fetchData(q: null | DocumentData): Promise<void> {
+  private async _fetchData(q: DocumentData): Promise<void> {
     console.log("fetching");
-    const doc = new Document(q || data);
+    const doc = new Document(q);
     try {
       const response = await fetch(this._host || "localhost", {
         method: "POST",
