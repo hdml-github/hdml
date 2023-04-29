@@ -234,7 +234,7 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Returns model's `JSON`-representation.
+   * Returns tables' `JSON`-representation.
    */
   public toJSON(): TableData {
     if (!this.name) {

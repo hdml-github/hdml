@@ -662,7 +662,12 @@ export const FIELD_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
 /**
  * The `TableElement` `origin` attribute RegExp.
  */
-export const TABLE_ORIGIN_REGEXP = /.*/;
+export const FIELD_ORIGIN_REGEXP = /.*/;
+
+/**
+ * The `TableElement` `clause` attribute RegExp.
+ */
+export const FIELD_CLAUSE_REGEXP = /.*/;
 
 /**
  * The `FieldElement` `type` attribute RegExp.
@@ -672,6 +677,26 @@ export const FIELD_TYPE_REGEXP = new RegExp(
     "float-16|float-32|float-64|binary|utf-8|decimal|" +
     "date|time|timestamp)$",
 );
+
+/**
+ * The `FieldElement` `nullable` attribute RegExp.
+ */
+export const FIELD_NULLABLE_REGEXP = /^(true|false|nullable)$/;
+
+/**
+ * The `FieldElement` `scale` attribute RegExp.
+ */
+export const FIELD_SCALE_REGEXP = /^[0-9]*$/;
+
+/**
+ * The `FieldElement` `precision` attribute RegExp.
+ */
+export const FIELD_PRECISION_REGEXP = /^[0-9]*$/;
+
+/**
+ * The `FieldElement` `bit-width` attribute RegExp.
+ */
+export const FIELD_BIT_WIDTH_REGEXP = /^(128|256)$/;
 
 /**
  * The `FieldElement` date `unit` attribute RegExp.
@@ -685,11 +710,6 @@ export const FIELD_TIME_UNIT_REGEXP =
   /^(second|millisecond|microsecond|nanosecond)$/;
 
 /**
- * The `FieldElement` `bit-width` attribute RegExp.
- */
-export const FIELD_BIT_WIDTH_REGEXP = /^(128|256)$/;
-
-/**
  * The `FieldElement` `timezone` attribute RegExp.
  */
 export const FIELD_TZ_REGEXP = new RegExp(
@@ -701,3 +721,8 @@ export const FIELD_TZ_REGEXP = new RegExp(
  */
 export const FIELD_AGG_REGEXP =
   /^(none|count|countDistinct|countDistinctApprox|sum|avg|min|max)$/;
+
+/**
+ * The `FieldElement` `asc` attribute RegExp.
+ */
+export const FIELD_ASC_REGEXP = /^(true|false|asc)$/;

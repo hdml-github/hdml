@@ -8,6 +8,7 @@
 import { IoElement } from "../components/IoElement";
 import { ModelElement } from "../components/ModelElement";
 import { TableElement } from "../components/TableElement";
+import { FieldElement } from "../components/FieldElement";
 
 /** *****************************************************************
  * IoElement - <hdml-io/>                                           *
@@ -105,6 +106,38 @@ export function getTableTag(): string {
 }
 
 /** *****************************************************************
+ * FieldElement - <hdml-field/>                                     *
+ * ******************************************************************/
+
+let fieldDefined = false;
+let fieldTag = "hdml-field";
+
+/**
+ * Define `FieldElement` component tag name and register custom
+ * element.
+ */
+export async function defineField(
+  tagName?: string,
+  Constructor?: new () => FieldElement,
+): Promise<void> {
+  if (!fieldDefined) {
+    fieldDefined = true;
+    if (tagName) {
+      fieldTag = tagName;
+    }
+    customElements.define(fieldTag, Constructor || FieldElement);
+    await customElements.whenDefined(fieldTag);
+  }
+}
+
+/**
+ * Returns registered `FieldElement` tag name.
+ */
+export function getFieldTag(): string {
+  return fieldTag;
+}
+
+/** *****************************************************************
  * Export                                                           *
  * ******************************************************************/
 
@@ -112,5 +145,10 @@ export function getTableTag(): string {
  * Define `hdml` tags with the defaults names and components.
  */
 export async function defineDefaults(): Promise<void> {
-  await Promise.all([defineIo(), defineModel(), defineTable()]);
+  await Promise.all([
+    defineIo(),
+    defineModel(),
+    defineTable(),
+    defineField(),
+  ]);
 }

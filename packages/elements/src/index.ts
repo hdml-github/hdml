@@ -19,6 +19,7 @@ import { UnifiedElement } from "./components/UnifiedElement";
 import { IoElement } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
 import { TableElement } from "./components/TableElement";
+import { FieldElement } from "./components/FieldElement";
 
 export {
   lit,
@@ -33,4 +34,5 @@ export {
   IoElement,
   ModelElement,
   TableElement,
+  FieldElement,
 };
