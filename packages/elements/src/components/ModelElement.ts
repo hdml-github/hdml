@@ -85,7 +85,6 @@ export class ModelElement extends UnifiedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    this._watchTables();
     document.body.dispatchEvent(
       new CustomEvent<ModelEventDetail>("hdml-model:connected", {
         cancelable: false,
@@ -96,6 +95,7 @@ export class ModelElement extends UnifiedElement {
         },
       }),
     );
+    this._watchTables();
   }
 
   /**

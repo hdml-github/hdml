@@ -18,6 +18,7 @@ import {
   DateUnit,
   TimeUnit,
   TimeZone,
+  AggType,
 } from "@hdml/schema";
 import {
   FIELD_NAME_REGEXP,
@@ -244,6 +245,11 @@ export class FieldElement extends UnifiedElement {
    * A `asc` private property.
    */
   private _asc: null | string = null;
+
+  /**
+   * An assosiated `hdml-table` element.
+   */
+  private _table: null | Element = null;
 
   /**
    * A `name` setter.
@@ -626,6 +632,19 @@ export class FieldElement extends UnifiedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    this._table = this._getTable();
+    if (this._table) {
+      this._table.dispatchEvent(
+        new CustomEvent<FieldEventDetail>("hdml-field:connected", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+          detail: {
+            field: this,
+          },
+        }),
+      );
+    }
   }
 
   /**
@@ -637,6 +656,7 @@ export class FieldElement extends UnifiedElement {
     value: string,
   ): void {
     super.attributeChangedCallback(name, old, value);
+    this._dispatchChangedEvent();
   }
 
   /**
@@ -644,28 +664,82 @@ export class FieldElement extends UnifiedElement {
    */
   public disconnectedCallback(): void {
     super.disconnectedCallback();
+    if (this._table) {
+      this._table.dispatchEvent(
+        new CustomEvent<FieldEventDetail>("hdml-field:disconnected", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+          detail: {
+            field: this,
+          },
+        }),
+      );
+      this._table = null;
+    }
   }
 
   /**
    * Component template.
    */
   public render(): TemplateResult<1> {
-    return html`<slot></slot>`;
+    return html`<!-- -->`;
   }
 
   /**
    * Returns field's `JSON`-representation.
    */
   public toJSON(): FieldData {
+    if (!this.name) {
+      throw new Error("A `name` property is required.");
+    }
+    if (this.origin && this.clause) {
+      throw new Error(
+        "An `origin` and a `clause` attributes couldn't be set " +
+          "together.",
+      );
+    }
     return {
-      description: "",
-      origin: "",
-      clause: "",
-      name: "",
+      description: undefined,
+      origin: this.origin ? this.origin : undefined,
+      clause: this.clause ? this.clause : undefined,
+      name: this.name,
       type: this._getType(),
-      // agg: "",
-      // asc: "",
+      agg: this._getAgg(),
+      asc: this.asc && this.asc !== "false" ? true : false,
     };
+  }
+
+  /**
+   * Returns assosiated `hdml-table` element if exist or null
+   * otherwise.
+   */
+  private _getTable(): null | Element {
+    let element = this.parentElement;
+    while (
+      element &&
+      element.tagName !== "BODY" &&
+      element.tagName !== getTableTag().toUpperCase()
+    ) {
+      element = this.parentElement;
+    }
+    return element && element.tagName !== "BODY" ? element : null;
+  }
+
+  /**
+   * Dispatches the `hdml-field:changed` event.
+   */
+  private _dispatchChangedEvent(): void {
+    this.dispatchEvent(
+      new CustomEvent<FieldEventDetail>("hdml-field:changed", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+        detail: {
+          field: this,
+        },
+      }),
+    );
   }
 
   /**
@@ -2671,5 +2745,35 @@ export class FieldElement extends UnifiedElement {
       nullable:
         this.nullable && this.nullable !== "false" ? true : false,
     };
+  }
+
+  /**
+   * Returns field agg value.
+   */
+  private _getAgg(): undefined | AggType {
+    if (!this.agg) {
+      return undefined;
+    } else {
+      switch (this.agg) {
+        case "none":
+          return AggType.None;
+        case "count":
+          return AggType.Count;
+        case "countDistinct":
+          return AggType.CountDistinct;
+        case "countDistinctApprox":
+          return AggType.CountDistinctApprox;
+        case "sum":
+          return AggType.Sum;
+        case "avg":
+          return AggType.Avg;
+        case "min":
+          return AggType.Min;
+        case "max":
+          return AggType.Max;
+        default:
+          throw new Error("Unsupported `agg` attribute value.");
+      }
+    }
   }
 }

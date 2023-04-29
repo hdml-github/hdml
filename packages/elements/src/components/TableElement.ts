@@ -6,14 +6,18 @@
  */
 
 import { html, TemplateResult } from "lit";
-import { TableData, TableType } from "@hdml/schema";
+import { FieldData, TableData, TableType } from "@hdml/schema";
 import {
   TABLE_NAME_REGEXP,
   TABLE_TYPE_REGEXP,
   TABLE_SOURCE_REGEXP,
 } from "../helpers/constants";
-import { getModelTag } from "../helpers/elementsRegister";
+import {
+  getFieldTag,
+  getModelTag,
+} from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
+import { FieldElement, FieldEventDetail } from "./FieldElement";
 
 /**
  * An `hdml-table` element event detail interface.
@@ -83,6 +87,11 @@ export class TableElement extends UnifiedElement {
    * An assosiated `hdml-model` element.
    */
   private _model: null | Element = null;
+
+  /**
+   * Attached `hdml-field` elements map.
+   */
+  private _fields: Map<string, FieldElement> = new Map();
 
   /**
    * A `name` setter.
@@ -192,6 +201,7 @@ export class TableElement extends UnifiedElement {
         }),
       );
     }
+    this._watchFields();
   }
 
   /**
@@ -210,6 +220,7 @@ export class TableElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
+    this._unwatchFields();
     super.disconnectedCallback();
     if (this._model) {
       this._model.dispatchEvent(
@@ -246,12 +257,140 @@ export class TableElement extends UnifiedElement {
     if (!this.source) {
       throw new Error("A `source` property is required.");
     }
+    const fields: FieldData[] = [];
+    this._fields.forEach((field) => {
+      fields.push(field.toJSON());
+    });
     return {
       name: this.name,
       type: this._getTableType(this.type),
       source: this.source,
-      fields: [],
+      fields,
     };
+  }
+
+  /**
+   * Returns assosiated `hdml-model` element if exist or null
+   * otherwise.
+   */
+  private _getModel(): null | Element {
+    let element = this.parentElement;
+    while (
+      element &&
+      element.tagName !== "BODY" &&
+      element.tagName !== getModelTag().toUpperCase()
+    ) {
+      element = this.parentElement;
+    }
+    return element && element.tagName !== "BODY" ? element : null;
+  }
+
+  /**
+   * Starts watching for the `hdml-field` elements changes.
+   */
+  private _watchFields(): void {
+    this.querySelectorAll(getFieldTag()).forEach((field) => {
+      this._attachField(<FieldElement>field);
+    });
+    this.addEventListener(
+      "hdml-field:connected",
+      this._fieldConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-field:disconnected",
+      this._fieldDisconnectedListener,
+    );
+  }
+
+  /**
+   * Stops watching for the `hdml-field` elements changes.
+   */
+  private _unwatchFields(): void {
+    this.removeEventListener(
+      "hdml-field:connected",
+      this._fieldConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-field:disconnected",
+      this._fieldDisconnectedListener,
+    );
+    this._fields.forEach((field) => {
+      this._detachField(field);
+    });
+    this._fields.clear();
+  }
+
+  /**
+   * The `hdml-field:connected` event listener.
+   */
+  private _fieldConnectedListener = (
+    event: CustomEvent<FieldEventDetail>,
+  ) => {
+    const field = event.detail.field;
+    this._attachField(field);
+  };
+
+  /**
+   * The `hdml-field:disconnected` event listener.
+   */
+  private _fieldDisconnectedListener = (
+    event: CustomEvent<FieldEventDetail>,
+  ) => {
+    const field = event.detail.field;
+    this._detachField(field);
+  };
+
+  /**
+   * The `hdml-field:changed` event listener.
+   */
+  private _fieldChangedListener = (
+    event: CustomEvent<FieldEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
+   * Attaches `hdml-field` element to the fields map.
+   */
+  private _attachField(field: FieldElement) {
+    if (!this._fields.has(field.uid)) {
+      this._fields.set(field.uid, field);
+      field.addEventListener(
+        "hdml-field:changed",
+        this._fieldChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-field` element from the tables map.
+   */
+  private _detachField(field: FieldElement) {
+    if (this._fields.has(field.uid)) {
+      field.removeEventListener(
+        "hdml-field:changed",
+        this._fieldChangedListener,
+      );
+      this._fields.delete(field.uid);
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Dispatches the `hdml-table:changed` event.
+   */
+  private _dispatchChangedEvent(): void {
+    this.dispatchEvent(
+      new CustomEvent<TableEventDetail>("hdml-table:changed", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+        detail: {
+          table: this,
+        },
+      }),
+    );
   }
 
   /**
@@ -270,37 +409,5 @@ export class TableElement extends UnifiedElement {
       default:
         throw new Error(`Unsupported table type "${type}".`);
     }
-  }
-
-  /**
-   * Returns assosiated `hdml-model` element if exist or false
-   * otherwise.
-   */
-  private _getModel(): null | Element {
-    let element = this.parentElement;
-    while (
-      element &&
-      element.tagName !== "BODY" &&
-      element.tagName !== getModelTag().toUpperCase()
-    ) {
-      element = this.parentElement;
-    }
-    return element && element.tagName !== "BODY" ? element : null;
-  }
-
-  /**
-   * Dispatches the `hdml-table:changed` event.
-   */
-  private _dispatchChangedEvent(): void {
-    this.dispatchEvent(
-      new CustomEvent<TableEventDetail>("hdml-table:changed", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-        detail: {
-          table: this,
-        },
-      }),
-    );
   }
 }

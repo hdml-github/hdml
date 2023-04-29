@@ -7,6 +7,7 @@
 
 import { ModelEventDetail } from "./components/ModelElement";
 import { TableEventDetail } from "./components/TableElement";
+import { FieldEventDetail } from "./components/FieldElement";
 
 declare global {
   interface HTMLElementEventMap {
@@ -17,5 +18,9 @@ declare global {
     "hdml-table:connected": CustomEvent<TableEventDetail>;
     "hdml-table:changed": CustomEvent<TableEventDetail>;
     "hdml-table:disconnected": CustomEvent<TableEventDetail>;
+
+    "hdml-field:connected": CustomEvent<FieldEventDetail>;
+    "hdml-field:changed": CustomEvent<FieldEventDetail>;
+    "hdml-field:disconnected": CustomEvent<FieldEventDetail>;
   }
 }
