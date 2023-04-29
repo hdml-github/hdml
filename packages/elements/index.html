@@ -15,7 +15,8 @@
         token="gwkcc9k31daqq9909hdshk1==">
       </hdml-io>
 
-      <hdml-model name="model">
+      <hdml-model
+        name="model">
         <hdml-table
           name="tables"
           type="table"
@@ -90,7 +91,8 @@
           type="inner"
           left="tables"
           right="columns">
-          <hdml-connective type="and">
+          <hdml-connective
+            type="and">
             <hdml-filter
               type="keys"
               left="catalog"
@@ -106,7 +108,8 @@
               left="table"
               right="table">
             </hdml-filter>            
-            <hdml-connective type="or">
+            <hdml-connective
+              type="or">
               <hdml-filter
                 type="expr"
                 clause="`columns`.`table` = 'applicable_roles'">
@@ -119,10 +122,5 @@
           </hdml-connective>
         </hdml-join>
       </hdml-model>
-
-      <script>
-        io = document.querySelector(hdml.getIoTag());
-        model = document.querySelector(hdml.getModelTag());
-      </script>
     </body>
 </html>
