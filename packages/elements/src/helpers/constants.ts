@@ -726,3 +726,33 @@ export const FIELD_AGG_REGEXP =
  * The `FieldElement` `asc` attribute RegExp.
  */
 export const FIELD_ASC_REGEXP = /^(true|false|asc)$/;
+
+/**
+ * The `JoinElement` `type` attribute RegExp.
+ */
+export const JOIN_TYPE_REGEXP =
+  /^(cross|inner|full|left|right|full-outer|left-outer|right-outer)$/;
+
+/**
+ * The `ConnectiveElement` `operator` attribute RegExp.
+ */
+export const CONNECTIVE_OP_REGEXP = /^(or|and|none)$/;
+
+/**
+ * The `FilterElement` `type` attribute RegExp.
+ */
+export const FILTER_TYPE_REGEXP = /^(expr|keys|named)$/;
+
+/**
+ * The `FilterElement` `name` attribute RegExp.
+ */
+export const FILTER_NAME_REGEXP = new RegExp(
+  "^(equals|not-equals|contains|not-contains|starts-with|ends-with|" +
+    "greater|greater-equal|less|less-equal|is-null|is-not-null|" +
+    "between)$",
+);
+
+/**
+ * The `FilterElement` `clause` attribute RegExp.
+ */
+export const FILTER_CLAUSE_REGEXP = /.*/;

@@ -9,6 +9,9 @@ import { IoElement } from "../components/IoElement";
 import { ModelElement } from "../components/ModelElement";
 import { TableElement } from "../components/TableElement";
 import { FieldElement } from "../components/FieldElement";
+import { JoinElement } from "../components/JoinElement";
+import { ConnectiveElement } from "../components/ConnectiveElement";
+import { FilterElement } from "../components/FilterElement";
 
 /** *****************************************************************
  * IoElement - <hdml-io/>                                           *
@@ -138,6 +141,105 @@ export function getFieldTag(): string {
 }
 
 /** *****************************************************************
+ * FieldElement - <hdml-join/>                                      *
+ * ******************************************************************/
+
+let joinDefined = false;
+let joinTag = "hdml-join";
+
+/**
+ * Define `JoinElement` component tag name and register custom
+ * element.
+ */
+export async function defineJoin(
+  tagName?: string,
+  Constructor?: new () => JoinElement,
+): Promise<void> {
+  if (!joinDefined) {
+    joinDefined = true;
+    if (tagName) {
+      joinTag = tagName;
+    }
+    customElements.define(joinTag, Constructor || JoinElement);
+    await customElements.whenDefined(joinTag);
+  }
+}
+
+/**
+ * Returns registered `JoinElement` tag name.
+ */
+export function getJoinTag(): string {
+  return joinTag;
+}
+
+/** *****************************************************************
+ * FieldElement - <hdml-connective/>                                *
+ * ******************************************************************/
+
+let connectiveDefined = false;
+let connectiveTag = "hdml-connective";
+
+/**
+ * Define `ConnectiveElement` component tag name and register custom
+ * element.
+ */
+export async function defineConnective(
+  tagName?: string,
+  Constructor?: new () => ConnectiveElement,
+): Promise<void> {
+  if (!connectiveDefined) {
+    connectiveDefined = true;
+    if (tagName) {
+      connectiveTag = tagName;
+    }
+    customElements.define(
+      connectiveTag,
+      Constructor || ConnectiveElement,
+    );
+    await customElements.whenDefined(connectiveTag);
+  }
+}
+
+/**
+ * Returns registered `ConnectiveElement` tag name.
+ */
+export function getConnectiveTag(): string {
+  return connectiveTag;
+}
+
+/** *****************************************************************
+ * FilterElement - <hdml-filter/>                                   *
+ * ******************************************************************/
+
+let filterDefined = false;
+let filterTag = "hdml-filter";
+
+/**
+ * Define `FilterElement` component tag name and register custom
+ * element.
+ */
+export async function defineFilter(
+  tagName?: string,
+  Constructor?: new () => FilterElement,
+): Promise<void> {
+  if (!filterDefined) {
+    filterDefined = true;
+    if (tagName) {
+      filterTag = tagName;
+    }
+    customElements.define(filterTag, Constructor || FilterElement);
+    await customElements.whenDefined(filterTag);
+  }
+}
+
+/**
+ * Returns registered `FilterElement` tag name.
+ */
+export function getFilterTag(): string {
+  return filterTag;
+}
+
+/** *****************************************************************
  * Export                                                           *
  * ******************************************************************/
 
@@ -150,5 +252,8 @@ export async function defineDefaults(): Promise<void> {
     defineModel(),
     defineTable(),
     defineField(),
+    defineJoin(),
+    defineConnective(),
+    defineFilter(),
   ]);
 }

@@ -7,6 +7,8 @@
 
 import { html, TemplateResult } from "lit";
 import { FieldData, TableData, TableType } from "@hdml/schema";
+
+import "../events";
 import {
   TABLE_NAME_REGEXP,
   TABLE_TYPE_REGEXP,
@@ -221,7 +223,6 @@ export class TableElement extends UnifiedElement {
    */
   public disconnectedCallback(): void {
     this._unwatchFields();
-    super.disconnectedCallback();
     if (this._model) {
       this._model.dispatchEvent(
         new CustomEvent<TableEventDetail>("hdml-table:disconnected", {
@@ -235,6 +236,7 @@ export class TableElement extends UnifiedElement {
       );
       this._model = null;
     }
+    super.disconnectedCallback();
   }
 
   /**
@@ -394,9 +396,9 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Converts `type` property to `TableType` enum.
+   * Converts `type` property to a `TableType` enum.
    */
-  private _getTableType(type: string): number {
+  private _getTableType(type: string): TableType {
     switch (type) {
       case "json":
         return TableType.Json;

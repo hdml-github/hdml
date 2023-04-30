@@ -92,7 +92,7 @@
           left="tables"
           right="columns">
           <hdml-connective
-            type="and">
+            operator="and">
             <hdml-filter
               type="keys"
               left="catalog"
@@ -109,7 +109,7 @@
               right="table">
             </hdml-filter>            
             <hdml-connective
-              type="or">
+              operator="or">
               <hdml-filter
                 type="expr"
                 clause="`columns`.`table` = 'applicable_roles'">

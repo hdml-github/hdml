@@ -6,11 +6,12 @@
  */
 
 import { html, TemplateResult } from "lit";
-import { ModelData, TableData } from "@hdml/schema";
+import { ModelData, TableData, JoinData } from "@hdml/schema";
 import { MODEL_NAME_REGEXP } from "../helpers/constants";
-import { getTableTag } from "../helpers/elementsRegister";
+import { getTableTag, getJoinTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 import { TableElement, TableEventDetail } from "./TableElement";
+import { JoinElement, JoinEventDetail } from "./JoinElement";
 import "../events";
 
 /**
@@ -49,6 +50,11 @@ export class ModelElement extends UnifiedElement {
    * Attached `hdml-table` elements map.
    */
   private _tables: Map<string, TableElement> = new Map();
+
+  /**
+   * Attached `hdml-join` elements map.
+   */
+  private _joins: Map<string, JoinElement> = new Map();
 
   /**
    * A `name` setter.
@@ -96,6 +102,7 @@ export class ModelElement extends UnifiedElement {
       }),
     );
     this._watchTables();
+    this._watchJoins();
   }
 
   /**
@@ -115,7 +122,7 @@ export class ModelElement extends UnifiedElement {
    */
   public disconnectedCallback(): void {
     this._unwatchTables();
-    super.disconnectedCallback();
+    this._unwatchJoins();
     document.body.dispatchEvent(
       new CustomEvent<ModelEventDetail>("hdml-model:disconnected", {
         cancelable: false,
@@ -126,6 +133,7 @@ export class ModelElement extends UnifiedElement {
         },
       }),
     );
+    super.disconnectedCallback();
   }
 
   /**
@@ -146,11 +154,21 @@ export class ModelElement extends UnifiedElement {
     this._tables.forEach((table) => {
       tables.push(table.toJSON());
     });
+    const joins: JoinData[] = [];
+    this._joins.forEach((join) => {
+      joins.push(join.toJSON());
+    });
+    console.log({
+      name: this.name,
+      host: "",
+      tables,
+      joins,
+    });
     return {
       name: this.name,
       host: "",
       tables,
-      joins: [],
+      joins,
     };
   }
 
@@ -172,14 +190,31 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
+   * Starts watching for the `hdml-join` elements changes.
+   */
+  private _watchJoins(): void {
+    this.querySelectorAll(getJoinTag()).forEach((join) => {
+      this._attachJoin(<JoinElement>join);
+    });
+    this.addEventListener(
+      "hdml-join:connected",
+      this._joinConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-join:disconnected",
+      this._joinDisconnectedListener,
+    );
+  }
+
+  /**
    * Stops watching for the `hdml-table` elements changes.
    */
   private _unwatchTables(): void {
-    document.body.removeEventListener(
+    this.removeEventListener(
       "hdml-table:connected",
       this._tableConnectedListener,
     );
-    document.body.removeEventListener(
+    this.removeEventListener(
       "hdml-table:disconnected",
       this._tableDisconnectedListener,
     );
@@ -187,6 +222,24 @@ export class ModelElement extends UnifiedElement {
       this._detachTable(table);
     });
     this._tables.clear();
+  }
+
+  /**
+   * Stops watching for the `hdml-join` elements changes.
+   */
+  private _unwatchJoins(): void {
+    this.removeEventListener(
+      "hdml-join:connected",
+      this._joinConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-join:disconnected",
+      this._joinDisconnectedListener,
+    );
+    this._joins.forEach((join) => {
+      this._detachJoin(join);
+    });
+    this._joins.clear();
   }
 
   /**
@@ -200,6 +253,16 @@ export class ModelElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-join:connected` event listener.
+   */
+  private _joinConnectedListener = (
+    event: CustomEvent<JoinEventDetail>,
+  ) => {
+    const join = event.detail.join;
+    this._attachJoin(join);
+  };
+
+  /**
    * The `hdml-table:disconnected` event listener.
    */
   private _tableDisconnectedListener = (
@@ -210,10 +273,29 @@ export class ModelElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-join:disconnected` event listener.
+   */
+  private _joinDisconnectedListener = (
+    event: CustomEvent<JoinEventDetail>,
+  ) => {
+    const join = event.detail.join;
+    this._detachJoin(join);
+  };
+
+  /**
    * The `hdml-model:changed` event listener.
    */
   private _tableChangedListener = (
     event: CustomEvent<TableEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
+   * The `hdml-join:changed` event listener.
+   */
+  private _joinChangedListener = (
+    event: CustomEvent<JoinEventDetail>,
   ) => {
     this._dispatchChangedEvent();
   };
@@ -233,6 +315,20 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
+   * Attaches `hdml-join` element to the joins map.
+   */
+  private _attachJoin(join: JoinElement) {
+    if (!this._joins.has(join.uid)) {
+      this._joins.set(join.uid, join);
+      join.addEventListener(
+        "hdml-join:changed",
+        this._joinChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
    * Detaches `hdml-table` element from the tables map.
    */
   private _detachTable(table: TableElement) {
@@ -242,6 +338,20 @@ export class ModelElement extends UnifiedElement {
         this._tableChangedListener,
       );
       this._tables.delete(table.uid);
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-join` element from the joins map.
+   */
+  private _detachJoin(join: JoinElement) {
+    if (this._joins.has(join.uid)) {
+      join.removeEventListener(
+        "hdml-join:changed",
+        this._joinChangedListener,
+      );
+      this._joins.delete(join.uid);
       this._dispatchChangedEvent();
     }
   }

@@ -20,6 +20,9 @@ import { IoElement } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
 import { TableElement } from "./components/TableElement";
 import { FieldElement } from "./components/FieldElement";
+import { JoinElement } from "./components/JoinElement";
+import { ConnectiveElement } from "./components/ConnectiveElement";
+import { FilterElement } from "./components/FilterElement";
 
 export {
   lit,
@@ -35,4 +38,7 @@ export {
   ModelElement,
   TableElement,
   FieldElement,
+  JoinElement,
+  ConnectiveElement,
+  FilterElement,
 };
