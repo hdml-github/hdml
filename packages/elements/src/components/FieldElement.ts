@@ -663,7 +663,6 @@ export class FieldElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
-    super.disconnectedCallback();
     if (this._table) {
       this._table.dispatchEvent(
         new CustomEvent<FieldEventDetail>("hdml-field:disconnected", {
@@ -677,13 +676,14 @@ export class FieldElement extends UnifiedElement {
       );
       this._table = null;
     }
+    super.disconnectedCallback();
   }
 
   /**
    * Component template.
    */
   public render(): TemplateResult<1> {
-    return html`<!-- -->`;
+    return html`<!-- FieldElement -->`;
   }
 
   /**
@@ -721,7 +721,7 @@ export class FieldElement extends UnifiedElement {
       element.tagName !== "BODY" &&
       element.tagName !== getTableTag().toUpperCase()
     ) {
-      element = this.parentElement;
+      element = element.parentElement;
     }
     return element && element.tagName !== "BODY" ? element : null;
   }

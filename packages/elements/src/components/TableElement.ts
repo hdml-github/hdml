@@ -282,7 +282,7 @@ export class TableElement extends UnifiedElement {
       element.tagName !== "BODY" &&
       element.tagName !== getModelTag().toUpperCase()
     ) {
-      element = this.parentElement;
+      element = element.parentElement;
     }
     return element && element.tagName !== "BODY" ? element : null;
   }

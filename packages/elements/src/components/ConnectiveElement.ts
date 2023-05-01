@@ -6,15 +6,21 @@
  */
 
 import { html, TemplateResult } from "lit";
-import { FilterOperator, FilterClauseData } from "@hdml/schema";
+import {
+  FilterOperator,
+  FilterClauseData,
+  FilterData,
+} from "@hdml/schema";
 
 import "../events";
 import { CONNECTIVE_OP_REGEXP } from "../helpers/constants";
 import {
   getJoinTag,
   getConnectiveTag,
+  getFilterTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
+import { FilterElement, FilterEventDetail } from "./FilterElement";
 
 /**
  * An `hdml-connective` element event detail interface.
@@ -58,6 +64,11 @@ export class ConnectiveElement extends UnifiedElement {
    * Attached `hdml-connective` elements map.
    */
   private _connectives: Map<string, ConnectiveElement> = new Map();
+
+  /**
+   * Attached `hdml-filter` elements map.
+   */
+  private _filters: Map<string, FilterElement> = new Map();
 
   /**
    * A `operator` setter.
@@ -114,6 +125,7 @@ export class ConnectiveElement extends UnifiedElement {
         ),
       );
     }
+    this._watchFilters();
     this._watchConnectives();
   }
 
@@ -133,6 +145,7 @@ export class ConnectiveElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
+    this._unwatchFilters();
     this._unwatchConnectives();
     if (this._parent) {
       this._parent.dispatchEvent(
@@ -167,13 +180,17 @@ export class ConnectiveElement extends UnifiedElement {
     if (!this.operator) {
       throw new Error("A `operator` property is required.");
     }
+    const filters: FilterData[] = [];
+    this._filters.forEach((filter) => {
+      filters.push(filter.toJSON());
+    });
     const children: FilterClauseData[] = [];
     this._connectives.forEach((conn) => {
       children.push(conn.toJSON());
     });
     return {
       type: this._getConnectiveOperator(this.operator),
-      filters: [],
+      filters,
       children,
     };
   }
@@ -190,9 +207,26 @@ export class ConnectiveElement extends UnifiedElement {
       element.tagName !== getJoinTag().toUpperCase() &&
       element.tagName !== getConnectiveTag().toUpperCase()
     ) {
-      element = this.parentElement;
+      element = element.parentElement;
     }
     return element && element.tagName !== "BODY" ? element : null;
+  }
+
+  /**
+   * Starts watching for the `hdml-filter` elements changes.
+   */
+  private _watchFilters(): void {
+    this.querySelectorAll(getFilterTag()).forEach((filter) => {
+      this._attachFilter(<FilterElement>filter);
+    });
+    this.addEventListener(
+      "hdml-filter:connected",
+      this._filterConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-filter:disconnected",
+      this._filterDisconnectedListener,
+    );
   }
 
   /**
@@ -210,6 +244,24 @@ export class ConnectiveElement extends UnifiedElement {
       "hdml-connective:disconnected",
       this._connectiveDisconnectedListener,
     );
+  }
+
+  /**
+   * Stops watching for the `hdml-filter` elements changes.
+   */
+  private _unwatchFilters(): void {
+    this.removeEventListener(
+      "hdml-filter:connected",
+      this._filterConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-filter:disconnected",
+      this._filterDisconnectedListener,
+    );
+    this._filters.forEach((filter) => {
+      this._detachFilter(filter);
+    });
+    this._filters.clear();
   }
 
   /**
@@ -231,6 +283,16 @@ export class ConnectiveElement extends UnifiedElement {
   }
 
   /**
+   * The `hdml-filter:connected` event listener.
+   */
+  private _filterConnectedListener = (
+    event: CustomEvent<FilterEventDetail>,
+  ) => {
+    const filter = event.detail.filter;
+    this._attachFilter(filter);
+  };
+
+  /**
    * The `hdml-connective:connected` event listener.
    */
   private _connectiveConnectedListener = (
@@ -238,6 +300,16 @@ export class ConnectiveElement extends UnifiedElement {
   ) => {
     const conn = event.detail.conn;
     this._attachConnective(conn);
+  };
+
+  /**
+   * The `hdml-filter:disconnected` event listener.
+   */
+  private _filterDisconnectedListener = (
+    event: CustomEvent<FilterEventDetail>,
+  ) => {
+    const filter = event.detail.filter;
+    this._detachFilter(filter);
   };
 
   /**
@@ -251,6 +323,15 @@ export class ConnectiveElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-filter:changed` event listener.
+   */
+  private _filterChangedListener = (
+    event: CustomEvent<FilterEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
    * The `hdml-connective:changed` event listener.
    */
   private _connectiveChangedListener = (
@@ -258,6 +339,20 @@ export class ConnectiveElement extends UnifiedElement {
   ) => {
     this._dispatchChangedEvent();
   };
+
+  /**
+   * Attaches `hdml-filter` element to the filters map.
+   */
+  private _attachFilter(filter: FilterElement) {
+    if (!this._filters.has(filter.uid)) {
+      this._filters.set(filter.uid, filter);
+      filter.addEventListener(
+        "hdml-filter:changed",
+        this._filterChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
 
   /**
    * Attaches `hdml-connective` element to the connectives map.
@@ -269,6 +364,20 @@ export class ConnectiveElement extends UnifiedElement {
         "hdml-connective:changed",
         this._connectiveChangedListener,
       );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-filter` element from the filters map.
+   */
+  private _detachFilter(filter: FilterElement) {
+    if (this._filters.has(filter.uid)) {
+      filter.removeEventListener(
+        "hdml-filter:changed",
+        this._filterChangedListener,
+      );
+      this._filters.delete(filter.uid);
       this._dispatchChangedEvent();
     }
   }
