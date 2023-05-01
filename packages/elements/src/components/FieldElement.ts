@@ -35,7 +35,12 @@ import {
   FIELD_AGG_REGEXP,
   FIELD_ASC_REGEXP,
 } from "../helpers/constants";
-import { getTableTag } from "../helpers/elementsRegister";
+import {
+  getTableTag,
+  getFrameTag,
+  getGroupByTag,
+  getSortByTag,
+} from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 
 /**
@@ -247,9 +252,10 @@ export class FieldElement extends UnifiedElement {
   private _asc: null | string = null;
 
   /**
-   * An assosiated `hdml-table` element.
+   * An assosiated `hdml-table`, `hdml-frame`, `hdml-group-by`,
+   * `hdml-group-by` or `hdml-sort-by` element.
    */
-  private _table: null | Element = null;
+  private _parent: null | Element = null;
 
   /**
    * A `name` setter.
@@ -632,9 +638,9 @@ export class FieldElement extends UnifiedElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    this._table = this._getTable();
-    if (this._table) {
-      this._table.dispatchEvent(
+    this._parent = this._getParent();
+    if (this._parent) {
+      this._parent.dispatchEvent(
         new CustomEvent<FieldEventDetail>("hdml-field:connected", {
           cancelable: false,
           composed: false,
@@ -663,8 +669,8 @@ export class FieldElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
-    if (this._table) {
-      this._table.dispatchEvent(
+    if (this._parent) {
+      this._parent.dispatchEvent(
         new CustomEvent<FieldEventDetail>("hdml-field:disconnected", {
           cancelable: false,
           composed: false,
@@ -674,7 +680,7 @@ export class FieldElement extends UnifiedElement {
           },
         }),
       );
-      this._table = null;
+      this._parent = null;
     }
     super.disconnectedCallback();
   }
@@ -711,15 +717,19 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns assosiated `hdml-table` element if exist or null
+   * Returns an assosiated `hdml-table`, `hdml-frame`,
+   * `hdml-group-by` or `hdml-sort-by` element if exist or null
    * otherwise.
    */
-  private _getTable(): null | Element {
+  private _getParent(): null | Element {
     let element = this.parentElement;
     while (
       element &&
       element.tagName !== "BODY" &&
-      element.tagName !== getTableTag().toUpperCase()
+      element.tagName !== getTableTag().toUpperCase() &&
+      element.tagName !== getFrameTag().toUpperCase() &&
+      element.tagName !== getGroupByTag().toUpperCase() &&
+      element.tagName !== getSortByTag().toUpperCase()
     ) {
       element = element.parentElement;
     }

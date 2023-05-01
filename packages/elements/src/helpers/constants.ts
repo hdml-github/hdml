@@ -756,3 +756,23 @@ export const FILTER_NAME_REGEXP = new RegExp(
  * The `FilterElement` `clause` attribute RegExp.
  */
 export const FILTER_CLAUSE_REGEXP = /.*/;
+
+/**
+ * The `FrameElement` `name` attribute RegExp.
+ */
+export const FRAME_NAME_REGEXP = /^[a-zA-Z0-9_]*$/;
+
+/**
+ * The `FrameElement` `source` attribute RegExp.
+ */
+export const FRAME_SOURCE_REGEXP = /.*/;
+
+/**
+ * The `FrameElement` `offset` attribute RegExp.
+ */
+export const FRAME_OFFSET_REGEXP = /^[0-9]*$/;
+
+/**
+ * The `FrameElement` `limit` attribute RegExp.
+ */
+export const FRAME_LIMIT_REGEXP = /^[0-9]*$/;

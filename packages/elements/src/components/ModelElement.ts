@@ -7,12 +7,13 @@
 
 import { html, TemplateResult } from "lit";
 import { ModelData, TableData, JoinData } from "@hdml/schema";
+
+import "../events";
 import { MODEL_NAME_REGEXP } from "../helpers/constants";
 import { getTableTag, getJoinTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 import { TableElement, TableEventDetail } from "./TableElement";
 import { JoinElement, JoinEventDetail } from "./JoinElement";
-import "../events";
 
 /**
  * An `hdml-model` element event detail interface.
@@ -157,12 +158,6 @@ export class ModelElement extends UnifiedElement {
     const joins: JoinData[] = [];
     this._joins.forEach((join) => {
       joins.push(join.toJSON());
-    });
-    console.log({
-      name: this.name,
-      host: "",
-      tables,
-      joins,
     });
     return {
       name: this.name,

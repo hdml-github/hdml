@@ -12,6 +12,7 @@ import { FieldElement } from "../components/FieldElement";
 import { JoinElement } from "../components/JoinElement";
 import { ConnectiveElement } from "../components/ConnectiveElement";
 import { FilterElement } from "../components/FilterElement";
+import { FrameElement } from "../components/FrameElement";
 
 /** *****************************************************************
  * IoElement - <hdml-io/>                                           *
@@ -240,6 +241,102 @@ export function getFilterTag(): string {
 }
 
 /** *****************************************************************
+ * FrameElement - <hdml-frame/>                                     *
+ * ******************************************************************/
+
+let frameDefined = false;
+let frameTag = "hdml-frame";
+
+/**
+ * Define `FrameElement` component tag name and register custom
+ * element.
+ */
+export async function defineFrame(
+  tagName?: string,
+  Constructor?: new () => FrameElement,
+): Promise<void> {
+  if (!frameDefined) {
+    frameDefined = true;
+    if (tagName) {
+      frameTag = tagName;
+    }
+    customElements.define(frameTag, Constructor || FrameElement);
+    await customElements.whenDefined(frameTag);
+  }
+}
+
+/**
+ * Returns registered `FrameElement` tag name.
+ */
+export function getFrameTag(): string {
+  return frameTag;
+}
+
+/** *****************************************************************
+ * GroupByElement - <hdml-group-by/>                                *
+ * ******************************************************************/
+
+let groupDefined = false;
+let groupTag = "hdml-group-by";
+
+/**
+ * Define `GroupByElement` component tag name and register custom
+ * element.
+ */
+export async function defineGroupBy(
+  tagName?: string,
+  Constructor?: new () => FrameElement,
+): Promise<void> {
+  if (!groupDefined) {
+    groupDefined = true;
+    if (tagName) {
+      groupTag = tagName;
+    }
+    customElements.define(groupTag, Constructor || FrameElement);
+    await customElements.whenDefined(groupTag);
+  }
+}
+
+/**
+ * Returns registered `GroupByElement` tag name.
+ */
+export function getGroupByTag(): string {
+  return groupTag;
+}
+
+/** *****************************************************************
+ * SortByElement - <hdml-sort-by/>                                *
+ * ******************************************************************/
+
+let sortDefined = false;
+let sortTag = "hdml-sort-by";
+
+/**
+ * Define `SortByElement` component tag name and register custom
+ * element.
+ */
+export async function defineSortBy(
+  tagName?: string,
+  Constructor?: new () => FrameElement,
+): Promise<void> {
+  if (!sortDefined) {
+    sortDefined = true;
+    if (tagName) {
+      sortTag = tagName;
+    }
+    customElements.define(sortTag, Constructor || FrameElement);
+    await customElements.whenDefined(sortTag);
+  }
+}
+
+/**
+ * Returns registered `SortByElement` tag name.
+ */
+export function getSortByTag(): string {
+  return sortTag;
+}
+
+/** *****************************************************************
  * Export                                                           *
  * ******************************************************************/
 
@@ -255,5 +352,6 @@ export async function defineDefaults(): Promise<void> {
     defineJoin(),
     defineConnective(),
     defineFilter(),
+    defineFrame(),
   ]);
 }

@@ -11,6 +11,7 @@ import { FieldEventDetail } from "./components/FieldElement";
 import { JoinEventDetail } from "./components/JoinElement";
 import { ConnEventDetail } from "./components/ConnectiveElement";
 import { FilterEventDetail } from "./components/FilterElement";
+import { FrameEventDetail } from "./components/FrameElement";
 
 declare global {
   interface HTMLElementEventMap {
@@ -37,5 +38,9 @@ declare global {
     "hdml-filter:connected": CustomEvent<FilterEventDetail>;
     "hdml-filter:changed": CustomEvent<FilterEventDetail>;
     "hdml-filter:disconnected": CustomEvent<FilterEventDetail>;
+
+    "hdml-frame:connected": CustomEvent<FrameEventDetail>;
+    "hdml-frame:changed": CustomEvent<FrameEventDetail>;
+    "hdml-frame:disconnected": CustomEvent<FrameEventDetail>;
   }
 }

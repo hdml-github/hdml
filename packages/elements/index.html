@@ -122,5 +122,106 @@
           </hdml-connective>
         </hdml-join>
       </hdml-model>
+
+      <hdml-frame
+        name="frame"
+        source="?hdml-model=model"
+        offset="0"
+        limit="1000">
+        <hdml-field
+          name="catalog"
+          origin="columns_catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema"
+          origin="columns_schema">
+        </hdml-field>
+        <hdml-field
+          name="table"
+          origin="columns_table">
+        </hdml-field>
+        <hdml-field
+          name="column"
+          origin="columns_column">
+        </hdml-field>
+        <hdml-field
+          name="count"
+          origin="columns_column"
+          agg="count">
+        </hdml-field>
+
+        <hdml-group-by>
+          <hdml-field
+            name="catalog">
+          </hdml-field>
+          <hdml-field
+            name="schema">
+          </hdml-field>
+          <hdml-field
+            name="table">
+          </hdml-field>
+          <hdml-field
+            name="column">
+          </hdml-field>
+        </hdml-group-by>
+      </hdml-frame>
+
+      <hdml-frame
+        name="query"
+        source="?hdml-frame=frame">
+        <hdml-field
+          name="catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema">
+        </hdml-field>
+        <hdml-field
+          name="table">
+        </hdml-field>
+        <hdml-field
+          name="sum"
+          origin="count"
+          agg="sum">
+        </hdml-field>
+
+        <hdml-filter-by>
+          <hdml-connective
+            operator="and">
+            <hdml-filter
+              type="expr"
+              clause="`catalog` = 'tenant_postgres'">
+            </hdml-filter>
+            <hdml-filter
+              type="expr"
+              clause="`schema` = 'information_schema'">
+            </hdml-filter>
+          </hdml-connective>
+        </hdml-filter-by>
+
+        <hdml-group-by>
+          <hdml-field
+            name="catalog">
+          </hdml-field>
+          <hdml-field
+            name="schema">
+          </hdml-field>
+          <hdml-field
+            name="table">
+          </hdml-field>
+        </hdml-group-by>
+
+        <hdml-sort-by>
+          <hdml-field
+            name="catalog">
+          </hdml-field>
+          <hdml-field
+            name="schema">
+          </hdml-field>
+          <hdml-field
+            name="table"
+            asc="false">
+          </hdml-field>
+        </hdml-sort-by>
+      </hdml-frame>
     </body>
 </html>

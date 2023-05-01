@@ -9,17 +9,27 @@ import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
 import * as arrow from "apache-arrow";
-import { Document, DocumentData } from "@hdml/schema";
+import {
+  Document,
+  DocumentData,
+  ModelData,
+  FrameData,
+} from "@hdml/schema";
+
+import "../events";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,
   IO_TENANT_REGEXP,
   IO_TOKEN_REGEXP,
 } from "../helpers/constants";
-import { getModelTag } from "../helpers/elementsRegister";
+import {
+  getModelTag,
+  getFrameTag,
+} from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 import { ModelEventDetail, ModelElement } from "./ModelElement";
-import "../events";
+import { FrameEventDetail, FrameElement } from "./FrameElement";
 
 /**
  * The `IoElement` class.
@@ -100,11 +110,24 @@ export class IoElement extends UnifiedElement {
   private _models: Map<string, ModelElement> = new Map();
 
   /**
-   * Query debouncer.
+   * Attached `hdml-frame` elements map.
    */
-  private _debouncer: null | debounce<
-    (q: DocumentData) => Promise<void>
-  > = null;
+  private _frames: Map<string, FrameElement> = new Map();
+
+  /**
+   * Parsed `hdml` documents map.
+   */
+  private _documents: Map<string, Document> = new Map();
+
+  /**
+   * The `hdml-model` update debouncer.
+   */
+  private _updateModel: null | debounce<() => Promise<void>> = null;
+
+  /**
+   * The `hdml-frame` update debouncer.
+   */
+  private _updateFrame: null | debounce<() => Promise<void>> = null;
 
   /**
    * A `name` setter.
@@ -227,21 +250,14 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Class constructor.
-   */
-  public constructor() {
-    super();
-  }
-
-  /**
    * @override
    */
   public connectedCallback(): void {
     super.connectedCallback();
     this._watchModels();
-    this._debouncer = debounce(50, async (q: DocumentData) => {
-      await this._fetchData(q);
-    });
+    this._watchFrames();
+    this._updateModel = debounce(50, this._modelDebounceCallback);
+    this._updateFrame = debounce(50, this._frameDebounceCallback);
   }
 
   /**
@@ -259,16 +275,18 @@ export class IoElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
-    super.disconnectedCallback();
+    this._updateModel && this._updateModel.cancel();
+    this._updateFrame && this._updateFrame.cancel();
     this._unwatchModels();
-    this._debouncer && this._debouncer.cancel();
+    this._unwatchFrames();
+    super.disconnectedCallback();
   }
 
   /**
    * Component template.
    */
   public render(): TemplateResult<1> {
-    return html`<slot></slot>`;
+    return html`<!-- IoElement -->`;
   }
 
   /**
@@ -285,6 +303,23 @@ export class IoElement extends UnifiedElement {
     document.body.addEventListener(
       "hdml-model:disconnected",
       this._modelDisconnectedListener,
+    );
+  }
+
+  /**
+   * Starts watching for the `hdml-frame` elements changes.
+   */
+  private _watchFrames(): void {
+    document.querySelectorAll(getFrameTag()).forEach((frame) => {
+      this._attachFrame(<FrameElement>frame);
+    });
+    document.body.addEventListener(
+      "hdml-frame:connected",
+      this._frameConnectedListener,
+    );
+    document.body.addEventListener(
+      "hdml-frame:disconnected",
+      this._frameDisconnectedListener,
     );
   }
 
@@ -307,6 +342,24 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
+   * Stops watching for the `hdml-frame` elements changes.
+   */
+  private _unwatchFrames(): void {
+    document.body.removeEventListener(
+      "hdml-frame:connected",
+      this._frameConnectedListener,
+    );
+    document.body.removeEventListener(
+      "hdml-frame:disconnected",
+      this._frameDisconnectedListener,
+    );
+    this._frames.forEach((frame) => {
+      this._detachFrame(frame);
+    });
+    this._frames.clear();
+  }
+
+  /**
    * The `hdml-model:connected` event listener.
    */
   private _modelConnectedListener = (
@@ -314,6 +367,16 @@ export class IoElement extends UnifiedElement {
   ) => {
     const model = event.detail.model;
     this._attachModel(model);
+  };
+
+  /**
+   * The `hdml-frame:connected` event listener.
+   */
+  private _frameConnectedListener = (
+    event: CustomEvent<FrameEventDetail>,
+  ) => {
+    const frame = event.detail.frame;
+    this._attachFrame(frame);
   };
 
   /**
@@ -327,13 +390,31 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-frame:disconnected` event listener.
+   */
+  private _frameDisconnectedListener = (
+    event: CustomEvent<FrameEventDetail>,
+  ) => {
+    const frame = event.detail.frame;
+    this._detachFrame(frame);
+  };
+
+  /**
    * The `hdml-model:changed` event listener.
    */
   private _modelChangedListener = (
     event: CustomEvent<ModelEventDetail>,
   ) => {
-    const model = event.detail.model;
-    this._processModel(model);
+    this._processModel();
+  };
+
+  /**
+   * The `hdml-frame:changed` event listener.
+   */
+  private _frameChangedListener = (
+    event: CustomEvent<FrameEventDetail>,
+  ) => {
+    this._processFrame();
   };
 
   /**
@@ -346,7 +427,21 @@ export class IoElement extends UnifiedElement {
         "hdml-model:changed",
         this._modelChangedListener,
       );
-      this._processModel(model);
+      this._processModel();
+    }
+  }
+
+  /**
+   * Attaches `hdml-frame` element to the frames map.
+   */
+  private _attachFrame(frame: FrameElement) {
+    if (!this._frames.has(frame.uid)) {
+      this._frames.set(frame.uid, frame);
+      frame.addEventListener(
+        "hdml-frame:changed",
+        this._frameChangedListener,
+      );
+      this._processFrame();
     }
   }
 
@@ -360,46 +455,121 @@ export class IoElement extends UnifiedElement {
         this._modelChangedListener,
       );
       this._models.delete(model.uid);
+      this._documents.delete(model.uid);
     }
   }
 
   /**
-   * Processes the `model`.
+   * Detaches `hdml-frame` element from the frames map.
    */
-  private _processModel(model: ModelElement) {
-    this._debouncer &&
-      this._debouncer({
-        name: "Test HDML Document.",
-        tenant: "common",
-        token: "sometokenhere",
-        model: model.toJSON(),
-      });
+  private _detachFrame(frame: FrameElement) {
+    if (this._frames.has(frame.uid)) {
+      frame.removeEventListener(
+        "hdml-frame:changed",
+        this._frameChangedListener,
+      );
+      this._frames.delete(frame.uid);
+      this._documents.delete(frame.uid);
+    }
   }
 
-  private async _fetchData(q: DocumentData): Promise<void> {
-    console.log("fetching");
-    const doc = new Document(q);
-    try {
-      const response = await fetch(this._host || "localhost", {
-        method: "POST",
-        mode: "cors",
-        redirect: "follow",
-        cache: "no-cache",
-        headers: {
-          Accept: "text/html; charset=utf-8",
-          "Content-Type": "text/html; charset=utf-8",
-        },
-        body: doc.buffer,
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not OK");
+  /**
+   * Processes models.
+   */
+  private _processModel() {
+    this._updateModel && this._updateModel();
+  }
+
+  /**
+   * Processes frames.
+   */
+  private _processFrame() {
+    this._updateFrame && this._updateFrame();
+  }
+
+  /**
+   * The `hdml-model` changed debouncer callback.
+   */
+  private _modelDebounceCallback = () => {
+    this._models.forEach((model) => {
+      if (!this._documents.has(model.uid)) {
+        const data: DocumentData = {
+          name: "Model document.",
+          tenant: this.tenant || "tenant",
+          token: this.token || "token",
+          model: model.toJSON(),
+        };
+        this._documents.set(model.uid, new Document(data));
       }
-      const buffer = await response.arrayBuffer();
-      const array = new Uint8Array(buffer);
-      const table = arrow.tableFromIPC(array);
-      console.log(table.toString());
-    } catch (err) {
-      console.error(err);
-    }
+    });
+  };
+
+  /**
+   * The `hdml-frame` changed debouncer callback.
+   */
+  private _frameDebounceCallback = () => {
+    this._frames.forEach((frame) => {
+      if (!this._documents.has(frame.uid)) {
+        let source = frame.source;
+        let _frame = frame.toJSON();
+        const data: DocumentData = {
+          name: "Frame document.",
+          tenant: this.tenant || "tenant",
+          token: this.token || "token",
+          frame: _frame,
+        };
+        while (source && source.indexOf("?") === 0) {
+          if (source.indexOf("?hdml-model=") === 0) {
+            const [, modelName] = source.split("?hdml-model=");
+            this._models.forEach((model) => {
+              if (model.name === modelName) {
+                data.model = model.toJSON();
+              }
+            });
+            source = null;
+          } else if (source.indexOf("?hdml-frame=") === 0) {
+            const [, frameName] = source.split("?hdml-frame=");
+            this._frames.forEach((frame) => {
+              if (frame.name === frameName) {
+                source = frame.source;
+                _frame.parent = frame.toJSON();
+                _frame = _frame.parent;
+              }
+            });
+          } else {
+            throw new Error("Invalid `source` value.");
+          }
+        }
+        this._documents.set(frame.uid, new Document(data));
+      }
+    });
+  };
+
+  private async _fetchData(q: DocumentData): Promise<void> {
+    const doc = new Document(q);
+    console.log("fetching", q, doc);
+    return Promise.resolve();
+    // try {
+    //   const response = await fetch(this._host || "localhost", {
+    //     method: "POST",
+    //     mode: "cors",
+    //     redirect: "follow",
+    //     cache: "no-cache",
+    //     headers: {
+    //       Accept: "text/html; charset=utf-8",
+    //       "Content-Type": "text/html; charset=utf-8",
+    //     },
+    //     body: doc.buffer,
+    //   });
+    //   if (!response.ok) {
+    //     throw new Error("Network response was not OK");
+    //   }
+    //   const buffer = await response.arrayBuffer();
+    //   const array = new Uint8Array(buffer);
+    //   const table = arrow.tableFromIPC(array);
+    //   console.log(table, table.toString());
+    // } catch (err) {
+    //   console.error(err);
+    // }
   }
 }
