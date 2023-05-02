@@ -13,6 +13,9 @@ import { JoinElement } from "../components/JoinElement";
 import { ConnectiveElement } from "../components/ConnectiveElement";
 import { FilterElement } from "../components/FilterElement";
 import { FrameElement } from "../components/FrameElement";
+import { FilterByElement } from "../components/FilterByElement";
+import { GroupByElement } from "../components/GroupByElement";
+import { SortByElement } from "../components/SortByElement";
 
 /** *****************************************************************
  * IoElement - <hdml-io/>                                           *
@@ -273,6 +276,41 @@ export function getFrameTag(): string {
 }
 
 /** *****************************************************************
+ * FilterByElement - <hdml-filter-by/>                              *
+ * ******************************************************************/
+
+let filterByDefined = false;
+let filterByTag = "hdml-filter-by";
+
+/**
+ * Define `FilterByElement` component tag name and register custom
+ * element.
+ */
+export async function defineFilterBy(
+  tagName?: string,
+  Constructor?: new () => FilterByElement,
+): Promise<void> {
+  if (!filterByDefined) {
+    filterByDefined = true;
+    if (tagName) {
+      filterByTag = tagName;
+    }
+    customElements.define(
+      filterByTag,
+      Constructor || FilterByElement,
+    );
+    await customElements.whenDefined(filterByTag);
+  }
+}
+
+/**
+ * Returns registered `FilterByElement` tag name.
+ */
+export function getFilterByTag(): string {
+  return filterByTag;
+}
+
+/** *****************************************************************
  * GroupByElement - <hdml-group-by/>                                *
  * ******************************************************************/
 
@@ -285,14 +323,14 @@ let groupTag = "hdml-group-by";
  */
 export async function defineGroupBy(
   tagName?: string,
-  Constructor?: new () => FrameElement,
+  Constructor?: new () => GroupByElement,
 ): Promise<void> {
   if (!groupDefined) {
     groupDefined = true;
     if (tagName) {
       groupTag = tagName;
     }
-    customElements.define(groupTag, Constructor || FrameElement);
+    customElements.define(groupTag, Constructor || GroupByElement);
     await customElements.whenDefined(groupTag);
   }
 }
@@ -305,7 +343,7 @@ export function getGroupByTag(): string {
 }
 
 /** *****************************************************************
- * SortByElement - <hdml-sort-by/>                                *
+ * SortByElement - <hdml-sort-by/>                                  *
  * ******************************************************************/
 
 let sortDefined = false;
@@ -317,14 +355,14 @@ let sortTag = "hdml-sort-by";
  */
 export async function defineSortBy(
   tagName?: string,
-  Constructor?: new () => FrameElement,
+  Constructor?: new () => SortByElement,
 ): Promise<void> {
   if (!sortDefined) {
     sortDefined = true;
     if (tagName) {
       sortTag = tagName;
     }
-    customElements.define(sortTag, Constructor || FrameElement);
+    customElements.define(sortTag, Constructor || SortByElement);
     await customElements.whenDefined(sortTag);
   }
 }
@@ -353,5 +391,8 @@ export async function defineDefaults(): Promise<void> {
     defineConnective(),
     defineFilter(),
     defineFrame(),
+    defineFilterBy(),
+    defineGroupBy(),
+    defineSortBy(),
   ]);
 }

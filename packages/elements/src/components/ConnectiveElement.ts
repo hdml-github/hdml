@@ -16,6 +16,7 @@ import "../events";
 import { CONNECTIVE_OP_REGEXP } from "../helpers/constants";
 import {
   getJoinTag,
+  getFilterByTag,
   getConnectiveTag,
   getFilterTag,
 } from "../helpers/elementsRegister";
@@ -205,6 +206,7 @@ export class ConnectiveElement extends UnifiedElement {
       element &&
       element.tagName !== "BODY" &&
       element.tagName !== getJoinTag().toUpperCase() &&
+      element.tagName !== getFilterByTag().toUpperCase() &&
       element.tagName !== getConnectiveTag().toUpperCase()
     ) {
       element = element.parentElement;

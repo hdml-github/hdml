@@ -17,6 +17,9 @@ import {
   defineConnective,
   defineFilter,
   defineFrame,
+  defineFilterBy,
+  defineGroupBy,
+  defineSortBy,
   getIoTag,
   getModelTag,
   getTableTag,
@@ -25,6 +28,9 @@ import {
   getConnectiveTag,
   getFilterTag,
   getFrameTag,
+  getFilterByTag,
+  getGroupByTag,
+  getSortByTag,
 } from "./helpers/elementsRegister";
 import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
@@ -36,6 +42,9 @@ import { JoinElement } from "./components/JoinElement";
 import { ConnectiveElement } from "./components/ConnectiveElement";
 import { FilterElement } from "./components/FilterElement";
 import { FrameElement } from "./components/FrameElement";
+import { FilterByElement } from "./components/FilterByElement";
+import { GroupByElement } from "./components/GroupByElement";
+import { SortByElement } from "./components/SortByElement";
 
 export {
   lit,
@@ -52,6 +61,9 @@ export {
   defineConnective,
   defineFilter,
   defineFrame,
+  defineFilterBy,
+  defineGroupBy,
+  defineSortBy,
   // get tag name
   getIoTag,
   getModelTag,
@@ -61,6 +73,9 @@ export {
   getConnectiveTag,
   getFilterTag,
   getFrameTag,
+  getFilterByTag,
+  getGroupByTag,
+  getSortByTag,
   // elements
   UnifiedElement,
   IoElement,
@@ -71,4 +86,7 @@ export {
   ConnectiveElement,
   FilterElement,
   FrameElement,
+  FilterByElement,
+  GroupByElement,
+  SortByElement,
 };

@@ -8,13 +8,7 @@
 import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
-import * as arrow from "apache-arrow";
-import {
-  Document,
-  DocumentData,
-  ModelData,
-  FrameData,
-} from "@hdml/schema";
+import { Document, DocumentData } from "@hdml/schema";
 
 import "../events";
 import {
@@ -30,6 +24,7 @@ import {
 import { UnifiedElement } from "./UnifiedElement";
 import { ModelEventDetail, ModelElement } from "./ModelElement";
 import { FrameEventDetail, FrameElement } from "./FrameElement";
+import { Client } from "../services/Client";
 
 /**
  * The `IoElement` class.
@@ -128,6 +123,11 @@ export class IoElement extends UnifiedElement {
    * The `hdml-frame` update debouncer.
    */
   private _updateFrame: null | debounce<() => Promise<void>> = null;
+
+  /**
+   * Data client.
+   */
+  private _client: null | Client = null;
 
   /**
    * A `name` setter.
@@ -258,6 +258,11 @@ export class IoElement extends UnifiedElement {
     this._watchFrames();
     this._updateModel = debounce(50, this._modelDebounceCallback);
     this._updateFrame = debounce(50, this._frameDebounceCallback);
+    this._client = new Client(
+      this.host || undefined,
+      this.tenant || undefined,
+      this.token || undefined,
+    );
   }
 
   /**
@@ -269,12 +274,18 @@ export class IoElement extends UnifiedElement {
     value: string,
   ): void {
     super.attributeChangedCallback(name, old, value);
+    this._client = new Client(
+      this.host || undefined,
+      this.tenant || undefined,
+      this.token || undefined,
+    );
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
+    this._client && this._client.close();
     this._updateModel && this._updateModel.cancel();
     this._updateFrame && this._updateFrame.cancel();
     this._unwatchModels();
@@ -544,32 +555,4 @@ export class IoElement extends UnifiedElement {
       }
     });
   };
-
-  private async _fetchData(q: DocumentData): Promise<void> {
-    const doc = new Document(q);
-    console.log("fetching", q, doc);
-    return Promise.resolve();
-    // try {
-    //   const response = await fetch(this._host || "localhost", {
-    //     method: "POST",
-    //     mode: "cors",
-    //     redirect: "follow",
-    //     cache: "no-cache",
-    //     headers: {
-    //       Accept: "text/html; charset=utf-8",
-    //       "Content-Type": "text/html; charset=utf-8",
-    //     },
-    //     body: doc.buffer,
-    //   });
-    //   if (!response.ok) {
-    //     throw new Error("Network response was not OK");
-    //   }
-    //   const buffer = await response.arrayBuffer();
-    //   const array = new Uint8Array(buffer);
-    //   const table = arrow.tableFromIPC(array);
-    //   console.log(table, table.toString());
-    // } catch (err) {
-    //   console.error(err);
-    // }
-  }
 }

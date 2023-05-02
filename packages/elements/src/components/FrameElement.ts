@@ -15,9 +15,20 @@ import {
   FRAME_OFFSET_REGEXP,
   FRAME_LIMIT_REGEXP,
 } from "../helpers/constants";
-import { getFieldTag } from "../helpers/elementsRegister";
+import {
+  getFieldTag,
+  getFilterByTag,
+  getGroupByTag,
+  getSortByTag,
+} from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 import { FieldElement, FieldEventDetail } from "./FieldElement";
+import {
+  FilterByElement,
+  FilterByEventDetail,
+} from "./FilterByElement";
+import { GroupByElement, GroupByEventDetail } from "./GroupByElement";
+import { SortByElement, SortByEventDetail } from "./SortByElement";
 
 /**
  * An `hdml-frame` element event detail interface.
@@ -103,6 +114,21 @@ export class FrameElement extends UnifiedElement {
    * Attached `hdml-field` elements map.
    */
   private _fields: Map<string, FieldElement> = new Map();
+
+  /**
+   * Attached `hdml-filter-by` element map.
+   */
+  private _filterBy: null | FilterByElement = null;
+
+  /**
+   * Attached `hdml-group-by` element map.
+   */
+  private _groupBy: null | GroupByElement = null;
+
+  /**
+   * Attached `hdml-sort-by` element map.
+   */
+  private _sortBy: null | SortByElement = null;
 
   /**
    * A `name` setter.
@@ -240,6 +266,9 @@ export class FrameElement extends UnifiedElement {
       }),
     );
     this._watchFields();
+    this._watchFilterBy();
+    this._watchGroupBy();
+    this._watchSortBy();
   }
 
   /**
@@ -259,6 +288,9 @@ export class FrameElement extends UnifiedElement {
    */
   public disconnectedCallback(): void {
     this._unwatchFields();
+    this._unwatchFilterBy();
+    this._unwatchGroupBy();
+    this._unwatchSortBy();
     document.body.dispatchEvent(
       new CustomEvent<FrameEventDetail>("hdml-frame:disconnected", {
         cancelable: false,
@@ -300,10 +332,10 @@ export class FrameElement extends UnifiedElement {
       offset: parseInt(this.offset || "0", 10),
       limit: parseInt(this.limit || "50000", 10),
       fields,
-      filterBy: undefined,
-      groupBy: undefined,
+      filterBy: this._filterBy ? this._filterBy.toJSON() : undefined,
+      groupBy: this._groupBy ? this._groupBy.toJSON() : undefined,
       splitBy: undefined,
-      sortBy: undefined,
+      sortBy: this._sortBy ? this._sortBy.toJSON() : undefined,
       parent: undefined,
     };
   }
@@ -326,6 +358,60 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
+   * Starts watching for the `hdml-filter-by` element changes.
+   */
+  private _watchFilterBy(): void {
+    const filterBy = this.querySelector(getFilterByTag());
+    if (filterBy) {
+      this._attachFilterBy(<FilterByElement>filterBy);
+    }
+    this.addEventListener(
+      "hdml-filter-by:connected",
+      this._filterByConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-filter-by:disconnected",
+      this._filterByDisconnectedListener,
+    );
+  }
+
+  /**
+   * Starts watching for the `hdml-group-by` element changes.
+   */
+  private _watchGroupBy(): void {
+    const groupBy = this.querySelector(getGroupByTag());
+    if (groupBy) {
+      this._attachGroupBy(<GroupByElement>groupBy);
+    }
+    this.addEventListener(
+      "hdml-group-by:connected",
+      this._groupByConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-group-by:disconnected",
+      this._groupByDisconnectedListener,
+    );
+  }
+
+  /**
+   * Starts watching for the `hdml-sort-by` element changes.
+   */
+  private _watchSortBy(): void {
+    const sortBy = this.querySelector(getSortByTag());
+    if (sortBy) {
+      this._attachSortBy(<SortByElement>sortBy);
+    }
+    this.addEventListener(
+      "hdml-sort-by:connected",
+      this._sortByConnectedListener,
+    );
+    this.addEventListener(
+      "hdml-sort-by:disconnected",
+      this._sortByDisconnectedListener,
+    );
+  }
+
+  /**
    * Stops watching for the `hdml-field` elements changes.
    */
   private _unwatchFields(): void {
@@ -344,6 +430,57 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
+   * Stops watching for the `hdml-filter-by` elements changes.
+   */
+  private _unwatchFilterBy(): void {
+    this.removeEventListener(
+      "hdml-filter-by:connected",
+      this._filterByConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-filter-by:disconnected",
+      this._filterByDisconnectedListener,
+    );
+    if (this._filterBy) {
+      this._detachFilterBy(this._filterBy);
+    }
+  }
+
+  /**
+   * Stops watching for the `hdml-group-by` elements changes.
+   */
+  private _unwatchGroupBy(): void {
+    this.removeEventListener(
+      "hdml-group-by:connected",
+      this._groupByConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-group-by:disconnected",
+      this._groupByDisconnectedListener,
+    );
+    if (this._groupBy) {
+      this._detachGroupBy(this._groupBy);
+    }
+  }
+
+  /**
+   * Stops watching for the `hdml-sort-by` elements changes.
+   */
+  private _unwatchSortBy(): void {
+    this.removeEventListener(
+      "hdml-sort-by:connected",
+      this._sortByConnectedListener,
+    );
+    this.removeEventListener(
+      "hdml-sort-by:disconnected",
+      this._sortByDisconnectedListener,
+    );
+    if (this._sortBy) {
+      this._detachSortBy(this._sortBy);
+    }
+  }
+
+  /**
    * The `hdml-field:connected` event listener.
    */
   private _fieldConnectedListener = (
@@ -351,6 +488,33 @@ export class FrameElement extends UnifiedElement {
   ) => {
     const field = event.detail.field;
     this._attachField(field);
+  };
+
+  /**
+   * The `hdml-filter-by:connected` event listener.
+   */
+  private _filterByConnectedListener = (
+    event: CustomEvent<FilterByEventDetail>,
+  ) => {
+    this._attachFilterBy(event.detail.filterBy);
+  };
+
+  /**
+   * The `hdml-group-by:connected` event listener.
+   */
+  private _groupByConnectedListener = (
+    event: CustomEvent<GroupByEventDetail>,
+  ) => {
+    this._attachGroupBy(event.detail.groupBy);
+  };
+
+  /**
+   * The `hdml-sort-by:connected` event listener.
+   */
+  private _sortByConnectedListener = (
+    event: CustomEvent<SortByEventDetail>,
+  ) => {
+    this._attachSortBy(event.detail.sortBy);
   };
 
   /**
@@ -364,10 +528,64 @@ export class FrameElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-filter-by:disconnected` event listener.
+   */
+  private _filterByDisconnectedListener = (
+    event: CustomEvent<FilterByEventDetail>,
+  ) => {
+    this._detachFilterBy(event.detail.filterBy);
+  };
+
+  /**
+   * The `hdml-group-by:disconnected` event listener.
+   */
+  private _groupByDisconnectedListener = (
+    event: CustomEvent<GroupByEventDetail>,
+  ) => {
+    this._detachGroupBy(event.detail.groupBy);
+  };
+
+  /**
+   * The `hdml-sort-by:disconnected` event listener.
+   */
+  private _sortByDisconnectedListener = (
+    event: CustomEvent<SortByEventDetail>,
+  ) => {
+    this._detachSortBy(event.detail.sortBy);
+  };
+
+  /**
    * The `hdml-field:changed` event listener.
    */
   private _fieldChangedListener = (
     event: CustomEvent<FieldEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
+   * The `hdml-filter-by:changed` event listener.
+   */
+  private _filterByChangedListener = (
+    event: CustomEvent<FilterByEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
+   * The `hdml-group-by:changed` event listener.
+   */
+  private _groupByChangedListener = (
+    event: CustomEvent<GroupByEventDetail>,
+  ) => {
+    this._dispatchChangedEvent();
+  };
+
+  /**
+   * The `hdml-sort-by:changed` event listener.
+   */
+  private _sortByChangedListener = (
+    event: CustomEvent<SortByEventDetail>,
   ) => {
     this._dispatchChangedEvent();
   };
@@ -387,6 +605,48 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
+   * Attaches `hdml-filter-by` element.
+   */
+  private _attachFilterBy(filterBy: FilterByElement) {
+    if (!this._filterBy) {
+      this._filterBy = filterBy;
+      this._filterBy.addEventListener(
+        "hdml-filter-by:changed",
+        this._filterByChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Attaches `hdml-group-by` element.
+   */
+  private _attachGroupBy(groupBy: GroupByElement) {
+    if (!this._groupBy) {
+      this._groupBy = groupBy;
+      this._groupBy.addEventListener(
+        "hdml-group-by:changed",
+        this._groupByChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Attaches `hdml-sort-by` element.
+   */
+  private _attachSortBy(sortBy: SortByElement) {
+    if (!this._sortBy) {
+      this._sortBy = sortBy;
+      this._sortBy.addEventListener(
+        "hdml-sort-by:changed",
+        this._sortByChangedListener,
+      );
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
    * Detaches `hdml-field` element from the fields map.
    */
   private _detachField(field: FieldElement) {
@@ -396,6 +656,48 @@ export class FrameElement extends UnifiedElement {
         this._fieldChangedListener,
       );
       this._fields.delete(field.uid);
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-filter-by` element.
+   */
+  private _detachFilterBy(filterBy: FilterByElement) {
+    if (this._filterBy && this._filterBy.uid === filterBy.uid) {
+      this._filterBy.removeEventListener(
+        "hdml-filter-by:changed",
+        this._filterByChangedListener,
+      );
+      this._filterBy = null;
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-group-by` element.
+   */
+  private _detachGroupBy(groupBy: GroupByElement) {
+    if (this._groupBy && this._groupBy.uid === groupBy.uid) {
+      this._groupBy.removeEventListener(
+        "hdml-group-by:changed",
+        this._groupByChangedListener,
+      );
+      this._groupBy = null;
+      this._dispatchChangedEvent();
+    }
+  }
+
+  /**
+   * Detaches `hdml-sort-by` element.
+   */
+  private _detachSortBy(sortBy: SortByElement) {
+    if (this._sortBy && this._sortBy.uid === sortBy.uid) {
+      this._sortBy.removeEventListener(
+        "hdml-sort-by:changed",
+        this._sortByChangedListener,
+      );
+      this._sortBy = null;
       this._dispatchChangedEvent();
     }
   }

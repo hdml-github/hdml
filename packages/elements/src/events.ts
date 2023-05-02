@@ -12,6 +12,9 @@ import { JoinEventDetail } from "./components/JoinElement";
 import { ConnEventDetail } from "./components/ConnectiveElement";
 import { FilterEventDetail } from "./components/FilterElement";
 import { FrameEventDetail } from "./components/FrameElement";
+import { FilterByEventDetail } from "./components/FilterByElement";
+import { GroupByEventDetail } from "./components/GroupByElement";
+import { SortByEventDetail } from "./components/SortByElement";
 
 declare global {
   interface HTMLElementEventMap {
@@ -42,5 +45,17 @@ declare global {
     "hdml-frame:connected": CustomEvent<FrameEventDetail>;
     "hdml-frame:changed": CustomEvent<FrameEventDetail>;
     "hdml-frame:disconnected": CustomEvent<FrameEventDetail>;
+
+    "hdml-filter-by:connected": CustomEvent<FilterByEventDetail>;
+    "hdml-filter-by:changed": CustomEvent<FilterByEventDetail>;
+    "hdml-filter-by:disconnected": CustomEvent<FilterByEventDetail>;
+
+    "hdml-group-by:connected": CustomEvent<GroupByEventDetail>;
+    "hdml-group-by:changed": CustomEvent<GroupByEventDetail>;
+    "hdml-group-by:disconnected": CustomEvent<GroupByEventDetail>;
+
+    "hdml-sort-by:connected": CustomEvent<SortByEventDetail>;
+    "hdml-sort-by:changed": CustomEvent<SortByEventDetail>;
+    "hdml-sort-by:disconnected": CustomEvent<SortByEventDetail>;
   }
 }
