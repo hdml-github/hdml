@@ -16,6 +16,6 @@ export class OptionsService implements OnModuleInit {
   }
 
   public getProjectPath(): string {
-    return this.options?.project || "";
+    return this.options?.project || ".";
   }
 }
