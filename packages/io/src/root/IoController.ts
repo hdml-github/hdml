@@ -11,11 +11,11 @@ import {
 import { Request } from "express";
 import { Document } from "@hdml/schema";
 import { orchestrate } from "@hdml/orchestrator";
-import { IoServiceV0 } from "./IoServiceV0";
+import { IoService } from "./IoService";
 
 @Controller()
 export class IoController {
-  constructor(private readonly queryService: IoServiceV0) {}
+  constructor(private readonly queryService: IoService) {}
 
   @Get()
   @Header("Access-Control-Allow-Origin", "*")

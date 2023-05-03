@@ -54,8 +54,8 @@
     "typescript": "^4.6.3"
   },
   "scripts": {
-    "up": "clear && docker compose -f ./devenv/compose.yaml up -d",
-    "down": "clear && docker compose -f ./devenv/compose.yaml down",
+    "up": "clear && docker compose -f ./dev.environment/compose.yaml up -d",
+    "down": "clear && docker compose -f ./dev.environment/compose.yaml down",
     "dev": "lerna run dev",
     "lint": "lerna run lint",
     "docs": "lerna run docs",
