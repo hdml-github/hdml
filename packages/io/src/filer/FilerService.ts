@@ -3,12 +3,21 @@ import { Injectable, OnModuleInit } from "@nestjs/common";
 import { watch, FSWatcher } from "chokidar";
 import { OptionsService } from "../options/OptionsService";
 
+/**
+ * Files system service.
+ */
 @Injectable()
 export class FilerService implements OnModuleInit {
   private _watcher: null | FSWatcher = null;
 
+  /**
+   * Class constructor.
+   */
   constructor(private readonly options: OptionsService) {}
 
+  /**
+   * Module initialized callback.
+   */
   public onModuleInit(): void {
     this._watcher = watch(this.options.getProjectPath(), {
       persistent: true,
@@ -29,6 +38,9 @@ export class FilerService implements OnModuleInit {
     this._watcher.on("unlinkDir", this._dirRemovedListener);
   }
 
+  /**
+   * Returns tenants list.
+   */
   public getTenants(): string[] {
     const paths = this.getWatchedPaths();
     return Object.keys(paths)
@@ -40,6 +52,10 @@ export class FilerService implements OnModuleInit {
       });
   }
 
+  /**
+   * Returns an object representing all the paths on the file system
+   * being watched.
+   */
   public getWatchedPaths(): { [directory: string]: string[] } {
     const result: { [directory: string]: string[] } = {};
     if (this._watcher) {
