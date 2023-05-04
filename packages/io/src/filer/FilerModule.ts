@@ -6,5 +6,6 @@ import { FilerService } from "./FilerService";
   imports: [OptionsModule],
   exports: [FilerService],
   providers: [FilerService],
+  controllers: [],
 })
 export class FilerModule {}

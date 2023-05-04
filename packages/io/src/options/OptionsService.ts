@@ -5,6 +5,9 @@ type Options = {
   project: string;
 };
 
+/**
+ * Options service.
+ */
 @Injectable()
 export class OptionsService implements OnModuleInit {
   private options: null | Options = null;
@@ -15,7 +18,66 @@ export class OptionsService implements OnModuleInit {
     this.options = program.opts() as unknown as Options;
   }
 
+  /**
+   * Returns project directory path.
+   */
   public getProjectPath(): string {
     return this.options?.project || ".";
+  }
+
+  /**
+   * Returns tenant's environment file name.
+   */
+  public getTenantEnvName(): string {
+    return ".env";
+  }
+
+  /**
+   * Returns tenant's keys directory path.
+   */
+  public getTenantKeysPath(): string {
+    return "keys";
+  }
+
+  /**
+   * Returns tenant's private key name.
+   */
+  public getTenantPrivateKeyName(): string {
+    return "key";
+  }
+
+  /**
+   * Returns tenant's public key name.
+   */
+  public getTenantPublicKeyName(): string {
+    return "key.pub";
+  }
+
+  /**
+   * Returns tenant's middlewares directory path.
+   */
+  public getTenantMiddlewaresPath(): string {
+    return "middlewares";
+  }
+
+  /**
+   * Returns tenant's `hdml` documents root directory path.
+   */
+  public getTenantDocumentsPath(): string {
+    return "hdml";
+  }
+
+  /**
+   * Returns tenant's `hdml` documents files extension.
+   */
+  public getTenantDocumentsExt(): string {
+    return "html";
+  }
+
+  /**
+   * Returns keys import algorythm.
+   */
+  public getKeysImportAlg(): string {
+    return "ES256";
   }
 }

@@ -1,14 +1,27 @@
+import { opendirSync, accessSync, readFileSync, constants } from "fs";
 import * as path from "path";
+import { KeyLike, importSPKI, importPKCS8 } from "jose";
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { watch, FSWatcher } from "chokidar";
 import { OptionsService } from "../options/OptionsService";
+
+type Tenant = {
+  env: string;
+  key: KeyLike;
+  pub: KeyLike;
+  docs: {
+    [dir: string]: string;
+  };
+};
 
 /**
  * Files system service.
  */
 @Injectable()
 export class FilerService implements OnModuleInit {
-  private _watcher: null | FSWatcher = null;
+  /**
+   * Tenants data.
+   */
+  private _tenants: Map<string, Tenant> = new Map();
 
   /**
    * Class constructor.
@@ -19,84 +32,139 @@ export class FilerService implements OnModuleInit {
    * Module initialized callback.
    */
   public onModuleInit(): void {
-    this._watcher = watch(this.options.getProjectPath(), {
-      persistent: true,
-      ignored: ["**/.*", "**/compose.yaml"],
+    this.runWorkflow().catch((reason: string) => {
+      console.error(reason);
     });
+  }
 
-    // Common:
-    this._watcher.on("ready", this._readyListener);
-    this._watcher.on("error", this._errorListener);
-
-    // Files:
-    this._watcher.on("add", this._fileAddedListener);
-    this._watcher.on("change", this._fileChangedListener);
-    this._watcher.on("unlink", this._fileRemovedListener);
-
-    // Directories:
-    this._watcher.on("addDir", this._dirAddedListener);
-    this._watcher.on("unlinkDir", this._dirRemovedListener);
+  /**
+   * Runs async workflow.
+   */
+  public async runWorkflow(): Promise<void> {
+    await this.loadTenants();
+    console.log(this._tenants);
   }
 
   /**
    * Returns tenants list.
    */
-  public getTenants(): string[] {
-    const paths = this.getWatchedPaths();
-    return Object.keys(paths)
-      .filter((val: string) => {
-        return val.split(path.sep).length === 2;
-      })
-      .map((val: string) => {
-        return val.split(path.sep)[1];
-      });
+  public async loadTenants(): Promise<void> {
+    const project = opendirSync(this.options.getProjectPath());
+    for await (const dirent of project) {
+      if (dirent.isDirectory() && dirent.name.indexOf(".") !== 0) {
+        const env = await this.loadEnv(dirent.name);
+        const key = await this.loadKey(dirent.name);
+        const pub = await this.loadPub(dirent.name);
+        const docs = await this.loadDocs(dirent.name);
+        this._tenants.set(dirent.name, {
+          env,
+          key,
+          pub,
+          docs,
+        });
+      }
+    }
   }
 
   /**
-   * Returns an object representing all the paths on the file system
-   * being watched.
+   * Returns the tenant `.env` file content.
    */
-  public getWatchedPaths(): { [directory: string]: string[] } {
-    const result: { [directory: string]: string[] } = {};
-    if (this._watcher) {
-      const base = this.options.getProjectPath();
-      const warched = this._watcher.getWatched();
-      Object.keys(warched).forEach((directory) => {
-        const key = directory.split(base)[1];
-        if (key) {
-          result[`.${key}`] = warched[directory];
-        }
-      });
-    }
-    return result;
+  public async loadEnv(tenant: string): Promise<string> {
+    const file = path.resolve(
+      this.options.getProjectPath(),
+      tenant,
+      this.options.getTenantEnvName(),
+    );
+    return this.loadFile(file);
   }
 
-  private _readyListener = () => {
-    console.log(this.getWatchedPaths());
-    console.log(this.getTenants());
-  };
+  /**
+   * Loads private key from a disk and returns `KeyLike` object.
+   */
+  public async loadKey(tenant: string): Promise<KeyLike> {
+    const file = path.resolve(
+      this.options.getProjectPath(),
+      tenant,
+      this.options.getTenantKeysPath(),
+      this.options.getTenantPrivateKeyName(),
+    );
+    const content = await this.loadFile(file);
+    const key = await importPKCS8(
+      content,
+      this.options.getKeysImportAlg(),
+    );
+    return key;
+  }
 
-  private _errorListener = (error: Error) => {
-    console.error(error);
-  };
+  /**
+   * Loads public key from a disk and returns `KeyLike` object.
+   */
+  public async loadPub(tenant: string): Promise<KeyLike> {
+    const file = path.resolve(
+      this.options.getProjectPath(),
+      tenant,
+      this.options.getTenantKeysPath(),
+      this.options.getTenantPublicKeyName(),
+    );
+    const content = await this.loadFile(file);
+    const key = await importSPKI(
+      content,
+      this.options.getKeysImportAlg(),
+    );
+    return key;
+  }
 
-  private _fileAddedListener = (path: string) => {
-    console.log(`File ${path} has been added.`);
-  };
+  public async loadDocs(
+    tenant: string,
+  ): Promise<{ [dir: string]: string }> {
+    const root = path.resolve(
+      this.options.getProjectPath(),
+      tenant,
+      this.options.getTenantDocumentsPath(),
+    );
+    const docs = await this.loadHdmlFiles(root);
+    return docs;
+  }
 
-  private _fileChangedListener = (path: string) => {
-    console.log(`File ${path} has been changed.`);
-  };
+  public async loadHdmlFiles(
+    dir: string,
+  ): Promise<{ [dir: string]: string }> {
+    let docs: { [dir: string]: string } = {};
+    const directory = opendirSync(dir);
+    for await (const dirent of directory) {
+      if (dirent.isDirectory()) {
+        const sub = await this.loadHdmlFiles(
+          path.resolve(dir, dirent.name),
+        );
+        docs = {
+          ...docs,
+          ...sub,
+        };
+      } else if (
+        dirent.isFile() &&
+        dirent.name.indexOf(
+          `.${this.options.getTenantDocumentsExt()}`,
+        ) > 0
+      ) {
+        const full = path.resolve(dir, dirent.name);
+        const key = full.split(this.options.getProjectPath())[1];
+        const doc = await this.loadFile(full);
+        docs[key] = doc;
+      }
+    }
+    return docs;
+  }
 
-  private _fileRemovedListener = (path: string) => {
-    console.log(`File ${path} has been removed.`);
-  };
-
-  private _dirAddedListener = (path: string) => {
-    console.log(`Directory ${path} has been added.`);
-  };
-
-  private _dirRemovedListener = (path: string) => {
-    console.log(`Directory ${path} has been removed.`);
-  };
+  /**
+   * Loads file from disk and returns its content.
+   */
+  private async loadFile(file: string): Promise<string> {
+    try {
+      accessSync(file, constants.R_OK);
+    } catch (err) {
+      throw new Error(`The ${file} file is not readable.`);
+    }
+    const content = readFileSync(file, "utf8");
+    return Promise.resolve(content);
+  }
 }

@@ -2,8 +2,9 @@ import { Module } from "@nestjs/common";
 import { OptionsService } from "./OptionsService";
 
 @Module({
-  controllers: [],
-  providers: [OptionsService],
+  imports: [],
   exports: [OptionsService],
+  providers: [OptionsService],
+  controllers: [],
 })
 export class OptionsModule {}
