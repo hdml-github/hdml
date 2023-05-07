@@ -114,6 +114,9 @@ export class FilerService implements OnModuleInit {
     return key;
   }
 
+  /**
+   * Load tenant `hdml` documents hash map object.
+   */
   public async loadDocs(
     tenant: string,
   ): Promise<{ [dir: string]: string }> {
@@ -126,6 +129,11 @@ export class FilerService implements OnModuleInit {
     return docs;
   }
 
+  /**
+   * Loads `hdml` files recursively starting from the specified `dir`.
+   * Returns a hash map with the keys equal to a file path and value
+   * equal to a file content.
+   */
   public async loadHdmlFiles(
     dir: string,
   ): Promise<{ [dir: string]: string }> {
