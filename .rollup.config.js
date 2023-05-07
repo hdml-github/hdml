@@ -4,6 +4,8 @@ import commonjs from "@rollup/plugin-commonjs"
 import inject from "@rollup/plugin-inject";
 import json from "@rollup/plugin-json";
 import { nodeResolve as resolve } from "@rollup/plugin-node-resolve";
+import replace from '@rollup/plugin-replace';
+import postcss from 'rollup-plugin-postcss';
 import sourcemaps from "rollup-plugin-sourcemaps";
 import { terser } from "rollup-plugin-terser";
 
@@ -26,9 +28,19 @@ function getInjectedModules() {
 export default {
   input,
   plugins: [
+    replace({
+      preventAssignment: true,
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    }),
     json(),
     resolve({
       jsnext: true,
+    }),
+    postcss({
+      extract: false,
+      modules: true,
+      inject: true,
+      use: "sass",
     }),
     commonjs({
       include: /node_modules/,
@@ -44,6 +56,8 @@ export default {
     name: `@hdml/${name}`,
     file: min,
     sourcemap: true,
-    plugins: [terser()],
+    plugins: [
+      terser(),
+    ],
   }],
 };

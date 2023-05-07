@@ -1,5 +1,5 @@
 {
-  "name": "@hdml/e.g.ui.react",
+  "name": "@hdml/ex-ui-react",
   "version": "0.0.0-alpha.1",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -7,10 +7,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@hdml/elements": "0.0.0-alpha.1"
+    "@hdml/elements": "0.0.0-alpha.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "scripts": {
-    "dev": "clear && npm run compile_esm && npm run compile_bin && ../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open index.html",
+    "dev": "clear && npm run compile_dev && ../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open index.html",
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
     "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
     "compile_asc": "asc \"./src/assembly.as\" --exportRuntime --extension as --target release",
@@ -18,7 +20,7 @@
     "compile_esm": "tsc -b ./tsconfig/esm.json",
     "compile_dts": "tsc -b ./tsconfig/dts.json",
     "compile_bin": "../../node_modules/.bin/rollup --config ../../.rollup.config.js",
-    "compile_dev": "npm run compile_esm && npm run compile_bin",
+    "compile_dev": "npm run compile_esm && cp ./src/components/*.scss ./esm/components && npm run compile_bin",
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_bin && npm run compile_dts",
     "test": "../../node_modules/.bin/wtr --config ../../.web-test.config.js \"src/**/*.test.html\"",
     "test_dbg": "PWDEBUG=console npm run test",

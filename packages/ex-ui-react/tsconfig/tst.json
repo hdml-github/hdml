@@ -1,6 +1,10 @@
 {
   "extends": "../../../tsconfig/tst.json",
-  "include": ["../src/**/*.ts"],
+  "include": [
+    "../src/declarations/*.d.ts",
+    "../src/**/*.ts",
+    "../src/**/*.tsx"
+  ],
   "compilerOptions": {
     "rootDir": "../src",
     "baseUrl": "../src",

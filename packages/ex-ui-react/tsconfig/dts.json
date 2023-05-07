@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig/dts.json",
+  "include": [
+    "../src/declarations/*.d.ts",
+    "../src/**/*.ts",
+    "../src/**/*.tsx"
+  ],
+  "compilerOptions": {
+    "rootDir": "../src",
+    "baseUrl": "../src",
+    "outDir": "../dts",
+    "declarationDir": "../dts",
+    "jsx": "react"
+  }
+}

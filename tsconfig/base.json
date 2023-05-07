@@ -1,5 +1,8 @@
 {
-  "include": ["../packages/**/src/**/*.ts"],
+  "include": [
+    "../packages/**/src/**/*.ts",
+    "../packages/**/src/**/*.tsx"
+  ],
   "exclude": ["../packages/**/src/**/*.test.ts"],
   "compilerOptions": {
     "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
