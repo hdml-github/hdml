@@ -5,6 +5,7 @@ declare global {
     interface IntrinsicElements {
       "hdml-io": HdmlIoProps;
       "hdml-model": HdmlModelProps;
+      "hdml-table": HdmlTableProps;
     }
   }
 }
@@ -26,4 +27,14 @@ interface HdmlModelProps
     HTMLElement
   > {
   name: string;
+}
+
+interface HdmlTableProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLElement>,
+    HTMLElement
+  > {
+  name: string;
+  type: string;
+  source: string;
 }
