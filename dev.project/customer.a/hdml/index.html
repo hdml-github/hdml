@@ -1,0 +1,216 @@
+<hdml-model
+  name="model">
+  <hdml-table
+    name="tables"
+    type="table"
+    source="`tenant_postgres`.`information_schema`.`tables`">
+    <hdml-field
+      name="catalog"
+      origin="table_catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema"
+      origin="table_schema">
+    </hdml-field>
+    <hdml-field
+      name="table"
+      origin="table_name">
+    </hdml-field>
+    <hdml-field
+      name="full"
+      clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)">
+    </hdml-field>
+    <hdml-field
+      name="hash"
+      clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"
+      type="binary">
+    </hdml-field>
+    <hdml-field
+      name="type"
+      origin="table_type">
+    </hdml-field>
+  </hdml-table>
+
+  <hdml-table
+    name="columns"
+    type="query"
+    source="select * from `tenant_postgres`.`information_schema`.`columns`">
+    <hdml-field
+      name="catalog"
+      origin="table_catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema"
+      origin="table_schema">
+    </hdml-field>
+    <hdml-field
+      name="table"
+      origin="table_name">
+    </hdml-field>
+    <hdml-field
+      name="column"
+      origin="column_name">
+    </hdml-field>
+    <hdml-field
+      name="position"
+      origin="ordinal_position"
+      type="int-32">
+    </hdml-field>
+    <hdml-field
+      name="default"
+      origin="column_default">
+    </hdml-field>
+    <hdml-field
+      name="nullable"
+      origin="is_nullable">
+    </hdml-field>
+    <hdml-field
+      name="type"
+      origin="data_type">
+    </hdml-field>
+  </hdml-table>
+
+  <hdml-join
+    type="inner"
+    left="tables"
+    right="columns">
+    <hdml-connective
+      operator="and">
+      <hdml-filter
+        type="keys"
+        left="catalog"
+        right="catalog">
+      </hdml-filter>
+      <hdml-filter
+        type="keys"
+        left="schema"
+        right="schema">
+      </hdml-filter>
+      <hdml-filter
+        type="keys"
+        left="table"
+        right="table">
+      </hdml-filter>            
+      <hdml-connective
+        operator="or">
+        <hdml-filter
+          type="expr"
+          clause="`columns`.`table` = 'applicable_roles'">
+        </hdml-filter>
+        <hdml-filter
+          type="expr"
+          clause="`columns`.`table` = 'tables'">
+        </hdml-filter>
+      </hdml-connective>
+    </hdml-connective>
+  </hdml-join>
+</hdml-model>
+
+<hdml-frame
+  name="frame"
+  source="?hdml-model=model"
+  offset="0"
+  limit="1000">
+  <hdml-field
+    name="catalog"
+    origin="columns_catalog">
+  </hdml-field>
+  <hdml-field
+    name="schema"
+    origin="columns_schema">
+  </hdml-field>
+  <hdml-field
+    name="table"
+    origin="columns_table">
+  </hdml-field>
+  <hdml-field
+    name="column"
+    origin="columns_column">
+  </hdml-field>
+  <hdml-field
+    name="count"
+    origin="columns_column"
+    agg="count">
+  </hdml-field>
+
+  <hdml-group-by>
+    <hdml-field
+      name="catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema">
+    </hdml-field>
+    <hdml-field
+      name="table">
+    </hdml-field>
+    <hdml-field
+      name="column">
+    </hdml-field>
+  </hdml-group-by>
+</hdml-frame>
+
+<hdml-frame
+  name="query"
+  source="?hdml-frame=frame">
+  <div>
+    <hdml-field
+      name="catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema">
+    </hdml-field>
+    <hdml-field
+      name="table">
+    </hdml-field>
+    <hdml-field
+      name="sum"
+      origin="count"
+      agg="sum">
+    </hdml-field>
+  </div>
+
+  <div>
+    <hdml-filter-by>
+      <hdml-connective
+        operator="and">
+        <hdml-filter
+          type="expr"
+          clause="`catalog` = 'tenant_postgres'">
+        </hdml-filter>
+        <hdml-filter
+          type="expr"
+          clause="`schema` = 'information_schema'">
+        </hdml-filter>
+      </hdml-connective>
+    </hdml-filter-by>
+  </div>
+
+  <div>
+    <hdml-group-by>
+      <hdml-field
+        name="catalog">
+      </hdml-field>
+      <hdml-field
+        name="schema">
+      </hdml-field>
+      <hdml-field
+        name="table">
+      </hdml-field>
+    </hdml-group-by>
+  </div>
+
+  <div>
+    <hdml-sort-by>
+      <hdml-field
+        name="catalog">
+      </hdml-field>
+      <hdml-field
+        name="schema">
+      </hdml-field>
+      <hdml-field
+        name="table"
+        asc="false">
+      </hdml-field>
+    </hdml-sort-by>
+  </div>
+</hdml-frame>

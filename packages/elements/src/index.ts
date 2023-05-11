@@ -32,7 +32,7 @@ import {
   getGroupByTag,
   getSortByTag,
 } from "./helpers/elementsRegister";
-import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
+// import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
 import { IoElement } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
@@ -50,7 +50,7 @@ export {
   lit,
   // utils
   getUid,
-  runAttrTestSuite,
+  // runAttrTestSuite,
   defineDefaults,
   // define tag name
   defineIo,

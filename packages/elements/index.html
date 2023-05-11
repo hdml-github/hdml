@@ -4,7 +4,7 @@
     <script src="/bin/elements.min.js"></script>
     <script>
       const hdml = window['@hdml/elements'];
-      hdml.defineDefaults();
+      (async () => {await hdml.defineDefaults();})();
     </script>
   </head>
     <body>
@@ -231,5 +231,10 @@
           </hdml-sort-by>
         </div>
       </hdml-frame>
+
+      <script>
+        const io = document.querySelector("hdml-io");
+        console.log(io.json);
+      </script>
     </body>
 </html>

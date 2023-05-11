@@ -1,0 +1,76 @@
+<data-frame
+  name="profitable_products"
+  host="data.io"
+  source="frame=product_profit"
+  cache-control="max-age=600">
+
+  <data-fields>
+    <data-field origin="code"/>
+    <data-field origin="name"/>
+    <data-field origin="date"/>
+    <data-field origin="total_quantity"/>
+    <data-field origin="total_price"/>
+    <data-field origin="total_cost"/>
+    <data-field origin="profit"/>
+  </data-fields>
+
+  <filter-by>
+    <logical-or>
+      <search-expr
+        clause='"total_price" > "total_cost"' />
+      <search-filter
+        field="profit"
+        more-than='0, "a", cast("2023.01.01" as date)'/>
+    </logical-or>
+  </filter-by>
+</data-frame>
+
+<data-frame
+  name="product_profit"
+  host="data.io"
+  source="/models/sales.html?model=sales"
+  limit="50000">
+
+  <data-fields>
+    <data-field
+      name="code"
+      origin="codes.code"/>
+    <data-field
+      name="product"
+      origin="products.name"/>
+    <data-field
+      name="date"
+      type="date"
+      unit="second"
+      clause="date_trunc('day', sales.date)"/>
+    <data-field
+      name="total_quantity"
+      origin="orders.quantity"
+      agg="sum"/>
+    <data-field
+      name="total_price"
+      origin="orders.price"
+      agg="sum"/>
+    <data-field
+      name="total_cost"
+      origin="orders.cost"
+      agg="sum"/>
+    <data-field
+      name="profit"
+      type="float-32"
+      clause="total_price - total_cost"/>
+  </data-fields>
+
+  <group-by>
+    <data-field name="product"/>
+    <data-field name="date"/>
+  </group-by>
+
+  <split-by>
+    <data-field name="date"/>
+  </split-by>
+
+  <sort-by>
+    <data-field name="code" desc/>
+  </sort-by>
+</data-frame>

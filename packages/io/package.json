@@ -7,6 +7,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@hdml/elements": "0.0.0-alpha.1",
     "@hdml/orchestrator": "0.0.0-alpha.1",
     "@hdml/schema": "0.0.0-alpha.1",
     "@nestjs/common": "^9.0.0",
@@ -15,9 +16,11 @@
     "apache-arrow": "^11.0.0",
     "chokidar": "^3.5.3",
     "commander": "^10.0.1",
+    "generic-pool": "^3.9.0",
     "jose": "^4.14.4",
     "json-bigint": "^1.0.0",
     "needle": "^3.2.0",
+    "puppeteer": "^20.1.2",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
   },

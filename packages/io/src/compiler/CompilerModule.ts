@@ -1,8 +1,9 @@
 import { Module } from "@nestjs/common";
+import { OptionsModule } from "../options/OptionsModule";
 import { CompilerService } from "./CompilerService";
 
 @Module({
-  imports: [],
+  imports: [OptionsModule],
   exports: [CompilerService],
   providers: [CompilerService],
   controllers: [],

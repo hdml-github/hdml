@@ -8,7 +8,12 @@
 import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
-import { Document, DocumentData } from "@hdml/schema";
+import {
+  Document,
+  DocumentData,
+  ModelData,
+  FrameData,
+} from "@hdml/schema";
 
 import "../events";
 import {
@@ -288,6 +293,8 @@ export class IoElement extends UnifiedElement {
     this._client && this._client.close();
     this._updateModel && this._updateModel.cancel();
     this._updateFrame && this._updateFrame.cancel();
+    this._updateModel = null;
+    this._updateFrame = null;
     this._unwatchModels();
     this._unwatchFrames();
     super.disconnectedCallback();
@@ -298,6 +305,59 @@ export class IoElement extends UnifiedElement {
    */
   public render(): TemplateResult<1> {
     return html`<!-- IoElement -->`;
+  }
+
+  /**
+   * Returns io `JSON`-representation.
+   */
+  public get json(): {
+    models: {
+      [name: string]: ModelData;
+    };
+    frames: {
+      [name: string]: FrameData;
+    };
+  } {
+    const models: { [name: string]: ModelData } = {};
+    const frames: { [name: string]: FrameData } = {};
+
+    // models
+    this._models.forEach((model) => {
+      const data = model.toJSON();
+      models[data.name] = data;
+    });
+
+    // frames
+    this._frames.forEach((frame) => {
+      let source = frame.source;
+      let _frame = frame.toJSON();
+      const name = _frame.name;
+      const body = _frame;
+
+      while (source && source.indexOf("?") === 0) {
+        if (source.indexOf("?hdml-model=") === 0) {
+          source = null;
+        } else if (source.indexOf("?hdml-frame=") === 0) {
+          const [, frameName] = source.split("?hdml-frame=");
+          let linked = false;
+          this._frames.forEach((frame) => {
+            if (frame.name === frameName) {
+              linked = true;
+              source = frame.source;
+              _frame.parent = frame.toJSON();
+              _frame = _frame.parent;
+            }
+          });
+          if (!linked) {
+            throw new Error(`Invalid \`source\` link: ${source}`);
+          }
+        } else {
+          throw new Error(`Invalid \`source\` value: ${source}`);
+        }
+      }
+      frames[name] = body;
+    });
+    return { models, frames };
   }
 
   /**
@@ -432,7 +492,7 @@ export class IoElement extends UnifiedElement {
    * Attaches `hdml-model` element to the models map.
    */
   private _attachModel(model: ModelElement) {
-    if (!this._models.has(model.uid)) {
+    if (model.uid && !this._models.has(model.uid)) {
       this._models.set(model.uid, model);
       model.addEventListener(
         "hdml-model:changed",
@@ -446,7 +506,7 @@ export class IoElement extends UnifiedElement {
    * Attaches `hdml-frame` element to the frames map.
    */
   private _attachFrame(frame: FrameElement) {
-    if (!this._frames.has(frame.uid)) {
+    if (frame.uid && !this._frames.has(frame.uid)) {
       this._frames.set(frame.uid, frame);
       frame.addEventListener(
         "hdml-frame:changed",
@@ -540,15 +600,20 @@ export class IoElement extends UnifiedElement {
             source = null;
           } else if (source.indexOf("?hdml-frame=") === 0) {
             const [, frameName] = source.split("?hdml-frame=");
+            let linked = false;
             this._frames.forEach((frame) => {
               if (frame.name === frameName) {
+                linked = true;
                 source = frame.source;
                 _frame.parent = frame.toJSON();
                 _frame = _frame.parent;
               }
             });
+            if (!linked) {
+              throw new Error(`Invalid \`source\` link: ${source}`);
+            }
           } else {
-            throw new Error("Invalid `source` value.");
+            throw new Error(`Invalid \`source\` value: ${source}`);
           }
         }
         this._documents.set(frame.uid, new Document(data));
