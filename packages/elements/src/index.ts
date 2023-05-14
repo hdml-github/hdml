@@ -34,7 +34,7 @@ import {
 } from "./helpers/elementsRegister";
 // import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
-import { IoElement } from "./components/IoElement";
+import { IoElement, IoJson } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
 import { TableElement } from "./components/TableElement";
 import { FieldElement } from "./components/FieldElement";
@@ -78,6 +78,7 @@ export {
   getSortByTag,
   // elements
   UnifiedElement,
+  IoJson,
   IoElement,
   ModelElement,
   TableElement,

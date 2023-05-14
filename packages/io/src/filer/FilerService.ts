@@ -8,6 +8,8 @@ import {
 import * as path from "path";
 import { KeyLike, importSPKI, importPKCS8 } from "jose";
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { ModelData, FrameData } from "@hdml/schema";
+import { IoJson } from "@hdml/elements";
 import { OptionsService } from "../options/OptionsService";
 import { CompilerService } from "../compiler/CompilerService";
 
@@ -15,8 +17,14 @@ type Tenant = {
   env: string;
   key: KeyLike;
   pub: KeyLike;
-  docs: {
-    [dir: string]: unknown;
+  fragments: {
+    [path: string]: IoJson;
+  };
+  documents: {
+    [path: string]: {
+      model?: ModelData;
+      frame?: FrameData;
+    };
   };
 };
 
@@ -79,15 +87,19 @@ export class FilerService implements OnModuleInit {
     const project = opendirSync(this.options.getProjectPath());
     for await (const dirent of project) {
       if (dirent.isDirectory() && dirent.name.indexOf(".") !== 0) {
-        const env = await this.loadEnv(dirent.name);
-        const key = await this.loadKey(dirent.name);
-        const pub = await this.loadPub(dirent.name);
-        const docs = await this.loadDocs(dirent.name);
-        this._tenants.set(dirent.name, {
+        const tenant = dirent.name;
+        const env = await this.loadEnv(tenant);
+        const key = await this.loadKey(tenant);
+        const pub = await this.loadPub(tenant);
+        const fragments = await this.loadFragments(tenant);
+        const documents = this.compiler.complete(fragments);
+        console.log(tenant, documents);
+        this._tenants.set(tenant, {
           env,
           key,
           pub,
-          docs,
+          fragments,
+          documents,
         });
       }
     }
@@ -142,11 +154,11 @@ export class FilerService implements OnModuleInit {
   }
 
   /**
-   * Load tenant `hdml` documents hash map object.
+   * Load tenant `hdml` fragments hash map object.
    */
-  public async loadDocs(
+  public async loadFragments(
     tenant: string,
-  ): Promise<{ [dir: string]: unknown }> {
+  ): Promise<{ [dir: string]: IoJson }> {
     const root = path.resolve(
       this.options.getProjectPath(),
       tenant,
@@ -173,10 +185,10 @@ export class FilerService implements OnModuleInit {
     tenant: string,
     directory: string,
     files: string[],
-  ): Promise<{ [dir: string]: unknown }> {
-    const docs: { [dir: string]: unknown } = {};
+  ): Promise<{ [dir: string]: IoJson }> {
+    const docs: { [dir: string]: IoJson } = {};
     const promises = files.map((file) => {
-      return new Promise<unknown>((resolve, reject) => {
+      return new Promise<IoJson>((resolve, reject) => {
         readFile(file, { encoding: "utf8" }, (err, hdml) => {
           if (err) {
             reject(err);
@@ -186,7 +198,7 @@ export class FilerService implements OnModuleInit {
         });
       });
     });
-    const datas = await Promise.all<unknown>(promises);
+    const datas = await Promise.all<IoJson>(promises);
     files.forEach((file, i) => {
       const key = file.split(
         path.resolve(
@@ -196,7 +208,6 @@ export class FilerService implements OnModuleInit {
         ),
       )[1];
       docs[key] = datas[i];
-      console.log(tenant, key, datas[i]);
     });
     return docs;
   }

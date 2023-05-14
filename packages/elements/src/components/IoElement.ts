@@ -32,6 +32,18 @@ import { FrameEventDetail, FrameElement } from "./FrameElement";
 import { Client } from "../services/Client";
 
 /**
+ * An `IoElement` `json` representation.
+ */
+export type IoJson = {
+  models: {
+    [name: string]: ModelData;
+  };
+  frames: {
+    [name: string]: FrameData;
+  };
+};
+
+/**
  * The `IoElement` class.
  */
 export class IoElement extends UnifiedElement {
@@ -308,16 +320,9 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Returns io `JSON`-representation.
+   * Returns element `JSON`-representation.
    */
-  public get json(): {
-    models: {
-      [name: string]: ModelData;
-    };
-    frames: {
-      [name: string]: FrameData;
-    };
-  } {
+  public toJSON(): IoJson {
     const models: { [name: string]: ModelData } = {};
     const frames: { [name: string]: FrameData } = {};
 
