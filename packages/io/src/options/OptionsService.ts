@@ -80,4 +80,32 @@ export class OptionsService implements OnModuleInit {
   public getKeysImportAlg(): string {
     return "ES256";
   }
+
+  /**
+   * Returns compiler min pages pool size.
+   */
+  public getCompilerPoolMin(): number {
+    return 2;
+  }
+
+  /**
+   * Returns compiler max pages pool size.
+   */
+  public getCompilerPoolMax(): number {
+    return 10;
+  }
+
+  /**
+   * Returns compiler pool max waiting clients number.
+   */
+  public getCompilerPoolQueueSize(): number {
+    return 50;
+  }
+
+  /**
+   * Returns max frame depth to break compiler loop.
+   */
+  public getCompilerFramesDepth(): number {
+    return 50;
+  }
 }

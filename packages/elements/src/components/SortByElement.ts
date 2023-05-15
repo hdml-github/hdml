@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { FieldData } from "@hdml/schema";
 
-import "../events";
 import {
   getFieldTag,
   getFrameTag,

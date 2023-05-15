@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { FieldData, TableData, TableType } from "@hdml/schema";
 
-import "../events";
 import {
   TABLE_NAME_REGEXP,
   TABLE_TYPE_REGEXP,

@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { JoinData, JoinType, FilterOperator } from "@hdml/schema";
 
-import "../events";
 import {
   TABLE_NAME_REGEXP,
   JOIN_TYPE_REGEXP,

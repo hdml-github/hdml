@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { FilterType, FilterName, FilterData } from "@hdml/schema";
 
-import "../events";
 import {
   FIELD_NAME_REGEXP,
   FILTER_TYPE_REGEXP,

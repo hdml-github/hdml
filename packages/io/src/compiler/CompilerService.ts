@@ -1,14 +1,22 @@
 import * as pool from "generic-pool";
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoElement, IoJson } from "@hdml/elements";
+import { OptionsService } from "../options/OptionsService";
 
 /**
  * Compiler service.
  */
 @Injectable()
 export class CompilerService {
+  /**
+   * Service logger.
+   */
+  private readonly _logger = new Logger(CompilerService.name, {
+    timestamp: true,
+  });
+
   /**
    * Puppeteer browser instance.
    */
@@ -18,6 +26,11 @@ export class CompilerService {
    * Puppeteer pages pool instance.
    */
   private _pool: null | pool.Pool<Page> = null;
+
+  /**
+   * Class constructor.
+   */
+  constructor(private readonly options: OptionsService) {}
 
   /**
    * Bootstrap service by running headless browser and preparing pages
@@ -58,13 +71,14 @@ export class CompilerService {
         },
       },
       {
-        min: 2,
-        max: 10,
-        maxWaitingClients: 50,
+        min: this.options.getCompilerPoolMin(),
+        max: this.options.getCompilerPoolMax(),
+        maxWaitingClients: this.options.getCompilerPoolQueueSize(),
         testOnBorrow: false,
         evictionRunIntervalMillis: 0,
       },
     );
+    this._logger.log("The browser and the pages pool initialized");
   }
 
   /**
@@ -162,9 +176,11 @@ export class CompilerService {
     current: string,
     source: string,
   ): ModelData {
+    let cnt = 0;
     let src: null | string = source;
     let curr = current;
-    while (src) {
+    while (src && cnt < this.options.getCompilerFramesDepth()) {
+      cnt++;
       this.assertSource(fragments, curr, src);
       const index = src.indexOf("?hdml-frame=");
       if (index >= 0) {
@@ -178,7 +194,9 @@ export class CompilerService {
         return fragments[uri]?.models[name];
       }
     }
-    throw new Error("Lookup model failed.");
+    throw new Error(
+      `Lookup model failed for \`${current}\` source \`${source}\``,
+    );
   }
 
   /**
@@ -232,7 +250,7 @@ export class CompilerService {
     script: string,
   ): Promise<void> {
     page.on("console", (msg) => {
-      console.log(`browser: ${msg.text()}`);
+      this._logger.debug(`Page message: ${msg.text()}`);
     });
     await page.addScriptTag({
       content: this.getScript(script),

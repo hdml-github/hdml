@@ -12,7 +12,6 @@ import {
   FilterData,
 } from "@hdml/schema";
 
-import "../events";
 import { CONNECTIVE_OP_REGEXP } from "../helpers/constants";
 import {
   getJoinTag,

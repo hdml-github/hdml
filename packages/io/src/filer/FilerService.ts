@@ -1,26 +1,33 @@
-import {
-  statSync,
-  opendirSync,
-  readdirSync,
-  readFileSync,
-  readFile,
-} from "fs";
+import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
+import * as dotenv from "dotenv";
 import { KeyLike, importSPKI, importPKCS8 } from "jose";
-import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoJson } from "@hdml/elements";
 import { OptionsService } from "../options/OptionsService";
 import { CompilerService } from "../compiler/CompilerService";
 
-type Tenant = {
-  env: string;
+/**
+ * List of the standard environment variables keys.
+ */
+export type EnvKey = "HDML_TENANT_NAME";
+
+/**
+ * Environment variables table.
+ */
+export type EnvTable = {
+  [key in EnvKey]: string;
+};
+
+/**
+ * Tenant files data.
+ */
+export type TenantFiles = {
+  env: EnvTable;
   key: KeyLike;
   pub: KeyLike;
-  fragments: {
-    [path: string]: IoJson;
-  };
-  documents: {
+  docs: {
     [path: string]: {
       model?: ModelData;
       frame?: FrameData;
@@ -34,14 +41,21 @@ type Tenant = {
 @Injectable()
 export class FilerService implements OnModuleInit {
   /**
+   * Service logger.
+   */
+  private readonly _logger = new Logger(FilerService.name, {
+    timestamp: true,
+  });
+
+  /**
    * `@hdml/elements` bundle content.
    */
   private _script: null | string = null;
 
   /**
-   * Tenants data.
+   * Tenants files map.
    */
-  private _tenants: Map<string, Tenant> = new Map();
+  private _tenants: Map<string, TenantFiles> = new Map();
 
   /**
    * Class constructor.
@@ -55,15 +69,76 @@ export class FilerService implements OnModuleInit {
    * Module initialized callback.
    */
   public onModuleInit(): void {
-    this.runWorkflow().catch((reason: string) => {
-      console.error(reason);
-    });
+    this._logger.log("Running compilation workflow");
+    this.runWorkflow().catch(this._logger.error);
+  }
+
+  /**
+   * Returns an array of available tenants.
+   */
+  public getTenantsList(): string[] {
+    return Array.from(this._tenants.keys());
+  }
+
+  /**
+   * Returns environments table of the specified `tenant` if exists,
+   * or `null` otherwise.
+   */
+  public getEnvTable(tenant: string): null | EnvTable {
+    if (this._tenants.has(tenant)) {
+      return (<TenantFiles>this._tenants.get(tenant)).env;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Returns public key of the specified `tenant` if exists, or `null`
+   * otherwise.
+   */
+  public getPublicKey(tenant: string): null | KeyLike {
+    if (this._tenants.has(tenant)) {
+      return (<TenantFiles>this._tenants.get(tenant)).pub;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Returns private key of the specified `tenant` if exists, or
+   * `null` otherwise.
+   */
+  public getPrivateKey(tenant: string): null | KeyLike {
+    if (this._tenants.has(tenant)) {
+      return (<TenantFiles>this._tenants.get(tenant)).key;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Returns `hdml` document for the specified `tenant` by the
+   * specified `uri`, or `null` otherwise.
+   */
+  public getHdmlDocument(
+    tenant: string,
+    uri: string,
+  ): null | {
+    model?: ModelData;
+    frame?: FrameData;
+  } {
+    if (this._tenants.has(tenant)) {
+      const doc = (<TenantFiles>this._tenants.get(tenant)).docs[uri];
+      return doc || null;
+    } else {
+      return null;
+    }
   }
 
   /**
    * Runs async workflow.
    */
-  public async runWorkflow(): Promise<void> {
+  private async runWorkflow(): Promise<void> {
     this._script = await this.loadFile(
       path.resolve(
         __dirname,
@@ -78,28 +153,38 @@ export class FilerService implements OnModuleInit {
     );
     await this.compiler.bootstrap(this._script);
     await this.loadTenants();
+    this._logger.log("Tenants initialized");
   }
 
   /**
-   * Returns tenants list.
+   * Returns tenants map.
    */
-  public async loadTenants(): Promise<void> {
-    const project = opendirSync(this.options.getProjectPath());
+  private async loadTenants(): Promise<void> {
+    const project = await new Promise<Dir>((resolve, reject) => {
+      opendir(this.options.getProjectPath(), (err, dir) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(dir);
+        }
+      });
+    });
     for await (const dirent of project) {
       if (dirent.isDirectory() && dirent.name.indexOf(".") !== 0) {
         const tenant = dirent.name;
-        const env = await this.loadEnv(tenant);
+        const env = dotenv.parse<EnvTable>(
+          await this.loadEnv(tenant),
+        );
         const key = await this.loadKey(tenant);
         const pub = await this.loadPub(tenant);
-        const fragments = await this.loadFragments(tenant);
-        const documents = this.compiler.complete(fragments);
-        console.log(tenant, documents);
+        const docs = this.compiler.complete(
+          await this.loadFragments(tenant),
+        );
         this._tenants.set(tenant, {
           env,
           key,
           pub,
-          fragments,
-          documents,
+          docs,
         });
       }
     }
@@ -108,7 +193,7 @@ export class FilerService implements OnModuleInit {
   /**
    * Returns the tenant `.env` file content.
    */
-  public async loadEnv(tenant: string): Promise<string> {
+  private async loadEnv(tenant: string): Promise<string> {
     const file = path.resolve(
       this.options.getProjectPath(),
       tenant,
@@ -120,7 +205,7 @@ export class FilerService implements OnModuleInit {
   /**
    * Loads private key from a disk and returns `KeyLike` object.
    */
-  public async loadKey(tenant: string): Promise<KeyLike> {
+  private async loadKey(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
       this.options.getProjectPath(),
       tenant,
@@ -138,7 +223,7 @@ export class FilerService implements OnModuleInit {
   /**
    * Loads public key from a disk and returns `KeyLike` object.
    */
-  public async loadPub(tenant: string): Promise<KeyLike> {
+  private async loadPub(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
       this.options.getProjectPath(),
       tenant,
@@ -156,7 +241,7 @@ export class FilerService implements OnModuleInit {
   /**
    * Load tenant `hdml` fragments hash map object.
    */
-  public async loadFragments(
+  private async loadFragments(
     tenant: string,
   ): Promise<{ [dir: string]: IoJson }> {
     const root = path.resolve(
@@ -164,7 +249,7 @@ export class FilerService implements OnModuleInit {
       tenant,
       this.options.getTenantDocumentsPath(),
     );
-    const files = this.getFilesList(root).filter(
+    const files = (await this.getFilesList(root)).filter(
       (file) =>
         file.indexOf(`.${this.options.getTenantDocumentsExt()}`) > 0,
     );
@@ -181,7 +266,7 @@ export class FilerService implements OnModuleInit {
    * Returns a hash map with the keys equal to a file path and value
    * equal to a file content.
    */
-  public async loadHdmls(
+  private async loadHdmls(
     tenant: string,
     directory: string,
     files: string[],
@@ -216,54 +301,83 @@ export class FilerService implements OnModuleInit {
    * Loads file from disk and returns its content.
    */
   private async loadFile(file: string): Promise<string> {
-    if (!this.isFileExist(file)) {
+    if (!(await this.isFileExist(file))) {
       throw new Error(`The ${file} file is not readable.`);
     } else {
-      const content = readFileSync(file, "utf8");
-      return Promise.resolve(content);
+      return new Promise((resolve, reject) => {
+        readFile(file, { encoding: "utf8" }, (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
     }
   }
 
   /**
-   * Recursive find all files in specified path.
+   * Recursive find all files in specified `directory`.
    */
-  public getFilesList(dirName: string): string[] {
-    let files: string[] = [];
-    const list = readdirSync(dirName);
-    list.forEach((item) => {
-      item = path.resolve(dirName, item);
-      if (this.isDirExist(item)) {
-        files = files.concat(this.getFilesList(item));
-      } else if (this.isFileExist(item)) {
-        files.push(item);
-      }
+  public async getFilesList(directory: string): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      readdir(directory, (err, paths) => {
+        if (err) {
+          reject(err);
+        } else {
+          let files: string[] = [];
+          const promises: Promise<string[]>[] = paths.map(
+            async (_path) => {
+              _path = path.resolve(directory, _path);
+              if (await this.isDirExist(_path)) {
+                return await this.getFilesList(_path);
+              } else if (await this.isFileExist(_path)) {
+                return [_path];
+              } else {
+                throw new Error(`Invalid path type: ${_path}`);
+              }
+            },
+          );
+          Promise.all(promises)
+            .then((pathsArray) => {
+              files = files.concat(...pathsArray);
+              resolve(files);
+            })
+            .catch((reason) => {
+              reject(reason);
+            });
+        }
+      });
     });
-    return files;
   }
 
   /**
-   * Determine is specified directory exist or not.
+   * Determine is specified `directory` exist or not.
    */
-  public isDirExist(dirName: string): boolean {
-    let exist;
-    try {
-      exist = statSync(dirName).isDirectory();
-    } catch (err) {
-      exist = false;
-    }
-    return exist;
+  public async isDirExist(directory: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      stat(directory, (err, stats) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(stats.isDirectory());
+        }
+      });
+    });
   }
 
   /**
-   * Determine is specified file exist or not.
+   * Determine is specified `file` exist or not.
    */
-  public isFileExist(fileName: string): boolean {
-    let exist;
-    try {
-      exist = statSync(fileName).isFile();
-    } catch (err) {
-      exist = false;
-    }
-    return exist;
+  public async isFileExist(file: string): Promise<boolean> {
+    return new Promise((resolve) => {
+      stat(file, (err, stats) => {
+        if (err) {
+          resolve(false);
+        } else {
+          resolve(stats.isFile());
+        }
+      });
+    });
   }
 }

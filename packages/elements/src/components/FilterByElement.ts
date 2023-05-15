@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { FilterClauseData, FilterOperator } from "@hdml/schema";
 
-import "../events";
 import {
   getFrameTag,
   getConnectiveTag,

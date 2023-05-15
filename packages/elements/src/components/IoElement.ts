@@ -15,7 +15,6 @@ import {
   FrameData,
 } from "@hdml/schema";
 
-import "../events";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,

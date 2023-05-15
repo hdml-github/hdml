@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { FieldData, FrameData } from "@hdml/schema";
 
-import "../events";
 import {
   FRAME_NAME_REGEXP,
   FRAME_SOURCE_REGEXP,

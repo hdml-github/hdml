@@ -8,7 +8,6 @@
 import { html, TemplateResult } from "lit";
 import { ModelData, TableData, JoinData } from "@hdml/schema";
 
-import "../events";
 import { MODEL_NAME_REGEXP } from "../helpers/constants";
 import { getTableTag, getJoinTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";

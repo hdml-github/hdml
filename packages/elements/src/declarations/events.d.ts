@@ -5,16 +5,16 @@
  * @license Apache-2.0
  */
 
-import { ModelEventDetail } from "./components/ModelElement";
-import { TableEventDetail } from "./components/TableElement";
-import { FieldEventDetail } from "./components/FieldElement";
-import { JoinEventDetail } from "./components/JoinElement";
-import { ConnEventDetail } from "./components/ConnectiveElement";
-import { FilterEventDetail } from "./components/FilterElement";
-import { FrameEventDetail } from "./components/FrameElement";
-import { FilterByEventDetail } from "./components/FilterByElement";
-import { GroupByEventDetail } from "./components/GroupByElement";
-import { SortByEventDetail } from "./components/SortByElement";
+import { ModelEventDetail } from "../components/ModelElement";
+import { TableEventDetail } from "../components/TableElement";
+import { FieldEventDetail } from "../components/FieldElement";
+import { JoinEventDetail } from "../components/JoinElement";
+import { ConnEventDetail } from "../components/ConnectiveElement";
+import { FilterEventDetail } from "../components/FilterElement";
+import { FrameEventDetail } from "../components/FrameElement";
+import { FilterByEventDetail } from "../components/FilterByElement";
+import { GroupByEventDetail } from "../components/GroupByElement";
+import { SortByEventDetail } from "../components/SortByElement";
 
 declare global {
   interface HTMLElementEventMap {
