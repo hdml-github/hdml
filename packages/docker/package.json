@@ -1,0 +1,29 @@
+{
+  "name": "@hdml/docker",
+  "version": "0.0.0-alpha.1",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "dependencies": {},
+  "scripts": {
+    "lint": "echo \"ok\"",
+    "docs": "echo \"ok\"",
+    "compile_asc": "echo \"ok\"",
+    "compile_cjs": "echo \"ok\"",
+    "compile_esm": "echo \"ok\"",
+    "compile_dts": "echo \"ok\"",
+    "compile_bin": "echo \"ok\"",
+    "compile_dev": "echo \"ok\"",
+    "compile_all": "echo \"ok\"",
+    "test": "echo \"ok\"",
+    "test_dbg": "echo \"ok\"",
+    "clear": "docker rmi -f $(docker images --filter \"dangling=true\" -q --no-trunc)",
+    "cleanup": "docker system prune -a -f",
+    "build_standalone": "docker build . -f ./standalone/Dockerfile -t hdml/standalone",
+    "debug_standalone": "docker run --network host -it hdml/standalone bash",
+    "exec_standalone": "",
+    "build": "npm run build_standalone"
+  }
+}
