@@ -108,4 +108,46 @@ export class OptionsService implements OnModuleInit {
   public getCompilerFramesDepth(): number {
     return 50;
   }
+
+  /**
+   * Returns queue host.
+   */
+  public getQueueHost(): string {
+    return "localhost";
+  }
+
+  /**
+   * Returns queue port.
+   */
+  public getQueuePort(): number {
+    return 6650;
+  }
+
+  /**
+   * Returns queue REST API port.
+   */
+  public getQueueRestPort(): number {
+    return 9090;
+  }
+
+  /**
+   * Returns queue tenant name.
+   */
+  public getQueueTenant(): string {
+    return "public";
+  }
+
+  /**
+   * Returns queue namespace.
+   */
+  public getQueueNamespace(): string {
+    return "default";
+  }
+
+  /**
+   * Returns queue cache timeout in ms.
+   */
+  public getQueueCacheTimeout(): number {
+    return 10000;
+  }
 }

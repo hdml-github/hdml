@@ -15,12 +15,12 @@ import { IoService } from "./IoService";
 
 @Controller()
 export class IoController {
-  constructor(private readonly queryService: IoService) {}
+  constructor(private readonly ioService: IoService) {}
 
   @Get()
   @Header("Access-Control-Allow-Origin", "*")
-  test(@Req() req: Request): string {
-    return JSON.stringify("Get World!");
+  async test(@Req() req: Request): Promise<string> {
+    return await this.ioService.test();
   }
 
   @Post()

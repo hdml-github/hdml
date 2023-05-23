@@ -70,7 +70,9 @@ export class FilerService implements OnModuleInit {
    */
   public onModuleInit(): void {
     this._logger.log("Running compilation workflow");
-    this.runWorkflow().catch(this._logger.error);
+    this.runWorkflow().catch((reason) => {
+      this._logger.error(reason);
+    });
   }
 
   /**

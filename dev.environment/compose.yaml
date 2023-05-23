@@ -1,6 +1,21 @@
 version: "2.2"
 services:
 
+  # Apache Pulsar
+  pulsar:
+    container_name: hdml-pulsar
+    image: apachepulsar/pulsar:3.0.0
+    ports:
+      - "6650:6650"
+      - "9090:8080"
+    depends_on:
+      - trino
+    links:
+      - trino
+    command: bin/pulsar standalone
+    restart: always
+
+  # Trino Query Engine
   trino:
     container_name: hdml-trino
     image: trinodb/trino
@@ -10,12 +25,15 @@ services:
       - ./catalog:/etc/trino/catalog
     depends_on:
       - postgres
-      - mysql
+      # - mysql
+      # - mongo
     links:
       - postgres
-      - mysql
+      # - mysql
+      # - mongo
     restart: always
 
+  # Postgres Databse
   postgres:
     container_name: hdml-postgres
     image: postgres:latest
@@ -30,30 +48,29 @@ services:
       - ./.data/postgres:/var/lib/postgresql/data
     restart: always
 
-  mysql:
-    # ALTER USER 'root'@'localhost' IDENTIFIED BY 'hdml';
-    # CREATE USER 'hdml' IDENTIFIED BY 'hdml';
-    # GRANT ALL PRIVILEGES ON *.* TO 'hdml';
-    container_name: hdml-mysql
-    image: mysql:8
-    environment:
-      - MYSQL_DATABASE=hdml
-      - MYSQL_ROOT_PASSWORD=hdml
-    command: mysqld --default-authentication-plugin=mysql_native_password
-    ports:
-      - "3306:3306"
-    volumes:
-      - ./.data/mysql:/var/lib/mysql
-    restart: always
+  # MySQL Database
+  # mysql:
+  #   container_name: hdml-mysql
+  #   image: mysql:8
+  #   environment:
+  #     - MYSQL_DATABASE=hdml
+  #     - MYSQL_ROOT_PASSWORD=hdml
+  #   command: mysqld --default-authentication-plugin=mysql_native_password
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - ./.data/mysql:/var/lib/mysql
+  #   restart: always
 
-  mongo:
-    container_name: hdml-mongo
-    image: mongo:latest
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: hdml
-      MONGO_INITDB_ROOT_PASSWORD: hdml
-    ports:
-      - "27017:27017"
-    volumes:
-      - ./.data/mongo:/data/db
-    restart: always
+  # Mongo Database
+  # mongo:
+  #   container_name: hdml-mongo
+  #   image: mongo:latest
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: hdml
+  #     MONGO_INITDB_ROOT_PASSWORD: hdml
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./.data/mongo:/data/db
+  #   restart: always

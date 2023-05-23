@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import { NestFactory } from "@nestjs/core";
-import { IoModule } from "./root/IoModule";
+import { IoModule } from "./io/IoModule";
 
 async function bootstrap() {
   const app = await NestFactory.create(IoModule, {
