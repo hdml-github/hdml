@@ -131,6 +131,34 @@ export class IoElement extends UnifiedElement {
   private _documents: Map<string, Document> = new Map();
 
   /**
+   * Promises that are resolved once all `hdml-model` or `hdml-frame`
+   * updates are done.
+   */
+  private _updatesPromises: {
+    model: {
+      promise: null | Promise<void>;
+      resolve: null | (() => void);
+      reject: null | ((reason: string) => void);
+    };
+    frame: {
+      promise: null | Promise<void>;
+      resolve: null | (() => void);
+      reject: null | ((reason: unknown) => void);
+    };
+  } = {
+    model: {
+      promise: null,
+      resolve: null,
+      reject: null,
+    },
+    frame: {
+      promise: null,
+      resolve: null,
+      reject: null,
+    },
+  };
+
+  /**
    * The `hdml-model` update debouncer.
    */
   private _updateModel: null | debounce<() => Promise<void>> = null;
@@ -301,6 +329,20 @@ export class IoElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
+    this._updatesPromises.model.reject &&
+      this._updatesPromises.model.reject("Disconnected `IoElement`");
+    this._updatesPromises.model = {
+      promise: null,
+      resolve: null,
+      reject: null,
+    };
+    this._updatesPromises.frame.reject &&
+      this._updatesPromises.frame.reject("Disconnected `IoElement`");
+    this._updatesPromises.frame = {
+      promise: null,
+      resolve: null,
+      reject: null,
+    };
     this._client && this._client.close();
     this._updateModel && this._updateModel.cancel();
     this._updateFrame && this._updateFrame.cancel();
@@ -484,12 +526,30 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
+   * The `hdml-model:request` event listener.
+   */
+  private _modelRequestListener = (
+    event: CustomEvent<ModelEventDetail>,
+  ) => {
+    this._processRequest(event.detail.model.uid);
+  };
+
+  /**
    * The `hdml-frame:changed` event listener.
    */
   private _frameChangedListener = (
     event: CustomEvent<FrameEventDetail>,
   ) => {
     this._processFrame();
+  };
+
+  /**
+   * The `hdml-frame:request` event listener.
+   */
+  private _frameRequestListener = (
+    event: CustomEvent<FrameEventDetail>,
+  ) => {
+    this._processRequest(event.detail.frame.uid);
   };
 
   /**
@@ -501,6 +561,10 @@ export class IoElement extends UnifiedElement {
       model.addEventListener(
         "hdml-model:changed",
         this._modelChangedListener,
+      );
+      model.addEventListener(
+        "hdml-model:request",
+        this._modelRequestListener,
       );
       this._processModel();
     }
@@ -516,6 +580,10 @@ export class IoElement extends UnifiedElement {
         "hdml-frame:changed",
         this._frameChangedListener,
       );
+      frame.addEventListener(
+        "hdml-frame:request",
+        this._frameRequestListener,
+      );
       this._processFrame();
     }
   }
@@ -528,6 +596,10 @@ export class IoElement extends UnifiedElement {
       model.removeEventListener(
         "hdml-model:changed",
         this._modelChangedListener,
+      );
+      model.removeEventListener(
+        "hdml-model:request",
+        this._modelRequestListener,
       );
       this._models.delete(model.uid);
       this._documents.delete(model.uid);
@@ -543,6 +615,10 @@ export class IoElement extends UnifiedElement {
         "hdml-frame:changed",
         this._frameChangedListener,
       );
+      frame.removeEventListener(
+        "hdml-frame:request",
+        this._frameRequestListener,
+      );
       this._frames.delete(frame.uid);
       this._documents.delete(frame.uid);
     }
@@ -552,14 +628,70 @@ export class IoElement extends UnifiedElement {
    * Processes models.
    */
   private _processModel() {
-    this._updateModel && this._updateModel();
+    if (this._updateModel) {
+      if (!this._updatesPromises.model.promise) {
+        this._updatesPromises.model.promise = new Promise(
+          (resolve, reject) => {
+            this._updatesPromises.model.resolve = resolve;
+            this._updatesPromises.model.reject = reject;
+          },
+        );
+      }
+      this._updateModel();
+    }
   }
 
   /**
    * Processes frames.
    */
   private _processFrame() {
-    this._updateFrame && this._updateFrame();
+    if (this._updateFrame) {
+      if (!this._updatesPromises.frame.promise) {
+        this._updatesPromises.frame.promise = new Promise(
+          (resolve, reject) => {
+            this._updatesPromises.frame.resolve = resolve;
+            this._updatesPromises.frame.reject = reject;
+          },
+        );
+      }
+      this._updateFrame();
+    }
+  }
+
+  /**
+   * Process request.
+   */
+  private _processRequest(uid: string): void {
+    const promises: Promise<void>[] = [];
+    if (this._updatesPromises.model.promise) {
+      promises.push(this._updatesPromises.model.promise);
+    }
+    if (this._updatesPromises.frame.promise) {
+      promises.push(this._updatesPromises.frame.promise);
+    }
+    Promise.all(promises)
+      .then(() => {
+        if (!this._documents.has(uid)) {
+          throw new Error(`Document is missing: ${uid}`);
+        } else {
+          const doc = <Document>this._documents.get(uid);
+          if (!this._client) {
+            throw new Error("Client is missing");
+          } else {
+            this._client
+              .fetch(uid, <Buffer>doc.buffer)
+              .then((table) => {
+                console.log(table);
+              })
+              .catch((reason) => {
+                console.error(reason);
+              });
+          }
+        }
+      })
+      .catch((reason) => {
+        console.error(reason);
+      });
   }
 
   /**
@@ -577,6 +709,13 @@ export class IoElement extends UnifiedElement {
         this._documents.set(model.uid, new Document(data));
       }
     });
+    this._updatesPromises.model.resolve &&
+      this._updatesPromises.model.resolve();
+    this._updatesPromises.model = {
+      promise: null,
+      resolve: null,
+      reject: null,
+    };
   };
 
   /**
@@ -623,5 +762,12 @@ export class IoElement extends UnifiedElement {
         this._documents.set(frame.uid, new Document(data));
       }
     });
+    this._updatesPromises.frame.resolve &&
+      this._updatesPromises.frame.resolve();
+    this._updatesPromises.frame = {
+      promise: null,
+      resolve: null,
+      reject: null,
+    };
   };
 }

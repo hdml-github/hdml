@@ -5,22 +5,70 @@ import {
   Header,
   Get,
   Post,
+  Param,
   Req,
   StreamableFile,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import { Request } from "express";
 import { Document } from "@hdml/schema";
 import { orchestrate } from "@hdml/orchestrator";
-import { GatewayQueue } from "./GatewayQueue";
+import { BaseLogger } from "@hdml/io.common";
+import { QueueSvc } from "./QueueSvc";
 
-@Controller("api/v0")
-export class GatewayRestApiV0 {
-  constructor(private readonly _queue: GatewayQueue) {}
+/**
+ * Public REST API controller.
+ */
+@Controller({ path: ":tenant/api/v0" })
+export class PublicRestCtrl {
+  /**
+   * Service logger.
+   */
+  private readonly _logger = new BaseLogger(PublicRestCtrl.name, {
+    timestamp: true,
+  });
 
-  @Get("test")
+  /**
+   * Class constructor.
+   */
+  constructor(private readonly _queue: QueueSvc) {}
+
+  /**
+   * The `POST /hdml` endpoint handler.
+   */
+  @Post("hdml")
   @Header("Access-Control-Allow-Origin", "*")
-  async test(@Req() req: Request): Promise<string> {
-    return await this._queue.test();
+  public async postHdml(
+    @Param("tenant") tenant: string,
+    @Req() request: Request,
+  ): Promise<string> {
+    if (!request.readable) {
+      throw new HttpException(
+        "Bad request (non-readable)",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const token = request.header("Token");
+    const buffer = await rawbody(request);
+    const document = new Document(buffer);
+    let name = "";
+    if (document.frame) {
+      name = `hdml-frame=${document.frame.name}`;
+    } else if (document.model) {
+      name = `hdml-model=${document.model.name}`;
+    } else {
+      throw new HttpException(
+        "Bad request (empty document)",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    this._logger.debug("Posting document", {
+      tenant,
+      token,
+      name,
+    });
+    return Promise.resolve("");
   }
 
   @Post()

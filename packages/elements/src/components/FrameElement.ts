@@ -311,6 +311,22 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
+   * Initiates request.
+   */
+  public request(): void {
+    this.dispatchEvent(
+      new CustomEvent<FrameEventDetail>("hdml-frame:request", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+        detail: {
+          frame: this,
+        },
+      }),
+    );
+  }
+
+  /**
    * Returns frame `JSON`-representation.
    */
   public toJSON(): FrameData {

@@ -20,6 +20,7 @@ declare global {
   interface HTMLElementEventMap {
     "hdml-model:connected": CustomEvent<ModelEventDetail>;
     "hdml-model:changed": CustomEvent<ModelEventDetail>;
+    "hdml-model:request": CustomEvent<ModelEventDetail>;
     "hdml-model:disconnected": CustomEvent<ModelEventDetail>;
 
     "hdml-table:connected": CustomEvent<TableEventDetail>;
@@ -44,6 +45,7 @@ declare global {
 
     "hdml-frame:connected": CustomEvent<FrameEventDetail>;
     "hdml-frame:changed": CustomEvent<FrameEventDetail>;
+    "hdml-frame:request": CustomEvent<FrameEventDetail>;
     "hdml-frame:disconnected": CustomEvent<FrameEventDetail>;
 
     "hdml-filter-by:connected": CustomEvent<FilterByEventDetail>;

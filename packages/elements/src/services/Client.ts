@@ -7,6 +7,7 @@
 
 import "whatwg-fetch";
 import { Table, tableFromIPC } from "apache-arrow";
+import { Document } from "@hdml/schema";
 
 /**
  * Data client class.
@@ -19,9 +20,9 @@ export class Client {
    * Class constructor.
    */
   public constructor(
-    private _url = "http://localhost",
-    private _tenant = "common",
-    private _token = "token_value",
+    private _url = "",
+    private _tenant = "",
+    private _token = "",
   ) {}
 
   /**
@@ -35,21 +36,20 @@ export class Client {
       const controller = new AbortController();
       const promise = new Promise(
         (resolve: (v: Table) => void, reject) => {
-          fetch(this._url, {
+          fetch(`${this._url}/${this._tenant}/api/v0/hdml`, {
             method: "POST",
             mode: "cors",
             redirect: "follow",
             cache: "no-cache",
             headers: {
-              Accept: "text/html; charset=utf-8",
-              "Content-Type": "text/html; charset=utf-8",
+              Token: this._token,
             },
             signal: controller.signal,
             body: doc,
           })
             .then((response) => {
               if (!response.ok) {
-                throw new Error("Network error.");
+                throw new Error(response.statusText);
               } else {
                 response
                   .arrayBuffer()
@@ -97,6 +97,9 @@ export class Client {
     });
   }
 
+  /**
+   * Cleanup internal structures from the query artifact.
+   */
   private _clear(uid: string): void {
     if (this._controllers.has(uid)) {
       this._controllers.delete(uid);

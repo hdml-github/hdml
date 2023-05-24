@@ -144,6 +144,22 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
+   * Initiates request.
+   */
+  public request(): void {
+    this.dispatchEvent(
+      new CustomEvent<ModelEventDetail>("hdml-model:request", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+        detail: {
+          model: this,
+        },
+      }),
+    );
+  }
+
+  /**
    * Returns model's `JSON`-representation.
    */
   public toJSON(): ModelData {

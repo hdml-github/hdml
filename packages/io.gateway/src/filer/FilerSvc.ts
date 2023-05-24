@@ -1,12 +1,12 @@
 import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
-import { KeyLike, importSPKI, importPKCS8 } from "jose";
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoJson } from "@hdml/elements";
-import { OptionsService } from "../options/OptionsService";
-import { CompilerService } from "../compiler/CompilerService";
+import { OptionsSvc } from "../options/OptionsSvc";
+import { TokensSvc, KeyLike } from "../authorization/TokensSvc";
+import { CompilerSvc } from "../compiler/CompilerSvc";
 
 /**
  * List of the standard environment variables keys.
@@ -39,11 +39,11 @@ export type TenantFiles = {
  * Files system service.
  */
 @Injectable()
-export class FilerService implements OnModuleInit {
+export class FilerSvc implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(FilerService.name, {
+  private readonly _logger = new Logger(FilerSvc.name, {
     timestamp: true,
   });
 
@@ -61,8 +61,9 @@ export class FilerService implements OnModuleInit {
    * Class constructor.
    */
   constructor(
-    private readonly options: OptionsService,
-    private readonly compiler: CompilerService,
+    private readonly _options: OptionsSvc,
+    private readonly _tokens: TokensSvc,
+    private readonly _compiler: CompilerSvc,
   ) {}
 
   /**
@@ -153,7 +154,7 @@ export class FilerService implements OnModuleInit {
         "elements.min.js",
       ),
     );
-    await this.compiler.bootstrap(this._script);
+    await this._compiler.bootstrap(this._script);
     await this.loadTenants();
     this._logger.log("Tenants initialized");
   }
@@ -163,7 +164,7 @@ export class FilerService implements OnModuleInit {
    */
   private async loadTenants(): Promise<void> {
     const project = await new Promise<Dir>((resolve, reject) => {
-      opendir(this.options.getProjectPath(), (err, dir) => {
+      opendir(this._options.getProjectPath(), (err, dir) => {
         if (err) {
           reject(err);
         } else {
@@ -179,7 +180,7 @@ export class FilerService implements OnModuleInit {
         );
         const key = await this.loadKey(tenant);
         const pub = await this.loadPub(tenant);
-        const docs = this.compiler.complete(
+        const docs = this._compiler.complete(
           await this.loadFragments(tenant),
         );
         this._tenants.set(tenant, {
@@ -197,9 +198,9 @@ export class FilerService implements OnModuleInit {
    */
   private async loadEnv(tenant: string): Promise<string> {
     const file = path.resolve(
-      this.options.getProjectPath(),
+      this._options.getProjectPath(),
       tenant,
-      this.options.getTenantEnvName(),
+      this._options.getTenantEnvName(),
     );
     return this.loadFile(file);
   }
@@ -209,17 +210,14 @@ export class FilerService implements OnModuleInit {
    */
   private async loadKey(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this.options.getProjectPath(),
+      this._options.getProjectPath(),
       tenant,
-      this.options.getTenantKeysPath(),
-      this.options.getTenantPrivateKeyName(),
+      this._options.getTenantKeysPath(),
+      this._options.getTenantPrivateKeyName(),
     );
-    const content = await this.loadFile(file);
-    const key = await importPKCS8(
-      content,
-      this.options.getKeysImportAlg(),
+    return await this._tokens.getPrivateKey(
+      await this.loadFile(file),
     );
-    return key;
   }
 
   /**
@@ -227,17 +225,12 @@ export class FilerService implements OnModuleInit {
    */
   private async loadPub(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this.options.getProjectPath(),
+      this._options.getProjectPath(),
       tenant,
-      this.options.getTenantKeysPath(),
-      this.options.getTenantPublicKeyName(),
+      this._options.getTenantKeysPath(),
+      this._options.getTenantPublicKeyName(),
     );
-    const content = await this.loadFile(file);
-    const key = await importSPKI(
-      content,
-      this.options.getKeysImportAlg(),
-    );
-    return key;
+    return this._tokens.getPublicKey(await this.loadFile(file));
   }
 
   /**
@@ -247,17 +240,17 @@ export class FilerService implements OnModuleInit {
     tenant: string,
   ): Promise<{ [dir: string]: IoJson }> {
     const root = path.resolve(
-      this.options.getProjectPath(),
+      this._options.getProjectPath(),
       tenant,
-      this.options.getTenantDocumentsPath(),
+      this._options.getTenantDocumentsPath(),
     );
     const files = (await this.getFilesList(root)).filter(
       (file) =>
-        file.indexOf(`.${this.options.getTenantDocumentsExt()}`) > 0,
+        file.indexOf(`.${this._options.getTenantDocumentsExt()}`) > 0,
     );
     const hdmls = await this.loadHdmls(
       tenant,
-      this.options.getTenantDocumentsPath(),
+      this._options.getTenantDocumentsPath(),
       files,
     );
     return hdmls;
@@ -280,7 +273,7 @@ export class FilerService implements OnModuleInit {
           if (err) {
             reject(err);
           } else {
-            this.compiler.compile(hdml).then(resolve).catch(reject);
+            this._compiler.compile(hdml).then(resolve).catch(reject);
           }
         });
       });
@@ -289,7 +282,7 @@ export class FilerService implements OnModuleInit {
     files.forEach((file, i) => {
       const key = file.split(
         path.resolve(
-          this.options.getProjectPath(),
+          this._options.getProjectPath(),
           tenant,
           directory,
         ),

@@ -3,17 +3,17 @@ import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { Injectable, Logger } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoElement, IoJson } from "@hdml/elements";
-import { OptionsService } from "../options/OptionsService";
+import { OptionsSvc } from "../options/OptionsSvc";
 
 /**
  * Compiler service.
  */
 @Injectable()
-export class CompilerService {
+export class CompilerSvc {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(CompilerService.name, {
+  private readonly _logger = new Logger(CompilerSvc.name, {
     timestamp: true,
   });
 
@@ -30,7 +30,7 @@ export class CompilerService {
   /**
    * Class constructor.
    */
-  constructor(private readonly options: OptionsService) {}
+  constructor(private readonly _options: OptionsSvc) {}
 
   /**
    * Bootstrap service by running headless browser and preparing pages
@@ -71,9 +71,9 @@ export class CompilerService {
         },
       },
       {
-        min: this.options.getCompilerPoolMin(),
-        max: this.options.getCompilerPoolMax(),
-        maxWaitingClients: this.options.getCompilerPoolQueueSize(),
+        min: this._options.getCompilerPoolMin(),
+        max: this._options.getCompilerPoolMax(),
+        maxWaitingClients: this._options.getCompilerPoolQueueSize(),
         testOnBorrow: false,
         evictionRunIntervalMillis: 0,
       },
@@ -179,7 +179,7 @@ export class CompilerService {
     let cnt = 0;
     let src: null | string = source;
     let curr = current;
-    while (src && cnt < this.options.getCompilerFramesDepth()) {
+    while (src && cnt < this._options.getCompilerFramesDepth()) {
       cnt++;
       this.assertSource(fragments, curr, src);
       const index = src.indexOf("?hdml-frame=");

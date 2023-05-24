@@ -1,23 +1,23 @@
 import { Module } from "@nestjs/common";
-import { OptionsModule } from "../options/OptionsModule";
-import { OptionsService } from "../options/OptionsService";
-import { FilerModule } from "../filer/FilerModule";
-import { GatewayQueue } from "./GatewayQueue";
-import { GatewayRestApiV0 } from "./GatewayRestApiV0";
+import { Options } from "../options/Options";
+import { OptionsSvc } from "../options/OptionsSvc";
+import { Filer } from "../filer/Filer";
+import { QueueSvc } from "./QueueSvc";
+import { PublicRestCtrl } from "./PublicRestCtrl";
 
 @Module({
-  imports: [OptionsModule, FilerModule],
-  controllers: [GatewayRestApiV0],
-  providers: [GatewayQueue],
+  imports: [Options, Filer],
+  controllers: [PublicRestCtrl],
+  providers: [QueueSvc],
 })
 export class Gateway {
-  private static _options: null | OptionsService = null;
+  private static _options: null | OptionsSvc = null;
 
   public static port(): number {
     return Gateway._options?.getGatewayPort() || 8888;
   }
 
-  constructor(options: OptionsService) {
+  constructor(options: OptionsSvc) {
     Gateway._options = options;
   }
 }

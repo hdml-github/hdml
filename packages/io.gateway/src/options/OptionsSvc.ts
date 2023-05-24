@@ -10,10 +10,7 @@ type Options = {
  * Options service.
  */
 @Injectable()
-export class OptionsService
-  extends BaseOptions
-  implements OnModuleInit
-{
+export class OptionsSvc extends BaseOptions implements OnModuleInit {
   private _options: null | Options = null;
 
   public onModuleInit(): void {
