@@ -1,17 +1,9 @@
 import * as crypto from "crypto";
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { Client, Producer, LogLevel } from "pulsar-client";
-import { OptionsService } from "../options/OptionsService";
+import { type BaseOptions } from "./BaseOptions";
+import { BaseLogger } from "./BaseLogger";
 
-@Injectable()
-export class IoService implements OnModuleInit {
-  /**
-   * Service logger.
-   */
-  private readonly _logger = new Logger(IoService.name, {
-    timestamp: true,
-  });
-
+export abstract class BaseQueue {
   /**
    * Pulsar client.
    */
@@ -23,75 +15,38 @@ export class IoService implements OnModuleInit {
   private _queriesProducer: null | Producer = null;
 
   /**
-   * Class constructor.
+   * Returns options object.
    */
-  public constructor(private readonly options: OptionsService) {}
+  protected abstract options(): BaseOptions;
 
   /**
-   * Module initialized callback.
+   * Returns logger instance.
    */
-  public onModuleInit(): void {
-    this._logger.log("Running IO");
-    this.runWorkflow().catch((reason) => {
-      this._logger.error(reason);
-    });
-  }
-
-  public async test(): Promise<string> {
-    const topic =
-      `${this.getHashname("sql query")}.` +
-      `${this.getTimehash(Date.now())}`;
-    const status = await this.isTopicExist("topic hash");
-    return JSON.stringify(status, undefined, 2);
-  }
+  protected abstract logger(): BaseLogger;
 
   /**
-   * Runs async workflow.
+   * Ensures that the queries queue exists.
    */
-  private async runWorkflow(): Promise<void> {
-    await this.assertQueries();
-
-    // const producer = await this._client.createProducer({
-    //   topic: "topic.hash",
-    // });
-    // const consumer = await this._client.subscribe({
-    //   topic: "topic.hash",
-    //   subscription: "subscription",
-    // });
-
-    // await producer.send({
-    //   data: Buffer.from("Hello, Pulsar"),
-    // });
-    // const msg = await consumer.receive();
-
-    // await consumer.acknowledge(msg);
-    // await consumer.close();
-    // await producer.close();
-
-    return Promise.resolve();
-  }
-
-  private async assertQueries(): Promise<void> {
+  protected async ensureQueries(): Promise<void> {
     const stats = await this.stats("queries");
     if (!stats) {
       await this.create("queries");
     }
-    await this.getQueriesProducer();
   }
 
   /**
    * Returns specified `topic` stats if exist or `null` otherwise.
    * @throws
    */
-  private async stats(
+  protected async stats(
     topic: string,
   ): Promise<null | { numberOfEntries: number }> {
     const apiURL =
-      `http://${this.options.getQueueHost()}` +
-      `:${this.options.getQueueRestPort()}` +
+      `http://${this.options().getQueueHost()}` +
+      `:${this.options().getQueueRestPort()}` +
       "/admin/v2/persistent" +
-      `/${this.options.getQueueTenant()}` +
-      `/${this.options.getQueueNamespace()}` +
+      `/${this.options().getQueueTenant()}` +
+      `/${this.options().getQueueNamespace()}` +
       `/${topic}/internalStats`;
     const response = await fetch(apiURL, {
       method: "GET",
@@ -102,7 +57,7 @@ export class IoService implements OnModuleInit {
         return null;
       }
       const message = `${response.status} ${response.statusText}`;
-      this._logger.error(message);
+      this.logger().error(message);
       throw new Error(message);
     }
     const status = <{ numberOfEntries: number }>await response.json();
@@ -113,13 +68,13 @@ export class IoService implements OnModuleInit {
    * Creates specified persistent non-partitioned `topic`.
    * @throws
    */
-  private async create(topic: string): Promise<void> {
+  protected async create(topic: string): Promise<void> {
     const apiURL =
-      `http://${this.options.getQueueHost()}` +
-      `:${this.options.getQueueRestPort()}` +
+      `http://${this.options().getQueueHost()}` +
+      `:${this.options().getQueueRestPort()}` +
       "/admin/v2/persistent" +
-      `/${this.options.getQueueTenant()}` +
-      `/${this.options.getQueueNamespace()}` +
+      `/${this.options().getQueueTenant()}` +
+      `/${this.options().getQueueNamespace()}` +
       `/${topic}`;
     const response = await fetch(apiURL, {
       method: "PUT",
@@ -127,7 +82,7 @@ export class IoService implements OnModuleInit {
     });
     if (!response.ok) {
       const message = `${response.status} ${response.statusText}`;
-      this._logger.error(message);
+      this.logger().error(message);
       throw new Error(message);
     }
     return;
@@ -137,13 +92,13 @@ export class IoService implements OnModuleInit {
    * Deletes specified persistent `topic`.
    * @throws
    */
-  private async delete(topic: string): Promise<void> {
+  protected async delete(topic: string): Promise<void> {
     const apiURL =
-      `http://${this.options.getQueueHost()}` +
-      `:${this.options.getQueueRestPort()}` +
+      `http://${this.options().getQueueHost()}` +
+      `:${this.options().getQueueRestPort()}` +
       "/admin/v2/persistent" +
-      `/${this.options.getQueueTenant()}` +
-      `/${this.options.getQueueNamespace()}` +
+      `/${this.options().getQueueTenant()}` +
+      `/${this.options().getQueueNamespace()}` +
       `/${topic}`;
     const response = await fetch(apiURL, {
       method: "DELETE",
@@ -151,7 +106,7 @@ export class IoService implements OnModuleInit {
     });
     if (!response.ok) {
       const message = `${response.status} ${response.statusText}`;
-      this._logger.error(message);
+      this.logger().error(message);
       throw new Error(message);
     }
     return;
@@ -160,9 +115,9 @@ export class IoService implements OnModuleInit {
   /**
    * Returns configured queries producer.
    */
-  private async getQueriesProducer(): Promise<Producer> {
+  protected async queriesProducer(): Promise<Producer> {
     if (!this._queriesProducer) {
-      this._queriesProducer = await this.getClient().createProducer({
+      this._queriesProducer = await this.client().createProducer({
         topic: "queries",
       });
     }
@@ -172,12 +127,12 @@ export class IoService implements OnModuleInit {
   /**
    * Returns configured queue client instance.
    */
-  private getClient(): Client {
+  protected client(): Client {
     if (!this._client) {
       this._client = new Client({
         serviceUrl:
-          `pulsar://${this.options.getQueueHost()}` +
-          `:${this.options.getQueuePort()}`,
+          `pulsar://${this.options().getQueueHost()}` +
+          `:${this.options().getQueuePort()}`,
         log: (
           level: LogLevel,
           file: string,
@@ -186,16 +141,16 @@ export class IoService implements OnModuleInit {
         ) => {
           switch (level) {
             case LogLevel.DEBUG:
-              this._logger.debug(message);
+              this.logger().debug(message);
               break;
             case LogLevel.INFO:
-              this._logger.log(message);
+              this.logger().log(message);
               break;
             case LogLevel.ERROR:
-              this._logger.error(message);
+              this.logger().error(message);
               break;
             case LogLevel.WARN:
-              this._logger.warn(message);
+              this.logger().warn(message);
               break;
           }
         },
@@ -207,7 +162,7 @@ export class IoService implements OnModuleInit {
   /**
    * Returns persistent hash for the provided `sql` string.
    */
-  private getHashname(sql: string): string {
+  protected getHashname(sql: string): string {
     const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
     const buffer = crypto
       .createHash("md5")
@@ -235,18 +190,18 @@ export class IoService implements OnModuleInit {
    * Returns persistent hash for the provided `timestamp` rounded by
    * the queue cache timeout value.
    */
-  private getTimehash(timestamp: number): string {
+  protected getTimehash(timestamp: number): string {
     return Math.floor(
-      timestamp / this.options.getQueueCacheTimeout(),
+      timestamp / this.options().getQueueCacheTimeout(),
     ).toString(32);
   }
 
   /**
    * Returns a timestamp fetched from the provided `timehash` value.
    */
-  private getTimestamp(timehash: string): Date {
+  protected getTimestamp(timehash: string): Date {
     return new Date(
-      parseInt(timehash, 32) * this.options.getQueueCacheTimeout(),
+      parseInt(timehash, 32) * this.options().getQueueCacheTimeout(),
     );
   }
 }

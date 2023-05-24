@@ -1,5 +1,5 @@
 {
-  "name": "@hdml/io",
+  "name": "@hdml/io.common",
   "version": "0.0.0-alpha.1",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -7,24 +7,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@hdml/elements": "0.0.0-alpha.1",
-    "@hdml/orchestrator": "0.0.0-alpha.1",
-    "@hdml/schema": "0.0.0-alpha.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "apache-arrow": "^11.0.0",
-    "chokidar": "^3.5.3",
-    "commander": "^10.0.1",
     "dotenv": "^16.0.3",
-    "generic-pool": "^3.9.0",
-    "jose": "^4.14.4",
-    "json-bigint": "^1.0.0",
-    "needle": "^3.2.0",
-    "pulsar-client": "^1.8.2",
-    "puppeteer": "^20.1.2",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.5.5"
+    "pulsar-client": "^1.8.2"
   },
   "scripts": {
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
@@ -35,15 +23,11 @@
     "compile_dts": "tsc -b ./tsconfig/dts.json",
     "compile_bin": "../../node_modules/.bin/rollup --config ../../.rollup.config.js",
     "compile_dev": "npm run compile_esm && npm run compile_bin",
-    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_bin && npm run compile_dts",
+    "compile_all": "npm run compile_cjs && npm run compile_dts",
     "test": "",
     "test_dbg": "",
     "clear": "rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
-    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
-    "io": "clear && npm run compile_cjs && node ./cjs/index"
-  },
-  "bin": {
-    "hdml.io": "./cjs/index"
+    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

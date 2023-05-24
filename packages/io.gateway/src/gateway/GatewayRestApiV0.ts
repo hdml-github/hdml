@@ -11,16 +11,16 @@ import {
 import { Request } from "express";
 import { Document } from "@hdml/schema";
 import { orchestrate } from "@hdml/orchestrator";
-import { IoService } from "./IoService";
+import { GatewayQueue } from "./GatewayQueue";
 
-@Controller()
-export class IoController {
-  constructor(private readonly ioService: IoService) {}
+@Controller("api/v0")
+export class GatewayRestApiV0 {
+  constructor(private readonly _queue: GatewayQueue) {}
 
-  @Get()
+  @Get("test")
   @Header("Access-Control-Allow-Origin", "*")
   async test(@Req() req: Request): Promise<string> {
-    return await this.ioService.test();
+    return await this._queue.test();
   }
 
   @Post()
