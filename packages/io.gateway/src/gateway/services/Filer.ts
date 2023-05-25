@@ -1,12 +1,13 @@
 import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import { KeyLike } from "jose";
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoJson } from "@hdml/elements";
-import { OptionsSvc } from "../options/OptionsSvc";
-import { TokensSvc, KeyLike } from "../authorization/TokensSvc";
-import { CompilerSvc } from "../compiler/CompilerSvc";
+import { Options } from "./Options";
+import { Tokens } from "./Tokens";
+import { Compiler } from "./Compiler";
 
 /**
  * List of the standard environment variables keys.
@@ -39,11 +40,11 @@ export type TenantFiles = {
  * Files system service.
  */
 @Injectable()
-export class FilerSvc implements OnModuleInit {
+export class Filer implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(FilerSvc.name, {
+  private readonly _logger = new Logger(Filer.name, {
     timestamp: true,
   });
 
@@ -61,9 +62,9 @@ export class FilerSvc implements OnModuleInit {
    * Class constructor.
    */
   constructor(
-    private readonly _options: OptionsSvc,
-    private readonly _tokens: TokensSvc,
-    private readonly _compiler: CompilerSvc,
+    private readonly _options: Options,
+    private readonly _tokens: Tokens,
+    private readonly _compiler: Compiler,
   ) {}
 
   /**
@@ -145,6 +146,7 @@ export class FilerSvc implements OnModuleInit {
     this._script = await this.loadFile(
       path.resolve(
         __dirname,
+        "..",
         "..",
         "..",
         "node_modules",

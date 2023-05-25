@@ -6,6 +6,7 @@ import {
   Get,
   Post,
   Param,
+  Query,
   Req,
   StreamableFile,
   HttpException,
@@ -15,24 +16,59 @@ import { Request } from "express";
 import { Document } from "@hdml/schema";
 import { orchestrate } from "@hdml/orchestrator";
 import { BaseLogger } from "@hdml/io.common";
-import { QueueSvc } from "./QueueSvc";
+import { Queue } from "../services/Queue";
+import { Filer } from "../services/Filer";
+import { Tokens } from "../services/Tokens";
+import { Options } from "../services/Options";
 
 /**
  * Public REST API controller.
  */
 @Controller({ path: ":tenant/api/v0" })
-export class PublicRestCtrl {
+export class PublicREST {
   /**
    * Service logger.
    */
-  private readonly _logger = new BaseLogger(PublicRestCtrl.name, {
+  private readonly _logger = new BaseLogger(PublicREST.name, {
     timestamp: true,
   });
 
   /**
    * Class constructor.
    */
-  constructor(private readonly _queue: QueueSvc) {}
+  constructor(
+    private readonly _filer: Filer,
+    private readonly _queue: Queue,
+    private readonly _tokens: Tokens,
+    private readonly _options: Options,
+  ) {}
+
+  /**
+   * The `GET /session?token=:token` endpopint handler.
+   */
+  @Get("session")
+  @Header("Access-Control-Allow-Origin", "*")
+  public async getSession(
+    @Param("tenant")
+    tenant: string,
+    @Query("token")
+    token?: string,
+  ): Promise<string> {
+    this._logger.debug("Session requested", {
+      tenant,
+      token,
+    });
+    try {
+      return this._tokens.getSessionToken(
+        this._filer.getPublicKey(tenant),
+        this._filer.getPrivateKey(tenant),
+        token,
+      );
+    } catch (error) {
+      this._logger.error(error);
+      throw error;
+    }
+  }
 
   /**
    * The `POST /hdml` endpoint handler.
@@ -43,32 +79,26 @@ export class PublicRestCtrl {
     @Param("tenant") tenant: string,
     @Req() request: Request,
   ): Promise<string> {
-    if (!request.readable) {
-      throw new HttpException(
-        "Bad request (non-readable)",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const token = request.header("Token");
-    const buffer = await rawbody(request);
-    const document = new Document(buffer);
-    let name = "";
-    if (document.frame) {
-      name = `hdml-frame=${document.frame.name}`;
-    } else if (document.model) {
-      name = `hdml-model=${document.model.name}`;
-    } else {
-      throw new HttpException(
-        "Bad request (empty document)",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    this._logger.debug("Posting document", {
+    this._logger.debug("Document posted", {
       tenant,
-      token,
-      name,
+      session: request.header("Session"),
     });
-    return Promise.resolve("");
+    try {
+      if (!request.readable) {
+        throw new HttpException(
+          "Bad request (non-readable)",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const scope = await this._tokens.getSessionScope(
+        this._filer.getPrivateKey(tenant),
+        request.header("Session"),
+      );
+      return Promise.resolve(JSON.stringify(scope));
+    } catch (error) {
+      this._logger.error(error);
+      throw error;
+    }
   }
 
   @Post()

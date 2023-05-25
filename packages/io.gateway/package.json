@@ -41,10 +41,12 @@
     "test_dbg": "",
     "clear": "rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
-    "gateway": "clear && npm run compile_cjs && node ./cjs/index --project /home/buntarb/Projects/hdml/dev.project"
+    "gateway": "clear && npm run compile_cjs && node ./cjs/gateway --project /home/buntarb/Projects/hdml/dev.project",
+    "hideway": "clear && npm run compile_cjs && node ./cjs/hideway --project /home/buntarb/Projects/hdml/dev.project"
   },
   "bin": {
-    "hdml.io": "./cjs/index"
+    "gateway": "./cjs/gateway",
+    "hideway": "./cjs/hideway"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

@@ -3,17 +3,17 @@ import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { Injectable, Logger } from "@nestjs/common";
 import { ModelData, FrameData } from "@hdml/schema";
 import { IoElement, IoJson } from "@hdml/elements";
-import { OptionsSvc } from "../options/OptionsSvc";
+import { Options } from "./Options";
 
 /**
  * Compiler service.
  */
 @Injectable()
-export class CompilerSvc {
+export class Compiler {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(CompilerSvc.name, {
+  private readonly _logger = new Logger(Compiler.name, {
     timestamp: true,
   });
 
@@ -30,7 +30,7 @@ export class CompilerSvc {
   /**
    * Class constructor.
    */
-  constructor(private readonly _options: OptionsSvc) {}
+  constructor(private readonly _options: Options) {}
 
   /**
    * Bootstrap service by running headless browser and preparing pages

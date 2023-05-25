@@ -10,6 +10,13 @@ export class BaseOptions {
   }
 
   /**
+   * Returns the Hideway port.
+   */
+  public getHidewayPort(): number {
+    return 8887;
+  }
+
+  /**
    * Returns tenant's environment file name.
    */
   public getTenantEnvName(): string {
@@ -63,6 +70,48 @@ export class BaseOptions {
    */
   public getKeysImportAlg(): string {
     return "ES256";
+  }
+
+  /**
+   * Returns tokens algorythm.
+   */
+  public getTokensAlg(): string {
+    return "RSA-OAEP-256";
+  }
+
+  /**
+   * Returns token encryption.
+   */
+  public getTokensEnc(): string {
+    return "A256GCM";
+  }
+
+  /**
+   * Returns token issuer.
+   */
+  public getTokensIss(): string {
+    return "TokensSvc";
+  }
+
+  /**
+   * Returns access token subject.
+   */
+  public getTokenAccessSub(): string {
+    return "Access Token";
+  }
+
+  /**
+   * Returns session token subject.
+   */
+  public getTokenSessionSub(): string {
+    return "Session Token";
+  }
+
+  /**
+   * Returns session length in seconds.
+   */
+  public getSessionLength(): number {
+    return 24 * 60;
   }
 
   /**

@@ -1,23 +1,23 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { BaseLogger, BaseOptions, BaseQueue } from "@hdml/io.common";
-import { OptionsSvc } from "../options/OptionsSvc";
+import { Options } from "./Options";
 
 /**
  * Gateway queue service class.
  */
 @Injectable()
-export class QueueSvc extends BaseQueue implements OnModuleInit {
+export class Queue extends BaseQueue implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new BaseLogger(QueueSvc.name, {
+  private readonly _logger = new BaseLogger(Queue.name, {
     timestamp: true,
   });
 
   /**
    * Class constructor.
    */
-  public constructor(private readonly _options: OptionsSvc) {
+  public constructor(private readonly _options: Options) {
     super();
   }
 

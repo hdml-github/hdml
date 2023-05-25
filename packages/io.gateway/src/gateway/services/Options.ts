@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit } from "@nestjs/common";
 import { BaseOptions } from "@hdml/io.common";
 import { program } from "commander";
 
-type Options = {
+type CliOptions = {
   project: string;
 };
 
@@ -10,19 +10,19 @@ type Options = {
  * Options service.
  */
 @Injectable()
-export class OptionsSvc extends BaseOptions implements OnModuleInit {
-  private _options: null | Options = null;
+export class Options extends BaseOptions implements OnModuleInit {
+  private _cliOptions: null | CliOptions = null;
 
   public onModuleInit(): void {
     program.option("--project <project>");
     program.parse();
-    this._options = program.opts() as unknown as Options;
+    this._cliOptions = program.opts() as unknown as CliOptions;
   }
 
   /**
    * Returns project directory path.
    */
   public getProjectPath(): string {
-    return this._options?.project || ".";
+    return this._cliOptions?.project || ".";
   }
 }

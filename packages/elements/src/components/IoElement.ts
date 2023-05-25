@@ -302,11 +302,6 @@ export class IoElement extends UnifiedElement {
     this._watchFrames();
     this._updateModel = debounce(50, this._modelDebounceCallback);
     this._updateFrame = debounce(50, this._frameDebounceCallback);
-    this._client = new Client(
-      this.host || undefined,
-      this.tenant || undefined,
-      this.token || undefined,
-    );
   }
 
   /**
@@ -318,6 +313,7 @@ export class IoElement extends UnifiedElement {
     value: string,
   ): void {
     super.attributeChangedCallback(name, old, value);
+    this._client && this._client.close();
     this._client = new Client(
       this.host || undefined,
       this.tenant || undefined,
@@ -679,9 +675,9 @@ export class IoElement extends UnifiedElement {
             throw new Error("Client is missing");
           } else {
             this._client
-              .fetch(uid, <Buffer>doc.buffer)
-              .then((table) => {
-                console.log(table);
+              .hdmlPost(uid, <Buffer>doc.buffer)
+              .then((identifier) => {
+                console.log(identifier);
               })
               .catch((reason) => {
                 console.error(reason);
@@ -701,9 +697,9 @@ export class IoElement extends UnifiedElement {
     this._models.forEach((model) => {
       if (!this._documents.has(model.uid)) {
         const data: DocumentData = {
-          name: "Model document.",
-          tenant: this.tenant || "tenant",
-          token: this.token || "token",
+          name: "",
+          tenant: "",
+          token: "",
           model: model.toJSON(),
         };
         this._documents.set(model.uid, new Document(data));
@@ -727,9 +723,9 @@ export class IoElement extends UnifiedElement {
         let source = frame.source;
         let _frame = frame.toJSON();
         const data: DocumentData = {
-          name: "Frame document.",
-          tenant: this.tenant || "tenant",
-          token: this.token || "token",
+          name: "",
+          tenant: "",
+          token: "",
           frame: _frame,
         };
         while (source && source.indexOf("?") === 0) {
