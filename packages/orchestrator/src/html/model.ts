@@ -6,11 +6,11 @@ import {
   TableType,
   JoinType,
 } from "@hdml/schema";
-import { getTableFieldSQL } from "./fields";
+import { getFieldHTML } from "./fields";
 import { getFilterClauseSQL } from "./filter";
-import { t } from "./const";
+import { t } from "../const";
 
-export function getModelSQL(model: ModelData, level = 0): string {
+export function getModelHTML(model: ModelData, level = 0): string {
   const pre = t.repeat(level);
   const tablesList = model.tables
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
@@ -94,10 +94,7 @@ export function getModelTableSQL(
     table.type === TableType.Table ? table.source : `_${table.name}`;
   const fields = table.fields
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    .map(
-      (field: FieldData) =>
-        `${pre}${t}${t}${getTableFieldSQL(field)}`,
-    )
+    .map((field: FieldData) => `${pre}${t}${t}${getFieldHTML(field)}`)
     .join(",\n");
 
   let sql = `${pre}"${table.name}" as (\n`;

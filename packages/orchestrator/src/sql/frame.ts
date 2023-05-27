@@ -6,7 +6,7 @@ import {
 import { getModelSQL } from "./model";
 import { getFrameFieldSQL } from "./fields";
 import { getFilterClauseSQL } from "./filter";
-import { t } from "./const";
+import { t } from "../const";
 
 export function getFrameSQL(
   frame: FrameData,

@@ -4,7 +4,7 @@ import {
   FilterType,
   FilterOperator,
 } from "@hdml/schema";
-import { t } from "./const";
+import { t } from "../const";
 
 export function getFilterClauseSQL(
   clause: FilterClauseData,

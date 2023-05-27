@@ -16,7 +16,7 @@ import {
   FilterOperator,
   FilterType,
 } from "@hdml/schema";
-import { orchestrate } from "./orchestrate";
+import { getSQL } from "./orchestrate";
 
 const data: DocumentData = {
   name: "Test HDML Document.",
@@ -282,7 +282,7 @@ const document = new Document(data);
 
 describe("Orchestrator", () => {
   it("convert document to a SQL string", () => {
-    const sql = orchestrate(document);
-    console.log(sql);
+    const sql = getSQL(document);
+    // console.log(sql);
   });
 });

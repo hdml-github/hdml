@@ -94,7 +94,11 @@ export class PublicREST {
         this._filer.getPrivateKey(tenant),
         request.header("Session"),
       );
-      return Promise.resolve(JSON.stringify(scope));
+      const document = this._filer.getQueriedHdmlDocument(
+        tenant,
+        new Document(await rawbody(request)),
+      );
+      return Promise.resolve(JSON.stringify(document));
     } catch (error) {
       this._logger.error(error);
       throw error;

@@ -2,8 +2,14 @@ import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { KeyLike } from "jose";
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { ModelData, FrameData } from "@hdml/schema";
+import {
+  Injectable,
+  Logger,
+  OnModuleInit,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
+import { ModelData, FrameData, Document } from "@hdml/schema";
 import { IoJson } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
@@ -61,7 +67,7 @@ export class Filer implements OnModuleInit {
   /**
    * Class constructor.
    */
-  constructor(
+  public constructor(
     private readonly _options: Options,
     private readonly _tokens: Tokens,
     private readonly _compiler: Compiler,
@@ -140,6 +146,47 @@ export class Filer implements OnModuleInit {
   }
 
   /**
+   * Returns complete queried `hdml` document for the specified
+   * `tenant`.
+   */
+  public getQueriedHdmlDocument(
+    tenant: string,
+    document: Document,
+  ): {
+    model: ModelData;
+    frame?: FrameData;
+  } {
+    if (!this.isValidDocument(document)) {
+      throw new HttpException(
+        "Invalid document",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (this.isCompleteDocument(document)) {
+      return {
+        model: <ModelData>document.model,
+        frame: <FrameData>document.frame,
+      };
+    } else {
+      const frame = <FrameData>document.frame;
+      let parent = frame;
+      while (parent.parent) parent = parent.parent;
+      const loaded = this.getHdmlDocument(tenant, parent.source);
+      if (!loaded) {
+        throw new HttpException(
+          `Document source is missing: ${parent.source}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      parent.parent = loaded.frame;
+      return {
+        model: <ModelData>loaded.model,
+        frame,
+      };
+    }
+  }
+
+  /**
    * Runs async workflow.
    */
   private async runWorkflow(): Promise<void> {
@@ -182,7 +229,7 @@ export class Filer implements OnModuleInit {
         );
         const key = await this.loadKey(tenant);
         const pub = await this.loadPub(tenant);
-        const docs = this._compiler.complete(
+        const docs = this.completeDocs(
           await this.loadFragments(tenant),
         );
         this._tenants.set(tenant, {
@@ -316,7 +363,7 @@ export class Filer implements OnModuleInit {
   /**
    * Recursive find all files in specified `directory`.
    */
-  public async getFilesList(directory: string): Promise<string[]> {
+  private async getFilesList(directory: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
       readdir(directory, (err, paths) => {
         if (err) {
@@ -351,7 +398,7 @@ export class Filer implements OnModuleInit {
   /**
    * Determine is specified `directory` exist or not.
    */
-  public async isDirExist(directory: string): Promise<boolean> {
+  private async isDirExist(directory: string): Promise<boolean> {
     return new Promise((resolve) => {
       stat(directory, (err, stats) => {
         if (err) {
@@ -366,7 +413,7 @@ export class Filer implements OnModuleInit {
   /**
    * Determine is specified `file` exist or not.
    */
-  public async isFileExist(file: string): Promise<boolean> {
+  private async isFileExist(file: string): Promise<boolean> {
     return new Promise((resolve) => {
       stat(file, (err, stats) => {
         if (err) {
@@ -376,5 +423,142 @@ export class Filer implements OnModuleInit {
         }
       });
     });
+  }
+
+  /**
+   * Completes fragments to a document's state.
+   */
+  private completeDocs(fragments: { [path: string]: IoJson }): {
+    [path: string]: {
+      model?: ModelData;
+      frame?: FrameData;
+    };
+  } {
+    const documents: {
+      [path: string]: {
+        model?: ModelData;
+        frame?: FrameData;
+      };
+    } = {};
+    Object.keys(fragments).forEach((path: string) => {
+      const fragment = fragments[path];
+      const models = Object.keys(fragment.models);
+      const frames = Object.keys(fragment.frames);
+      if (models.length) {
+        models.forEach((name) => {
+          documents[`${path}?hdml-model=${name}`] = {
+            model: fragment.models[name],
+          };
+        });
+      }
+      if (frames.length) {
+        frames.forEach((name) => {
+          const uri = `${path}?hdml-frame=${name}`;
+          const frame = fragment.frames[name];
+          const source = frame.source;
+          documents[uri] = {
+            model: this.lookupModel(fragments, path, source),
+            frame: frame,
+          };
+          if (source.indexOf("/") === 0) {
+            if (source.indexOf("?hdml-frame=") > 0) {
+              const [path, name] = source.split("?hdml-frame=");
+              const parent = fragments[path]?.frames[name];
+              (<FrameData>documents[uri].frame).parent = parent;
+            }
+          }
+        });
+      }
+    });
+    return documents;
+  }
+
+  /**
+   * Searchs a `model` for the specified `current` path and the
+   * specified `fragment`.
+   */
+  private lookupModel(
+    fragments: { [path: string]: IoJson },
+    current: string,
+    source: string,
+  ): ModelData {
+    let cnt = 0;
+    let src: null | string = source;
+    let curr = current;
+    while (src && cnt < this._options.getCompilerFramesDepth()) {
+      cnt++;
+      this.assertSource(fragments, curr, src);
+      const index = src.indexOf("?hdml-frame=");
+      if (index >= 0) {
+        const [path, name]: string[] = src.split("?hdml-frame=");
+        const uri: string = index === 0 ? curr : path;
+        src = fragments[uri]?.frames[name]?.source;
+        curr = uri;
+      } else {
+        const [path, name] = src.split("?hdml-model=");
+        const uri: string = path.length === 0 ? curr : path;
+        return fragments[uri]?.models[name];
+      }
+    }
+    throw new Error(
+      `Lookup model failed for \`${current}\` source \`${source}\``,
+    );
+  }
+
+  /**
+   * Asserts `source` value for the specified `current` path and the
+   * specified `fragments`.
+   */
+  private assertSource(
+    fragments: { [path: string]: IoJson },
+    current: string,
+    source: string,
+  ): void {
+    const modelIndex = source.indexOf("?hdml-model=");
+    const frameIndex = source.indexOf("?hdml-frame=");
+    if (modelIndex === -1 && frameIndex === -1) {
+      throw new Error(`Invalid \`source\` value: ${source}`);
+    }
+    if (modelIndex > -1 && frameIndex > -1) {
+      throw new Error(`Invalid \`source\` value: ${source}`);
+    }
+    if (modelIndex === 0) {
+      const [, name] = source.split("?hdml-model=");
+      if (!fragments[current]?.models[name]) {
+        throw new Error(`Specified \`model\` is missing: ${source}`);
+      }
+    }
+    if (modelIndex > 0) {
+      const [path, name] = source.split("?hdml-model=");
+      if (!fragments[path]?.models[name]) {
+        throw new Error(`Specified \`model\` is missing: ${source}`);
+      }
+    }
+    if (frameIndex === 0) {
+      const [, name] = source.split("?hdml-frame=");
+      if (!fragments[current]?.frames[name]) {
+        throw new Error(`Specified \`frame\` is missing: ${source}`);
+      }
+    }
+    if (frameIndex > 0) {
+      const [path, name] = source.split("?hdml-frame=");
+      if (!fragments[path]?.frames[name]) {
+        throw new Error(`Specified \`frame\` is missing: ${source}`);
+      }
+    }
+  }
+
+  /**
+   * Determine whether specified `document` is valid or not.
+   */
+  private isValidDocument(document: Document): boolean {
+    return !!document.model || !!document.frame;
+  }
+
+  /**
+   * Determine whether specified `document` is complete or not.
+   */
+  private isCompleteDocument(document: Document): boolean {
+    return !!document.model;
   }
 }
