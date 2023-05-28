@@ -6,40 +6,42 @@ import {
 } from "@hdml/schema";
 import { t } from "../const";
 
-export function getFilterClauseSQL(
+export function getFilterClauseHTML(
   clause: FilterClauseData,
   level = 0,
   left?: string,
   right?: string,
 ): string {
   const pre = t.repeat(level);
-  let op = "";
-  let sql = "";
+  let open = "";
+  let close = "";
+  let html = "";
   switch (clause.type) {
     case FilterOperator.And:
-      sql = sql + `${pre}1 = 1\n`;
-      op = `${pre}and `;
+      open = `${pre}<hdml-connective operator="and">\n`;
+      close = `${pre}</hdml-connective>\n`;
       break;
     case FilterOperator.Or:
-      sql = sql + `${pre}1 != 1\n`;
-      op = `${pre}or `;
+      open = `${pre}<hdml-connective operator="or">\n`;
+      close = `${pre}</hdml-connective>\n`;
       break;
     case FilterOperator.None:
     default:
-      op = `${pre}`;
+      open = "";
+      close = "";
       break;
   }
-  sql =
-    sql +
+  html =
+    html +
+    open +
     clause.filters
-      .map((f) => `${op}${getFilter(f, left, right)}\n`)
+      .map((f) => `${pre}${t}${getFilter(f, left, right)}\n`)
       .join("");
   clause.children.forEach((child) => {
-    sql = sql + `${op}(\n`;
-    sql = sql + getFilterClauseSQL(child, level + 1, left, right);
-    sql = sql + `${pre})\n`;
+    html = html + getFilterClauseHTML(child, level + 1, left, right);
   });
-  return sql;
+  html = html + `${close}`;
+  return html;
 }
 
 export function getFilter(
@@ -57,12 +59,7 @@ export function getFilter(
       ) {
         throw new Error("Invalid `Keys` filter.");
       }
-      return getKeysFilter(
-        left,
-        filter.options.left,
-        right,
-        filter.options.right,
-      );
+      return getKeysFilter(filter.options.left, filter.options.right);
     case FilterType.Expr:
       if (!filter.options.clause) {
         throw new Error("Invalid `Expr` filter.");
@@ -74,14 +71,18 @@ export function getFilter(
 }
 
 export function getKeysFilter(
-  lTable: string,
   lField: string,
-  rTable: string,
   rField: string,
 ): string {
-  return `"${lTable}"."${lField}" =` + `"${rTable}"."${rField}"`;
+  return (
+    `<hdml-filter type="keys" left="${lField}" ` +
+    `right="${rField}"></hdml-filter>`
+  );
 }
 
 export function getExprFilter(clause: string): string {
-  return clause;
+  return `<hdml-filter type="expr" clause="${clause.replaceAll(
+    '"',
+    "`",
+  )}"></hdml-filter>`;
 }

@@ -283,6 +283,6 @@ const document = new Document(data);
 describe("Orchestrator", () => {
   it("convert document to a SQL string", () => {
     const sql = getSQL(document);
-    // console.log(sql);
+    console.log(sql);
   });
 });

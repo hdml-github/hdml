@@ -5,7 +5,10 @@ import {
   AggType,
 } from "@hdml/schema";
 
-export function getFieldHTML(field: FieldData): string {
+export function getFieldHTML(
+  field: FieldData,
+  withOrdering = false,
+): string {
   let result = `<hdml-field name="${field.name}"`;
   if (field.origin) {
     result = result + ` origin="${field.origin}"`;
@@ -20,8 +23,8 @@ export function getFieldHTML(field: FieldData): string {
   if (field.agg) {
     result = result + getAgg(field.agg);
   }
-  if (field.asc) {
-    result = result + (field.asc ? "" : ` asc="false"`);
+  if (withOrdering) {
+    result = result + (field.asc ? ` asc="true"` : ` asc="false"`);
   }
   result = result + "></hdml-field>";
   return result;

@@ -7,67 +7,37 @@ import {
   JoinType,
 } from "@hdml/schema";
 import { getFieldHTML } from "./fields";
-import { getFilterClauseSQL } from "./filter";
+import { getFilterClauseHTML } from "./filter";
 import { t } from "../const";
 
 export function getModelHTML(model: ModelData, level = 0): string {
-  const pre = t.repeat(level);
   const tablesList = model.tables
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .filter((t) => isModelTableJoined(model, t));
-
   const tables = tablesList
     .map((table: TableData) => {
       switch (table.type) {
         case TableType.Table:
         case TableType.Query:
-          return getModelTableSQL(table, level + 2);
+          return getModelTableHTML(table, level + 1);
         case TableType.Csv:
           return "";
         case TableType.Json:
           return "";
       }
     })
-    .join(",\n");
-
-  // subqueries
-  let sql = `${pre}${t}with\n`;
-  sql = sql + `${tables}\n`;
-
-  // select clause
-  sql = sql + `${pre}${t}select\n`;
-  sql =
-    sql +
-    tablesList
-      .map((tbl) =>
-        tbl.fields
-          .map(
-            (f) =>
-              `${pre}${t}${t}` +
-              `"${tbl.name}"."${f.name}" as "${tbl.name}_${f.name}"`,
-          )
-          .join(",\n"),
-      )
-      .join(",\n");
-
-  // from clause
-  if (model.joins.length === 0) {
-    sql = sql + `\n${pre}${t}from\n`;
-    sql =
-      sql +
-      tablesList
-        .map((tbl) => `${pre}${t}${t}"${tbl.name}"`)
-        .join(",\n");
-  } else {
+    .join("\n");
+  let html = `<hdml-model name="${model.name}">\n` + `${tables}\n`;
+  if (model.joins.length > 0) {
     const path = getModelJoinsPath(model.joins);
-    sql =
-      sql +
+    html =
+      html +
       model.joins
-        .map((join, i) => getModelJoinSQL(path, join, i, level))
+        .map((join, i) => getModelJoinHTML(path, join, i, level + 1))
         .join();
   }
-
-  return sql;
+  html = html + "</hdml-model>\n";
+  return html;
 }
 
 export function isModelTableJoined(
@@ -85,35 +55,36 @@ export function isModelTableJoined(
   return res;
 }
 
-export function getModelTableSQL(
+export function getModelTableHTML(
   table: TableData,
   level = 0,
 ): string {
   const pre = t.repeat(level);
-  const source =
-    table.type === TableType.Table ? table.source : `_${table.name}`;
   const fields = table.fields
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
-    .map((field: FieldData) => `${pre}${t}${t}${getFieldHTML(field)}`)
-    .join(",\n");
-
-  let sql = `${pre}"${table.name}" as (\n`;
-  sql =
-    sql +
-    (table.type === TableType.Query
-      ? `${pre}${t}with ${source} as (\n` +
-        `${table.source
-          .split("\n")
-          .map((r) => `${pre}${t}${t}${r}`)
-          .join("\n")}\n` +
-        `${pre}${t})\n`
-      : "");
-  sql = sql + `${pre}${t}select\n`;
-  sql = sql + `${fields}\n`;
-  sql = sql + `${pre}${t}from\n`;
-  sql = sql + `${pre}${t}${t}${source}\n`;
-  sql = sql + `${pre})`;
-  return sql;
+    .map((field: FieldData) => `${pre}${t}${getFieldHTML(field)}`)
+    .join("\n");
+  let type = "";
+  switch (table.type) {
+    case TableType.Table:
+      type = "table";
+      break;
+    case TableType.Query:
+      type = "query";
+      break;
+    case TableType.Csv:
+      type = "csv";
+      break;
+    case TableType.Json:
+      type = "json";
+      break;
+  }
+  let html = `${pre}<hdml-table name="${
+    table.name
+  }" type="${type}" source="${table.source.replaceAll('"', "`")}">\n`;
+  html = html + `${fields}\n`;
+  html = html + `${pre}</hdml-table>`;
+  return html;
 }
 
 export function getModelJoinsPath(joins: JoinData[]): string[] {
@@ -131,57 +102,57 @@ export function getModelJoinsPath(joins: JoinData[]): string[] {
   return path;
 }
 
-export function getModelJoinSQL(
+export function getModelJoinHTML(
   path: string[],
   join: JoinData,
   i: number,
   level = 0,
 ): string {
   const pre = t.repeat(level);
-  let sql = "";
+  let html = `${pre}<hdml-join`;
   let type = "";
   switch (join.type) {
     case JoinType.Full:
-      type = "full join";
+      type = "full";
       break;
     case JoinType.Left:
-      type = "left join";
+      type = "left";
       break;
     case JoinType.Right:
-      type = "right join";
+      type = "right";
       break;
     case JoinType.FullOuter:
-      type = "full outer join";
+      type = "full-outer";
       break;
     case JoinType.LeftOuter:
-      type = "left outer join";
+      type = "left-outer";
       break;
     case JoinType.RightOuter:
-      type = "right outer join";
+      type = "right-outer";
       break;
     case JoinType.Inner:
-      type = "inner join";
+      type = "inner";
       break;
     case JoinType.Cross:
     default:
-      type = "cross join";
+      type = "cross";
       break;
   }
-  if (i === 0) {
-    sql = sql + `\n${pre}${t}from "${join.left}"\n`;
-  }
-  sql = sql + `${pre}${t}${type} "${path[i]}"\n`;
+  html =
+    html +
+    ` type="${type}"` +
+    ` left="${join.left}"` +
+    ` right="${join.right}">\n`;
   if (join.type !== JoinType.Cross) {
-    sql = sql + `${pre}${t}on (\n`;
-    sql =
-      sql +
-      getFilterClauseSQL(
+    html =
+      html +
+      getFilterClauseHTML(
         join.clause,
-        level + 2,
+        level + 1,
         join.left,
         join.right,
       );
-    sql = sql + `${pre}${t})\n`;
   }
-  return sql;
+  html = html + `${pre}</hdml-join>\n`;
+  return html;
 }

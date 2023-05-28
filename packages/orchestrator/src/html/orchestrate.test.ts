@@ -29,7 +29,7 @@ const data: DocumentData = {
       {
         name: "tables",
         type: TableType.Table,
-        source: "tenant_postgres.information_schema.tables",
+        source: '"tenant_postgres"."information_schema"."tables"',
         fields: [
           {
             name: "catalog",
@@ -71,7 +71,8 @@ const data: DocumentData = {
         name: "columns",
         type: TableType.Query,
         source:
-          "select * from tenant_postgres.information_schema.columns",
+          "select * from " +
+          '"tenant_postgres"."information_schema"."columns"',
         fields: [
           {
             name: "catalog",
