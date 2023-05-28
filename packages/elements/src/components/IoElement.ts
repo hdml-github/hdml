@@ -325,15 +325,15 @@ export class IoElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
-    this._updatesPromises.model.reject &&
-      this._updatesPromises.model.reject("Disconnected `IoElement`");
+    // this._updatesPromises.model.reject &&
+    // this._updatesPromises.model.reject("Disconnected `IoElement`");
     this._updatesPromises.model = {
       promise: null,
       resolve: null,
       reject: null,
     };
-    this._updatesPromises.frame.reject &&
-      this._updatesPromises.frame.reject("Disconnected `IoElement`");
+    // this._updatesPromises.frame.reject &&
+    // this._updatesPromises.frame.reject("Disconnected `IoElement`");
     this._updatesPromises.frame = {
       promise: null,
       resolve: null,
@@ -597,7 +597,7 @@ export class IoElement extends UnifiedElement {
    * Detaches `hdml-model` element from the models map.
    */
   private _detachModel(model: ModelElement) {
-    if (this._models.has(model.uid)) {
+    if (model.uid && this._models.has(model.uid)) {
       model.removeEventListener(
         "hdml-model:changed",
         this._modelChangedListener,
@@ -615,7 +615,7 @@ export class IoElement extends UnifiedElement {
    * Detaches `hdml-frame` element from the frames map.
    */
   private _detachFrame(frame: FrameElement) {
-    if (this._frames.has(frame.uid)) {
+    if (frame.uid && this._frames.has(frame.uid)) {
       frame.removeEventListener(
         "hdml-frame:changed",
         this._frameChangedListener,

@@ -354,7 +354,7 @@ export class TableElement extends UnifiedElement {
    * Attaches `hdml-field` element to the fields map.
    */
   private _attachField(field: FieldElement) {
-    if (!this._fields.has(field.uid)) {
+    if (field.uid && !this._fields.has(field.uid)) {
       this._fields.set(field.uid, field);
       field.addEventListener(
         "hdml-field:changed",
@@ -368,7 +368,7 @@ export class TableElement extends UnifiedElement {
    * Detaches `hdml-field` element from the tables map.
    */
   private _detachField(field: FieldElement) {
-    if (this._fields.has(field.uid)) {
+    if (field.uid && this._fields.has(field.uid)) {
       field.removeEventListener(
         "hdml-field:changed",
         this._fieldChangedListener,

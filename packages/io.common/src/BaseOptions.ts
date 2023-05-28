@@ -118,14 +118,14 @@ export class BaseOptions {
    * Returns compiler min pages pool size.
    */
   public getCompilerPoolMin(): number {
-    return 2;
+    return 3;
   }
 
   /**
    * Returns compiler max pages pool size.
    */
   public getCompilerPoolMax(): number {
-    return 10;
+    return 50;
   }
 
   /**

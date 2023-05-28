@@ -314,7 +314,7 @@ export class ModelElement extends UnifiedElement {
    * Attaches `hdml-table` element to the tables map.
    */
   private _attachTable(table: TableElement) {
-    if (!this._tables.has(table.uid)) {
+    if (table.uid && !this._tables.has(table.uid)) {
       this._tables.set(table.uid, table);
       table.addEventListener(
         "hdml-table:changed",
@@ -328,7 +328,7 @@ export class ModelElement extends UnifiedElement {
    * Attaches `hdml-join` element to the joins map.
    */
   private _attachJoin(join: JoinElement) {
-    if (!this._joins.has(join.uid)) {
+    if (join.uid && !this._joins.has(join.uid)) {
       this._joins.set(join.uid, join);
       join.addEventListener(
         "hdml-join:changed",
@@ -342,7 +342,7 @@ export class ModelElement extends UnifiedElement {
    * Detaches `hdml-table` element from the tables map.
    */
   private _detachTable(table: TableElement) {
-    if (this._tables.has(table.uid)) {
+    if (table.uid && this._tables.has(table.uid)) {
       table.removeEventListener(
         "hdml-table:changed",
         this._tableChangedListener,
@@ -356,7 +356,7 @@ export class ModelElement extends UnifiedElement {
    * Detaches `hdml-join` element from the joins map.
    */
   private _detachJoin(join: JoinElement) {
-    if (this._joins.has(join.uid)) {
+    if (join.uid && this._joins.has(join.uid)) {
       join.removeEventListener(
         "hdml-join:changed",
         this._joinChangedListener,

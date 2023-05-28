@@ -345,7 +345,7 @@ export class ConnectiveElement extends UnifiedElement {
    * Attaches `hdml-filter` element to the filters map.
    */
   private _attachFilter(filter: FilterElement) {
-    if (!this._filters.has(filter.uid)) {
+    if (filter.uid && !this._filters.has(filter.uid)) {
       this._filters.set(filter.uid, filter);
       filter.addEventListener(
         "hdml-filter:changed",
@@ -359,7 +359,7 @@ export class ConnectiveElement extends UnifiedElement {
    * Attaches `hdml-connective` element to the connectives map.
    */
   private _attachConnective(conn: ConnectiveElement) {
-    if (!this._connectives.has(conn.uid)) {
+    if (conn.uid && !this._connectives.has(conn.uid)) {
       this._connectives.set(conn.uid, conn);
       conn.addEventListener(
         "hdml-connective:changed",
@@ -373,7 +373,7 @@ export class ConnectiveElement extends UnifiedElement {
    * Detaches `hdml-filter` element from the filters map.
    */
   private _detachFilter(filter: FilterElement) {
-    if (this._filters.has(filter.uid)) {
+    if (filter.uid && this._filters.has(filter.uid)) {
       filter.removeEventListener(
         "hdml-filter:changed",
         this._filterChangedListener,
@@ -387,7 +387,7 @@ export class ConnectiveElement extends UnifiedElement {
    * Detaches `hdml-connective` element from the connectives map.
    */
   private _detachConnective(conn: ConnectiveElement) {
-    if (this._connectives.has(conn.uid)) {
+    if (conn.uid && this._connectives.has(conn.uid)) {
       conn.removeEventListener(
         "hdml-connective:changed",
         this._connectiveChangedListener,

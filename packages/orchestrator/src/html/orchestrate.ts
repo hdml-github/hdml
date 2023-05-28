@@ -10,7 +10,7 @@ export function getHTML(document: {
     throw new Error("Model is missing.");
   }
   if (document.frame) {
-    return getFrameHTML(document.frame, document.model, 0);
+    return getFrameHTML(document.frame, document.model, 0, true);
   } else {
     return getModelHTML(document.model, 0);
   }

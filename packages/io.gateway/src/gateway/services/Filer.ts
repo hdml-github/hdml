@@ -14,7 +14,8 @@ import { getHTML } from "@hdml/orchestrator";
 import { IoJson } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
-import { Compiler } from "./Compiler";
+// import { CompilerJsDom as Compiler } from "./CompilerJsDom";
+import { CompilerPuppeteer as Compiler } from "./CompilerPuppeteer";
 
 /**
  * List of the standard environment variables keys.

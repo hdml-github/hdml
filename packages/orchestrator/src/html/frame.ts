@@ -12,6 +12,7 @@ export function getFrameHTML(
   frame: FrameData,
   model: ModelData,
   level = 0,
+  isRoot = false,
 ): string {
   const pre = t.repeat(level);
   let html = "";
@@ -26,7 +27,8 @@ export function getFrameHTML(
     `name="${frame.name}" ` +
     `source="${frame.source}" ` +
     `offset="${frame.offset}" ` +
-    `limit="${frame.limit}">\n`;
+    `limit="${frame.limit}"` +
+    `${isRoot ? ` root="root"` : ""}>\n`;
   html =
     html +
     frame.fields

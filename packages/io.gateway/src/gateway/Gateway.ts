@@ -3,14 +3,22 @@ import { Options } from "./services/Options";
 import { Filer } from "./services/Filer";
 import { Queue } from "./services/Queue";
 import { Tokens } from "./services/Tokens";
-import { Compiler } from "./services/Compiler";
+import { CompilerPuppeteer } from "./services/CompilerPuppeteer";
+import { CompilerJsDom } from "./services/CompilerJsDom";
 import { PublicREST } from "./controllers/PublicREST.v0";
 
 @Module({
   imports: [],
   exports: [],
   controllers: [PublicREST],
-  providers: [Options, Tokens, Compiler, Filer, Queue],
+  providers: [
+    Options,
+    Tokens,
+    CompilerPuppeteer,
+    CompilerJsDom,
+    Filer,
+    Queue,
+  ],
 })
 export class Gateway {
   private static _options: null | Options = null;

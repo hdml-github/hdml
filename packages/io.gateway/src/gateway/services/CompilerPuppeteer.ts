@@ -1,7 +1,6 @@
 import * as pool from "generic-pool";
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { Injectable, Logger } from "@nestjs/common";
-import { ModelData, FrameData } from "@hdml/schema";
 import { IoElement, IoJson } from "@hdml/elements";
 import { Options } from "./Options";
 
@@ -9,11 +8,11 @@ import { Options } from "./Options";
  * Compiler service.
  */
 @Injectable()
-export class Compiler {
+export class CompilerPuppeteer {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(Compiler.name, {
+  private readonly _logger = new Logger(CompilerPuppeteer.name, {
     timestamp: true,
   });
 
@@ -38,10 +37,10 @@ export class Compiler {
    */
   public async bootstrap(script: string): Promise<void> {
     this._browser = await puppeteer.launch({
-      headless: false,
-      devtools: true,
-      // headless: "new",
-      // devtools: false,
+      // headless: false,
+      // devtools: true,
+      headless: "new",
+      devtools: false,
     });
     let createPage = false;
     this._pool = pool.createPool<Page>(
@@ -71,8 +70,8 @@ export class Compiler {
         },
       },
       {
-        min: 10, // this._options.getCompilerPoolMin(),
-        max: 100, // this._options.getCompilerPoolMax(),
+        min: this._options.getCompilerPoolMin(),
+        max: this._options.getCompilerPoolMax(),
         maxWaitingClients: this._options.getCompilerPoolQueueSize(),
         testOnBorrow: false,
         evictionRunIntervalMillis: 0,
@@ -111,7 +110,8 @@ export class Compiler {
       const json = await io.evaluate(async (elm) => {
         return await elm.toJSON();
       });
-      await this.removeBody(page);
+      const a = await page.evaluate("console.log(window.document.querySelector('hdml-io'))");
+      await this.removeBody(page, io);
       await this._pool.release(page);
       return json;
     } else {
@@ -135,16 +135,6 @@ export class Compiler {
   }
 
   /**
-   * Returns scripts content.
-   */
-  private getScript(script: string): string {
-    return `${script}\n
-    (async () => {
-      await window['@hdml/elements'].defineDefaults();
-    })();`;
-  }
-
-  /**
    * Renders `hdml` content on the page body.
    */
   private async renderBody(page: Page, hdml: string): Promise<void> {
@@ -158,20 +148,12 @@ export class Compiler {
   }
 
   /**
-   * Returns body content.
-   */
-  private getBody(hdml: string): string {
-    return `<hdml-io
-      name="hdml.io"
-      host="hdml.io"
-      tenant="common"
-      token="compiler_token"></hdml-io>\n${hdml}`;
-  }
-
-  /**
    * Removes page body content.
    */
-  private async removeBody(page: Page): Promise<void> {
+  private async removeBody(
+    page: Page,
+    io: ElementHandle<IoElement>,
+  ): Promise<void> {
     await page.$$eval("hdml-model", (models) => {
       models.forEach((model) => {
         model.parentElement?.removeChild(model);
@@ -182,8 +164,33 @@ export class Compiler {
         frame.parentElement?.removeChild(frame);
       });
     });
+    await io.dispose();
     await page.$eval("body", (elm) => {
       elm.textContent = null;
     });
+  }
+
+  /**
+   * Returns scripts content.
+   */
+  private getScript(script: string): string {
+    return `${script}
+    (async () => {
+      await window['@hdml/elements'].defineDefaults();
+    })();`;
+  }
+
+  /**
+   * Returns body content.
+   */
+  private getBody(hdml: string): string {
+    return `
+      <hdml-io
+        name="hdml.io"
+        host="hdml.io"
+        tenant="common"
+        token="compiler_token">
+      </hdml-io>
+      ${hdml}`;
   }
 }
