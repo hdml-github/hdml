@@ -359,47 +359,56 @@ export class IoElement extends UnifiedElement {
   /**
    * Returns element `JSON`-representation.
    */
-  public toJSON(): IoJson {
-    const models: { [name: string]: ModelData } = {};
-    const frames: { [name: string]: FrameData } = {};
+  public async toJSON(): Promise<IoJson> {
+    const promises: Promise<void>[] = [];
+    if (this._updatesPromises.model.promise) {
+      promises.push(this._updatesPromises.model.promise);
+    }
+    if (this._updatesPromises.frame.promise) {
+      promises.push(this._updatesPromises.frame.promise);
+    }
+    return await Promise.all(promises).then(() => {
+      const models: { [name: string]: ModelData } = {};
+      const frames: { [name: string]: FrameData } = {};
 
-    // models
-    this._models.forEach((model) => {
-      const data = model.toJSON();
-      models[data.name] = data;
-    });
+      // models
+      this._models.forEach((model) => {
+        const data = model.toJSON();
+        models[data.name] = data;
+      });
 
-    // frames
-    this._frames.forEach((frame) => {
-      let source = frame.source;
-      let _frame = frame.toJSON();
-      const name = _frame.name;
-      const body = _frame;
+      // frames
+      this._frames.forEach((frame) => {
+        let source = frame.source;
+        let _frame = frame.toJSON();
+        const name = _frame.name;
+        const body = _frame;
 
-      while (source && source.indexOf("?") === 0) {
-        if (source.indexOf("?hdml-model=") === 0) {
-          source = null;
-        } else if (source.indexOf("?hdml-frame=") === 0) {
-          const [, frameName] = source.split("?hdml-frame=");
-          let linked = false;
-          this._frames.forEach((frame) => {
-            if (frame.name === frameName) {
-              linked = true;
-              source = frame.source;
-              _frame.parent = frame.toJSON();
-              _frame = _frame.parent;
+        while (source && source.indexOf("?") === 0) {
+          if (source.indexOf("?hdml-model=") === 0) {
+            source = null;
+          } else if (source.indexOf("?hdml-frame=") === 0) {
+            const [, frameName] = source.split("?hdml-frame=");
+            let linked = false;
+            this._frames.forEach((frame) => {
+              if (frame.name === frameName) {
+                linked = true;
+                source = frame.source;
+                _frame.parent = frame.toJSON();
+                _frame = _frame.parent;
+              }
+            });
+            if (!linked) {
+              throw new Error(`Invalid \`source\` link: ${source}`);
             }
-          });
-          if (!linked) {
-            throw new Error(`Invalid \`source\` link: ${source}`);
+          } else {
+            throw new Error(`Invalid \`source\` value: ${source}`);
           }
-        } else {
-          throw new Error(`Invalid \`source\` value: ${source}`);
         }
-      }
-      frames[name] = body;
+        frames[name] = body;
+      });
+      return { models, frames };
     });
-    return { models, frames };
   }
 
   /**

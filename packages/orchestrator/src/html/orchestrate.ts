@@ -1,8 +1,11 @@
-import { type Document } from "@hdml/schema";
+import { type ModelData, type FrameData } from "@hdml/schema";
 import { getModelHTML } from "./model";
 import { getFrameHTML } from "./frame";
 
-export function getHTML(document: Document): string {
+export function getHTML(document: {
+  model: ModelData;
+  frame?: FrameData;
+}): string {
   if (!document.model) {
     throw new Error("Model is missing.");
   }

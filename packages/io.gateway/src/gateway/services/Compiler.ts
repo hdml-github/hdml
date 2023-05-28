@@ -38,10 +38,10 @@ export class Compiler {
    */
   public async bootstrap(script: string): Promise<void> {
     this._browser = await puppeteer.launch({
-      // headless: false,
-      // devtools: true,
-      headless: "new",
-      devtools: false,
+      headless: false,
+      devtools: true,
+      // headless: "new",
+      // devtools: false,
     });
     let createPage = false;
     this._pool = pool.createPool<Page>(
@@ -71,8 +71,8 @@ export class Compiler {
         },
       },
       {
-        min: this._options.getCompilerPoolMin(),
-        max: this._options.getCompilerPoolMax(),
+        min: 10, // this._options.getCompilerPoolMin(),
+        max: 100, // this._options.getCompilerPoolMax(),
         maxWaitingClients: this._options.getCompilerPoolQueueSize(),
         testOnBorrow: false,
         evictionRunIntervalMillis: 0,
@@ -108,8 +108,8 @@ export class Compiler {
       const io = (await page.$(
         "hdml-io",
       )) as ElementHandle<IoElement>;
-      const json = await io.evaluate((elm) => {
-        return elm.toJSON();
+      const json = await io.evaluate(async (elm) => {
+        return await elm.toJSON();
       });
       await this.removeBody(page);
       await this._pool.release(page);
@@ -165,13 +165,23 @@ export class Compiler {
       name="hdml.io"
       host="hdml.io"
       tenant="common"
-      token="token"></hdml-io>\n${hdml}`;
+      token="compiler_token"></hdml-io>\n${hdml}`;
   }
 
   /**
    * Removes page body content.
    */
   private async removeBody(page: Page): Promise<void> {
+    await page.$$eval("hdml-model", (models) => {
+      models.forEach((model) => {
+        model.parentElement?.removeChild(model);
+      });
+    });
+    await page.$$eval("hdml-frame", (frames) => {
+      frames.forEach((frame) => {
+        frame.parentElement?.removeChild(frame);
+      });
+    });
     await page.$eval("body", (elm) => {
       elm.textContent = null;
     });

@@ -94,47 +94,47 @@ export class PublicREST {
         this._filer.getPrivateKey(tenant),
         request.header("Session"),
       );
-      const document = this._filer.getQueriedHdmlDocument(
+      const document = this._filer.getQueriedHtmlDocument(
         tenant,
         new Document(await rawbody(request)),
       );
-      return Promise.resolve(JSON.stringify(document));
+      return document;
     } catch (error) {
       this._logger.error(error);
       throw error;
     }
   }
 
-  @Post()
-  @Header("Access-Control-Allow-Origin", "*")
-  async statement(@Req() req: Request): Promise<StreamableFile> {
-    if (req.readable) {
-      const buff = await rawbody(req);
-      const doc = new Document(buff);
-      const sql = orchestrate(doc);
-      console.log(sql);
-      const response = await fetch("http://localhost:3000", {
-        method: "POST",
-        mode: "cors",
-        redirect: "follow",
-        cache: "no-cache",
-        headers: {
-          Accept: "text/html; charset=utf-8",
-          "Content-Type": "text/html; charset=utf-8",
-        },
-        body: sql,
-      });
-      if (!response.ok) {
-        throw new Error("Network response was not OK");
-      }
-      const buffer = await response.arrayBuffer();
-      const array = new Uint8Array(buffer);
-      const datasetStream = new stream.PassThrough();
-      datasetStream.write(array);
-      datasetStream.end();
-      return new StreamableFile(datasetStream);
-    } else {
-      throw new Error("Can't parse the request body.");
-    }
-  }
+  // @Post()
+  // @Header("Access-Control-Allow-Origin", "*")
+  // async statement(@Req() req: Request): Promise<StreamableFile> {
+  //   if (req.readable) {
+  //     const buff = await rawbody(req);
+  //     const doc = new Document(buff);
+  //     const sql = orchestrate(doc);
+  //     console.log(sql);
+  //     const response = await fetch("http://localhost:3000", {
+  //       method: "POST",
+  //       mode: "cors",
+  //       redirect: "follow",
+  //       cache: "no-cache",
+  //       headers: {
+  //         Accept: "text/html; charset=utf-8",
+  //         "Content-Type": "text/html; charset=utf-8",
+  //       },
+  //       body: sql,
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not OK");
+  //     }
+  //     const buffer = await response.arrayBuffer();
+  //     const array = new Uint8Array(buffer);
+  //     const datasetStream = new stream.PassThrough();
+  //     datasetStream.write(array);
+  //     datasetStream.end();
+  //     return new StreamableFile(datasetStream);
+  //   } else {
+  //     throw new Error("Can't parse the request body.");
+  //   }
+  // }
 }

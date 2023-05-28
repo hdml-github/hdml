@@ -38,7 +38,8 @@ export class Client {
       _tenant &&
       _tenant.length &&
       _token &&
-      _token.length
+      _token.length &&
+      _token !== "compiler_token"
     ) {
       this.initialize().catch(console.error);
     }

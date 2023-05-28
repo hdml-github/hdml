@@ -12,7 +12,7 @@
         name="hdml.io"
         host="http://localhost:8888"
         tenant="common"
-        token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.dZztg-grohkP7WETtTF8Obai_79SD1-BfGBh5TLzlUA4IhueurGlpKwllqonZly8bwT9qgAxD-kn0-_40RkPQ7NcX3R9cYlg7CBJFKDsOYMm5nbq8VyKhijw7AtimsVaVRgf3vGTCaHfORA2H2uxq8cGa37rXvINXOhwPghzWpMoF4kzPpQKCGYVBB3LCR2onqCxuhTleH5qU428lRxzmwC_0UefqSyI6edlgI5gC3cLhDgnEXC1PEj4iyYEFl1pa5z5ibHSpTuWL20yJHlOAHgLgukKYnWJBQELgVS9JRjnYg1EJub_b_x47h9Q6wS4FKvbUtA0uyEl9dlBwiZCu5FIQSf61JecfqKLmkJ9e8Lg2G2KdZ_ySlzHvs4awdlRDJ3SFqVVLAC8ORpv2J74FcnvMYFXQImVlbsNd3ma0qF-oHPE1rWpi3t8FqX3kyOo53gFVKHw0J9HXp5KZubMXf2lw7SaEipUak-wTew01ksFrjHpKB5Mn-pyhS8qlKYW.5LyQPlwyYR--SQPs.US6DY6-LCyjA1eWfXd3cbzjKgRRXn20ODsTGNllqxScnC9bA3tWea3oG-3aONJPVEHDZ07q43ZXDsVfcq5Q6gCX3nmyDMb0C5n2QPVLIKgXid243HuHd1aIJ4R3hkPrkQ5BxuC8-Pu70E-a3H1tXDnT_LSgm.fUzEZsUDqF_jljEI7eWaiw">
+        token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.S1jfZ5bAoRMabXOqrCcdbfrgRehltutAShLkO918e1DDFrolQR7xnY6gtZCJbXskN1jUY_pqhpTRQi_EMHzOnHRJyKmJFS9B1XkoTXJ38d3_e_WxLzw70U5iBj0QpsqY0Bl-j_u7sCIq7gYSNSq7TGZsTe7as0IVwhqoEOO0-f-ssDzmalP3biEJOq-GFMnd1LmKSGuoO4BkxQKf50QQfzyGU-vg-7RW_YU5wwxCt_xHNNzUsLFHMl5U0-bSu3GwYM0acDWDHyl0RcevOAvGn2dd-pW8abQuS1uwKxwgeo34JpIVjhfJ6yKmZTNrf1K9IU4Wgik3HUZSMiq-bTkzeXC5WTjxB1p7I7ODOK_juER-VJFrzF24p3NDHo84QBiq9Gyjqt4WlCGw3RtwJpFEsxzMASrIEXflPzd4BD2-cOs1LwQ23gdpHuBtnLqQPDPKjyklsBT3fmUbKaqLZikJD5JZ9ok4U9JI9bnr4KxfswprFjTP-p4lVE4ZWyI-Ifb7.G-bdMIkQ8rY_Q2EY.jJhREjPZ32F2pkvh95JMDd9hfRJwsc-Hx3NTOZ5UUjZCBx1n9Hd7pXeYeLIaRvSqBghnna1IzrxIizXntORckKSJYPOPXhsgKeUoUvtsM1guojKlYGGfUzBTAv6ipk01GKUeY_m-JnVmVBvnbU72RsAo5qWV.fTVjMuxeXJaj9YY7Q9axPQ">
       </hdml-io>
 
       <hdml-model
@@ -234,7 +234,7 @@
 
       <script>
         const io = document.querySelector("hdml-io");
-        console.log(io.json);
+        io.toJSON().then(console.log);
       </script>
     </body>
 </html>

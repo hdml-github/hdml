@@ -10,6 +10,7 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { ModelData, FrameData, Document } from "@hdml/schema";
+import { getHTML } from "@hdml/orchestrator";
 import { IoJson } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
@@ -184,6 +185,13 @@ export class Filer implements OnModuleInit {
         frame,
       };
     }
+  }
+
+  public getQueriedHtmlDocument(
+    tenant: string,
+    document: Document,
+  ): string {
+    return getHTML(this.getQueriedHdmlDocument(tenant, document));
   }
 
   /**

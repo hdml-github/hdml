@@ -15,6 +15,8 @@ import {
   JoinType,
   FilterOperator,
   FilterType,
+  FrameData,
+  ModelData,
 } from "@hdml/schema";
 import { getHTML } from "./orchestrate";
 
@@ -283,7 +285,14 @@ const document = new Document(data);
 
 describe("Orchestrator", () => {
   it("convert document to a SQL string", () => {
-    const sql = getHTML(document);
+    const sql = getHTML(
+      <
+        {
+          model: ModelData;
+          frame?: FrameData;
+        }
+      >document,
+    );
     console.log(sql);
   });
 });

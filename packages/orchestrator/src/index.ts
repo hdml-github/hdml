@@ -1,9 +1,12 @@
-import { type Document } from "@hdml/schema";
+import { type ModelData, type FrameData } from "@hdml/schema";
 import { getSQL } from "./sql/orchestrate";
 import { getHTML } from "./html/orchestrate";
 
 export function orchestrate(
-  document: Document,
+  document: {
+    model: ModelData;
+    frame?: FrameData;
+  },
   toHtml = false,
 ): string {
   if (!toHtml) {
@@ -12,4 +15,4 @@ export function orchestrate(
     return getHTML(document);
   }
 }
-export { getSQL };
+export { getSQL, getHTML };
