@@ -39,7 +39,9 @@ export function getFrameHTML(
       .join("\n") +
     "\n";
   if (frame.filterBy) {
-    html = html + getFilterClauseHTML(frame.filterBy, level + 1);
+    html = html + `${pre}${t}<hdml-filter-by>\n`;
+    html = html + getFilterClauseHTML(frame.filterBy, level + 2);
+    html = html + `${pre}${t}</hdml-filter-by>\n`;
   }
   if (frame.groupBy && frame.groupBy.length > 0) {
     html = html + `${pre}${t}<hdml-group-by>\n`;
