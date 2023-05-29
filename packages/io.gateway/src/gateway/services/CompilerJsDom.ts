@@ -1,7 +1,5 @@
 import { TextEncoder, TextDecoder } from "util";
 import { JSDOM, DOMWindow } from "jsdom";
-import { NodeVM, VMScript } from "vm2";
-import * as pool from "generic-pool";
 import { Injectable, Logger } from "@nestjs/common";
 import { IoElement, IoJson } from "@hdml/elements";
 import { Options } from "./Options";
