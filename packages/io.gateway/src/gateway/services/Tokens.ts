@@ -201,9 +201,9 @@ export class Tokens {
   }
 
   /**
-   * Returns session scope. Throws if decryption failed.
+   * Returns session context. Throws if decryption failed.
    */
-  public async getSessionScope(
+  public async getContext(
     key: null | KeyLike,
     token?: string,
   ): Promise<object> {

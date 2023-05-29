@@ -27,6 +27,11 @@ export class CompilerPuppeteer {
   private _pool: null | pool.Pool<Page> = null;
 
   /**
+   * Page script content.
+   */
+  private _script = "";
+
+  /**
    * Class constructor.
    */
   constructor(private readonly _options: Options) {}
@@ -36,6 +41,7 @@ export class CompilerPuppeteer {
    * pool.
    */
   public async bootstrap(script: string): Promise<void> {
+    this._script = script;
     this._browser = await puppeteer.launch({
       // headless: false,
       // devtools: true,
@@ -57,7 +63,6 @@ export class CompilerPuppeteer {
           } else {
             page = await this._browser.newPage();
           }
-          await this.configurePage(page, script);
           return page;
         },
         destroy: async (page: Page) => {
@@ -103,6 +108,7 @@ export class CompilerPuppeteer {
   private async compilePuppeteer(hdml: string): Promise<IoJson> {
     if (this._browser && this._pool) {
       const page = await this._pool.acquire();
+      await this.configurePage(page);
       await this.renderBody(page, hdml);
       const io = (await page.$(
         "hdml-io",
@@ -110,8 +116,9 @@ export class CompilerPuppeteer {
       const json = await io.evaluate(async (elm) => {
         return await elm.toJSON();
       });
-      const a = await page.evaluate("console.log(window.document.querySelector('hdml-io'))");
-      await this.removeBody(page, io);
+      // const a = await page.evaluate();
+      await io.dispose();
+      await page.reload({ timeout: 0 });
       await this._pool.release(page);
       return json;
     } else {
@@ -122,15 +129,12 @@ export class CompilerPuppeteer {
   /**
    * Configures browser page.
    */
-  private async configurePage(
-    page: Page,
-    script: string,
-  ): Promise<void> {
+  private async configurePage(page: Page): Promise<void> {
     page.on("console", (msg) => {
       this._logger.debug(`Page ${msg.type()}: ${msg.text()}`);
     });
     await page.addScriptTag({
-      content: this.getScript(script),
+      content: this.getScript(this._script),
     });
   }
 
@@ -150,25 +154,25 @@ export class CompilerPuppeteer {
   /**
    * Removes page body content.
    */
-  private async removeBody(
-    page: Page,
-    io: ElementHandle<IoElement>,
-  ): Promise<void> {
-    await page.$$eval("hdml-model", (models) => {
-      models.forEach((model) => {
-        model.parentElement?.removeChild(model);
-      });
-    });
-    await page.$$eval("hdml-frame", (frames) => {
-      frames.forEach((frame) => {
-        frame.parentElement?.removeChild(frame);
-      });
-    });
-    await io.dispose();
-    await page.$eval("body", (elm) => {
-      elm.textContent = null;
-    });
-  }
+  // private async removeBody(
+  //   page: Page,
+  //   io: ElementHandle<IoElement>,
+  // ): Promise<void> {
+  //   await page.$$eval("hdml-model", (models) => {
+  //     models.forEach((model) => {
+  //       model.parentElement?.removeChild(model);
+  //     });
+  //   });
+  //   await page.$$eval("hdml-frame", (frames) => {
+  //     frames.forEach((frame) => {
+  //       frame.parentElement?.removeChild(frame);
+  //     });
+  //   });
+  //   await io.dispose();
+  //   await page.$eval("body", (elm) => {
+  //     elm.textContent = null;
+  //   });
+  // }
 
   /**
    * Returns scripts content.

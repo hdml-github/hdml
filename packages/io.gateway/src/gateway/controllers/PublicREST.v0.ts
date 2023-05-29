@@ -90,13 +90,19 @@ export class PublicREST {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const scope = await this._tokens.getSessionScope(
+      const body = await rawbody(request);
+      const context = await this._tokens.getContext(
         this._filer.getPrivateKey(tenant),
         request.header("Session"),
       );
+      await this._filer.postHdmlDocument(
+        tenant,
+        context,
+        new Document(body),
+      );
       const document = this._filer.getQueriedHtmlDocument(
         tenant,
-        new Document(await rawbody(request)),
+        new Document(body),
       );
       return document;
     } catch (error) {

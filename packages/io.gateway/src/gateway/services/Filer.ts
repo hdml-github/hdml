@@ -2,6 +2,7 @@ import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { KeyLike } from "jose";
+import { NodeVM, VMScript } from "vm2";
 import {
   Injectable,
   Logger,
@@ -14,8 +15,7 @@ import { getHTML } from "@hdml/orchestrator";
 import { IoJson } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
-// import { CompilerJsDom as Compiler } from "./CompilerJsDom";
-import { CompilerPuppeteer as Compiler } from "./CompilerPuppeteer";
+import { HookFn, CompilerJsDom as Compiler } from "./CompilerJsDom";
 
 /**
  * List of the standard environment variables keys.
@@ -36,6 +36,7 @@ export type TenantFiles = {
   env: EnvTable;
   key: KeyLike;
   pub: KeyLike;
+  hook: HookFn;
   docs: {
     [path: string]: {
       model?: ModelData;
@@ -188,11 +189,27 @@ export class Filer implements OnModuleInit {
     }
   }
 
+  /**
+   * Returns complete queried `html` document for the specified
+   * `tenant`.
+   */
   public getQueriedHtmlDocument(
     tenant: string,
     document: Document,
   ): string {
     return getHTML(this.getQueriedHdmlDocument(tenant, document));
+  }
+
+  public async postHdmlDocument(
+    tenant: string,
+    context: object,
+    document: Document,
+  ): Promise<void> {
+    if (this._tenants.has(tenant)) {
+      const hook = <HookFn>this._tenants.get(tenant)?.hook;
+      const html = this.getQueriedHtmlDocument(tenant, document);
+      await this._compiler.hook(html, hook, context);
+    }
   }
 
   /**
@@ -238,6 +255,7 @@ export class Filer implements OnModuleInit {
         );
         const key = await this.loadKey(tenant);
         const pub = await this.loadPub(tenant);
+        const hook = await this.loadHook(tenant);
         const docs = this.completeDocs(
           await this.loadFragments(tenant),
         );
@@ -245,6 +263,7 @@ export class Filer implements OnModuleInit {
           env,
           key,
           pub,
+          hook,
           docs,
         });
       }
@@ -289,6 +308,39 @@ export class Filer implements OnModuleInit {
       this._options.getTenantPublicKeyName(),
     );
     return this._tokens.getPublicKey(await this.loadFile(file));
+  }
+
+  /**
+   * Loads hook function.
+   */
+  private async loadHook(tenant: string): Promise<HookFn> {
+    const hookPath = path.resolve(
+      this._options.getProjectPath(),
+      tenant,
+      this._options.getTenantHookPath(),
+    );
+    const hookFile = path.resolve(hookPath, "index.js");
+    const hookContent = await this.loadFile(hookFile);
+    const hookScript = new VMScript(hookContent, {
+      filename: hookFile,
+    });
+    const vm = new NodeVM({
+      console: "inherit",
+      sandbox: {},
+      eval: false,
+      wasm: false,
+      sourceExtensions: ["js"],
+      require: {
+        external: true,
+        builtin: ["*"],
+        context: "sandbox",
+      },
+      argv: [],
+      env: {},
+      strict: true,
+    });
+    const hook = <HookFn>vm.run(hookScript, hookFile);
+    return hook;
   }
 
   /**

@@ -27,7 +27,8 @@
     "pulsar-client": "^1.8.2",
     "puppeteer": "^20.1.2",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.5.5"
+    "rxjs": "^7.5.5",
+    "vm2": "^3.9.19"
   },
   "scripts": {
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",

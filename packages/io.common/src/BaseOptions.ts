@@ -45,10 +45,10 @@ export class BaseOptions {
   }
 
   /**
-   * Returns tenant's middlewares directory path.
+   * Returns tenant's hooks directory path.
    */
-  public getTenantMiddlewaresPath(): string {
-    return "middlewares";
+  public getTenantHookPath(): string {
+    return "hook";
   }
 
   /**
