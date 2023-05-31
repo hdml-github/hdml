@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 import { NestFactory } from "@nestjs/core";
 import { QueryModule } from "./query/QueryModule";
 

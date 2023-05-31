@@ -17,6 +17,13 @@ export class BaseOptions {
   }
 
   /**
+   * Returns the Querier port.
+   */
+  public getQuerierPort(): number {
+    return 8886;
+  }
+
+  /**
    * Returns tenant's environment file name.
    */
   public getTenantEnvName(): string {

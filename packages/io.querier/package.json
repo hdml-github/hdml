@@ -1,5 +1,5 @@
 {
-  "name": "@hdml/querier",
+  "name": "@hdml/io.querier",
   "version": "0.0.0-alpha.1",
   "license": "Apache-2.0",
   "publishConfig": {
@@ -7,6 +7,9 @@
     "access": "public"
   },
   "dependencies": {
+    "@hdml/io.common": "0.0.0-alpha.1",
+    "@hdml/orchestrator": "0.0.0-alpha.1",
+    "@hdml/schema": "0.0.0-alpha.1",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
@@ -30,7 +33,7 @@
     "test_dbg": "",
     "clear": "rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
-    "svc": "clear && npm run compile_cjs && node ./cjs/index"
+    "querier": "clear && npm run compile_cjs && node ./cjs/index"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",
