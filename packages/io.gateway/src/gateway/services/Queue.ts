@@ -56,6 +56,8 @@ export class Queue extends BaseQueue implements OnModuleInit {
   }
 
   /**
+   * Posts specified `hdml` document to the queue and returns its
+   * unique identifier.
    * @throws
    */
   public async postHdmlDocument(hdml: Document): Promise<string> {

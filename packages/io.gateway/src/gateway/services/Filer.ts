@@ -131,6 +131,11 @@ export class Filer implements OnModuleInit {
     }
   }
 
+  /**
+   * Posts specified `hdml` `document` and returns its unique
+   * identifier.
+   * @throws
+   */
   public async postHdmlDocument(
     tenant: string,
     context: object,
