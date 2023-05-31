@@ -82,7 +82,7 @@ export class Filer implements OnModuleInit {
    * Module initialized callback.
    */
   public onModuleInit(): void {
-    this._logger.log("Running compilation workflow");
+    this._logger.log("Running filer service");
     this.runWorkflow().catch((reason) => {
       this._logger.error(reason);
     });
