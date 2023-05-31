@@ -187,6 +187,34 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
+   * The `JoinData` object.
+   */
+  public get data(): JoinData {
+    if (!this.type) {
+      throw new Error("A `type` property is required.");
+    }
+    if (!this.left) {
+      throw new Error("A `left` property is required.");
+    }
+    if (!this.right) {
+      throw new Error("A `right` property is required.");
+    }
+    const clause = this._connective
+      ? this._connective.data
+      : {
+          type: FilterOperator.None,
+          filters: [],
+          children: [],
+        };
+    return {
+      type: this._getJoinType(this.type),
+      left: this.left,
+      right: this.right,
+      clause,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -245,34 +273,6 @@ export class JoinElement extends UnifiedElement {
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
-  }
-
-  /**
-   * Returns join `JSON`-representation.
-   */
-  public toJSON(): JoinData {
-    if (!this.type) {
-      throw new Error("A `type` property is required.");
-    }
-    if (!this.left) {
-      throw new Error("A `left` property is required.");
-    }
-    if (!this.right) {
-      throw new Error("A `right` property is required.");
-    }
-    const clause = this._connective
-      ? this._connective.toJSON()
-      : {
-          type: FilterOperator.None,
-          filters: [],
-          children: [],
-        };
-    return {
-      type: this._getJoinType(this.type),
-      left: this.left,
-      right: this.right,
-      clause,
-    };
   }
 
   /**

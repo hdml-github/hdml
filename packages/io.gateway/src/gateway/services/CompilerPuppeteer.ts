@@ -1,7 +1,7 @@
 import * as pool from "generic-pool";
 import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
 import { Injectable, Logger } from "@nestjs/common";
-import { IoElement, IoJson } from "@hdml/elements";
+import { IoElement, ElementsData } from "@hdml/elements";
 import { Options } from "./Options";
 
 /**
@@ -98,14 +98,14 @@ export class CompilerPuppeteer {
   /**
    * Compiles provided `hdml` document.
    */
-  public async compile(hdml: string): Promise<IoJson> {
+  public async compile(hdml: string): Promise<ElementsData> {
     return this.compilePuppeteer(hdml);
   }
 
   /**
    * Compiles `hdml` document using Puppeteer.
    */
-  private async compilePuppeteer(hdml: string): Promise<IoJson> {
+  private async compilePuppeteer(hdml: string): Promise<ElementsData> {
     if (this._browser && this._pool) {
       const page = await this._pool.acquire();
       await this.configurePage(page);
@@ -113,14 +113,14 @@ export class CompilerPuppeteer {
       const io = (await page.$(
         "hdml-io",
       )) as ElementHandle<IoElement>;
-      const json = await io.evaluate(async (elm) => {
-        return await elm.toJSON();
+      const data = await io.evaluate(async (elm) => {
+        return await elm.getElementsData();
       });
       // const a = await page.evaluate();
       await io.dispose();
       await page.reload({ timeout: 0 });
       await this._pool.release(page);
-      return json;
+      return data;
     } else {
       throw new Error("Browser is missed.");
     }

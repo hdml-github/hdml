@@ -33,7 +33,7 @@ import { Client } from "../services/Client";
 /**
  * An `IoElement` `json` representation.
  */
-export type IoJson = {
+export type ElementsData = {
   models: {
     [name: string]: ModelData;
   };
@@ -357,58 +357,70 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Returns element `JSON`-representation.
+   * Returns data objects of the `model`s and `frame`s elements
+   * available in the current `html` document. Throws if detects local
+   * `frame`s links disintegrity (i.e when a local `frame` specified
+   * in the `source` attribute of another local `frame` is missed in
+   * the document).
+   * @throws
    */
-  public async toJSON(): Promise<IoJson> {
-    const promises: Promise<void>[] = [];
-    if (this._updatesPromises.model.promise) {
-      promises.push(this._updatesPromises.model.promise);
-    }
-    if (this._updatesPromises.frame.promise) {
-      promises.push(this._updatesPromises.frame.promise);
-    }
-    return await Promise.all(promises).then(() => {
-      const models: { [name: string]: ModelData } = {};
-      const frames: { [name: string]: FrameData } = {};
+  public async getElementsData(): Promise<ElementsData> {
+    await this._updates();
+    const models: { [name: string]: ModelData } = {};
+    const frames: { [name: string]: FrameData } = {};
 
-      // models
-      this._models.forEach((model) => {
-        const data = model.toJSON();
-        models[data.name] = data;
-      });
+    // models
+    this._models.forEach((model) => {
+      const data = model.data;
+      models[data.name] = data;
+    });
 
-      // frames
-      this._frames.forEach((frame) => {
-        let source = frame.source;
-        let _frame = frame.toJSON();
-        const name = _frame.name;
-        const body = _frame;
-
-        while (source && source.indexOf("?") === 0) {
-          if (source.indexOf("?hdml-model=") === 0) {
-            source = null;
-          } else if (source.indexOf("?hdml-frame=") === 0) {
-            const [, frameName] = source.split("?hdml-frame=");
-            let linked = false;
-            this._frames.forEach((frame) => {
-              if (frame.name === frameName) {
-                linked = true;
-                source = frame.source;
-                _frame.parent = frame.toJSON();
-                _frame = _frame.parent;
-              }
-            });
-            if (!linked) {
-              throw new Error(`Invalid \`source\` link: ${source}`);
+    // frames
+    this._frames.forEach((frame) => {
+      let source = frame.source;
+      let _frame = frame.data;
+      const name = _frame.name;
+      const body = _frame;
+      while (source && source.indexOf("?") === 0) {
+        if (source.indexOf("?hdml-model=") === 0) {
+          source = null;
+        } else {
+          const [, frameName] = source.split("?hdml-frame=");
+          let linked = false;
+          this._frames.forEach((frame) => {
+            if (frame.name === frameName) {
+              linked = true;
+              source = frame.source;
+              _frame.parent = frame.data;
+              _frame = _frame.parent;
             }
-          } else {
-            throw new Error(`Invalid \`source\` value: ${source}`);
+          });
+          if (!linked) {
+            throw new Error(
+              `Specified \`hdml-frame\` is missed: ${frameName}`,
+            );
           }
         }
-        frames[name] = body;
-      });
-      return { models, frames };
+      }
+      frames[name] = body;
     });
+    return { models, frames };
+  }
+
+  /**
+   * Returns `hdml` document specified by the `uid` if it exist in the
+   * current `html` document, `null` otherwise.
+   */
+  public async getHdmlDocument(
+    uid: string,
+  ): Promise<null | Document> {
+    await this._updates();
+    if (!this._documents.has(uid)) {
+      return null;
+    } else {
+      const document = <Document>this._documents.get(uid);
+      return document;
+    }
   }
 
   /**
@@ -536,7 +548,9 @@ export class IoElement extends UnifiedElement {
   private _modelRequestListener = (
     event: CustomEvent<ModelEventDetail>,
   ) => {
-    this._processRequest(event.detail.model.uid);
+    this._processRequest(event.detail.model.uid).catch((reason) => {
+      console.error(reason);
+    });
   };
 
   /**
@@ -554,7 +568,9 @@ export class IoElement extends UnifiedElement {
   private _frameRequestListener = (
     event: CustomEvent<FrameEventDetail>,
   ) => {
-    this._processRequest(event.detail.frame.uid);
+    this._processRequest(event.detail.frame.uid).catch((reason) => {
+      console.error(reason);
+    });
   };
 
   /**
@@ -665,38 +681,24 @@ export class IoElement extends UnifiedElement {
 
   /**
    * Process request.
+   * @throws
    */
-  private _processRequest(uid: string): void {
-    const promises: Promise<void>[] = [];
-    if (this._updatesPromises.model.promise) {
-      promises.push(this._updatesPromises.model.promise);
+  private async _processRequest(uid: string): Promise<void> {
+    await this._updates();
+    if (!this._documents.has(uid)) {
+      throw new Error(`Document is missing: ${uid}`);
+    } else {
+      const doc = <Document>this._documents.get(uid);
+      if (!this._client) {
+        throw new Error("Client is missing");
+      } else {
+        const identifier = await this._client.hdmlPost(
+          uid,
+          <Buffer>doc.buffer,
+        );
+        console.log(identifier);
+      }
     }
-    if (this._updatesPromises.frame.promise) {
-      promises.push(this._updatesPromises.frame.promise);
-    }
-    Promise.all(promises)
-      .then(() => {
-        if (!this._documents.has(uid)) {
-          throw new Error(`Document is missing: ${uid}`);
-        } else {
-          const doc = <Document>this._documents.get(uid);
-          if (!this._client) {
-            throw new Error("Client is missing");
-          } else {
-            this._client
-              .hdmlPost(uid, <Buffer>doc.buffer)
-              .then((identifier) => {
-                console.log(identifier);
-              })
-              .catch((reason) => {
-                console.error(reason);
-              });
-          }
-        }
-      })
-      .catch((reason) => {
-        console.error(reason);
-      });
   }
 
   /**
@@ -704,15 +706,13 @@ export class IoElement extends UnifiedElement {
    */
   private _modelDebounceCallback = () => {
     this._models.forEach((model) => {
-      if (!this._documents.has(model.uid)) {
-        const data: DocumentData = {
-          name: "",
-          tenant: "",
-          token: "",
-          model: model.toJSON(),
-        };
-        this._documents.set(model.uid, new Document(data));
-      }
+      const data: DocumentData = {
+        name: "",
+        tenant: "",
+        token: "",
+        model: model.data,
+      };
+      this._documents.set(model.uid, new Document(data));
     });
     this._updatesPromises.model.resolve &&
       this._updatesPromises.model.resolve();
@@ -728,44 +728,42 @@ export class IoElement extends UnifiedElement {
    */
   private _frameDebounceCallback = () => {
     this._frames.forEach((frame) => {
-      if (!this._documents.has(frame.uid)) {
-        let source = frame.source;
-        let _frame = frame.toJSON();
-        const data: DocumentData = {
-          name: "",
-          tenant: "",
-          token: "",
-          frame: _frame,
-        };
-        while (source && source.indexOf("?") === 0) {
-          if (source.indexOf("?hdml-model=") === 0) {
-            const [, modelName] = source.split("?hdml-model=");
-            this._models.forEach((model) => {
-              if (model.name === modelName) {
-                data.model = model.toJSON();
-              }
-            });
-            source = null;
-          } else if (source.indexOf("?hdml-frame=") === 0) {
-            const [, frameName] = source.split("?hdml-frame=");
-            let linked = false;
-            this._frames.forEach((frame) => {
-              if (frame.name === frameName) {
-                linked = true;
-                source = frame.source;
-                _frame.parent = frame.toJSON();
-                _frame = _frame.parent;
-              }
-            });
-            if (!linked) {
-              throw new Error(`Invalid \`source\` link: ${source}`);
+      let source = frame.source;
+      let _frame = frame.data;
+      const data: DocumentData = {
+        name: "",
+        tenant: "",
+        token: "",
+        frame: _frame,
+      };
+      while (source && source.indexOf("?") === 0) {
+        if (source.indexOf("?hdml-model=") === 0) {
+          const [, modelName] = source.split("?hdml-model=");
+          this._models.forEach((model) => {
+            if (model.name === modelName) {
+              data.model = model.data;
             }
-          } else {
-            throw new Error(`Invalid \`source\` value: ${source}`);
+          });
+          source = null;
+        } else if (source.indexOf("?hdml-frame=") === 0) {
+          const [, frameName] = source.split("?hdml-frame=");
+          let linked = false;
+          this._frames.forEach((frame) => {
+            if (frame.name === frameName) {
+              linked = true;
+              source = frame.source;
+              _frame.parent = frame.data;
+              _frame = _frame.parent;
+            }
+          });
+          if (!linked) {
+            throw new Error(`Invalid \`source\` link: ${source}`);
           }
+        } else {
+          throw new Error(`Invalid \`source\` value: ${source}`);
         }
-        this._documents.set(frame.uid, new Document(data));
       }
+      this._documents.set(frame.uid, new Document(data));
     });
     this._updatesPromises.frame.resolve &&
       this._updatesPromises.frame.resolve();
@@ -775,4 +773,18 @@ export class IoElement extends UnifiedElement {
       reject: null,
     };
   };
+
+  /**
+   * Awaits the `hdml-model` and `hdml-frame` elements updates.
+   */
+  private async _updates(): Promise<void> {
+    const promises: Promise<void>[] = [];
+    if (this._updatesPromises.model.promise) {
+      promises.push(this._updatesPromises.model.promise);
+    }
+    if (this._updatesPromises.frame.promise) {
+      promises.push(this._updatesPromises.frame.promise);
+    }
+    await Promise.all(promises);
+  }
 }

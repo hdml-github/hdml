@@ -105,6 +105,28 @@ export class ConnectiveElement extends UnifiedElement {
   }
 
   /**
+   * The `FilterClauseData` object.
+   */
+  public get data(): FilterClauseData {
+    if (!this.operator) {
+      throw new Error("A `operator` property is required.");
+    }
+    const filters: FilterData[] = [];
+    this._filters.forEach((filter) => {
+      filters.push(filter.data);
+    });
+    const children: FilterClauseData[] = [];
+    this._connectives.forEach((conn) => {
+      children.push(conn.data);
+    });
+    return {
+      type: this._getConnectiveOperator(this.operator),
+      filters,
+      children,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -174,28 +196,6 @@ export class ConnectiveElement extends UnifiedElement {
   }
 
   /**
-   * Returns connective `JSON`-representation.
-   */
-  public toJSON(): FilterClauseData {
-    if (!this.operator) {
-      throw new Error("A `operator` property is required.");
-    }
-    const filters: FilterData[] = [];
-    this._filters.forEach((filter) => {
-      filters.push(filter.toJSON());
-    });
-    const children: FilterClauseData[] = [];
-    this._connectives.forEach((conn) => {
-      children.push(conn.toJSON());
-    });
-    return {
-      type: this._getConnectiveOperator(this.operator),
-      filters,
-      children,
-    };
-  }
-
-  /**
    * Returns assosiated parent element if exist or null
    * otherwise.
    */
@@ -217,9 +217,11 @@ export class ConnectiveElement extends UnifiedElement {
    * Starts watching for the `hdml-filter` elements changes.
    */
   private _watchFilters(): void {
-    this.querySelectorAll(getFilterTag()).forEach((filter) => {
-      this._attachFilter(<FilterElement>filter);
-    });
+    this.queryHdmlChildren<FilterElement>(getFilterTag()).forEach(
+      (filter) => {
+        this._attachFilter(filter);
+      },
+    );
     this.addEventListener(
       "hdml-filter:connected",
       this._filterConnectedListener,
@@ -234,8 +236,10 @@ export class ConnectiveElement extends UnifiedElement {
    * Starts watching for the `hdml-connective` elements changes.
    */
   private _watchConnectives(): void {
-    this.querySelectorAll(getConnectiveTag()).forEach((conn) => {
-      this._attachConnective(<ConnectiveElement>conn);
+    this.queryHdmlChildren<ConnectiveElement>(
+      getConnectiveTag(),
+    ).forEach((conn) => {
+      this._attachConnective(conn);
     });
     this.addEventListener(
       "hdml-connective:connected",

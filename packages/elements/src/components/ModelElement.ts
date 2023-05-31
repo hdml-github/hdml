@@ -87,6 +87,29 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
+   * The `ModelData` object.
+   */
+  public get data(): ModelData {
+    if (!this.name) {
+      throw new Error("A `name` property is required.");
+    }
+    const tables: TableData[] = [];
+    this._tables.forEach((table) => {
+      tables.push(table.data);
+    });
+    const joins: JoinData[] = [];
+    this._joins.forEach((join) => {
+      joins.push(join.data);
+    });
+    return {
+      name: this.name,
+      host: "",
+      tables,
+      joins,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -160,35 +183,14 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Returns model's `JSON`-representation.
-   */
-  public toJSON(): ModelData {
-    if (!this.name) {
-      throw new Error("A `name` property is required.");
-    }
-    const tables: TableData[] = [];
-    this._tables.forEach((table) => {
-      tables.push(table.toJSON());
-    });
-    const joins: JoinData[] = [];
-    this._joins.forEach((join) => {
-      joins.push(join.toJSON());
-    });
-    return {
-      name: this.name,
-      host: "",
-      tables,
-      joins,
-    };
-  }
-
-  /**
    * Starts watching for the `hdml-table` elements changes.
    */
   private _watchTables(): void {
-    this.querySelectorAll(getTableTag()).forEach((table) => {
-      this._attachTable(<TableElement>table);
-    });
+    this.queryHdmlChildren<TableElement>(getTableTag()).forEach(
+      (table) => {
+        this._attachTable(table);
+      },
+    );
     this.addEventListener(
       "hdml-table:connected",
       this._tableConnectedListener,
@@ -203,9 +205,11 @@ export class ModelElement extends UnifiedElement {
    * Starts watching for the `hdml-join` elements changes.
    */
   private _watchJoins(): void {
-    this.querySelectorAll(getJoinTag()).forEach((join) => {
-      this._attachJoin(<JoinElement>join);
-    });
+    this.queryHdmlChildren<JoinElement>(getJoinTag()).forEach(
+      (join) => {
+        this._attachJoin(join);
+      },
+    );
     this.addEventListener(
       "hdml-join:connected",
       this._joinConnectedListener,

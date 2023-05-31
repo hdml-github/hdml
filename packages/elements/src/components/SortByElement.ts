@@ -37,6 +37,17 @@ export class SortByElement extends UnifiedElement {
   private _fields: Map<string, FieldElement> = new Map();
 
   /**
+   * The `FieldData` objects array.
+   */
+  public get data(): FieldData[] {
+    const fields: FieldData[] = [];
+    this._fields.forEach((field) => {
+      fields.push(field.data);
+    });
+    return fields;
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -101,17 +112,6 @@ export class SortByElement extends UnifiedElement {
   }
 
   /**
-   * Returns frame `JSON`-representation.
-   */
-  public toJSON(): FieldData[] {
-    const fields: FieldData[] = [];
-    this._fields.forEach((field) => {
-      fields.push(field.toJSON());
-    });
-    return fields;
-  }
-
-  /**
    * Returns assosiated `hdml-frame` element if exist or null
    * otherwise.
    */
@@ -131,9 +131,11 @@ export class SortByElement extends UnifiedElement {
    * Starts watching for the `hdml-field` elements changes.
    */
   private _watchFields(): void {
-    this.querySelectorAll(getFieldTag()).forEach((field) => {
-      this._attachField(<FieldElement>field);
-    });
+    this.queryHdmlChildren<FieldElement>(getFieldTag()).forEach(
+      (field) => {
+        this._attachField(field);
+      },
+    );
     this.addEventListener(
       "hdml-field:connected",
       this._fieldConnectedListener,

@@ -11,8 +11,8 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { ModelData, FrameData, Document } from "@hdml/schema";
-import { getHTML } from "@hdml/orchestrator";
-import { IoJson } from "@hdml/elements";
+import { getHTML, getSQL } from "@hdml/orchestrator";
+import { ElementsData } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
 import { HookFn, CompilerJsDom as Compiler } from "./CompilerJsDom";
@@ -208,7 +208,18 @@ export class Filer implements OnModuleInit {
     if (this._tenants.has(tenant)) {
       const hook = <HookFn>this._tenants.get(tenant)?.hook;
       const html = this.getQueriedHtmlDocument(tenant, document);
-      await this._compiler.hook(html, hook, context);
+      const hdml = await this._compiler.hook(html, hook, context);
+      if (hdml) {
+        const sql = getSQL(
+          <
+            {
+              model: ModelData;
+              frame?: FrameData;
+            }
+          >hdml,
+        );
+        this._logger.debug(sql);
+      }
     }
   }
 
@@ -348,7 +359,7 @@ export class Filer implements OnModuleInit {
    */
   private async loadFragments(
     tenant: string,
-  ): Promise<{ [dir: string]: IoJson }> {
+  ): Promise<{ [dir: string]: ElementsData }> {
     const root = path.resolve(
       this._options.getProjectPath(),
       tenant,
@@ -375,10 +386,10 @@ export class Filer implements OnModuleInit {
     tenant: string,
     directory: string,
     files: string[],
-  ): Promise<{ [dir: string]: IoJson }> {
-    const docs: { [dir: string]: IoJson } = {};
+  ): Promise<{ [dir: string]: ElementsData }> {
+    const docs: { [dir: string]: ElementsData } = {};
     const promises = files.map((file) => {
-      return new Promise<IoJson>((resolve, reject) => {
+      return new Promise<ElementsData>((resolve, reject) => {
         readFile(file, { encoding: "utf8" }, (err, hdml) => {
           if (err) {
             reject(err);
@@ -388,7 +399,7 @@ export class Filer implements OnModuleInit {
         });
       });
     });
-    const datas = await Promise.all<IoJson>(promises);
+    const datas = await Promise.all<ElementsData>(promises);
     files.forEach((file, i) => {
       const key = file.split(
         path.resolve(
@@ -489,7 +500,7 @@ export class Filer implements OnModuleInit {
   /**
    * Completes fragments to a document's state.
    */
-  private completeDocs(fragments: { [path: string]: IoJson }): {
+  private completeDocs(fragments: { [path: string]: ElementsData }): {
     [path: string]: {
       model?: ModelData;
       frame?: FrameData;
@@ -539,7 +550,7 @@ export class Filer implements OnModuleInit {
    * specified `fragment`.
    */
   private lookupModel(
-    fragments: { [path: string]: IoJson },
+    fragments: { [path: string]: ElementsData },
     current: string,
     source: string,
   ): ModelData {
@@ -571,7 +582,7 @@ export class Filer implements OnModuleInit {
    * specified `fragments`.
    */
   private assertSource(
-    fragments: { [path: string]: IoJson },
+    fragments: { [path: string]: ElementsData },
     current: string,
     source: string,
   ): void {

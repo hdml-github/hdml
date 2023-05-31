@@ -185,6 +185,31 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
+   * The `TableData` object.
+   */
+  public get data(): TableData {
+    if (!this.name) {
+      throw new Error("A `name` property is required.");
+    }
+    if (!this.type) {
+      throw new Error("A `type` property is required.");
+    }
+    if (!this.source) {
+      throw new Error("A `source` property is required.");
+    }
+    const fields: FieldData[] = [];
+    this._fields.forEach((field) => {
+      fields.push(field.data);
+    });
+    return {
+      name: this.name,
+      type: this._getTableType(this.type),
+      source: this.source,
+      fields,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -246,31 +271,6 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Returns tables' `JSON`-representation.
-   */
-  public toJSON(): TableData {
-    if (!this.name) {
-      throw new Error("A `name` property is required.");
-    }
-    if (!this.type) {
-      throw new Error("A `type` property is required.");
-    }
-    if (!this.source) {
-      throw new Error("A `source` property is required.");
-    }
-    const fields: FieldData[] = [];
-    this._fields.forEach((field) => {
-      fields.push(field.toJSON());
-    });
-    return {
-      name: this.name,
-      type: this._getTableType(this.type),
-      source: this.source,
-      fields,
-    };
-  }
-
-  /**
    * Returns assosiated `hdml-model` element if exist or null
    * otherwise.
    */
@@ -290,9 +290,11 @@ export class TableElement extends UnifiedElement {
    * Starts watching for the `hdml-field` elements changes.
    */
   private _watchFields(): void {
-    this.querySelectorAll(getFieldTag()).forEach((field) => {
-      this._attachField(<FieldElement>field);
-    });
+    this.queryHdmlChildren<FieldElement>(getFieldTag()).forEach(
+      (field) => {
+        this._attachField(field);
+      },
+    );
     this.addEventListener(
       "hdml-field:connected",
       this._fieldConnectedListener,

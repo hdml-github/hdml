@@ -163,7 +163,16 @@ export class FrameElement extends UnifiedElement {
    * A `source` setter.
    */
   public set source(val: null | string) {
-    if (val === null || val === "" || FRAME_SOURCE_REGEXP.test(val)) {
+    if (
+      val === null ||
+      val === "" ||
+      (FRAME_SOURCE_REGEXP.test(val) &&
+        (val.includes("?hdml-model=") ||
+          val.includes("?hdml-frame=")) &&
+        (val.startsWith("?hdml-model=") ||
+          val.startsWith("?hdml-frame=") ||
+          val.startsWith("/")))
+    ) {
       const old = this._source;
       this._source = val;
       this.requestUpdate("source", old);
@@ -250,6 +259,35 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
+   * The `FrameData` object.
+   */
+  public get data(): FrameData {
+    if (!this.name) {
+      throw new Error("A `name` property is required.");
+    }
+    if (!this.source) {
+      throw new Error("A `source` property is required.");
+    }
+    const fields: FieldData[] = [];
+    this._fields.forEach((field) => {
+      fields.push(field.data);
+    });
+    return {
+      name: this.name,
+      host: "",
+      source: this.source,
+      offset: parseInt(this.offset || "0", 10),
+      limit: parseInt(this.limit || "50000", 10),
+      fields,
+      filterBy: this._filterBy ? this._filterBy.data : undefined,
+      groupBy: this._groupBy ? this._groupBy.data : undefined,
+      splitBy: undefined,
+      sortBy: this._sortBy ? this._sortBy.data : undefined,
+      parent: undefined,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -327,41 +365,14 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Returns frame `JSON`-representation.
-   */
-  public toJSON(): FrameData {
-    if (!this.name) {
-      throw new Error("A `name` property is required.");
-    }
-    if (!this.source) {
-      throw new Error("A `source` property is required.");
-    }
-    const fields: FieldData[] = [];
-    this._fields.forEach((field) => {
-      fields.push(field.toJSON());
-    });
-    return {
-      name: this.name,
-      host: "",
-      source: this.source,
-      offset: parseInt(this.offset || "0", 10),
-      limit: parseInt(this.limit || "50000", 10),
-      fields,
-      filterBy: this._filterBy ? this._filterBy.toJSON() : undefined,
-      groupBy: this._groupBy ? this._groupBy.toJSON() : undefined,
-      splitBy: undefined,
-      sortBy: this._sortBy ? this._sortBy.toJSON() : undefined,
-      parent: undefined,
-    };
-  }
-
-  /**
    * Starts watching for the `hdml-field` elements changes.
    */
   private _watchFields(): void {
-    this.querySelectorAll(getFieldTag()).forEach((field) => {
-      this._attachField(<FieldElement>field);
-    });
+    this.queryHdmlChildren<FieldElement>(getFieldTag()).forEach(
+      (field) => {
+        this._attachField(field);
+      },
+    );
     this.addEventListener(
       "hdml-field:connected",
       this._fieldConnectedListener,

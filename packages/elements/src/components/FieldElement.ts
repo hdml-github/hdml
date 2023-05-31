@@ -20,6 +20,7 @@ import {
   TimeZone,
   AggType,
 } from "@hdml/schema";
+
 import {
   FIELD_NAME_REGEXP,
   FIELD_ORIGIN_REGEXP,
@@ -634,6 +635,30 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
+   * The `FieldData` object.
+   */
+  public get data(): FieldData {
+    if (!this.name) {
+      throw new Error("A `name` property is required.");
+    }
+    if (this.origin && this.clause) {
+      throw new Error(
+        "An `origin` and a `clause` attributes couldn't be set " +
+          "together.",
+      );
+    }
+    return {
+      description: undefined,
+      origin: this.origin ? this.origin : undefined,
+      clause: this.clause ? this.clause : undefined,
+      name: this.name,
+      type: this._getType(),
+      agg: this._getAgg(),
+      asc: this.asc && this.asc !== "false" ? true : false,
+    };
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -690,30 +715,6 @@ export class FieldElement extends UnifiedElement {
    */
   public render(): TemplateResult<1> {
     return html`<!-- FieldElement -->`;
-  }
-
-  /**
-   * Returns field's `JSON`-representation.
-   */
-  public toJSON(): FieldData {
-    if (!this.name) {
-      throw new Error("A `name` property is required.");
-    }
-    if (this.origin && this.clause) {
-      throw new Error(
-        "An `origin` and a `clause` attributes couldn't be set " +
-          "together.",
-      );
-    }
-    return {
-      description: undefined,
-      origin: this.origin ? this.origin : undefined,
-      clause: this.clause ? this.clause : undefined,
-      name: this.name,
-      type: this._getType(),
-      agg: this._getAgg(),
-      asc: this.asc && this.asc !== "false" ? true : false,
-    };
   }
 
   /**

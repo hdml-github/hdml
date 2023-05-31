@@ -12,6 +12,6 @@ export function getHTML(document: {
   if (document.frame) {
     return getFrameHTML(document.frame, document.model, 0, true);
   } else {
-    return getModelHTML(document.model, 0);
+    return getModelHTML(document.model, 0, true);
   }
 }

@@ -273,6 +273,57 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
+   * The `FilterData` object.
+   */
+  public get data(): FilterData {
+    if (!this.type) {
+      throw new Error("A `type` property is required.");
+    }
+    let filter: FilterData;
+    switch (this.type) {
+      case "expr":
+        if (!this.clause) {
+          throw new Error();
+        }
+        filter = {
+          type: FilterType.Expr,
+          options: {
+            clause: this.clause,
+          },
+        };
+        break;
+      case "keys":
+        if (!this.left || !this.right) {
+          throw new Error();
+        }
+        filter = {
+          type: FilterType.Keys,
+          options: {
+            left: this.left,
+            right: this.right,
+          },
+        };
+        break;
+      case "named":
+        if (!this.name) {
+          throw new Error();
+        }
+        filter = {
+          type: FilterType.Named,
+          options: {
+            name: this._getName(this.name),
+            field: "",
+            values: [],
+          },
+        };
+        break;
+      default:
+        throw new Error("Unsupported `type` attribute value.");
+    }
+    return filter;
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -332,57 +383,6 @@ export class FilterElement extends UnifiedElement {
    */
   public render(): TemplateResult<1> {
     return html`<!-- FilterElement -->`;
-  }
-
-  /**
-   * Returns filter `JSON`-representation.
-   */
-  public toJSON(): FilterData {
-    if (!this.type) {
-      throw new Error("A `type` property is required.");
-    }
-    let filter: FilterData;
-    switch (this.type) {
-      case "expr":
-        if (!this.clause) {
-          throw new Error();
-        }
-        filter = {
-          type: FilterType.Expr,
-          options: {
-            clause: this.clause,
-          },
-        };
-        break;
-      case "keys":
-        if (!this.left || !this.right) {
-          throw new Error();
-        }
-        filter = {
-          type: FilterType.Keys,
-          options: {
-            left: this.left,
-            right: this.right,
-          },
-        };
-        break;
-      case "named":
-        if (!this.name) {
-          throw new Error();
-        }
-        filter = {
-          type: FilterType.Named,
-          options: {
-            name: this._getName(this.name),
-            field: "",
-            values: [],
-          },
-        };
-        break;
-      default:
-        throw new Error("Unsupported `type` attribute value.");
-    }
-    return filter;
   }
 
   /**

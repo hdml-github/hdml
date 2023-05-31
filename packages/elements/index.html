@@ -13,7 +13,7 @@
           name="hdml.io"
           host="http://localhost:8888"
           tenant="common"
-          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.WfR1L9xVo0upNd7jKFlB57p-ybM7HcxAzbOXY3TsDatus1HmHIZyAcEylfJVHPzGMNFioJwWU0D1JQKeWXbW-MivXjRdTIlG3jiQAzXa5K4leOcm3WsbHhOvIrYJmJXV35xvg0cInvi3Wb01IR2s1pTbFCGWFKXQZh0SEncomvmEDnwjPmCLl4BGLWk_VJ8D5OS0V_DLo192OxdACQ1SOoVxBL4k2VToZxaKyiEmKqjEb_o2gJ0oA8KRiR5INsmFuHmY7E78gL3le3VSThZ5wX70cWylt2RGuZXef30kwZ8-GF11xW18KA2T0pnN82ffGTYcfx8Z76kJXlDzLgnbTbU4nvuqhwq9Gy9H780S32nsi_RKm6N4wCbLJGqduy7ZWfVeX77MxKBcOAuiIruyyKcQPFEvVMlrD_XvqkmV9bc20W9fKwL_lofpzVMeqZe_16ZzhKdGlHLG3QzeBm5qjDZ1gqkN25WO9ns1_-lbDdOM3J3-POo0y6UYtbmbe40m.A9I9Cvst4IQAhsfg.vMssgHMqsIqcCLTc3HGExgXZamd0DSD5cgdbWSzVoFJV3ps00x1moWtNbYme6S876rri-J5VDPlLnKPpoW4qMGSOLF38KHnabWRXxa3ZymbZ8-YfUsAnKAr5sGNy-PinC1DXfVJdpXTvd7HitGRUBtr81q4L.ONi3UYK0LJvIgNzKGJraiQ">
+          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.j77krY_tK77iYmJ5-Qs_fx4wxFTKP4ykLpwLMOCcPk5cDnFpccI4EWoCAeoPBLTuG9vRWkwF6AToGPLlgi1b4vQI0Js_WPRpwqZe8ljdOXrbEQUm1oOivRMmW6A0RKVPxNA6ABBlQ_ICndSQ8TOBEjMUZ3vNSJw3zyUsvPeoXfSfjlZfVmI4daskLtas6gbdawJV906rffwLkVZXXaJWwrHOrkLf5eHkP_UJviGp3BZCnmTmNWwjRSk1baVhz1V4ESAN-sN_Gf95TcuPY6zkejo1rTjss_58jKFZzBSJUc0I1kNA7Urj-pust14U1mhXFZsp1Za247_W-s3lCl89X0f3DIloI3SSpN9w6B7MprIKvVSsV6D1M48esQ2NT4gqfg0HlZjAbjTYjljhmk_1gqs8d8UimYUlSEgsroNN9SLz5_INg1Ou9rYnziZTlE77JwFJwC0EEOLOTfVBtTAlSlYIVPc513flhr3nq-sWMfoRjexjV75unjqpwMPpRPDu.DqPC6oB6fzAKxGjE.lWzzf8GgmR5y8ZbxgVzXPAehwJezNJOycfSTjD6GY3bQxyweKstenpVcSXlX4uThn3b4dC7JYhIhy2RLNHnM10PNm3L-GneapTp-m13n4CBsq3ngsNCTYmPALBjEj7KHr58JNo_8ugnLy6BWho7XhrX8OxT1.bORl5_rQ2aPVoxa-hVFSdQ">
         </hdml-io>
 
         <hdml-model
@@ -119,6 +119,12 @@
                   type="expr"
                   clause="`columns`.`table` = 'tables'">
                 </hdml-filter>
+                <hdml-connective
+                  operator="or">
+                  <hdml-filter
+                    type="expr"
+                    clause="1 = 1">
+                </hdml-connective>
               </hdml-connective>
             </hdml-connective>
           </hdml-join>
@@ -171,20 +177,22 @@
           name="query"
           source="/frames/frame.html?hdml-frame=frame">
           <div>
-            <hdml-field
-              name="catalog">
-            </hdml-field>
-            <hdml-field
-              name="schema">
-            </hdml-field>
-            <hdml-field
-              name="table">
-            </hdml-field>
-            <hdml-field
-              name="sum"
-              origin="count"
-              agg="sum">
-            </hdml-field>
+            <div>
+              <hdml-field
+                name="catalog">
+              </hdml-field>
+              <hdml-field
+                name="schema">
+              </hdml-field>
+              <hdml-field
+                name="table">
+              </hdml-field>
+              <hdml-field
+                name="sum"
+                origin="count"
+                agg="sum">
+              </hdml-field>
+            </div>
           </div>
 
           <div>
@@ -205,15 +213,17 @@
 
           <div>
             <hdml-group-by>
-              <hdml-field
-                name="catalog">
-              </hdml-field>
-              <hdml-field
-                name="schema">
-              </hdml-field>
-              <hdml-field
-                name="table">
-              </hdml-field>
+              <div>
+                <hdml-field
+                  name="catalog">
+                </hdml-field>
+                <hdml-field
+                  name="schema">
+                </hdml-field>
+                <hdml-field
+                  name="table">
+                </hdml-field>
+              </div>
             </hdml-group-by>
           </div>
 
@@ -227,7 +237,7 @@
               </hdml-field>
               <hdml-field
                 name="table"
-                asc="false">
+                asc="true">
               </hdml-field>
             </hdml-sort-by>
           </div>
@@ -236,7 +246,7 @@
 
       <script>
         const io = document.querySelector("hdml-io");
-        io.toJSON().then(console.log);
+        io.getElementsData().then(console.log);
       </script>
     </body>
 </html>

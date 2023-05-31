@@ -25,7 +25,7 @@ export function getFrameHTML(
     html +
     `${pre}<hdml-frame ` +
     `name="${frame.name}" ` +
-    `source="${frame.source}" ` +
+    `source="${`?${frame.source.split("?")[1]}`}" ` +
     `offset="${frame.offset}" ` +
     `limit="${frame.limit}"` +
     `${isRoot ? ` root="root"` : ""}>\n`;

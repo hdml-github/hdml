@@ -10,7 +10,11 @@ import { getFieldHTML } from "./fields";
 import { getFilterClauseHTML } from "./filter";
 import { t } from "../const";
 
-export function getModelHTML(model: ModelData, level = 0): string {
+export function getModelHTML(
+  model: ModelData,
+  level = 0,
+  isRoot = false,
+): string {
   const tablesList = model.tables
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .filter((t) => isModelTableJoined(model, t));
@@ -27,7 +31,10 @@ export function getModelHTML(model: ModelData, level = 0): string {
       }
     })
     .join("\n");
-  let html = `<hdml-model name="${model.name}">\n` + `${tables}\n`;
+  let html =
+    `<hdml-model name="${model.name}"` +
+    `${isRoot ? ` root="root"` : ""}>\n` +
+    `${tables}\n`;
   if (model.joins.length > 0) {
     const path = getModelJoinsPath(model.joins);
     html =

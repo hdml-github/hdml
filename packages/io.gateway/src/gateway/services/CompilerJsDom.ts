@@ -1,13 +1,18 @@
 import { TextEncoder, TextDecoder } from "util";
 import { JSDOM, DOMWindow } from "jsdom";
 import { Injectable, Logger } from "@nestjs/common";
-import { IoElement, IoJson } from "@hdml/elements";
+import { Document } from "@hdml/schema";
+import {
+  UnifiedElement,
+  IoElement,
+  ElementsData,
+} from "@hdml/elements";
 import { Options } from "./Options";
 
 export type HookFn = (
   scope: object,
   window: DOMWindow,
-) => Promise<Buffer>;
+) => Promise<void>;
 
 /**
  * Compiler service.
@@ -51,14 +56,14 @@ export class CompilerJsDom {
   /**
    * Compiles provided `hdml` document.
    */
-  public async compile(hdml: string): Promise<IoJson> {
+  public async compile(hdml: string): Promise<ElementsData> {
     const dom = this.getDOM(hdml);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );
-    const json = await io.toJSON();
+    const data = await io.getElementsData();
     dom.window.close();
-    return json;
+    return data;
   }
 
   /**
@@ -68,9 +73,18 @@ export class CompilerJsDom {
     hdml: string,
     hook: HookFn,
     context: object,
-  ): Promise<void> {
+  ): Promise<null | Document> {
     const dom = this.getDOM(hdml);
     await hook(context, dom.window);
+    this._logger.debug(dom.window.document.body.innerHTML);
+    const io = <IoElement>(
+      dom.window.document.querySelector("hdml-io")
+    );
+    const root = <UnifiedElement>(
+      dom.window.document.querySelector("[root=root]")
+    );
+    const document = await io.getHdmlDocument(root.uid);
+    return document;
   }
 
   private getDOM(hdml: string): JSDOM {

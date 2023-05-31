@@ -40,6 +40,20 @@ export class FilterByElement extends UnifiedElement {
   private _connective: null | ConnectiveElement = null;
 
   /**
+   * The `FilterClauseData` object.
+   */
+  public get data(): FilterClauseData {
+    const clause = this._connective
+      ? this._connective.data
+      : {
+          type: FilterOperator.None,
+          filters: [],
+          children: [],
+        };
+    return clause;
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
@@ -104,20 +118,6 @@ export class FilterByElement extends UnifiedElement {
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
-  }
-
-  /**
-   * Returns join `JSON`-representation.
-   */
-  public toJSON(): FilterClauseData {
-    const clause = this._connective
-      ? this._connective.toJSON()
-      : {
-          type: FilterOperator.None,
-          filters: [],
-          children: [],
-        };
-    return clause;
   }
 
   /**
