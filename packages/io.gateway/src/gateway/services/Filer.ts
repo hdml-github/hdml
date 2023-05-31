@@ -11,11 +11,12 @@ import {
   HttpStatus,
 } from "@nestjs/common";
 import { ModelData, FrameData, Document } from "@hdml/schema";
-import { getHTML, getSQL } from "@hdml/orchestrator";
+import { getHTML } from "@hdml/orchestrator";
 import { ElementsData } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
-import { HookFn, CompilerJsDom as Compiler } from "./CompilerJsDom";
+import { HookFn, Compiler } from "./Compiler";
+import { Queue } from "./Queue";
 
 /**
  * List of the standard environment variables keys.
@@ -74,6 +75,7 @@ export class Filer implements OnModuleInit {
     private readonly _options: Options,
     private readonly _tokens: Tokens,
     private readonly _compiler: Compiler,
+    private readonly _queue: Queue,
   ) {}
 
   /**
@@ -129,11 +131,100 @@ export class Filer implements OnModuleInit {
     }
   }
 
+  public async postHdmlDocument(
+    tenant: string,
+    context: object,
+    document: Document,
+  ): Promise<string> {
+    if (this._tenants.has(tenant)) {
+      const hook = <HookFn>this._tenants.get(tenant)?.hook;
+      const html = this.getHtmlDocument(tenant, document);
+      const hdml = await this._compiler.getHdmlDocument(
+        html,
+        hook,
+        context,
+      );
+      if (hdml) {
+        try {
+          return this._queue.postHdmlDocument(hdml);
+        } catch (error) {
+          const message = (<Error>error).message;
+          throw new HttpException(
+            message,
+            HttpStatus.FAILED_DEPENDENCY,
+          );
+        }
+      } else {
+        throw new HttpException(
+          `HdmlDocument was not completed`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    } else {
+      throw new HttpException(
+        `Tenant files are missed: ${tenant}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  /**
+   * Returns complete queried `html` document for the specified
+   * `tenant`.
+   */
+  public getHtmlDocument(tenant: string, document: Document): string {
+    return getHTML(this.getHdmlDocument(tenant, document));
+  }
+
+  /**
+   * Returns complete queried `hdml` document for the specified
+   * `tenant`.
+   */
+  public getHdmlDocument(
+    tenant: string,
+    document: Document,
+  ): Document {
+    if (!this.isValidDocument(document)) {
+      throw new HttpException(
+        "Invalid document",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    if (this.isCompleteDocument(document)) {
+      return document;
+    } else {
+      const frame = <FrameData>document.frame;
+      let parent = frame;
+      while (parent.parent) parent = parent.parent;
+      const data = this.getHdmlDocumentData(tenant, parent.source);
+      if (!data) {
+        throw new HttpException(
+          `DocumentData is missing: ${parent.source}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      if (!data.model) {
+        throw new HttpException(
+          `Document model is missing: ${parent.source}`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      parent.parent = data.frame;
+      return new Document({
+        name: "",
+        tenant: "",
+        token: "",
+        model: data.model,
+        frame,
+      });
+    }
+  }
+
   /**
    * Returns `hdml` document for the specified `tenant` by the
    * specified `uri`, or `null` otherwise.
    */
-  public getHdmlDocument(
+  public getHdmlDocumentData(
     tenant: string,
     uri: string,
   ): null | {
@@ -145,81 +236,6 @@ export class Filer implements OnModuleInit {
       return doc || null;
     } else {
       return null;
-    }
-  }
-
-  /**
-   * Returns complete queried `hdml` document for the specified
-   * `tenant`.
-   */
-  public getQueriedHdmlDocument(
-    tenant: string,
-    document: Document,
-  ): {
-    model: ModelData;
-    frame?: FrameData;
-  } {
-    if (!this.isValidDocument(document)) {
-      throw new HttpException(
-        "Invalid document",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    if (this.isCompleteDocument(document)) {
-      return {
-        model: <ModelData>document.model,
-        frame: <FrameData>document.frame,
-      };
-    } else {
-      const frame = <FrameData>document.frame;
-      let parent = frame;
-      while (parent.parent) parent = parent.parent;
-      const loaded = this.getHdmlDocument(tenant, parent.source);
-      if (!loaded) {
-        throw new HttpException(
-          `Document source is missing: ${parent.source}`,
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      parent.parent = loaded.frame;
-      return {
-        model: <ModelData>loaded.model,
-        frame,
-      };
-    }
-  }
-
-  /**
-   * Returns complete queried `html` document for the specified
-   * `tenant`.
-   */
-  public getQueriedHtmlDocument(
-    tenant: string,
-    document: Document,
-  ): string {
-    return getHTML(this.getQueriedHdmlDocument(tenant, document));
-  }
-
-  public async postHdmlDocument(
-    tenant: string,
-    context: object,
-    document: Document,
-  ): Promise<void> {
-    if (this._tenants.has(tenant)) {
-      const hook = <HookFn>this._tenants.get(tenant)?.hook;
-      const html = this.getQueriedHtmlDocument(tenant, document);
-      const hdml = await this._compiler.hook(html, hook, context);
-      if (hdml) {
-        const sql = getSQL(
-          <
-            {
-              model: ModelData;
-              frame?: FrameData;
-            }
-          >hdml,
-        );
-        this._logger.debug(sql);
-      }
     }
   }
 

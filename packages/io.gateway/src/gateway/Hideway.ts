@@ -1,21 +1,15 @@
 import { Module } from "@nestjs/common";
 import { Options } from "./services/Options";
 import { Filer } from "./services/Filer";
+import { Queue } from "./services/Queue";
 import { Tokens } from "./services/Tokens";
-import { CompilerPuppeteer } from "./services/CompilerPuppeteer";
-import { CompilerJsDom } from "./services/CompilerJsDom";
+import { Compiler } from "./services/Compiler";
 import { PrivateREST } from "./controllers/PrivateREST.v0";
 
 @Module({
   imports: [],
   controllers: [PrivateREST],
-  providers: [
-    Options,
-    Tokens,
-    CompilerPuppeteer,
-    CompilerJsDom,
-    Filer,
-  ],
+  providers: [Options, Tokens, Compiler, Filer, Queue],
 })
 export class Hideway {
   private static _options: null | Options = null;

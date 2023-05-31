@@ -95,16 +95,12 @@ export class PublicREST {
         this._filer.getPrivateKey(tenant),
         request.header("Session"),
       );
-      await this._filer.postHdmlDocument(
+      const name = await this._filer.postHdmlDocument(
         tenant,
         context,
         new Document(body),
       );
-      const document = this._filer.getQueriedHtmlDocument(
-        tenant,
-        new Document(body),
-      );
-      return document;
+      return name;
     } catch (error) {
       this._logger.error(error);
       throw error;

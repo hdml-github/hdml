@@ -1,4 +1,6 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
+import { Document } from "@hdml/schema";
+import { getSQL } from "@hdml/orchestrator";
 import { BaseLogger, BaseOptions, BaseQueue } from "@hdml/io.common";
 import { Options } from "./Options";
 
@@ -39,7 +41,7 @@ export class Queue extends BaseQueue implements OnModuleInit {
    * Module initialized callback.
    */
   public onModuleInit(): void {
-    this._logger.log("Running IO");
+    this.logger().log("Running gateway queue service");
     this.runWorkflow().catch((reason) => {
       this._logger.error(reason);
     });
@@ -53,11 +55,23 @@ export class Queue extends BaseQueue implements OnModuleInit {
     await this.queriesProducer();
   }
 
-  public async test(): Promise<string> {
-    const topic =
-      `${this.getHashname("sql query")}.` +
-      `${this.getTimehash(Date.now())}`;
-    const status = await this.stats("topic hash");
-    return JSON.stringify(status, undefined, 2);
+  /**
+   * @throws
+   */
+  public async postHdmlDocument(hdml: Document): Promise<string> {
+    const sql = getSQL(hdml);
+    const hashname = this.getHashname(sql);
+    const hashtime = this.getHashtime(Date.now());
+    const name = `${hashname}.${hashtime}`;
+    const stats = await this.stats(name);
+    if (!stats) {
+      await this.create(name);
+      const writer = await this.queriesProducer();
+      await writer.send({
+        data: Buffer.from(hdml.buffer),
+        properties: { name },
+      });
+    }
+    return name;
   }
 }

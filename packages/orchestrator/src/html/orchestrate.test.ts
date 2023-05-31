@@ -285,14 +285,7 @@ const document = new Document(data);
 
 describe("Orchestrator", () => {
   it("convert document to a SQL string", () => {
-    const sql = getHTML(
-      <
-        {
-          model: ModelData;
-          frame?: FrameData;
-        }
-      >document,
-    );
+    const sql = getHTML(document);
     console.log(sql);
   });
 });

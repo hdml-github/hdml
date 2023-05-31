@@ -18,11 +18,11 @@ export type HookFn = (
  * Compiler service.
  */
 @Injectable()
-export class CompilerJsDom {
+export class Compiler {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(CompilerJsDom.name, {
+  private readonly _logger = new Logger(Compiler.name, {
     timestamp: true,
   });
 
@@ -54,10 +54,10 @@ export class CompilerJsDom {
   }
 
   /**
-   * Compiles provided `hdml` document.
+   * Compiles provided `html` string to an `ElementsData` object.
    */
-  public async compile(hdml: string): Promise<ElementsData> {
-    const dom = this.getDOM(hdml);
+  public async compile(html: string): Promise<ElementsData> {
+    const dom = this.getDOM(html);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );
@@ -69,14 +69,13 @@ export class CompilerJsDom {
   /**
    * Patches provided `hdml` document.
    */
-  public async hook(
+  public async getHdmlDocument(
     hdml: string,
     hook: HookFn,
     context: object,
   ): Promise<null | Document> {
     const dom = this.getDOM(hdml);
     await hook(context, dom.window);
-    this._logger.debug(dom.window.document.body.innerHTML);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );

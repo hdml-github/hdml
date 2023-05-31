@@ -1,5 +1,12 @@
 import * as crypto from "crypto";
-import { Client, Producer, LogLevel } from "pulsar-client";
+import {
+  Client,
+  Producer,
+  Reader,
+  MessageId,
+  LogLevel,
+} from "pulsar-client";
+import { LRUCache } from "lru-cache";
 import { type BaseOptions } from "./BaseOptions";
 import { BaseLogger } from "./BaseLogger";
 
@@ -13,6 +20,20 @@ export abstract class BaseQueue {
    * Queries topic producer.
    */
   private _queriesProducer: null | Producer = null;
+
+  /**
+   * Data topics readers LRU cache.
+   */
+  private _dataReadersCache: LRUCache<string, Reader, void> =
+    new LRUCache({
+      max: 500,
+      allowStale: false,
+      dispose: (reader) => {
+        reader.close().catch((reason) => {
+          this.logger().error(reason);
+        });
+      },
+    });
 
   /**
    * Returns options object.
@@ -125,6 +146,20 @@ export abstract class BaseQueue {
   }
 
   /**
+   * Returns `name` topic reader.
+   */
+  protected async dataReader(name: string): Promise<Reader> {
+    if (!this._dataReadersCache.has(name)) {
+      const reader = await this.client().createReader({
+        topic: name,
+        startMessageId: MessageId.earliest(),
+      });
+      this._dataReadersCache.set(name, reader);
+    }
+    return <Reader>this._dataReadersCache.get(name);
+  }
+
+  /**
    * Returns configured queue client instance.
    */
   protected client(): Client {
@@ -190,18 +225,18 @@ export abstract class BaseQueue {
    * Returns persistent hash for the provided `timestamp` rounded by
    * the queue cache timeout value.
    */
-  protected getTimehash(timestamp: number): string {
+  protected getHashtime(timestamp: number): string {
     return Math.floor(
       timestamp / this.options().getQueueCacheTimeout(),
     ).toString(32);
   }
 
   /**
-   * Returns a timestamp fetched from the provided `timehash` value.
+   * Returns a timestamp fetched from the provided `hashtime` value.
    */
-  protected getTimestamp(timehash: string): Date {
+  protected getTimestamp(hashtime: string): Date {
     return new Date(
-      parseInt(timehash, 32) * this.options().getQueueCacheTimeout(),
+      parseInt(hashtime, 32) * this.options().getQueueCacheTimeout(),
     );
   }
 }

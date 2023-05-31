@@ -1,11 +1,8 @@
-import { type ModelData, type FrameData } from "@hdml/schema";
+import { type Document } from "@hdml/schema";
 import { getModelSQL } from "./model";
 import { getFrameSQL } from "./frame";
 
-export function getSQL(document: {
-  model: ModelData;
-  frame?: FrameData;
-}): string {
+export function getSQL(document: Document): string {
   if (!document.model) {
     throw new Error("Model is missing.");
   }
