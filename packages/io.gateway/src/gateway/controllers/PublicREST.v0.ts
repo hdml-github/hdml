@@ -13,7 +13,6 @@ import {
 import { Request } from "express";
 import { Document } from "@hdml/schema";
 import { BaseLogger } from "@hdml/io.common";
-import { Queue } from "../services/Queue";
 import { Filer } from "../services/Filer";
 import { Tokens } from "../services/Tokens";
 import { Options } from "../services/Options";
@@ -35,7 +34,6 @@ export class PublicREST {
    */
   constructor(
     private readonly _filer: Filer,
-    private readonly _queue: Queue,
     private readonly _tokens: Tokens,
     private readonly _options: Options,
   ) {}

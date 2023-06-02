@@ -2,8 +2,10 @@ import * as crypto from "crypto";
 import {
   Client,
   Producer,
+  Consumer,
   Reader,
   MessageId,
+  Message,
   LogLevel,
 } from "pulsar-client";
 import { LRUCache } from "lru-cache";
@@ -20,6 +22,11 @@ export abstract class BaseQueue {
    * Queries topic producer.
    */
   private _queriesProducer: null | Producer = null;
+
+  /**
+   * Queries topic consumer.
+   */
+  private _queriesConsumer: null | Consumer = null;
 
   /**
    * Data topics readers LRU cache.
@@ -143,6 +150,32 @@ export abstract class BaseQueue {
       });
     }
     return this._queriesProducer;
+  }
+
+  /**
+   * Returns configured queries producer.
+   */
+  protected async queriesConsumer(
+    listener?: (message: Message, consumer: Consumer) => void,
+  ): Promise<Consumer> {
+    if (!this._queriesConsumer) {
+      this._queriesConsumer = await this.client().subscribe({
+        topic: "queries",
+        subscription: "querier",
+        subscriptionType: "Shared",
+        listener,
+      });
+    }
+    return this._queriesConsumer;
+  }
+
+  /**
+   * Returns `name` topic producer.
+   */
+  protected async dataProducer(name: string): Promise<Producer> {
+    return await this.client().createProducer({
+      topic: name,
+    });
   }
 
   /**

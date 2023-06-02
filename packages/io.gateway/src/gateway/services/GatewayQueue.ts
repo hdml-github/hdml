@@ -8,11 +8,11 @@ import { Options } from "./Options";
  * Gateway queue service class.
  */
 @Injectable()
-export class Queue extends BaseQueue implements OnModuleInit {
+export class GatewayQueue extends BaseQueue implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new BaseLogger(Queue.name, {
+  private readonly _logger = new BaseLogger(GatewayQueue.name, {
     timestamp: true,
   });
 

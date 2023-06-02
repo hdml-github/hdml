@@ -16,7 +16,7 @@ import { ElementsData } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
 import { HookFn, Compiler } from "./Compiler";
-import { Queue } from "./Queue";
+import { GatewayQueue } from "./GatewayQueue";
 
 /**
  * List of the standard environment variables keys.
@@ -75,7 +75,7 @@ export class Filer implements OnModuleInit {
     private readonly _options: Options,
     private readonly _tokens: Tokens,
     private readonly _compiler: Compiler,
-    private readonly _queue: Queue,
+    private readonly _queue: GatewayQueue,
   ) {}
 
   /**

@@ -59,17 +59,17 @@ export class AsyncIterableDataset
 
   private _stateHandler(res: DataResponse) {
     switch (res.stats.state) {
-      case "STARTING":
       case "QUEUED":
       case "PLANNING":
+      case "STARTING":
       case "RUNNING":
         console.log("state", res.stats.state);
         break;
       case "FINISHED":
         console.log("state", res.stats.state);
         break;
-      case "FAILED":
       case "CANCELED":
+      case "FAILED":
         console.log("state", res.stats.state, res.error);
         break;
     }

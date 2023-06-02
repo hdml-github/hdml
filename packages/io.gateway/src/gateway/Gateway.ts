@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { Options } from "./services/Options";
 import { Filer } from "./services/Filer";
-import { Queue } from "./services/Queue";
+import { GatewayQueue } from "./services/GatewayQueue";
 import { Tokens } from "./services/Tokens";
 import { Compiler } from "./services/Compiler";
 import { PublicREST } from "./controllers/PublicREST.v0";
@@ -10,7 +10,7 @@ import { PublicREST } from "./controllers/PublicREST.v0";
   imports: [],
   exports: [],
   controllers: [PublicREST],
-  providers: [Options, Tokens, Compiler, Filer, Queue],
+  providers: [Options, Tokens, Compiler, Filer, GatewayQueue],
 })
 export class Gateway {
   private static _options: null | Options = null;
