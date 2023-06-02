@@ -1,6 +1,5 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Document } from "@hdml/schema";
-import { getSQL } from "@hdml/orchestrator";
 import {
   BaseLogger,
   BaseOptions,
