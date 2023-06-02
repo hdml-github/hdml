@@ -9,6 +9,7 @@ import {
   Req,
   HttpException,
   HttpStatus,
+  StreamableFile,
 } from "@nestjs/common";
 import { Request } from "express";
 import { Document } from "@hdml/schema";
@@ -39,7 +40,7 @@ export class PublicREST {
   ) {}
 
   /**
-   * The `GET /session?token=:token` endpopint handler.
+   * `GET /session?token=:token` endpopint handler.
    */
   @Get("session")
   @Header("Access-Control-Allow-Origin", "*")
@@ -66,13 +67,15 @@ export class PublicREST {
   }
 
   /**
-   * The `POST /hdml` endpoint handler.
+   * `POST /hdml` endpoint handler.
    */
   @Post("hdml")
   @Header("Access-Control-Allow-Origin", "*")
   public async postHdml(
-    @Param("tenant") tenant: string,
-    @Req() request: Request,
+    @Param("tenant")
+    tenant: string,
+    @Req()
+    request: Request,
   ): Promise<string> {
     this._logger.debug("Document posted", {
       tenant,
@@ -100,6 +103,23 @@ export class PublicREST {
       this._logger.error(error);
       throw error;
     }
+  }
+
+  /**
+   * `GET /hdml/:document` endpoint handler.
+   */
+  @Get("hdml/:document")
+  @Header("Access-Control-Allow-Origin", "*")
+  public async getHdml(
+    @Param("tenant")
+    tenant: string,
+    @Param("document")
+    document: string,
+    @Req()
+    request: Request,
+  ): Promise<void> {
+    console.log(tenant, document);
+    return Promise.resolve();
   }
 
   // @Post()

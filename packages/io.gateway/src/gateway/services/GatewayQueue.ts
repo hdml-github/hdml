@@ -64,7 +64,7 @@ export class GatewayQueue extends BaseQueue implements OnModuleInit {
     const sql = getSQL(hdml);
     const hashname = this.getHashname(sql);
     const hashtime = this.getHashtime(Date.now());
-    const name = `${hashname}.${hashtime}`;
+    const name = `${hashname}.${hashtime}.hdml`;
     const stats = await this.stats(name);
     if (!stats) {
       await this.create(name);

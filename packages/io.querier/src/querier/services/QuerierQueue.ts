@@ -80,14 +80,21 @@ export class QuerierQueue extends BaseQueue implements OnModuleInit {
         this._options,
       );
       for await (const batch of dataset) {
-        console.log(batch);
+        const properties: { [key: string]: string } = {
+          state: batch.state,
+        };
+        if (batch.error) {
+          properties.error = batch.error;
+        }
         await producer.send({
           data: Buffer.from(batch.data ? batch.data : ""),
-          properties: { state: batch.state },
+          properties,
         });
       }
       await producer.close();
       await consumer.acknowledge(message);
+    } else {
+      // TODO (buntarb): ???
     }
   }
 }
