@@ -50,10 +50,7 @@ export class PublicREST {
     @Query("token")
     token?: string,
   ): Promise<string> {
-    this._logger.debug("Session requested", {
-      tenant,
-      token,
-    });
+    this._logger.debug("Session requested");
     try {
       return this._tokens.getSessionToken(
         this._filer.getPublicKey(tenant),
@@ -76,11 +73,8 @@ export class PublicREST {
     tenant: string,
     @Req()
     request: Request,
-  ): Promise<string> {
-    this._logger.debug("Document posted", {
-      tenant,
-      session: request.header("Session"),
-    });
+  ): Promise<StreamableFile> {
+    this._logger.debug("Document posted");
     try {
       if (!request.readable) {
         throw new HttpException(
@@ -93,12 +87,11 @@ export class PublicREST {
         this._filer.getPrivateKey(tenant),
         request.header("Session"),
       );
-      const name = await this._filer.postHdmlDocument(
+      return await this._filer.postHdmlDocument(
         tenant,
         context,
         new Document(body),
       );
-      return name;
     } catch (error) {
       this._logger.error(error);
       throw error;
@@ -117,41 +110,17 @@ export class PublicREST {
     document: string,
     @Req()
     request: Request,
-  ): Promise<void> {
-    console.log(tenant, document);
-    return Promise.resolve();
+  ): Promise<StreamableFile> {
+    this._logger.debug("Document requested");
+    try {
+      await this._tokens.getContext(
+        this._filer.getPrivateKey(tenant),
+        request.header("Session"),
+      );
+      return await this._filer.getHdmlDocumentFile(document);
+    } catch (error) {
+      this._logger.error(error);
+      throw error;
+    }
   }
-
-  // @Post()
-  // @Header("Access-Control-Allow-Origin", "*")
-  // async statement(@Req() req: Request): Promise<StreamableFile> {
-  //   if (req.readable) {
-  //     const buff = await rawbody(req);
-  //     const doc = new Document(buff);
-  //     const sql = orchestrate(doc);
-  //     console.log(sql);
-  //     const response = await fetch("http://localhost:3000", {
-  //       method: "POST",
-  //       mode: "cors",
-  //       redirect: "follow",
-  //       cache: "no-cache",
-  //       headers: {
-  //         Accept: "text/html; charset=utf-8",
-  //         "Content-Type": "text/html; charset=utf-8",
-  //       },
-  //       body: sql,
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not OK");
-  //     }
-  //     const buffer = await response.arrayBuffer();
-  //     const array = new Uint8Array(buffer);
-  //     const datasetStream = new stream.PassThrough();
-  //     datasetStream.write(array);
-  //     datasetStream.end();
-  //     return new StreamableFile(datasetStream);
-  //   } else {
-  //     throw new Error("Can't parse the request body.");
-  //   }
-  // }
 }

@@ -88,3 +88,51 @@ static endDoc(builder:flatbuffers.Builder):flatbuffers.Offset {
 
 }
 
+/**
+ * Data document name.
+ */
+export class Name {
+  bb: flatbuffers.ByteBuffer|null = null;
+  bb_pos = 0;
+  __init(i:number, bb:flatbuffers.ByteBuffer):Name {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+}
+
+static getRootAsName(bb:flatbuffers.ByteBuffer, obj?:Name):Name {
+  return (obj || new Name()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+}
+
+static getSizePrefixedRootAsName(bb:flatbuffers.ByteBuffer, obj?:Name):Name {
+  bb.setPosition(bb.position() + flatbuffers.SIZE_PREFIX_LENGTH);
+  return (obj || new Name()).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+}
+
+value():string|null
+value(optionalEncoding:flatbuffers.Encoding):string|Uint8Array|null
+value(optionalEncoding?:any):string|Uint8Array|null {
+  const offset = this.bb!.__offset(this.bb_pos, 4);
+  return offset ? this.bb!.__string(this.bb_pos + offset, optionalEncoding) : null;
+}
+
+static startName(builder:flatbuffers.Builder) {
+  builder.startObject(1);
+}
+
+static addValue(builder:flatbuffers.Builder, valueOffset:flatbuffers.Offset) {
+  builder.addFieldOffset(0, valueOffset, 0);
+}
+
+static endName(builder:flatbuffers.Builder):flatbuffers.Offset {
+  const offset = builder.endObject();
+  return offset;
+}
+
+static createName(builder:flatbuffers.Builder, valueOffset:flatbuffers.Offset):flatbuffers.Offset {
+  Name.startName(builder);
+  Name.addValue(builder, valueOffset);
+  return Name.endName(builder);
+}
+}
+

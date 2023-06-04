@@ -1,3 +1,4 @@
+import { PassThrough } from "stream";
 import * as crypto from "crypto";
 import {
   Client,
@@ -8,7 +9,7 @@ import {
   Message,
   LogLevel,
 } from "pulsar-client";
-import { LRUCache } from "lru-cache";
+import { HttpException, HttpStatus } from "@nestjs/common";
 import { type BaseOptions } from "./BaseOptions";
 import { BaseLogger } from "./BaseLogger";
 
@@ -27,20 +28,6 @@ export abstract class BaseQueue {
    * Queries topic consumer.
    */
   private _queriesConsumer: null | Consumer = null;
-
-  /**
-   * Data topics readers LRU cache.
-   */
-  private _dataReadersCache: LRUCache<string, Reader, void> =
-    new LRUCache({
-      max: 500,
-      allowStale: false,
-      dispose: (reader) => {
-        reader.close().catch((reason) => {
-          this.logger().error(reason);
-        });
-      },
-    });
 
   /**
    * Returns options object.
@@ -181,15 +168,45 @@ export abstract class BaseQueue {
   /**
    * Returns `name` topic reader.
    */
-  protected async dataReader(name: string): Promise<Reader> {
-    if (!this._dataReadersCache.has(name)) {
-      const reader = await this.client().createReader({
-        topic: name,
-        startMessageId: MessageId.earliest(),
-      });
-      this._dataReadersCache.set(name, reader);
-    }
-    return <Reader>this._dataReadersCache.get(name);
+  protected async dataReader(
+    name: string,
+    stream: PassThrough,
+  ): Promise<Reader> {
+    return await this.client().createReader({
+      topic: name,
+      readerName: name,
+      startMessageId: MessageId.earliest(),
+      // This cause a "segmentation fault (core dumped)" error.
+      // listener: (message, reader) => {
+      //   switch (message.getProperties().state) {
+      //     case "PROCESSING":
+      //       break;
+      //     case "SCHEMA":
+      //       stream.write(message.getData());
+      //       break;
+      //     case "CHUNK":
+      //       stream.write(message.getData());
+      //       break;
+      //     case "DONE":
+      //       reader.close().catch((reason) => {
+      //         this.logger().error(reason);
+      //       });
+      //       stream.end();
+      //       break;
+      //     case "FAIL":
+      //       reader.close().catch((reason) => {
+      //         this.logger().error(reason);
+      //       });
+      //       stream.destroy(
+      //         new HttpException(
+      //           message.getProperties().error,
+      //           HttpStatus.FAILED_DEPENDENCY,
+      //         ),
+      //       );
+      //       break;
+      //   }
+      // },
+    });
   }
 
   /**
@@ -201,6 +218,8 @@ export abstract class BaseQueue {
         serviceUrl:
           `pulsar://${this.options().getQueueHost()}` +
           `:${this.options().getQueuePort()}`,
+        // ioThreads: 10,
+        // messageListenerThreads: 10,
         log: (
           level: LogLevel,
           file: string,

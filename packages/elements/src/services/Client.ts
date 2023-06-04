@@ -7,7 +7,7 @@
 
 import "whatwg-fetch";
 import { Table, tableFromIPC } from "apache-arrow";
-import { Document } from "@hdml/schema";
+import { Name } from "@hdml/schema";
 
 let sessionToken: null | string = null;
 
@@ -20,9 +20,10 @@ export class Client {
     string,
     [AbortController, Promise<string>]
   > = new Map();
-
-  private _promises: Map<string, Promise<Table>> = new Map();
-  private _controllers: Map<string, AbortController> = new Map();
+  private _requestedHdmls: Map<
+    string,
+    [AbortController, Promise<Table>]
+  > = new Map();
 
   /**
    * Class constructor.
@@ -46,16 +47,9 @@ export class Client {
   }
 
   /**
-   * Close client by cancelling every active fetch.
+   * Sends a `Document` with the specified `uid` and `body` and
+   * returns its name.
    */
-  public close(): void {
-    sessionToken = null;
-    this._initialized = false;
-    this._postedHdmls.forEach((tuple, uid) => {
-      this.hdmlCancel(uid);
-    });
-  }
-
   public async hdmlPost(uid: string, body: Buffer): Promise<string> {
     if (!this._initialized) {
       throw new Error("Client is not initialized");
@@ -75,31 +69,36 @@ export class Client {
     }
   }
 
-  private async hdmlPostInternal(
-    uid: string,
-    body: Buffer,
-    signal: AbortSignal,
-  ): Promise<string> {
-    const resp = await this.fetch({
-      method: "POST",
-      api: "hdml",
-      signal,
-      body,
-    });
-    const identifier = await resp.text();
-    if (this._postedHdmls.has(uid)) {
-      this._postedHdmls.delete(uid);
+  /**
+   * Retrieves the `Document` data stream and returns parsed `Table`.
+   */
+  public async hdmlGet(uid: string, name: string): Promise<Table> {
+    if (!this._initialized) {
+      throw new Error("Client is not initialized");
+    } else {
+      if (!this._requestedHdmls.has(uid)) {
+        const abort = new AbortController();
+        const promise = this.hdmlGetInternal(uid, name, abort.signal);
+        this._requestedHdmls.set(uid, [abort, promise]);
+      }
+      return (<[AbortController, Promise<Table>]>(
+        this._requestedHdmls.get(uid)
+      ))[1];
     }
-    return identifier;
   }
 
-  private hdmlCancel(uid: string): void {
-    if (this._postedHdmls.has(uid)) {
-      (<[AbortController, Promise<string>]>(
-        this._postedHdmls.get(uid)
-      ))[0].abort();
-      this._postedHdmls.delete(uid);
-    }
+  /**
+   * Close client by cancelling every active fetch.
+   */
+  public close(): void {
+    sessionToken = null;
+    this._initialized = false;
+    this._postedHdmls.forEach((tuple, uid) => {
+      this.hdmlPostCancel(uid);
+    });
+    this._requestedHdmls.forEach((tuple, uid) => {
+      this.hdmlGetCancel(uid);
+    });
   }
 
   /**
@@ -119,21 +118,80 @@ export class Client {
     }
   }
 
+  private async hdmlPostInternal(
+    uid: string,
+    body: Buffer,
+    signal: AbortSignal,
+  ): Promise<string> {
+    const resp = await this.fetch({
+      method: "POST",
+      api: "hdml",
+      signal,
+      body,
+    });
+    const buff = await resp.arrayBuffer();
+    const name = new Name(new Uint8Array(buff));
+    if (this._postedHdmls.has(uid)) {
+      this._postedHdmls.delete(uid);
+    }
+    return name.value;
+  }
+
+  private async hdmlGetInternal(
+    uid: string,
+    name: string,
+    signal: AbortSignal,
+  ): Promise<Table> {
+    const response = await this.fetch({
+      method: "GET",
+      api: "hdml",
+      path: `/${name}`,
+      signal,
+    });
+    const buffer = await response.arrayBuffer();
+    const table = tableFromIPC(<Buffer>buffer);
+    if (this._requestedHdmls.has(uid)) {
+      this._requestedHdmls.delete(uid);
+    }
+    return table;
+  }
+
+  private hdmlPostCancel(uid: string): void {
+    if (this._postedHdmls.has(uid)) {
+      (<[AbortController, Promise<string>]>(
+        this._postedHdmls.get(uid)
+      ))[0].abort();
+      this._postedHdmls.delete(uid);
+    }
+  }
+
+  private hdmlGetCancel(uid: string): void {
+    if (this._requestedHdmls.has(uid)) {
+      (<[AbortController, Promise<Table>]>(
+        this._requestedHdmls.get(uid)
+      ))[0].abort();
+      this._requestedHdmls.delete(uid);
+    }
+  }
+
   /**
    * Fetches remote resource.
    */
   private async fetch(config: {
     method: "GET" | "POST" | "PUT" | "DELETE";
     api: "session" | "hdml";
+    path?: string;
     params?: Record<string, string>;
     signal?: AbortSignal;
     body?: Buffer;
   }): Promise<Response> {
-    const { method, api, params, signal, body } = config;
+    const { method, api, path, params, signal, body } = config;
     const query = params
       ? `?${new URLSearchParams(params).toString()}`
       : "";
-    const url = `${this._url}/${this._tenant}/api/v0/${api}${query}`;
+    const url =
+      `${this._url}/${this._tenant}/api/v0` +
+      `/${api}${path ? path : ""}${query}`;
     const response = await fetch(url, {
       method,
       mode: "cors",

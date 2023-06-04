@@ -18,3 +18,8 @@ table Doc {
   model: data.Model;
   frame: data.Frame;
 }
+
+/// Data document name.
+table Name {
+  value: string;
+}

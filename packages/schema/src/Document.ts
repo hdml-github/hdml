@@ -1,5 +1,5 @@
 import { ByteBuffer, Builder } from "flatbuffers";
-import { Doc } from "./.fbs/data.Doc_generated";
+import { Doc, Name as _Name } from "./.fbs/data.Doc_generated";
 import { Model } from "./.fbs/data.Model_generated";
 import { Frame } from "./.fbs/data.Frame_generated";
 import { ModelHelper, ModelData } from "./helpers/ModelHelper";
@@ -87,5 +87,33 @@ export class Document {
       this._buffer = new ByteBuffer(this._builder.asUint8Array());
       this._document = Doc.getRootAsDoc(this._buffer);
     }
+  }
+}
+
+export class Name {
+  private _builder: Builder;
+  private _buffer: ByteBuffer;
+  private _name: _Name;
+
+  public get buffer(): Uint8Array {
+    return this._buffer.bytes();
+  }
+
+  public get value(): string {
+    return this._name.value() || "";
+  }
+
+  constructor(value: string | Uint8Array) {
+    this._builder = new Builder(1024);
+    if (value instanceof Uint8Array) {
+      this._buffer = new ByteBuffer(value);
+    } else {
+      const _value = this._builder.createString(value);
+      _Name.startName(this._builder);
+      _Name.addValue(this._builder, _value);
+      this._builder.finish(_Name.endName(this._builder));
+      this._buffer = new ByteBuffer(this._builder.asUint8Array());
+    }
+    this._name = _Name.getRootAsName(this._buffer);
   }
 }

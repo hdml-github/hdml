@@ -692,11 +692,39 @@ export class IoElement extends UnifiedElement {
       if (!this._client) {
         throw new Error("Client is missing");
       } else {
-        const identifier = await this._client.hdmlPost(
+        const name = await this._client.hdmlPost(
           uid,
           <Buffer>doc.buffer,
         );
-        console.log(identifier);
+        const table = await this._client.hdmlGet(uid, name);
+        if (this._models.has(uid)) {
+          const model = <ModelElement>this._models.get(uid);
+          model.dispatchEvent(
+            new CustomEvent<ModelEventDetail>("hdml-model:data", {
+              cancelable: false,
+              composed: false,
+              bubbles: false,
+              detail: {
+                model,
+                table,
+              },
+            }),
+          );
+        }
+        if (this._frames.has(uid)) {
+          const frame = <FrameElement>this._frames.get(uid);
+          frame.dispatchEvent(
+            new CustomEvent<FrameEventDetail>("hdml-frame:data", {
+              cancelable: false,
+              composed: false,
+              bubbles: false,
+              detail: {
+                frame,
+                table,
+              },
+            }),
+          );
+        }
       }
     }
   }

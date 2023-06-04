@@ -9,6 +9,7 @@ import {
   OnModuleInit,
   HttpException,
   HttpStatus,
+  StreamableFile,
 } from "@nestjs/common";
 import { ModelData, FrameData, Document } from "@hdml/schema";
 import { getHTML } from "@hdml/orchestrator";
@@ -140,7 +141,7 @@ export class Filer implements OnModuleInit {
     tenant: string,
     context: object,
     document: Document,
-  ): Promise<string> {
+  ): Promise<StreamableFile> {
     if (this._tenants.has(tenant)) {
       const hook = <HookFn>this._tenants.get(tenant)?.hook;
       const html = this.getHtmlDocument(tenant, document);
@@ -171,6 +172,15 @@ export class Filer implements OnModuleInit {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  /**
+   * Returns document's `file` stream.
+   */
+  public async getHdmlDocumentFile(
+    file: string,
+  ): Promise<StreamableFile> {
+    return this._queue.getHdmlDocumentFile(file);
   }
 
   /**

@@ -13,7 +13,7 @@
           name="hdml.io"
           host="http://localhost:8888"
           tenant="common"
-          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.IkJ0MgZ82nvAkiHqDcyptpZ_oLhn1N2v6kmGZe14mrmqB_WtHLesd7AUJFA9fQsvbEMGlgiJckWSReCYp9AeEIur0QKrN2NUZP3KbfpCkkqT9a4kP8-ZkksVpkmRc1XVcTKbh38JtBF4s1rFdkgwadQyOZPKPg3VVIEQ1b_2nNWhfQVyN-w1NO1m1qgqQo_FuB8uF9PlMLLyBDfa9THaa5cBPSxfd6OY6IbXg2Olp8Gzh7QgnC9snZebYzw1p7hJYVORRf6ZBfEfhUmaVePXjlq1_3KwODNezY6YCgBJElZmRL_Ba9WuuBm68mOrAN65KRJ7t-aTaz-XQ87jHNs9i8tAugplr2e-uRGdWQFs74HUDEIHGjPPLqfzrarvLm_1lnCw7GSTmBWC0VR904E6LDW9Lb6Z6C-bg72pT2z9ciMFw0rLRMlMdXKXZBk0-8tGXDrH_51iQyffIwlvfra6ZjwtZEEGn5UQMQdv_xUyBVblsMNjecoZxAdLNlHhbjBL.bYw7Ip2KFKH7yD06.t1PoImDbQik7mYPfQVB8dLGxS8aLboLjolVOtAgkyWLcaEEAz1ErkQqj_PteEajp-tuLRa3Ran99BZNIZP51YyMNoNypt0InT99u2KXLMTvZASe_WpBKlP945ahtDs7k27bnOpm9JkmRWSVFAPY7hx0mm9oJ.xMrKeAHhsA9Fr5quH-pwGA">
+          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.kPYaHQKnNNWhoaW6y1VDRe-ISSdi-0ktVcUSoo9nIwZxp1yXJ_my6nEvDOiOHRH02pR6AMT7XXq7VklzwfHER6jB3ZOKZbtV85KxpgPjhdhuj4rKNiHKnHf-1z6K-7e7rQBISf-KRmdLXiZyBLIpsaNL1XbJi6NGoHnkb9TPOc2AopK6Vb8LgWA7IDZJ93KNxMoLkZbmCjCHIgnGn3I2aWM_yHZrDD02R52cgckHvSkQLN7HRWlMwHC8GXZbGJH7z0p4HmTgoV58-xkWwwl7-wpVii2xBYruvRzgrKIBuu0C1uch_dOhPUS2cfEzAdT7jHnI2OiP6z42vrcX3eSFwMDPdd92YrcCC7DS1QSNkMXloY3ysGgkRmekPgn8BqPfg79LVjuqIS7NKCUq_1IckHZs8vHJqHlg-OTm8wM-mr5YvQvIxCYd4wLaBaT6NXBsrgpvoxDvUmloSMWq47zzt0bKLmZYp2hmgZgGc8MsqtndKetX_9mZhsKfobSwOvKY.LYu0VzDXw1m60HRG.V05oW2NJW5bqjMnfy1Qp1QT_nUfiPY7yA4QQz2q7ht2QSV-ILIoPdr6QB6X94BjN5_g3J8VPMJwyo-FDks5oYuZQhhOBRGb51LJqHx0FOxpPlJxqAe77TtfW79Tvx94MqQPHnchJOm0MjKGn6Fhfb8-OIB_7.8hWEpT8czcJG3pKSR1Nu_Q">
         </hdml-io>
 
         <hdml-model
@@ -245,8 +245,23 @@
       </div>
 
       <script>
-        const io = document.querySelector("hdml-io");
-        io.getElementsData().then(console.log);
+        const m = document.querySelector("hdml-model");
+        const f1 = document.querySelector("hdml-frame[name=frame]");
+        const f2 = document.querySelector("hdml-frame[name=query]");
+
+        m.addEventListener("hdml-model:data", (event) => {
+          console.log(event.detail.table.toString());
+        });
+        f1.addEventListener("hdml-frame:data", (event) => {
+          console.log(event.detail.table.toString());
+        });
+        f2.addEventListener("hdml-frame:data", (event) => {
+          console.log(event.detail.table.toString());
+        });
+
+        m.request();
+        f1.request();
+        f2.request();
       </script>
     </body>
 </html>

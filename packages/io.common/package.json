@@ -7,12 +7,12 @@
     "access": "public"
   },
   "dependencies": {
+    "@hdml/schema": "0.0.0-alpha.1",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "apache-arrow": "^11.0.0",
     "dotenv": "^16.0.3",
-    "lru-cache": "^9.1.1",
     "pulsar-client": "^1.8.2"
   },
   "scripts": {

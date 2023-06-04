@@ -32,7 +32,7 @@ import { TableData } from "./helpers/TableHelper";
 import { JoinData } from "./helpers/JoinHelper";
 import { ModelData } from "./helpers/ModelHelper";
 import { FrameData } from "./helpers/FrameHelper";
-import { Document, DocumentData } from "./Document";
+import { Document, DocumentData, Name } from "./Document";
 
 export {
   TableType,
@@ -61,4 +61,5 @@ export {
   FilterClauseData,
   JoinData,
   FrameData,
+  Name,
 };
