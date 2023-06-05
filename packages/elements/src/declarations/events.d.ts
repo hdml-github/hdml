@@ -5,6 +5,7 @@
  * @license Apache-2.0
  */
 
+import { DataEventDetail } from "../components/IoElement";
 import { ModelEventDetail } from "../components/ModelElement";
 import { TableEventDetail } from "../components/TableElement";
 import { FieldEventDetail } from "../components/FieldElement";
@@ -18,10 +19,11 @@ import { SortByEventDetail } from "../components/SortByElement";
 
 declare global {
   interface HTMLElementEventMap {
+    "hdml-data": CustomEvent<DataEventDetail>;
+
     "hdml-model:connected": CustomEvent<ModelEventDetail>;
     "hdml-model:changed": CustomEvent<ModelEventDetail>;
     "hdml-model:request": CustomEvent<ModelEventDetail>;
-    "hdml-model:data": CustomEvent<ModelEventDetail>;
     "hdml-model:disconnected": CustomEvent<ModelEventDetail>;
 
     "hdml-table:connected": CustomEvent<TableEventDetail>;

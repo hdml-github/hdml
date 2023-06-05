@@ -6,7 +6,6 @@
  */
 
 import { html, TemplateResult } from "lit";
-import { Table } from "apache-arrow";
 import { FieldData, FrameData } from "@hdml/schema";
 
 import {
@@ -35,7 +34,6 @@ import { SortByElement, SortByEventDetail } from "./SortByElement";
  */
 export interface FrameEventDetail {
   frame: FrameElement;
-  table?: Table;
 }
 
 /**

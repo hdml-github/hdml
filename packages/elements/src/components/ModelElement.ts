@@ -6,7 +6,6 @@
  */
 
 import { html, TemplateResult } from "lit";
-import { Table } from "apache-arrow";
 import { ModelData, TableData, JoinData } from "@hdml/schema";
 
 import { MODEL_NAME_REGEXP } from "../helpers/constants";
@@ -20,7 +19,6 @@ import { JoinElement, JoinEventDetail } from "./JoinElement";
  */
 export interface ModelEventDetail {
   model: ModelElement;
-  table?: Table;
 }
 
 /**

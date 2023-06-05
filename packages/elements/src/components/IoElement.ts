@@ -8,6 +8,7 @@
 import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
+import { Table } from "apache-arrow";
 import {
   Document,
   DocumentData,
@@ -29,6 +30,13 @@ import { UnifiedElement } from "./UnifiedElement";
 import { ModelEventDetail, ModelElement } from "./ModelElement";
 import { FrameEventDetail, FrameElement } from "./FrameElement";
 import { Client } from "../services/Client";
+
+/**
+ * An `hdml-data` event detail interface.
+ */
+export interface DataEventDetail {
+  table: Table;
+}
 
 /**
  * An `IoElement` `json` representation.
@@ -697,29 +705,20 @@ export class IoElement extends UnifiedElement {
           <Buffer>doc.buffer,
         );
         const table = await this._client.hdmlGet(uid, name);
+        let target: false | Element = false;
         if (this._models.has(uid)) {
-          const model = <ModelElement>this._models.get(uid);
-          model.dispatchEvent(
-            new CustomEvent<ModelEventDetail>("hdml-model:data", {
-              cancelable: false,
-              composed: false,
-              bubbles: false,
-              detail: {
-                model,
-                table,
-              },
-            }),
-          );
+          target = <ModelElement>this._models.get(uid);
         }
         if (this._frames.has(uid)) {
-          const frame = <FrameElement>this._frames.get(uid);
-          frame.dispatchEvent(
-            new CustomEvent<FrameEventDetail>("hdml-frame:data", {
+          target = <FrameElement>this._frames.get(uid);
+        }
+        if (target) {
+          target.dispatchEvent(
+            new CustomEvent<DataEventDetail>("hdml-data", {
               cancelable: false,
               composed: false,
               bubbles: false,
               detail: {
-                frame,
                 table,
               },
             }),
