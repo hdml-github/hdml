@@ -156,24 +156,6 @@ export class Client {
     return table;
   }
 
-  private hdmlPostCancel(uid: string): void {
-    if (this._postedHdmls.has(uid)) {
-      (<[AbortController, Promise<string>]>(
-        this._postedHdmls.get(uid)
-      ))[0].abort();
-      this._postedHdmls.delete(uid);
-    }
-  }
-
-  private hdmlGetCancel(uid: string): void {
-    if (this._requestedHdmls.has(uid)) {
-      (<[AbortController, Promise<Table>]>(
-        this._requestedHdmls.get(uid)
-      ))[0].abort();
-      this._requestedHdmls.delete(uid);
-    }
-  }
-
   /**
    * Fetches remote resource.
    */
@@ -210,6 +192,24 @@ export class Client {
       throw new Error(message.message || response.statusText);
     } else {
       return response;
+    }
+  }
+
+  private hdmlPostCancel(uid: string): void {
+    if (this._postedHdmls.has(uid)) {
+      (<[AbortController, Promise<string>]>(
+        this._postedHdmls.get(uid)
+      ))[0].abort();
+      this._postedHdmls.delete(uid);
+    }
+  }
+
+  private hdmlGetCancel(uid: string): void {
+    if (this._requestedHdmls.has(uid)) {
+      (<[AbortController, Promise<Table>]>(
+        this._requestedHdmls.get(uid)
+      ))[0].abort();
+      this._requestedHdmls.delete(uid);
     }
   }
 }
