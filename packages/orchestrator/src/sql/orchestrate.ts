@@ -1,14 +1,24 @@
-import { type Document } from "@hdml/schema";
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
+import { type Query, type QueryDef } from "@hdml/schema";
 import { getModelSQL } from "./model";
 import { getFrameSQL } from "./frame";
 
-export function getSQL(document: Document): string {
-  if (!document.model) {
+/**
+ * Converts the specified `query` to an `SQL` string. Throws if the
+ * `query` object does not contain a `model` property.
+ */
+export function getSQL(query: Query | QueryDef): string {
+  if (!query.model) {
     throw new Error("Model is missing.");
   }
-  if (document.frame) {
-    return getFrameSQL(document.frame, document.model, 0);
+  if (query.frame) {
+    return getFrameSQL(query.frame, query.model, 0);
   } else {
-    return getModelSQL(document.model, 0);
+    return getModelSQL(query.model, 0);
   }
 }

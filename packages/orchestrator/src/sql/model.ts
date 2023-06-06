@@ -1,8 +1,14 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  type ModelData,
-  type TableData,
-  type FieldData,
-  type JoinData,
+  type ModelDef,
+  type TableDef,
+  type FieldDef,
+  type JoinDef,
   TableType,
   JoinType,
 } from "@hdml/schema";
@@ -10,14 +16,17 @@ import { getTableFieldSQL } from "./fields";
 import { getFilterClauseSQL } from "./filter";
 import { t } from "../const";
 
-export function getModelSQL(model: ModelData, level = 0): string {
+/**
+ * Returns the SQL representation of the `model`.
+ */
+export function getModelSQL(model: ModelDef, level = 0): string {
   const pre = t.repeat(level);
   const tablesList = model.tables
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .filter((t) => isModelTableJoined(model, t));
 
   const tables = tablesList
-    .map((table: TableData) => {
+    .map((table: TableDef) => {
       switch (table.type) {
         case TableType.Table:
         case TableType.Query:
@@ -70,9 +79,12 @@ export function getModelSQL(model: ModelData, level = 0): string {
   return sql;
 }
 
+/**
+ * Determines if model tables are joined.
+ */
 export function isModelTableJoined(
-  model: ModelData,
-  table: TableData,
+  model: ModelDef,
+  table: TableDef,
 ): boolean {
   if (model.joins.length === 0) {
     return true;
@@ -85,18 +97,17 @@ export function isModelTableJoined(
   return res;
 }
 
-export function getModelTableSQL(
-  table: TableData,
-  level = 0,
-): string {
+/**
+ * Returns the SQL representation of the `table`.
+ */
+export function getModelTableSQL(table: TableDef, level = 0): string {
   const pre = t.repeat(level);
   const source =
     table.type === TableType.Table ? table.source : `_${table.name}`;
   const fields = table.fields
     .sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
     .map(
-      (field: FieldData) =>
-        `${pre}${t}${t}${getTableFieldSQL(field)}`,
+      (field: FieldDef) => `${pre}${t}${t}${getTableFieldSQL(field)}`,
     )
     .join(",\n");
 
@@ -119,7 +130,11 @@ export function getModelTableSQL(
   return sql;
 }
 
-export function getModelJoinsPath(joins: JoinData[]): string[] {
+/**
+ * Returns joins path helper object.
+ * TODO: optimize this.
+ */
+export function getModelJoinsPath(joins: JoinDef[]): string[] {
   const path = [joins[0].right];
   for (let i = 1; i < joins.length; i++) {
     if (
@@ -134,9 +149,12 @@ export function getModelJoinsPath(joins: JoinData[]): string[] {
   return path;
 }
 
+/**
+ * Returns the SQL representation of the `join`.
+ */
 export function getModelJoinSQL(
   path: string[],
-  join: JoinData,
+  join: JoinDef,
   i: number,
   level = 0,
 ): string {

@@ -1,13 +1,22 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  FilterClauseData,
-  FilterData,
+  type FilterClauseDef,
+  type FilterDef,
   FilterType,
   FilterOperator,
 } from "@hdml/schema";
 import { t } from "../const";
 
+/**
+ * Returns the HTML representation of the filter clause.
+ */
 export function getFilterClauseHTML(
-  clause: FilterClauseData,
+  clause: FilterClauseDef,
   level = 0,
   left?: string,
   right?: string,
@@ -44,8 +53,11 @@ export function getFilterClauseHTML(
   return html;
 }
 
+/**
+ * Returns the HTML representation of the `filter`.
+ */
 export function getFilter(
-  filter: FilterData,
+  filter: FilterDef,
   left?: string,
   right?: string,
 ): string {
@@ -70,6 +82,9 @@ export function getFilter(
   }
 }
 
+/**
+ * Returns the HTML representation of the keys filter.
+ */
 export function getKeysFilter(
   lField: string,
   rField: string,
@@ -80,6 +95,9 @@ export function getKeysFilter(
   );
 }
 
+/**
+ * Returns the HTML representation of the expression filter.
+ */
 export function getExprFilter(clause: string): string {
   return `<hdml-filter type="expr" clause="${clause.replaceAll(
     '"',

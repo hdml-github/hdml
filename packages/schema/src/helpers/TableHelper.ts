@@ -1,15 +1,27 @@
-import { Builder } from "flatbuffers";
-import { Table, Model } from "../.fbs/data.Model_generated";
-import { TableType } from "../Enums";
-import { FieldHelper, FieldData } from "./FieldHelper";
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
 
-export type TableData = {
+import { Builder } from "flatbuffers";
+import { Table, Model } from "../.fbs/query.Model_generated";
+import { TableType } from "../enums";
+import { FieldHelper, FieldDef } from "./FieldHelper";
+
+/**
+ * An object for defining table.
+ */
+export type TableDef = {
   name: string;
   type: TableType;
   source: string;
-  fields: FieldData[];
+  fields: FieldDef[];
 };
 
+/**
+ * Table helper class.
+ */
 export class TableHelper {
   private _field: FieldHelper;
 
@@ -17,11 +29,11 @@ export class TableHelper {
     this._field = new FieldHelper(this._builder);
   }
 
-  public bufferizeTables(data: TableData[]): number[] {
+  public bufferizeTables(data: TableDef[]): number[] {
     return data.map((t) => this.bufferizeTable(t));
   }
 
-  public bufferizeTable(data: TableData): number {
+  public bufferizeTable(data: TableDef): number {
     const name = this._builder.createString(data.name);
     const source = this._builder.createString(data.source);
     const offsets = this._field.bufferizeFields(data.fields);
@@ -34,8 +46,8 @@ export class TableHelper {
     return Table.endTable(this._builder);
   }
 
-  public parseTables(model: Model): TableData[] {
-    const tables: TableData[] = [];
+  public parseTables(model: Model): TableDef[] {
+    const tables: TableDef[] = [];
     for (let i = 0; i < model.tablesLength(); i++) {
       const table = model.tables(i, new Table());
       if (table) {

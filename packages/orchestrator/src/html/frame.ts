@@ -1,16 +1,25 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  type ModelData,
-  type FieldData,
-  FrameData,
+  type ModelDef,
+  type FieldDef,
+  type FrameDef,
 } from "@hdml/schema";
 import { getModelHTML } from "./model";
 import { getFieldHTML } from "./fields";
 import { getFilterClauseHTML } from "./filter";
 import { t } from "../const";
 
+/**
+ * Returns the HTML representation of the `frame` and the `model`.
+ */
 export function getFrameHTML(
-  frame: FrameData,
-  model: ModelData,
+  frame: FrameDef,
+  model: ModelDef,
   level = 0,
   isRoot = false,
 ): string {
@@ -35,7 +44,7 @@ export function getFrameHTML(
       .sort((a, b) =>
         a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
       )
-      .map((field: FieldData) => `${pre}${t}${getFieldHTML(field)}`)
+      .map((field: FieldDef) => `${pre}${t}${getFieldHTML(field)}`)
       .join("\n") +
     "\n";
   if (frame.filterBy) {

@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Builder } from "flatbuffers";
 import {
   FilterClause,
@@ -6,52 +12,70 @@ import {
   ExprOpts,
   KeysOpts,
   NamedOpts,
-} from "../.fbs/data.FilterClause_generated";
-import { FilterName, FilterOperator, FilterType } from "../Enums";
+} from "../.fbs/query.FilterClause_generated";
+import { FilterName, FilterOperator, FilterType } from "../enums";
 
-export type ExprOptsData = {
+/**
+ * An object for defining expression filter options.
+ */
+export type ExprOptsDef = {
   clause: string;
 };
 
-export type KeysOptsData = {
+/**
+ * An object for defining keys filter options.
+ */
+export type KeysOptsDef = {
   left: string;
   right: string;
 };
 
-export type NamedOptsData = {
+/**
+ * An object for defining named filter options.
+ */
+export type NamedOptsDef = {
   name: FilterName;
   field: string;
   values: string[];
 };
 
-export type FilterData =
+/**
+ * An object for defining filter.
+ */
+export type FilterDef =
   | {
       type: FilterType.Expr;
-      options: ExprOptsData;
+      options: ExprOptsDef;
     }
   | {
       type: FilterType.Keys;
-      options: KeysOptsData;
+      options: KeysOptsDef;
     }
   | {
       type: FilterType.Named;
-      options: NamedOptsData;
+      options: NamedOptsDef;
     };
 
-export type FilterClauseData = {
+/**
+ * An object for defining filters clause.
+ */
+export type FilterClauseDef = {
   type: FilterOperator;
-  filters: FilterData[];
-  children: FilterClauseData[];
+  filters: FilterDef[];
+  children: FilterClauseDef[];
 };
 
+/**
+ * Filter helper class.
+ */
 export class FilterHelper {
   public constructor(private _builder: Builder) {}
 
-  public bufferizeFiltersClauses(data: FilterClauseData[]): number[] {
+  public bufferizeFiltersClauses(data: FilterClauseDef[]): number[] {
     return data.map((c) => this.bufferizeFilterClause(c));
   }
 
-  public bufferizeFilterClause(data: FilterClauseData): number {
+  public bufferizeFilterClause(data: FilterClauseDef): number {
     const filters_ = this.bufferizeFilters(data.filters);
     const filters = FilterClause.createFiltersVector(
       this._builder,
@@ -69,11 +93,11 @@ export class FilterHelper {
     return FilterClause.endFilterClause(this._builder);
   }
 
-  public bufferizeFilters(data: FilterData[]): number[] {
+  public bufferizeFilters(data: FilterDef[]): number[] {
     return data.map((f) => this.bufferizeFilter(f));
   }
 
-  public bufferizeFilter(data: FilterData): number {
+  public bufferizeFilter(data: FilterDef): number {
     let type = FilterOpts.NONE;
     let opts = 0;
     switch (data.type) {
@@ -99,14 +123,14 @@ export class FilterHelper {
     return Filter.endFilter(this._builder);
   }
 
-  public bufferizeExprOpts(data: ExprOptsData): number {
+  public bufferizeExprOpts(data: ExprOptsDef): number {
     const clause = this._builder.createString(data.clause);
     ExprOpts.startExprOpts(this._builder);
     ExprOpts.addClause(this._builder, clause);
     return ExprOpts.endExprOpts(this._builder);
   }
 
-  public bufferizeKeysOpts(data: KeysOptsData): number {
+  public bufferizeKeysOpts(data: KeysOptsDef): number {
     const left = this._builder.createString(data.left);
     const right = this._builder.createString(data.right);
     KeysOpts.startKeysOpts(this._builder);
@@ -115,7 +139,7 @@ export class FilterHelper {
     return KeysOpts.endKeysOpts(this._builder);
   }
 
-  public bufferizeNamedOpts(data: NamedOptsData): number {
+  public bufferizeNamedOpts(data: NamedOptsDef): number {
     const field = this._builder.createString(data.field);
     const values_ = data.values.map((v) =>
       this._builder.createString(v),
@@ -131,15 +155,15 @@ export class FilterHelper {
     return NamedOpts.endNamedOpts(this._builder);
   }
 
-  public parseFilterClause(clause: FilterClause): FilterClauseData {
+  public parseFilterClause(clause: FilterClause): FilterClauseDef {
     const type = clause.type();
-    const filters: FilterData[] = [];
-    const children: FilterClauseData[] = [];
+    const filters: FilterDef[] = [];
+    const children: FilterClauseDef[] = [];
     if (clause.filtersLength() > 0) {
       for (let i = 0; i < clause.filtersLength(); i++) {
         const filter = clause.filters(i, new Filter());
         if (filter) {
-          filters.push(<FilterData>{
+          filters.push(<FilterDef>{
             type: filter.type(),
             options: this.parseFilterOpts(filter),
           });
@@ -163,9 +187,9 @@ export class FilterHelper {
 
   public parseFilterOpts(
     filter: Filter,
-  ): ExprOptsData | KeysOptsData | NamedOptsData {
+  ): ExprOptsDef | KeysOptsDef | NamedOptsDef {
     let opts: unknown;
-    let data: ExprOptsData | KeysOptsData | NamedOptsData;
+    let data: ExprOptsDef | KeysOptsDef | NamedOptsDef;
     switch (filter.optionsType()) {
       default:
         throw new Error("Invalid filter options type.");

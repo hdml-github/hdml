@@ -1,32 +1,24 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  Document,
-  DocumentData,
-  DecimalOptsData,
-  DateOptsData,
-  TimeOptsData,
-  TimestampOptsData,
+  type QueryDef,
+  Query,
   TableType,
   AggType,
-  DateUnit,
-  TimeUnit,
-  TimeZone,
   DataType,
-  DecimalBitWidth,
   JoinType,
   FilterOperator,
   FilterType,
-  ModelData,
-  FrameData,
 } from "@hdml/schema";
 import { getSQL } from "./orchestrate";
 
-const data: DocumentData = {
-  name: "Test HDML Document.",
-  tenant: "common",
-  token: "sometokenhere",
+const queryDef: QueryDef = {
   model: {
     name: "model",
-    host: "hostname",
     tables: [
       {
         name: "tables",
@@ -172,7 +164,6 @@ const data: DocumentData = {
   },
   frame: {
     name: "query",
-    host: "hostname",
     source: "frame",
     offset: 1,
     limit: 1,
@@ -235,7 +226,6 @@ const data: DocumentData = {
     ],
     parent: {
       name: "frame",
-      host: "hostname",
       source: "model",
       offset: 0,
       limit: 1000,
@@ -280,11 +270,11 @@ const data: DocumentData = {
   },
 };
 
-const document = new Document(data);
+const query = new Query(queryDef);
 
 describe("Orchestrator", () => {
-  it("convert document to a SQL string", () => {
-    const sql = getSQL(document);
+  it("must convert the query object to an SQL string", () => {
+    const sql = getSQL(query);
     console.log(sql);
   });
 });

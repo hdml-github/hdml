@@ -1,0 +1,24 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query filter names enum.
+enum FilterName: byte {
+  Equals,
+  NotEquals,
+  Contains,
+  NotContains,
+  StartsWith,
+  EndsWith,
+  Greater,
+  GreaterEqual,
+  Less,
+  LessEqual,
+  IsNull,
+  IsNotNull,
+  Between,
+}

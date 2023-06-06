@@ -1,5 +1,4 @@
 /**
- * @fileoverview Package export.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -12,27 +11,28 @@ import {
   TimeUnit,
   TimeZone,
   DataType,
-  DecimalBitWidth,
+  DecBitWidth,
   JoinType,
   FilterName,
   FilterType,
   FilterOperator,
-} from "./Enums";
+} from "./enums";
 import {
-  CommonOptsData,
-  DecimalOptsData,
-  DateOptsData,
-  TimeOptsData,
-  TimestampOptsData,
-  TypeData,
-  FieldData,
+  CommonOptsDef,
+  DecimalOptsDef,
+  DateOptsDef,
+  TimeOptsDef,
+  TimestampOptsDef,
+  TypeDef,
+  FieldDef,
 } from "./helpers/FieldHelper";
-import { FilterClauseData, FilterData } from "./helpers/FilterHelper";
-import { TableData } from "./helpers/TableHelper";
-import { JoinData } from "./helpers/JoinHelper";
-import { ModelData } from "./helpers/ModelHelper";
-import { FrameData } from "./helpers/FrameHelper";
-import { Document, DocumentData, Name } from "./Document";
+import { FilterClauseDef, FilterDef } from "./helpers/FilterHelper";
+import { TableDef } from "./helpers/TableHelper";
+import { JoinDef } from "./helpers/JoinHelper";
+import { ModelDef } from "./helpers/ModelHelper";
+import { FrameDef } from "./helpers/FrameHelper";
+import { Query, QueryDef } from "./Query";
+import { File, FileDef } from "./File";
 
 export {
   TableType,
@@ -41,25 +41,26 @@ export {
   TimeUnit,
   TimeZone,
   DataType,
-  DecimalBitWidth,
-  Document,
-  DocumentData,
-  CommonOptsData,
-  DecimalOptsData,
-  DateOptsData,
-  FieldData,
-  ModelData,
-  TableData,
-  TimeOptsData,
-  TimestampOptsData,
-  TypeData,
+  DecBitWidth,
+  File,
+  FileDef,
+  Query,
+  QueryDef,
+  CommonOptsDef,
+  DecimalOptsDef,
+  DateOptsDef,
+  FieldDef,
+  ModelDef,
+  TableDef,
+  TimeOptsDef,
+  TimestampOptsDef,
+  TypeDef,
   FilterName,
   FilterType,
   FilterOperator,
   JoinType,
-  FilterData,
-  FilterClauseData,
-  JoinData,
-  FrameData,
-  Name,
+  FilterDef,
+  FilterClauseDef,
+  JoinDef,
+  FrameDef,
 };

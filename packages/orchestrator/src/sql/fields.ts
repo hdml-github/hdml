@@ -1,11 +1,20 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  type FieldData,
-  type TypeData,
+  type FieldDef,
+  type TypeDef,
   DataType,
   AggType,
 } from "@hdml/schema";
 
-export function getTableFieldSQL(field: FieldData): string {
+/**
+ * Returns the SQL representation of the table field.
+ */
+export function getTableFieldSQL(field: FieldDef): string {
   if (!field.type) {
     return getNamedField(
       field.name,
@@ -22,7 +31,10 @@ export function getTableFieldSQL(field: FieldData): string {
   }
 }
 
-export function getFrameFieldSQL(field: FieldData): string {
+/**
+ * Returns the SQL representation of the frame field.
+ */
+export function getFrameFieldSQL(field: FieldDef): string {
   if (!field.type) {
     return getNamedField(
       field.name,
@@ -45,10 +57,16 @@ export function getFrameFieldSQL(field: FieldData): string {
   }
 }
 
+/**
+ * Returns the SQL representation of the named field.
+ */
 export function getNamedField(name: string, clause: string): string {
   return `${clause} as "${name}"`;
 }
 
+/**
+ * Returns the SQL clause.
+ */
 export function getPlainClause(
   name: string,
   origin?: string,
@@ -57,6 +75,9 @@ export function getPlainClause(
   return clause ? clause : `"${origin || name}"`;
 }
 
+/**
+ * Returns the SQL couped clause.
+ */
 export function getGroupedClause(
   clause: string,
   agg?: AggType,
@@ -91,9 +112,12 @@ export function getGroupedClause(
   return clause;
 }
 
+/**
+ * Returns the SQL casted clause.
+ */
 export function getCastedClause(
   clause: string,
-  type: TypeData,
+  type: TypeDef,
 ): string {
   let sql = "";
   switch (type.type) {

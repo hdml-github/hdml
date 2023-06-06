@@ -1,23 +1,34 @@
-import { Builder } from "flatbuffers";
-import { Frame } from "../.fbs/data.Frame_generated";
-import { FieldHelper, FieldData } from "./FieldHelper";
-import { FilterHelper, FilterClauseData } from "./FilterHelper";
-import { FilterClause } from "../.fbs/data.FilterClause_generated";
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
 
-export type FrameData = {
+import { Builder } from "flatbuffers";
+import { Frame } from "../.fbs/query.Frame_generated";
+import { FieldHelper, FieldDef } from "./FieldHelper";
+import { FilterHelper, FilterClauseDef } from "./FilterHelper";
+import { FilterClause } from "../.fbs/query.FilterClause_generated";
+
+/**
+ * An object for defining frame.
+ */
+export type FrameDef = {
   name: string;
-  host: string;
   source: string;
   offset: number;
   limit: number;
-  fields: FieldData[];
-  filterBy?: FilterClauseData;
-  groupBy?: FieldData[];
-  splitBy?: FieldData[];
-  sortBy?: FieldData[];
-  parent?: FrameData;
+  fields: FieldDef[];
+  filterBy?: FilterClauseDef;
+  groupBy?: FieldDef[];
+  splitBy?: FieldDef[];
+  sortBy?: FieldDef[];
+  parent?: FrameDef;
 };
 
+/**
+ * Frame helper class.
+ */
 export class FrameHelper {
   private _field: FieldHelper;
   private _filter: FilterHelper;
@@ -27,9 +38,8 @@ export class FrameHelper {
     this._filter = new FilterHelper(this._builder);
   }
 
-  public bufferizeFrame(data: FrameData): number {
+  public bufferizeFrame(data: FrameDef): number {
     const name = this._builder.createString(data.name);
-    const host = this._builder.createString(data.host);
     const source = this._builder.createString(data.source);
     const fields_ = this._field.bufferizeFields(data.fields);
     const fields = Frame.createFieldsVector(this._builder, fields_);
@@ -58,7 +68,6 @@ export class FrameHelper {
     }
     Frame.startFrame(this._builder);
     Frame.addName(this._builder, name);
-    Frame.addHost(this._builder, host);
     Frame.addSource(this._builder, source);
     Frame.addLimit(this._builder, BigInt(data.limit));
     Frame.addOffset(this._builder, BigInt(data.offset));
@@ -81,12 +90,11 @@ export class FrameHelper {
     return Frame.endFrame(this._builder);
   }
 
-  public parseFrame(frame: Frame): FrameData {
+  public parseFrame(frame: Frame): FrameDef {
     const clause = frame.filterBy(new FilterClause());
     const parent = frame.parent(new Frame());
     return {
       name: <string>frame.name(),
-      host: <string>frame.host(),
       source: <string>frame.source(),
       limit: Number(frame.limit()),
       offset: Number(frame.offset()),

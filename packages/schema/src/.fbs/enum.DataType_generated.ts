@@ -2,7 +2,7 @@
 
 
 /**
- * DataType enum.
+ * `HDML` network protocol query data types enum.
  */
 export enum DataType {
   Int8 = 0,

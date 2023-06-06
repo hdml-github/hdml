@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Builder } from "flatbuffers";
 import {
   Field,
@@ -8,44 +14,62 @@ import {
   DateOpts,
   DecimalOpts,
   CommonOpts,
-} from "../.fbs/data.Field_generated";
+} from "../.fbs/query.Field_generated";
 import {
   AggType,
   DateUnit,
   TimeUnit,
   TimeZone,
   DataType,
-  DecimalBitWidth,
-} from "../Enums";
+  DecBitWidth,
+} from "../enums";
 
-export type CommonOptsData = {
+/**
+ * An object for defining field common type options.
+ */
+export type CommonOptsDef = {
   nullable: boolean;
 };
 
-export type DecimalOptsData = {
+/**
+ * An object for defining field decimal type options.
+ */
+export type DecimalOptsDef = {
   nullable: boolean;
   scale: number;
   precision: number;
-  bitWidth: DecimalBitWidth;
+  bitWidth: DecBitWidth;
 };
 
-export type DateOptsData = {
+/**
+ * An object for defining field date type options.
+ */
+export type DateOptsDef = {
   nullable: boolean;
   unit: DateUnit;
 };
 
-export type TimeOptsData = {
+/**
+ * An object for defining field time type options.
+ */
+export type TimeOptsDef = {
   nullable: boolean;
   unit: TimeUnit;
 };
 
-export type TimestampOptsData = {
+/**
+ * An object for defining field timestamp type options.
+ */
+export type TimestampOptsDef = {
   nullable: boolean;
   unit: TimeUnit;
   timezone: TimeZone;
 };
 
-export type TypeData =
+/**
+ * An object for defining field type.
+ */
+export type TypeDef =
   | {
       type:
         | DataType.Int8
@@ -61,43 +85,49 @@ export type TypeData =
         | DataType.Float64
         | DataType.Binary
         | DataType.Utf8;
-      options: CommonOptsData;
+      options: CommonOptsDef;
     }
   | {
       type: DataType.Decimal;
-      options: DecimalOptsData;
+      options: DecimalOptsDef;
     }
   | {
       type: DataType.Date;
-      options: DateOptsData;
+      options: DateOptsDef;
     }
   | {
       type: DataType.Time;
-      options: TimeOptsData;
+      options: TimeOptsDef;
     }
   | {
       type: DataType.Timestamp;
-      options: TimestampOptsData;
+      options: TimestampOptsDef;
     };
 
-export type FieldData = {
+/**
+ * An object for defining field.
+ */
+export type FieldDef = {
   description?: string;
   origin?: string;
   clause?: string;
   name: string;
-  type?: TypeData;
+  type?: TypeDef;
   agg?: AggType;
   asc?: boolean;
 };
 
+/**
+ * Field helper class.
+ */
 export class FieldHelper {
   public constructor(private _builder: Builder) {}
 
-  public bufferizeFields(data: FieldData[]): number[] {
+  public bufferizeFields(data: FieldDef[]): number[] {
     return data.map((f) => this.bufferizeField(f));
   }
 
-  public bufferizeField(data: FieldData): number {
+  public bufferizeField(data: FieldDef): number {
     const name = this._builder.createString(data.name);
     const origin = data.origin
       ? this._builder.createString(data.origin)
@@ -134,7 +164,7 @@ export class FieldHelper {
     return Field.endField(this._builder);
   }
 
-  public bufferizeType(data: TypeData): number {
+  public bufferizeType(data: TypeDef): number {
     let opts: number;
     let type: TypeOpts = TypeOpts.NONE;
     switch (data.type) {
@@ -182,11 +212,11 @@ export class FieldHelper {
     return Type.endType(this._builder);
   }
 
-  public bufferizeCommonOpts(data: CommonOptsData): number {
+  public bufferizeCommonOpts(data: CommonOptsDef): number {
     return CommonOpts.createCommonOpts(this._builder, data.nullable);
   }
 
-  public bufferizeDecimalOpts(data: DecimalOptsData): number {
+  public bufferizeDecimalOpts(data: DecimalOptsDef): number {
     return DecimalOpts.createDecimalOpts(
       this._builder,
       data.nullable,
@@ -196,7 +226,7 @@ export class FieldHelper {
     );
   }
 
-  public bufferizeDateOpts(data: DateOptsData): number {
+  public bufferizeDateOpts(data: DateOptsDef): number {
     return DateOpts.createDateOpts(
       this._builder,
       data.nullable,
@@ -204,7 +234,7 @@ export class FieldHelper {
     );
   }
 
-  public bufferizeTimeOpts(data: TimeOptsData): number {
+  public bufferizeTimeOpts(data: TimeOptsDef): number {
     return TimeOpts.createTimeOpts(
       this._builder,
       data.nullable,
@@ -212,7 +242,7 @@ export class FieldHelper {
     );
   }
 
-  public bufferizeTimestampOpts(data: TimestampOptsData): number {
+  public bufferizeTimestampOpts(data: TimestampOptsDef): number {
     return TimestampOpts.createTimestampOpts(
       this._builder,
       data.nullable,
@@ -224,8 +254,8 @@ export class FieldHelper {
   public parseFields(
     fieldGetter: (index: number, obj?: Field) => Field | null,
     length: number,
-  ): FieldData[] {
-    const fields: FieldData[] = [];
+  ): FieldDef[] {
+    const fields: FieldDef[] = [];
     for (let j = 0; j < length; j++) {
       const field = fieldGetter(j, new Field());
       if (field) {
@@ -243,11 +273,11 @@ export class FieldHelper {
     return fields;
   }
 
-  public parseType(type: null | Type): TypeData | undefined {
+  public parseType(type: null | Type): TypeDef | undefined {
     if (!type) {
       return;
     }
-    let data: TypeData | undefined = undefined;
+    let data: TypeDef | undefined = undefined;
     let options: unknown;
     switch (type.optionsType()) {
       case TypeOpts.CommonOpts:

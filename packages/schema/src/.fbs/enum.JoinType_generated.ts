@@ -2,7 +2,7 @@
 
 
 /**
- * JoinType enum.
+ * `HDML` network protocol query join types enum.
  */
 export enum JoinType {
   Cross = 0,

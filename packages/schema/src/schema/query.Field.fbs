@@ -1,0 +1,72 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./enum.AggType.fbs";
+include "./enum.DataType.fbs";
+include "./enum.DecBitWidth.fbs";
+include "./enum.DateUnit.fbs";
+include "./enum.TimeUnit.fbs";
+include "./enum.TimeZone.fbs";
+
+namespace query;
+
+/// `HDML` network protocol query data field common type options structure.
+struct CommonOpts {
+  nullable: bool;
+}
+
+/// `HDML` network protocol query data field decimal type options structure.
+struct DecimalOpts {
+  nullable: bool;
+  scale: ushort;
+  precision: ushort;
+  bit_width: enum.DecBitWidth;
+}
+
+///  `HDML` network protocol query data field date type options structure.
+struct DateOpts {
+  nullable: bool;
+  unit: enum.DateUnit;
+}
+
+/// `HDML` network protocol query data field time type options structure.
+struct TimeOpts {
+  nullable: bool;
+  unit: enum.TimeUnit;
+}
+
+/// `HDML` network protocol query data field timestamp type options structure.
+struct TimestampOpts {
+  nullable: bool;
+  unit: enum.TimeUnit;
+  timezone: enum.TimeZone;
+}
+
+/// `HDML` network protocol query data field type options union.
+union TypeOpts {
+  CommonOpts,
+  DecimalOpts,
+  DateOpts,
+  TimeOpts,
+  TimestampOpts,
+}
+
+/// `HDML` network protocol query data field type structure.
+table Type {
+  type: enum.DataType;
+  options: TypeOpts;
+}
+
+/// `HDML` network protocol query data field structure.
+table Field {
+  description: string;
+  origin: string;
+  clause: string;
+  name: string;
+  type: Type;
+  agg: enum.AggType;
+  asc: bool;
+}

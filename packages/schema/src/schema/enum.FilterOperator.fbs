@@ -1,0 +1,14 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query filter oprators enum.
+enum FilterOperator: byte {
+  Or,
+  And,
+  None,
+}

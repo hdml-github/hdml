@@ -2,7 +2,7 @@
 
 
 /**
- * TimeZone enum.
+ * `HDML` network protocol query time zone enum.
  */
 export enum TimeZone {
   Africa_Algiers = 0,

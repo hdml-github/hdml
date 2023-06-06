@@ -1,0 +1,19 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query join types enum.
+enum JoinType: byte {
+  Cross,
+  Inner,
+  Full,
+  Left,
+  Right,
+  FullOuter,
+  LeftOuter,
+  RightOuter,
+}

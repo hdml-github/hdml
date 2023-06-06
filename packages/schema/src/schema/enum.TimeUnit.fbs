@@ -1,0 +1,15 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query time unit enum.
+enum TimeUnit: byte {
+  second,
+  millisecond,
+  microsecond,
+  nanosecond,
+}

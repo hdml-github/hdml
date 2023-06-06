@@ -1,16 +1,25 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  type ModelData,
-  type FieldData,
-  FrameData,
+  type ModelDef,
+  type FieldDef,
+  type FrameDef,
 } from "@hdml/schema";
 import { getModelSQL } from "./model";
 import { getFrameFieldSQL } from "./fields";
 import { getFilterClauseSQL } from "./filter";
 import { t } from "../const";
 
+/**
+ * Returns the SQL representation of the `frame` and the `model`.
+ */
 export function getFrameSQL(
-  frame: FrameData,
-  model: ModelData,
+  frame: FrameDef,
+  model: ModelDef,
   level = 0,
 ): string {
   const pre = t.repeat(level);
@@ -34,7 +43,7 @@ export function getFrameSQL(
         a.name < b.name ? -1 : a.name > b.name ? 1 : 0,
       )
       .map(
-        (field: FieldData) => `${pre}${t}${getFrameFieldSQL(field)}`,
+        (field: FieldDef) => `${pre}${t}${getFrameFieldSQL(field)}`,
       )
       .join(",\n") +
     "\n";

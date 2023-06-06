@@ -1,0 +1,16 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./query.Model.fbs";
+include "./query.Frame.fbs";
+
+namespace query;
+
+/// `HDML` network protocol query structure.
+table Query {
+  model: query.Model;
+  frame: query.Frame;
+}

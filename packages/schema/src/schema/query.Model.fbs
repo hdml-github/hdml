@@ -1,0 +1,35 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./enum.TableType.fbs";
+include "./enum.JoinType.fbs";
+include "./query.Field.fbs";
+include "./query.FilterClause.fbs";
+
+namespace query;
+
+/// `HDML` network protocol query data-model structure.
+table Model {
+  name: string;
+  tables: [Table];
+  joins: [Join];
+}
+
+/// `HDML` network protocol query data-table structure.
+table Table {
+  name: string;
+  type: enum.TableType;
+  source: string;
+  fields: [query.Field];
+}
+
+/// `HDML` network protocol query data-tables join structure.
+table Join {
+  type: enum.JoinType;
+  left: string;
+  right: string;
+  clause: query.FilterClause;
+}

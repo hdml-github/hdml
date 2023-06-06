@@ -2,7 +2,7 @@
 
 
 /**
- * AggType enum.
+ * `HDML` network protocol query aggregations enum.
  */
 export enum AggType {
   None = 0,

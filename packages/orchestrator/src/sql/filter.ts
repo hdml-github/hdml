@@ -1,13 +1,22 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  FilterClauseData,
-  FilterData,
+  type FilterClauseDef,
+  type FilterDef,
   FilterType,
   FilterOperator,
 } from "@hdml/schema";
 import { t } from "../const";
 
+/**
+ * Returns the SQL representation of the filter clause.
+ */
 export function getFilterClauseSQL(
-  clause: FilterClauseData,
+  clause: FilterClauseDef,
   level = 0,
   left?: string,
   right?: string,
@@ -42,8 +51,11 @@ export function getFilterClauseSQL(
   return sql;
 }
 
+/**
+ * Returns the SQL representation of the `filter`.
+ */
 export function getFilter(
-  filter: FilterData,
+  filter: FilterDef,
   left?: string,
   right?: string,
 ): string {
@@ -73,6 +85,9 @@ export function getFilter(
   }
 }
 
+/**
+ * Returns the SQL representation of the keys filter.
+ */
 export function getKeysFilter(
   lTable: string,
   lField: string,
@@ -82,6 +97,9 @@ export function getKeysFilter(
   return `"${lTable}"."${lField}" =` + `"${rTable}"."${rField}"`;
 }
 
+/**
+ * Returns the SQL representation of the expression filter.
+ */
 export function getExprFilter(clause: string): string {
   return clause;
 }

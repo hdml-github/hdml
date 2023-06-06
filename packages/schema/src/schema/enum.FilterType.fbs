@@ -1,0 +1,14 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query filter types enum.
+enum FilterType: byte {
+  Expr,
+  Keys,
+  Named,
+}

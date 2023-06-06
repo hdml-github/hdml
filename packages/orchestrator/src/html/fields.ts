@@ -1,12 +1,21 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
-  type FieldData,
-  type TypeData,
+  type FieldDef,
+  type TypeDef,
   DataType,
   AggType,
 } from "@hdml/schema";
 
+/**
+ * Returns the HTML representation of the field.
+ */
 export function getFieldHTML(
-  field: FieldData,
+  field: FieldDef,
   withOrdering = false,
 ): string {
   let result = `<hdml-field name="${field.name}"`;
@@ -30,7 +39,10 @@ export function getFieldHTML(
   return result;
 }
 
-export function getType(type: TypeData): string {
+/**
+ * Returns the HTML representation of the field's type.
+ */
+export function getType(type: TypeDef): string {
   switch (type.type) {
     case DataType.Int8:
       return ` type="int-8"`;
@@ -73,6 +85,9 @@ export function getType(type: TypeData): string {
   }
 }
 
+/**
+ * Returns the HTML representation of the aggregation function.
+ */
 export function getAgg(agg: AggType): string {
   switch (agg) {
     case AggType.Count:
