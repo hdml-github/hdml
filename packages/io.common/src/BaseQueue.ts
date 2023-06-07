@@ -1,4 +1,9 @@
-import { PassThrough } from "stream";
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import * as crypto from "crypto";
 import {
   Client,
@@ -9,38 +14,41 @@ import {
   Message,
   LogLevel,
 } from "pulsar-client";
-import { HttpException, HttpStatus } from "@nestjs/common";
 import { type BaseOptions } from "./BaseOptions";
 import { BaseLogger } from "./BaseLogger";
 
+/**
+ * `BaseQueue` class. An abstract class that provides basic queue
+ * management methods.
+ */
 export abstract class BaseQueue {
   /**
-   * Pulsar client.
+   * The `Pulsar` client.
    */
   private _client: null | Client = null;
 
   /**
-   * Queries topic producer.
+   * The `queries` topic producer.
    */
   private _queriesProducer: null | Producer = null;
 
   /**
-   * Queries topic consumer.
+   * The `queries` topic consumer.
    */
   private _queriesConsumer: null | Consumer = null;
 
   /**
-   * Returns options object.
+   * An abstract method that returns configuration parameters.
    */
   protected abstract options(): BaseOptions;
 
   /**
-   * Returns logger instance.
+   * An abstract method that returns an instance of the logger.
    */
   protected abstract logger(): BaseLogger;
 
   /**
-   * Ensures that the queries queue exists.
+   * Ensures the existence of the `queries` queue.
    */
   protected async ensureQueries(): Promise<void> {
     const stats = await this.stats("queries");
@@ -50,7 +58,9 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns specified `topic` stats if exist or `null` otherwise.
+   * Returns statistics for the specified `topic` if it exists, or
+   * `null` otherwise.
+   *
    * @throws
    */
   protected async stats(
@@ -80,7 +90,8 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Creates specified persistent non-partitioned `topic`.
+   * Creates the specified persistent non-partitioned `topic`.
+   *
    * @throws
    */
   protected async create(topic: string): Promise<void> {
@@ -104,7 +115,8 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Deletes specified persistent `topic`.
+   * Deletes the specified persistent non-partitioned `topic`.
+   *
    * @throws
    */
   protected async delete(topic: string): Promise<void> {
@@ -128,7 +140,7 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns configured queries producer.
+   * Returns the configured `queries` producer.
    */
   protected async queriesProducer(): Promise<Producer> {
     if (!this._queriesProducer) {
@@ -140,7 +152,7 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns configured queries producer.
+   * Returns the configured `queries` consumer.
    */
   protected async queriesConsumer(
     listener?: (message: Message, consumer: Consumer) => void,
@@ -157,7 +169,7 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns `name` topic producer.
+   * Returns the producer for the topic given in the `name` parameter.
    */
   protected async dataProducer(name: string): Promise<Producer> {
     return await this.client().createProducer({
@@ -166,51 +178,19 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns `name` topic reader.
+   * Returns the reader of the topic specified in the "name"
+   * parameter.
    */
-  protected async dataReader(
-    name: string,
-    stream: PassThrough,
-  ): Promise<Reader> {
+  protected async dataReader(name: string): Promise<Reader> {
     return await this.client().createReader({
       topic: name,
       readerName: name,
       startMessageId: MessageId.earliest(),
-      // This cause a "segmentation fault (core dumped)" error.
-      // listener: (message, reader) => {
-      //   switch (message.getProperties().state) {
-      //     case "PROCESSING":
-      //       break;
-      //     case "SCHEMA":
-      //       stream.write(message.getData());
-      //       break;
-      //     case "CHUNK":
-      //       stream.write(message.getData());
-      //       break;
-      //     case "DONE":
-      //       reader.close().catch((reason) => {
-      //         this.logger().error(reason);
-      //       });
-      //       stream.end();
-      //       break;
-      //     case "FAIL":
-      //       reader.close().catch((reason) => {
-      //         this.logger().error(reason);
-      //       });
-      //       stream.destroy(
-      //         new HttpException(
-      //           message.getProperties().error,
-      //           HttpStatus.FAILED_DEPENDENCY,
-      //         ),
-      //       );
-      //       break;
-      //   }
-      // },
     });
   }
 
   /**
-   * Returns configured queue client instance.
+   * Returns the configured queue client instance.
    */
   protected client(): Client {
     if (!this._client) {
@@ -218,8 +198,6 @@ export abstract class BaseQueue {
         serviceUrl:
           `pulsar://${this.options().getQueueHost()}` +
           `:${this.options().getQueuePort()}`,
-        // ioThreads: 10,
-        // messageListenerThreads: 10,
         log: (
           level: LogLevel,
           file: string,
@@ -247,7 +225,7 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns persistent hash for the provided `sql` string.
+   * Returns a constant hash for the provided `sql` string.
    */
   protected getHashname(sql: string): string {
     const charset = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -255,7 +233,6 @@ export abstract class BaseQueue {
       .createHash("md5")
       .update(JSON.stringify(sql))
       .digest();
-
     let hashname = "";
     let residue = 0;
     let counter = 0;
@@ -274,7 +251,7 @@ export abstract class BaseQueue {
   }
 
   /**
-   * Returns persistent hash for the provided `timestamp` rounded by
+   * Returns a constant hash for the provided `timestamp` rounded by
    * the queue cache timeout value.
    */
   protected getHashtime(timestamp: number): string {

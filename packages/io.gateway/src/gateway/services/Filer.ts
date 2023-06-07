@@ -588,7 +588,7 @@ export class Filer implements OnModuleInit {
     let cnt = 0;
     let src: null | string = source;
     let curr = current;
-    while (src && cnt < this._options.getCompilerFramesDepth()) {
+    while (src && cnt < 100) {
       cnt++;
       this.assertSource(fragments, curr, src);
       const index = src.indexOf("?hdml-frame=");

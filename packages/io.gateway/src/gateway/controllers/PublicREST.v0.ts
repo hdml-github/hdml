@@ -12,7 +12,7 @@ import {
   StreamableFile,
 } from "@nestjs/common";
 import { Request } from "express";
-import { Document } from "@hdml/schema";
+import { Query as HdmlQuery } from "@hdml/schema";
 import { BaseLogger } from "@hdml/io.common";
 import { Filer } from "../services/Filer";
 import { Tokens } from "../services/Tokens";
@@ -74,7 +74,7 @@ export class PublicREST {
     @Req()
     request: Request,
   ): Promise<StreamableFile> {
-    this._logger.debug("Document posted");
+    this._logger.debug("Query posted");
     try {
       if (!request.readable) {
         throw new HttpException(
@@ -90,7 +90,7 @@ export class PublicREST {
       return await this._filer.postHdmlDocument(
         tenant,
         context,
-        new Document(body),
+        new HdmlQuery(body),
       );
     } catch (error) {
       this._logger.error(error);

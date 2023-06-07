@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { Document } from "@hdml/schema";
+import { Query } from "@hdml/schema";
 import {
   BaseLogger,
   BaseOptions,
@@ -76,7 +76,7 @@ export class QuerierQueue extends BaseQueue implements OnModuleInit {
     if (stats) {
       const producer = await this.dataProducer(name);
       const dataset = new TrinoDataset(
-        new Document(message.getData()),
+        new Query(message.getData()),
         this._options,
       );
       for await (const batch of dataset) {

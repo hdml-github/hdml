@@ -11,7 +11,7 @@ import {
   Utf8,
   Uint32,
 } from "apache-arrow";
-import { Document } from "@hdml/schema";
+import { Query } from "@hdml/schema";
 import { getSQL } from "@hdml/orchestrator";
 import { Options } from "../querier/services/Options";
 import {
@@ -33,7 +33,7 @@ export enum State {
 }
 
 /**
- * The type of the `document` data fragment.
+ * Fragment of the response to the published query.
  */
 export type Chunk = {
   state: State;
@@ -44,7 +44,7 @@ export type Chunk = {
 
 /**
  * An asynchronous iterator that returns pieces of data from a
- * published `document`.
+ * published query.
  */
 export class TrinoDataset implements AsyncIterable<Chunk> {
   private _options: Options;
@@ -57,7 +57,7 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
   /**
    * Class constructor.
    */
-  public constructor(document: Document, options: Options) {
+  public constructor(query: Query, options: Options) {
     this._options = options;
     this._client = new TrinoClient({
       engine: "trino",
@@ -68,7 +68,7 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
       user: "hdml",
       source: "TrinoDataset (AsyncIterableDataset)",
     });
-    this._promise = this._client.post(getSQL(document), {});
+    this._promise = this._client.post(getSQL(query), {});
   }
 
   public async *[Symbol.asyncIterator](): AsyncGenerator<Chunk> {

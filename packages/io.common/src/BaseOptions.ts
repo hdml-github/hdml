@@ -1,191 +1,170 @@
 /**
- * Options service.
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
+/**
+ * `BaseOptions` class. Provides access to basic configuration
+ * options.
  */
 export class BaseOptions {
   /**
-   * Returns the Gateway port.
+   * Returns the `Gateway` port.
    */
   public getGatewayPort(): number {
     return 8888;
   }
 
   /**
-   * Returns the Hideway port.
+   * Returns the `Hideway` port.
    */
   public getHidewayPort(): number {
     return 8887;
   }
 
   /**
-   * Returns the Querier port.
+   * Returns the `Querier` port.
    */
   public getQuerierPort(): number {
     return 8886;
   }
 
   /**
-   * Returns tenant's environment file name.
+   * Returns the name of the tenant environment file.
    */
   public getTenantEnvName(): string {
     return ".env";
   }
 
   /**
-   * Returns tenant's keys directory path.
+   * Returns the pathname of the tenant keys.
    */
   public getTenantKeysPath(): string {
     return "keys";
   }
 
   /**
-   * Returns tenant's private key name.
+   * Returns the name of the tenant private key file.
    */
   public getTenantPrivateKeyName(): string {
     return "key";
   }
 
   /**
-   * Returns tenant's public key name.
+   * Returns the name of the tenant public key file.
    */
   public getTenantPublicKeyName(): string {
     return "key.pub";
   }
 
   /**
-   * Returns tenant's hooks directory path.
+   * Returns the name of the tenant hook directory.
    */
   public getTenantHookPath(): string {
     return "hook";
   }
 
   /**
-   * Returns tenant's `hdml` documents root directory path.
+   * Returns the root directory name of the tenant's `hdml` documents.
    */
   public getTenantDocumentsPath(): string {
     return "hdml";
   }
 
   /**
-   * Returns tenant's `hdml` documents files extension.
+   * Returns the tenant's `hdml` document file extension.
    */
   public getTenantDocumentsExt(): string {
     return "html";
   }
 
   /**
-   * Returns keys import algorythm.
+   * Returns the key import algorithm.
    */
   public getKeysImportAlg(): string {
     return "ES256";
   }
 
   /**
-   * Returns tokens algorythm.
+   * Returns the token encryption algorithm.
    */
   public getTokensAlg(): string {
     return "RSA-OAEP-256";
   }
 
   /**
-   * Returns token encryption.
+   * Returns the encryption of the token.
    */
   public getTokensEnc(): string {
     return "A256GCM";
   }
 
   /**
-   * Returns token issuer.
+   * Returns the issuer of the token.
    */
   public getTokensIss(): string {
     return "TokensSvc";
   }
 
   /**
-   * Returns access token subject.
+   * Returns the subject of the access token.
    */
   public getTokenAccessSub(): string {
     return "Access Token";
   }
 
   /**
-   * Returns session token subject.
+   * Returns the subject of the session token.
    */
   public getTokenSessionSub(): string {
     return "Session Token";
   }
 
   /**
-   * Returns session length in seconds.
+   * Returns the duration of the session in seconds.
    */
   public getSessionLength(): number {
     return 24 * 60;
   }
 
   /**
-   * Returns compiler min pages pool size.
-   */
-  public getCompilerPoolMin(): number {
-    return 3;
-  }
-
-  /**
-   * Returns compiler max pages pool size.
-   */
-  public getCompilerPoolMax(): number {
-    return 50;
-  }
-
-  /**
-   * Returns compiler pool max waiting clients number.
-   */
-  public getCompilerPoolQueueSize(): number {
-    return 50;
-  }
-
-  /**
-   * Returns max frame depth to break compiler loop.
-   */
-  public getCompilerFramesDepth(): number {
-    return 50;
-  }
-
-  /**
-   * Returns queue host.
+   * Returns the queue host.
    */
   public getQueueHost(): string {
     return "localhost";
   }
 
   /**
-   * Returns queue port.
+   * Returns the queue port for the driver.
    */
   public getQueuePort(): number {
     return 6650;
   }
 
   /**
-   * Returns queue REST API port.
+   * Returns the queue port for the REST API calls.
    */
   public getQueueRestPort(): number {
     return 9090;
   }
 
   /**
-   * Returns queue tenant name.
+   * Returns the queue tenant name.
    */
   public getQueueTenant(): string {
     return "public";
   }
 
   /**
-   * Returns queue namespace.
+   * Returns the queue namespace.
    */
   public getQueueNamespace(): string {
     return "default";
   }
 
   /**
-   * Returns queue cache timeout in ms.
+   * Returns the queue cache timeout in ms.
    */
   public getQueueCacheTimeout(): number {
     return 10000;
