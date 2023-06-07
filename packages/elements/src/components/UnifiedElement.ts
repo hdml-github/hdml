@@ -1,5 +1,4 @@
 /**
- * @fileoverview `UnifiedElement` class definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -22,14 +21,14 @@ import {
 } from "../helpers/elementsRegister";
 
 /**
- * Base class for the `hdml` elements. Responds for the uniqueness by
- * providing unique identifier `UnifiedElement#uid`.
+ * Base class for all `HDML` elements. Responsible for uniqueness by
+ * providing a unique identifier `UnifiedElement#uid`.
  */
 export class UnifiedElement extends LitElement {
   private [signature] = getUid();
 
   /**
-   * Element unique identifier getter.
+   * The unique ID of the element.
    */
   public get uid(): string {
     return this[signature];
@@ -47,7 +46,7 @@ export class UnifiedElement extends LitElement {
   /**
    * Returns all `UnifiedElement` elements specified by the `tag` that
    * are descendants of a current `UnifiedElement` (and are not
-   * descendant of another nested `UnifiedElement` if any).
+   * descendant of another nested `UnifiedElement`).
    */
   public queryHdmlChildren<T extends UnifiedElement>(
     tag: string,

@@ -1,48 +1,47 @@
 /**
- * @fileoverview The `FilterByElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { FilterClauseData, FilterOperator } from "@hdml/schema";
-
+import { FilterClauseDef, FilterOperator } from "@hdml/schema";
 import {
   getFrameTag,
   getConnectiveTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import {
-  ConnectiveElement,
-  ConnEventDetail,
-} from "./ConnectiveElement";
+import { ConnectiveElement, ConnDetail } from "./ConnectiveElement";
 
 /**
- * An `hdml-filter-by` element event detail interface.
+ * `hdml-filter-by:connected`, `hdml-filter-by:changed`,
+ * `hdml-filter-by:request`, `hdml-filter-by:disconnected` events
+ * details interface.
  */
-export interface FilterByEventDetail {
+export interface FilterByDetail {
   filterBy: FilterByElement;
 }
 
 /**
- * The `FilterByElement` class.
+ * `FilterByElement` class. Adds an `HTML` tag (default
+ * `hdml-filter-by`), which is the root element for adding data frame
+ * filtering.
  */
 export class FilterByElement extends UnifiedElement {
   /**
-   * An assosiated `hdml-frame` element.
+   * The assosiated `FrameElement` element.
    */
   private _frame: null | Element = null;
 
   /**
-   * An assosiated `hdml-connective` element.
+   * The assosiated `ConnectiveElement` element.
    */
   private _connective: null | ConnectiveElement = null;
 
   /**
-   * The `FilterClauseData` object.
+   * The `FilterClauseDef` object.
    */
-  public get data(): FilterClauseData {
+  public get data(): FilterClauseDef {
     const clause = this._connective
       ? this._connective.data
       : {
@@ -61,17 +60,14 @@ export class FilterByElement extends UnifiedElement {
     this._frame = this._getFrame();
     if (this._frame) {
       this._frame.dispatchEvent(
-        new CustomEvent<FilterByEventDetail>(
-          "hdml-filter-by:connected",
-          {
-            cancelable: false,
-            composed: false,
-            bubbles: false,
-            detail: {
-              filterBy: this,
-            },
+        new CustomEvent<FilterByDetail>("hdml-filter-by:connected", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+          detail: {
+            filterBy: this,
           },
-        ),
+        }),
       );
     }
     this._watchConnective();
@@ -96,7 +92,7 @@ export class FilterByElement extends UnifiedElement {
     this._unwatchConnective();
     if (this._frame) {
       this._frame.dispatchEvent(
-        new CustomEvent<FilterByEventDetail>(
+        new CustomEvent<FilterByDetail>(
           "hdml-filter-by:disconnected",
           {
             cancelable: false,
@@ -114,15 +110,15 @@ export class FilterByElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 
   /**
-   * Returns assosiated `hdml-frame` element if exist or null
-   * otherwise.
+   * Returns the associated `FrameElement` element if it exists,
+   * or `null` otherwise.
    */
   private _getFrame(): null | Element {
     let element = this.parentElement;
@@ -137,7 +133,7 @@ export class FilterByElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-connective` elements changes.
+   * Starts tracking changes to `ConnectiveElement` element.
    */
   private _watchConnective(): void {
     const conn = <ConnectiveElement>(
@@ -157,7 +153,7 @@ export class FilterByElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-connective` elements changes.
+   * Stops watching for changes to `ConnectiveElement` element.
    */
   private _unwatchConnective(): void {
     this.removeEventListener(
@@ -172,35 +168,31 @@ export class FilterByElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-connective:connected` event listener.
+   * `hdml-connective:connected` event listener.
    */
   private _connectiveConnectedListener = (
-    event: CustomEvent<ConnEventDetail>,
+    event: CustomEvent<ConnDetail>,
   ) => {
     const conn = event.detail.conn;
     this._attachConnective(conn);
   };
 
   /**
-   * The `hdml-connective:disconnected` event listener.
+   * `hdml-connective:disconnected` event listener.
    */
-  private _connectiveDisconnectedListener = (
-    event: CustomEvent<ConnEventDetail>,
-  ) => {
+  private _connectiveDisconnectedListener = () => {
     this._detachConnective();
   };
 
   /**
-   * The `hdml-connective:changed` event listener.
+   * `hdml-connective:changed` event listener.
    */
-  private _connectiveChangedListener = (
-    event: CustomEvent<ConnEventDetail>,
-  ) => {
+  private _connectiveChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * Attaches `hdml-connective` element.
+   * Attaches a `ConnectiveElement` element.
    */
   private _attachConnective(conn: ConnectiveElement) {
     if (!this._connective) {
@@ -214,7 +206,7 @@ export class FilterByElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-connective` element.
+   * Detaches a `ConnectiveElement` element.
    */
   private _detachConnective() {
     if (this._connective) {
@@ -232,7 +224,7 @@ export class FilterByElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<FilterByEventDetail>("hdml-filter-by:changed", {
+      new CustomEvent<FilterByDetail>("hdml-filter-by:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,

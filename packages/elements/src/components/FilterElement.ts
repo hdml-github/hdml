@@ -1,13 +1,11 @@
 /**
- * @fileoverview The `FilterElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { FilterType, FilterName, FilterData } from "@hdml/schema";
-
+import { FilterType, FilterName, FilterDef } from "@hdml/schema";
 import {
   FIELD_NAME_REGEXP,
   FILTER_TYPE_REGEXP,
@@ -18,14 +16,18 @@ import { getConnectiveTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
 
 /**
- * An `hdml-filter` element event detail interface.
+ * `hdml-filter:connected`, `hdml-filter:changed`,
+ * `hdml-filter:request`, `hdml-filter:disconnected` events details
+ * interface.
  */
-export interface FilterEventDetail {
+export interface FilterDetail {
   filter: FilterElement;
 }
 
 /**
- * The `FilterElement` class.
+ * `FilterElement` class. Adds an `HTML` tag (default `hdml-filter`)
+ * that allows the user to describe a filter to be applied to the data
+ * frame.
  */
 export class FilterElement extends UnifiedElement {
   /**
@@ -33,7 +35,7 @@ export class FilterElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `type` property definition.
+     * The `type` property definition.
      */
     type: {
       type: String,
@@ -44,7 +46,7 @@ export class FilterElement extends UnifiedElement {
     },
 
     /**
-     * A `left` property definition.
+     * The `left` property definition.
      */
     left: {
       type: String,
@@ -55,7 +57,7 @@ export class FilterElement extends UnifiedElement {
     },
 
     /**
-     * A `right` property definition.
+     * The `right` property definition.
      */
     right: {
       type: String,
@@ -66,7 +68,7 @@ export class FilterElement extends UnifiedElement {
     },
 
     /**
-     * A `clause` property definition.
+     * The `clause` property definition.
      */
     clause: {
       type: String,
@@ -77,7 +79,7 @@ export class FilterElement extends UnifiedElement {
     },
 
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -89,37 +91,37 @@ export class FilterElement extends UnifiedElement {
   };
 
   /**
-   * A `type` private property.
+   * The `type` private property.
    */
   private _type: null | string = null;
 
   /**
-   * A `left` private property.
+   * The `left` private property.
    */
   private _left: null | string = null;
 
   /**
-   * A `right` private property.
+   * The `right` private property.
    */
   private _right: null | string = null;
 
   /**
-   * A `clause` private property.
+   * The `clause` private property.
    */
   private _clause: null | string = null;
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * Attached `hdml-connective` elements map.
+   * The assosiated `ConnectiveElement` element.
    */
   private _connective: null | Element = null;
 
   /**
-   * A `type` setter.
+   * The `type` setter.
    */
   public set type(val: null | string) {
     if (val === null || val === "" || FILTER_TYPE_REGEXP.test(val)) {
@@ -142,14 +144,14 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * A `type` getter.
+   * The `type` getter.
    */
   public get type(): null | string {
     return this._type;
   }
 
   /**
-   * A `left` setter.
+   * The `left` setter.
    */
   public set left(val: null | string) {
     if (val === null || val === "" || FIELD_NAME_REGEXP.test(val)) {
@@ -172,14 +174,14 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * A `left` getter.
+   * The `left` getter.
    */
   public get left(): null | string {
     return this._left;
   }
 
   /**
-   * A `right` setter.
+   * The `right` setter.
    */
   public set right(val: null | string) {
     if (val === null || val === "" || FIELD_NAME_REGEXP.test(val)) {
@@ -202,14 +204,14 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * A `right` getter.
+   * The `right` getter.
    */
   public get right(): null | string {
     return this._right;
   }
 
   /**
-   * A `clause` setter.
+   * The `clause` setter.
    */
   public set clause(val: null | string) {
     if (
@@ -236,14 +238,14 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * A `clause` getter.
+   * The `clause` getter.
    */
   public get clause(): null | string {
     return this._clause ? this._clause.replaceAll("`", '"') : null;
   }
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || FILTER_NAME_REGEXP.test(val)) {
@@ -266,20 +268,20 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * The `FilterData` object.
+   * The `FilterDef` object.
    */
-  public get data(): FilterData {
+  public get data(): FilterDef {
     if (!this.type) {
       throw new Error("A `type` property is required.");
     }
-    let filter: FilterData;
+    let filter: FilterDef;
     switch (this.type) {
       case "expr":
         if (!this.clause) {
@@ -331,7 +333,7 @@ export class FilterElement extends UnifiedElement {
     this._connective = this._getConnective();
     if (this._connective) {
       this._connective.dispatchEvent(
-        new CustomEvent<FilterEventDetail>("hdml-filter:connected", {
+        new CustomEvent<FilterDetail>("hdml-filter:connected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -361,17 +363,14 @@ export class FilterElement extends UnifiedElement {
   public disconnectedCallback(): void {
     if (this._connective) {
       this._connective.dispatchEvent(
-        new CustomEvent<FilterEventDetail>(
-          "hdml-filter:disconnected",
-          {
-            cancelable: false,
-            composed: false,
-            bubbles: false,
-            detail: {
-              filter: this,
-            },
+        new CustomEvent<FilterDetail>("hdml-filter:disconnected", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+          detail: {
+            filter: this,
           },
-        ),
+        }),
       );
       this._connective = null;
     }
@@ -379,15 +378,15 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<!-- FilterElement -->`;
   }
 
   /**
-   * Returns assosiated `hdml-connective` element if exist or null
-   * otherwise.
+   * Returns the associated `ConnectiveElement` element if it exists,
+   * or `null` otherwise.
    */
   private _getConnective(): null | Element {
     let element = this.parentElement;
@@ -406,7 +405,7 @@ export class FilterElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<FilterEventDetail>("hdml-filter:changed", {
+      new CustomEvent<FilterDetail>("hdml-filter:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -418,7 +417,7 @@ export class FilterElement extends UnifiedElement {
   }
 
   /**
-   * Returns named filter name.
+   * Converts a `name` property to a `FilterName` enum.
    */
   private _getName(name: string): FilterName {
     switch (name) {

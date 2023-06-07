@@ -1,13 +1,11 @@
 /**
- * @fileoverview The `JoinElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { JoinData, JoinType, FilterOperator } from "@hdml/schema";
-
+import { JoinDef, JoinType, FilterOperator } from "@hdml/schema";
 import {
   TABLE_NAME_REGEXP,
   JOIN_TYPE_REGEXP,
@@ -17,20 +15,20 @@ import {
   getConnectiveTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import {
-  ConnectiveElement,
-  ConnEventDetail,
-} from "./ConnectiveElement";
+import { ConnectiveElement, ConnDetail } from "./ConnectiveElement";
 
 /**
- * An `hdml-join` element event detail interface.
+ * `hdml-join:connected`, `hdml-join:changed`, `hdml-join:request`,
+ * `hdml-join:disconnected` events details interface.
  */
-export interface JoinEventDetail {
+export interface JoinDetail {
   join: JoinElement;
 }
 
 /**
- * The `JoinElement` class.
+ * `JoinElement` class. Adds a new `HTML` tag (default `hdml-join`)
+ * which is the root element to describe the join of two tables in the
+ * underlying data model.
  */
 export class JoinElement extends UnifiedElement {
   /**
@@ -38,7 +36,7 @@ export class JoinElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `type` property definition.
+     * The `type` property definition.
      */
     type: {
       type: String,
@@ -49,7 +47,7 @@ export class JoinElement extends UnifiedElement {
     },
 
     /**
-     * A `left` property definition.
+     * The `left` property definition.
      */
     left: {
       type: String,
@@ -60,7 +58,7 @@ export class JoinElement extends UnifiedElement {
     },
 
     /**
-     * A `right` property definition.
+     * The `right` property definition.
      */
     right: {
       type: String,
@@ -72,32 +70,32 @@ export class JoinElement extends UnifiedElement {
   };
 
   /**
-   * A `type` private property.
+   * The `type` private property.
    */
   private _type: null | string = null;
 
   /**
-   * A `left` private property.
+   * The `left` private property.
    */
   private _left: null | string = null;
 
   /**
-   * A `right` private property.
+   * The `right` private property.
    */
   private _right: null | string = null;
 
   /**
-   * An assosiated `hdml-model` element.
+   * The assosiated `ModelElement` element.
    */
   private _model: null | Element = null;
 
   /**
-   * An assosiated `hdml-connective` element.
+   * The assosiated `ConnectiveElement` element.
    */
   private _connective: null | ConnectiveElement = null;
 
   /**
-   * A `type` setter.
+   * The `type` setter.
    */
   public set type(val: null | string) {
     if (val === null || val === "" || JOIN_TYPE_REGEXP.test(val)) {
@@ -120,14 +118,14 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * A `type` getter.
+   * The `type` getter.
    */
   public get type(): null | string {
     return this._type;
   }
 
   /**
-   * A `left` setter.
+   * The `left` setter.
    */
   public set left(val: null | string) {
     if (val === null || val === "" || TABLE_NAME_REGEXP.test(val)) {
@@ -150,14 +148,14 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * A `left` getter.
+   * The `left` getter.
    */
   public get left(): null | string {
     return this._left;
   }
 
   /**
-   * A `right` setter.
+   * The `right` setter.
    */
   public set right(val: null | string) {
     if (val === null || val === "" || TABLE_NAME_REGEXP.test(val)) {
@@ -180,24 +178,24 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * A `right` getter.
+   * The `right` getter.
    */
   public get right(): null | string {
     return this._right;
   }
 
   /**
-   * The `JoinData` object.
+   * The `JoinDef` object.
    */
-  public get data(): JoinData {
+  public get data(): JoinDef {
     if (!this.type) {
-      throw new Error("A `type` property is required.");
+      throw new Error("The `type` property is required.");
     }
     if (!this.left) {
-      throw new Error("A `left` property is required.");
+      throw new Error("The `left` property is required.");
     }
     if (!this.right) {
-      throw new Error("A `right` property is required.");
+      throw new Error("The `right` property is required.");
     }
     const clause = this._connective
       ? this._connective.data
@@ -222,7 +220,7 @@ export class JoinElement extends UnifiedElement {
     this._model = this._getModel();
     if (this._model) {
       this._model.dispatchEvent(
-        new CustomEvent<JoinEventDetail>("hdml-join:connected", {
+        new CustomEvent<JoinDetail>("hdml-join:connected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -254,7 +252,7 @@ export class JoinElement extends UnifiedElement {
     this._unwatchConnective();
     if (this._model) {
       this._model.dispatchEvent(
-        new CustomEvent<JoinEventDetail>("hdml-join:disconnected", {
+        new CustomEvent<JoinDetail>("hdml-join:disconnected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -269,15 +267,15 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 
   /**
-   * Returns assosiated `hdml-model` element if exist or null
-   * otherwise.
+   * Returns the associated `ModelElement` element if it exists, or
+   * `null` otherwise.
    */
   private _getModel(): null | Element {
     let element = this.parentElement;
@@ -292,7 +290,7 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-connective` elements changes.
+   * Starts tracking changes to `ConnectiveElement` elements.
    */
   private _watchConnective(): void {
     const conn = <ConnectiveElement>(
@@ -312,7 +310,7 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-connective` elements changes.
+   * Stops watching for changes to `ConnectiveElement` elements.
    */
   private _unwatchConnective(): void {
     this.removeEventListener(
@@ -327,35 +325,31 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-connective:connected` event listener.
+   * `hdml-connective:connected` event listener.
    */
   private _connectiveConnectedListener = (
-    event: CustomEvent<ConnEventDetail>,
+    event: CustomEvent<ConnDetail>,
   ) => {
     const conn = event.detail.conn;
     this._attachConnective(conn);
   };
 
   /**
-   * The `hdml-connective:disconnected` event listener.
+   * `hdml-connective:disconnected` event listener.
    */
-  private _connectiveDisconnectedListener = (
-    event: CustomEvent<ConnEventDetail>,
-  ) => {
+  private _connectiveDisconnectedListener = () => {
     this._detachConnective();
   };
 
   /**
-   * The `hdml-connective:changed` event listener.
+   * `hdml-connective:changed` event listener.
    */
-  private _connectiveChangedListener = (
-    event: CustomEvent<ConnEventDetail>,
-  ) => {
+  private _connectiveChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * Attaches `hdml-connective` element.
+   * Attaches a `ConnectiveElement` element.
    */
   private _attachConnective(conn: ConnectiveElement) {
     if (!this._connective) {
@@ -369,7 +363,7 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-connective` element.
+   * Detaches a `ConnectiveElement` element.
    */
   private _detachConnective() {
     if (this._connective) {
@@ -387,7 +381,7 @@ export class JoinElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<JoinEventDetail>("hdml-join:changed", {
+      new CustomEvent<JoinDetail>("hdml-join:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -399,7 +393,7 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
-   * Converts `type` property to a `JoinType` enum.
+   * Converts a `type` property to a `JoinType` enum.
    */
   private _getJoinType(type: string): JoinType {
     switch (type) {

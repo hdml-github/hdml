@@ -1,13 +1,11 @@
 /**
- * @fileoverview The `TableElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { FieldData, TableData, TableType } from "@hdml/schema";
-
+import { FieldDef, TableDef, TableType } from "@hdml/schema";
 import {
   TABLE_NAME_REGEXP,
   TABLE_TYPE_REGEXP,
@@ -18,17 +16,20 @@ import {
   getModelTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import { FieldElement, FieldEventDetail } from "./FieldElement";
+import { FieldElement, FieldDetail } from "./FieldElement";
 
 /**
- * An `hdml-table` element event detail interface.
+ * `hdml-table:connected`, `hdml-table:changed`, `hdml-table:request`,
+ * `hdml-table:disconnected` events details interface.
  */
-export interface TableEventDetail {
+export interface TableDetail {
   table: TableElement;
 }
 
 /**
- * The `TableElement` class.
+ * `TableElement` class. Adds an `HTML` tag (default `hdml-table`)
+ * which is the root tag for describing a table for the base data
+ * model.
  */
 export class TableElement extends UnifiedElement {
   /**
@@ -36,7 +37,7 @@ export class TableElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -47,7 +48,7 @@ export class TableElement extends UnifiedElement {
     },
 
     /**
-     * A `type` property definition.
+     * The `type` property definition.
      */
     type: {
       type: String,
@@ -58,7 +59,7 @@ export class TableElement extends UnifiedElement {
     },
 
     /**
-     * A `source` property definition.
+     * The `source` property definition.
      */
     source: {
       type: String,
@@ -70,32 +71,32 @@ export class TableElement extends UnifiedElement {
   };
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * A `type` private property.
+   * The `type` private property.
    */
   private _type: null | string = null;
 
   /**
-   * A `source` private property.
+   * The `source` private property.
    */
   private _source: null | string = null;
 
   /**
-   * An assosiated `hdml-model` element.
+   * The assosiated `ModelElement` element.
    */
   private _model: null | Element = null;
 
   /**
-   * Attached `hdml-field` elements map.
+   * A map of attached `FieldElement` elements.
    */
   private _fields: Map<string, FieldElement> = new Map();
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || TABLE_NAME_REGEXP.test(val)) {
@@ -118,14 +119,14 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * A `type` setter.
+   * The `type` setter.
    */
   public set type(val: null | string) {
     if (val === null || val === "" || TABLE_TYPE_REGEXP.test(val)) {
@@ -148,14 +149,14 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * A `type` getter.
+   * The `type` getter.
    */
   public get type(): null | string {
     return this._type;
   }
 
   /**
-   * A `source` setter.
+   * The `source` setter.
    */
   public set source(val: null | string) {
     if (val === null || val === "" || TABLE_SOURCE_REGEXP.test(val)) {
@@ -178,16 +179,16 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * A `source` getter.
+   * The `source` getter.
    */
   public get source(): null | string {
     return this._source ? this._source.replaceAll("`", '"') : null;
   }
 
   /**
-   * The `TableData` object.
+   * The `TableDef` object.
    */
-  public get data(): TableData {
+  public get data(): TableDef {
     if (!this.name) {
       throw new Error("A `name` property is required.");
     }
@@ -197,7 +198,7 @@ export class TableElement extends UnifiedElement {
     if (!this.source) {
       throw new Error("A `source` property is required.");
     }
-    const fields: FieldData[] = [];
+    const fields: FieldDef[] = [];
     this._fields.forEach((field) => {
       fields.push(field.data);
     });
@@ -217,7 +218,7 @@ export class TableElement extends UnifiedElement {
     this._model = this._getModel();
     if (this._model) {
       this._model.dispatchEvent(
-        new CustomEvent<TableEventDetail>("hdml-table:connected", {
+        new CustomEvent<TableDetail>("hdml-table:connected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -249,7 +250,7 @@ export class TableElement extends UnifiedElement {
     this._unwatchFields();
     if (this._model) {
       this._model.dispatchEvent(
-        new CustomEvent<TableEventDetail>("hdml-table:disconnected", {
+        new CustomEvent<TableDetail>("hdml-table:disconnected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -264,15 +265,15 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 
   /**
-   * Returns assosiated `hdml-model` element if exist or null
-   * otherwise.
+   * Returns the associated `ModelElement` element if it exists, or
+   * `null` otherwise.
    */
   private _getModel(): null | Element {
     let element = this.parentElement;
@@ -287,7 +288,7 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-field` elements changes.
+   * Starts tracking changes to `FieldElement` elements.
    */
   private _watchFields(): void {
     this.queryHdmlChildren<FieldElement>(getFieldTag()).forEach(
@@ -306,7 +307,7 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-field` elements changes.
+   * Stops watching for changes to `FieldElement` elements.
    */
   private _unwatchFields(): void {
     this.removeEventListener(
@@ -324,36 +325,34 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-field:connected` event listener.
+   * `hdml-field:connected` event listener.
    */
   private _fieldConnectedListener = (
-    event: CustomEvent<FieldEventDetail>,
+    event: CustomEvent<FieldDetail>,
   ) => {
     const field = event.detail.field;
     this._attachField(field);
   };
 
   /**
-   * The `hdml-field:disconnected` event listener.
+   * `hdml-field:disconnected` event listener.
    */
   private _fieldDisconnectedListener = (
-    event: CustomEvent<FieldEventDetail>,
+    event: CustomEvent<FieldDetail>,
   ) => {
     const field = event.detail.field;
     this._detachField(field);
   };
 
   /**
-   * The `hdml-field:changed` event listener.
+   * `hdml-field:changed` event listener.
    */
-  private _fieldChangedListener = (
-    event: CustomEvent<FieldEventDetail>,
-  ) => {
+  private _fieldChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * Attaches `hdml-field` element to the fields map.
+   * Attaches a `FieldElement` element to the fields map.
    */
   private _attachField(field: FieldElement) {
     if (field.uid && !this._fields.has(field.uid)) {
@@ -367,7 +366,7 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-field` element from the tables map.
+   * Detaches `FieldElement` element from the fields map.
    */
   private _detachField(field: FieldElement) {
     if (field.uid && this._fields.has(field.uid)) {
@@ -385,7 +384,7 @@ export class TableElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<TableEventDetail>("hdml-table:changed", {
+      new CustomEvent<TableDetail>("hdml-table:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -397,7 +396,7 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
-   * Converts `type` property to a `TableType` enum.
+   * Converts the `type` property to a `TableType` enum.
    */
   private _getTableType(type: string): TableType {
     switch (type) {

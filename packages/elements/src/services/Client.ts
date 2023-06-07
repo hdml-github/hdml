@@ -1,5 +1,4 @@
 /**
- * @fileoverview The `Client` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -7,20 +6,20 @@
 
 import "whatwg-fetch";
 import { Table, tableFromIPC } from "apache-arrow";
-import { Name } from "@hdml/schema";
+import { File } from "@hdml/schema";
 
 let sessionToken: null | string = null;
 
 /**
- * Data client class.
+ * Network client class.
  */
 export class Client {
   private _initialized = false;
-  private _postedHdmls: Map<
+  private _postedQueries: Map<
     string,
     [AbortController, Promise<string>]
   > = new Map();
-  private _requestedHdmls: Map<
+  private _downloadableFiles: Map<
     string,
     [AbortController, Promise<Table>]
   > = new Map();
@@ -47,57 +46,58 @@ export class Client {
   }
 
   /**
-   * Sends a `Document` with the specified `uid` and `body` and
-   * returns its name.
+   * Submits a request for execution. Returns the identifier of the
+   * file with the results of the request.
    */
-  public async hdmlPost(uid: string, body: Buffer): Promise<string> {
+  public async postQuery(uid: string, body: Buffer): Promise<string> {
     if (!this._initialized) {
       throw new Error("Client is not initialized");
     } else {
-      if (!this._postedHdmls.has(uid)) {
+      if (!this._postedQueries.has(uid)) {
         const abort = new AbortController();
-        const promise = this.hdmlPostInternal(
+        const promise = this.postQueryInternal(
           uid,
           body,
           abort.signal,
         );
-        this._postedHdmls.set(uid, [abort, promise]);
+        this._postedQueries.set(uid, [abort, promise]);
       }
       return (<[AbortController, Promise<string>]>(
-        this._postedHdmls.get(uid)
+        this._postedQueries.get(uid)
       ))[1];
     }
   }
 
   /**
-   * Retrieves the `Document` data stream and returns parsed `Table`.
+   * Downloads a file with the results of a query. Returns a table
+   * with query data in `arrow.Table` format.
    */
-  public async hdmlGet(uid: string, name: string): Promise<Table> {
+  public async getFile(uid: string, name: string): Promise<Table> {
     if (!this._initialized) {
       throw new Error("Client is not initialized");
     } else {
-      if (!this._requestedHdmls.has(uid)) {
+      if (!this._downloadableFiles.has(uid)) {
         const abort = new AbortController();
-        const promise = this.hdmlGetInternal(uid, name, abort.signal);
-        this._requestedHdmls.set(uid, [abort, promise]);
+        const promise = this.getFileInternal(uid, name, abort.signal);
+        this._downloadableFiles.set(uid, [abort, promise]);
       }
       return (<[AbortController, Promise<Table>]>(
-        this._requestedHdmls.get(uid)
+        this._downloadableFiles.get(uid)
       ))[1];
     }
   }
 
   /**
-   * Close client by cancelling every active fetch.
+   * Closes the client, canceling all active requests and downloads.
    */
   public close(): void {
     sessionToken = null;
     this._initialized = false;
-    this._postedHdmls.forEach((tuple, uid) => {
-      this.hdmlPostCancel(uid);
+    this._postedQueries.forEach((tuple, uid) => {
+      this.cancelPostQuery(uid);
     });
-    this._requestedHdmls.forEach((tuple, uid) => {
-      this.hdmlGetCancel(uid);
+    this._downloadableFiles.forEach((tuple, uid) => {
+      this.cancelGetFile(uid);
     });
   }
 
@@ -118,7 +118,10 @@ export class Client {
     }
   }
 
-  private async hdmlPostInternal(
+  /**
+   * Internal implementation of sending a request.
+   */
+  private async postQueryInternal(
     uid: string,
     body: Buffer,
     signal: AbortSignal,
@@ -130,14 +133,17 @@ export class Client {
       body,
     });
     const buff = await resp.arrayBuffer();
-    const name = new Name(new Uint8Array(buff));
-    if (this._postedHdmls.has(uid)) {
-      this._postedHdmls.delete(uid);
+    const file = new File(new Uint8Array(buff));
+    if (this._postedQueries.has(uid)) {
+      this._postedQueries.delete(uid);
     }
-    return name.value;
+    return file.name;
   }
 
-  private async hdmlGetInternal(
+  /**
+   * Internal implementation of downloading a file.
+   */
+  private async getFileInternal(
     uid: string,
     name: string,
     signal: AbortSignal,
@@ -150,14 +156,14 @@ export class Client {
     });
     const buffer = await response.arrayBuffer();
     const table = tableFromIPC(<Buffer>buffer);
-    if (this._requestedHdmls.has(uid)) {
-      this._requestedHdmls.delete(uid);
+    if (this._downloadableFiles.has(uid)) {
+      this._downloadableFiles.delete(uid);
     }
     return table;
   }
 
   /**
-   * Fetches remote resource.
+   * Internal implementation of fetching remote resource.
    */
   private async fetch(config: {
     method: "GET" | "POST" | "PUT" | "DELETE";
@@ -195,21 +201,27 @@ export class Client {
     }
   }
 
-  private hdmlPostCancel(uid: string): void {
-    if (this._postedHdmls.has(uid)) {
+  /**
+   * Cancels sending the query.
+   */
+  private cancelPostQuery(uid: string): void {
+    if (this._postedQueries.has(uid)) {
       (<[AbortController, Promise<string>]>(
-        this._postedHdmls.get(uid)
+        this._postedQueries.get(uid)
       ))[0].abort();
-      this._postedHdmls.delete(uid);
+      this._postedQueries.delete(uid);
     }
   }
 
-  private hdmlGetCancel(uid: string): void {
-    if (this._requestedHdmls.has(uid)) {
+  /**
+   * Cancels the download of a file.
+   */
+  private cancelGetFile(uid: string): void {
+    if (this._downloadableFiles.has(uid)) {
       (<[AbortController, Promise<Table>]>(
-        this._requestedHdmls.get(uid)
+        this._downloadableFiles.get(uid)
       ))[0].abort();
-      this._requestedHdmls.delete(uid);
+      this._downloadableFiles.delete(uid);
     }
   }
 }

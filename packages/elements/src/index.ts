@@ -1,5 +1,4 @@
 /**
- * @fileoverview Package export.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -32,9 +31,8 @@ import {
   getGroupByTag,
   getSortByTag,
 } from "./helpers/elementsRegister";
-// import { runAttrTestSuite } from "./helpers/runAttrTestSuite";
 import { UnifiedElement } from "./components/UnifiedElement";
-import { IoElement, ElementsData } from "./components/IoElement";
+import { IoElement, ElementsDef } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
 import { TableElement } from "./components/TableElement";
 import { FieldElement } from "./components/FieldElement";
@@ -78,7 +76,7 @@ export {
   getSortByTag,
   // elements
   UnifiedElement,
-  ElementsData,
+  ElementsDef,
   IoElement,
   ModelElement,
   TableElement,

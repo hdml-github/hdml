@@ -1,32 +1,13 @@
 /**
- * @fileoverview Element's attribute/property test suite.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
-/* eslint-disable @typescript-eslint/restrict-template-expressions */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import { expect } from "@esm-bundle/chai";
 import { createSandbox } from "sinon";
-import { UnifiedElement } from "../components/UnifiedElement";
 
-type Tested = {
-  [key: string]: unknown;
-  getAttribute: (attr: string) => unknown;
-  setAttribute: (attr: string, val: unknown) => void;
-  removeAttribute: (attr: string) => void;
-  remove: () => void;
-};
-
-export function runAttrTestSuite(
-  Constructor: new () => UnifiedElement,
-  property: { name: string; valid: unknown; invalid: unknown },
-  attribute: { name: string; valid: unknown; invalid: unknown },
-): void {
+export function runAttrTestSuite(Constructor, property, attribute) {
   describe("instantiated in script", () => {
     const sandbox = createSandbox();
 
@@ -39,8 +20,8 @@ export function runAttrTestSuite(
     });
 
     it(`must contain a nulled \`${property.name}\` property`, () => {
-      const element: Tested = <Tested>(<unknown>new Constructor());
-      window.document.body.appendChild(<Node>(<unknown>element));
+      const element = new Constructor();
+      window.document.body.appendChild(element);
 
       expect(
         element[property.name],
@@ -67,8 +48,8 @@ export function runAttrTestSuite(
       `must ignore an invalid \`${property.name}\` ` +
         "property values",
       () => {
-        const element: Tested = <Tested>(<unknown>new Constructor());
-        window.document.body.appendChild(<Node>(<unknown>element));
+        const element = new Constructor();
+        window.document.body.appendChild(element);
         element[property.name] = property.invalid;
 
         expect(
@@ -91,12 +72,10 @@ export function runAttrTestSuite(
           `\`${property.name}\` attribute value is not null`,
         ).to.equal(null);
 
-        // @ts-ignore
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -111,8 +90,8 @@ export function runAttrTestSuite(
       `must keep a valid \`${property.name}\` property ` +
         "value if invalid was set after a valid",
       async () => {
-        const element: Tested = <Tested>(<unknown>new Constructor());
-        window.document.body.appendChild(<Node>(<unknown>element));
+        const element = new Constructor();
+        window.document.body.appendChild(element);
         element[property.name] = property.valid;
         await element.updateComplete;
         element[property.name] = property.invalid;
@@ -137,12 +116,11 @@ export function runAttrTestSuite(
           `\`${attribute.name}\` attribute value is not valid`,
         ).to.equal(attribute.valid);
 
-        // @ts-ignore
+
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -156,8 +134,8 @@ export function runAttrTestSuite(
     it(
       `must set a correct \`${property.name}\` ` + "property values",
       async () => {
-        const element: Tested = <Tested>(<unknown>new Constructor());
-        window.document.body.appendChild(<Node>(<unknown>element));
+        const element = new Constructor();
+        window.document.body.appendChild(element);
         element[property.name] = property.valid;
         await element.updateComplete;
 
@@ -200,8 +178,8 @@ export function runAttrTestSuite(
         `and a nulled \`${attribute.name}\` attribute`,
       () => {
         window.document.body.innerHTML = `<tested-element/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         const attr = element.getAttribute(attribute.name);
 
@@ -233,8 +211,8 @@ export function runAttrTestSuite(
       () => {
         window.document.body.innerHTML =
           "<tested-element " + `${attribute.name}/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         const attr = element.getAttribute(attribute.name);
 
@@ -265,8 +243,8 @@ export function runAttrTestSuite(
         "property values",
       async () => {
         window.document.body.innerHTML = `<tested-element/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element[property.name] = property.invalid;
         await element.updateComplete;
@@ -290,12 +268,11 @@ export function runAttrTestSuite(
           `\`${attribute.name}\` attribute is not null`,
         ).to.equal(null);
 
-        // @ts-ignore
+
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -312,8 +289,8 @@ export function runAttrTestSuite(
         "if incorrect property was set",
       async () => {
         window.document.body.innerHTML = `<tested-element/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element[property.name] = property.valid;
         await element.updateComplete;
@@ -338,12 +315,11 @@ export function runAttrTestSuite(
           `\`${attribute.name}\` attribute is not valid`,
         ).to.equal(attribute.valid);
 
-        // @ts-ignore
+
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -362,8 +338,8 @@ export function runAttrTestSuite(
           `<tested-element ` +
           `${attribute.name}=` +
           `"${attribute.invalid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         const attr = element.getAttribute(attribute.name);
 
@@ -385,12 +361,11 @@ export function runAttrTestSuite(
           `\`${attribute.name}\` attribute is not null`,
         ).to.equal(null);
 
-        // @ts-ignore
+
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -410,8 +385,8 @@ export function runAttrTestSuite(
           `<tested-element ` +
           `${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element.setAttribute(attribute.name, attribute.invalid);
         const attr = element.getAttribute(attribute.name);
@@ -434,12 +409,11 @@ export function runAttrTestSuite(
           `\`${attribute.name}\` attribute is not valid`,
         ).to.equal(attribute.valid);
 
-        // @ts-ignore
+
         expect(console.error.calledOnce, "error consoled not once").to
           .be.true;
 
         expect(
-          // @ts-ignore
           console.error.getCall(0).args[0],
           "error message",
         ).to.equal(
@@ -454,8 +428,8 @@ export function runAttrTestSuite(
       `must set a correct \`${property.name}\` ` + "property value",
       async () => {
         window.document.body.innerHTML = `<tested-element/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element[property.name] = property.valid;
         await element.updateComplete;
@@ -487,8 +461,8 @@ export function runAttrTestSuite(
         window.document.body.innerHTML =
           `<tested-element ${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         const attr = element.getAttribute(attribute.name);
 
@@ -520,8 +494,8 @@ export function runAttrTestSuite(
         window.document.body.innerHTML =
           `<tested-element ${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element[property.name] = "";
         await element.updateComplete;
@@ -555,8 +529,8 @@ export function runAttrTestSuite(
         window.document.body.innerHTML =
           `<tested-element ${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element[property.name] = null;
         await element.updateComplete;
@@ -590,8 +564,8 @@ export function runAttrTestSuite(
         window.document.body.innerHTML =
           `<tested-element ${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element.setAttribute(attribute.name, "");
         const attr = element.getAttribute(attribute.name);
@@ -624,8 +598,8 @@ export function runAttrTestSuite(
         window.document.body.innerHTML =
           `<tested-element ${attribute.name}=` +
           `"${attribute.valid}"/>`;
-        const element = <Tested>(
-          (<unknown>document.querySelector("tested-element"))
+        const element = (
+          (document.querySelector("tested-element"))
         );
         element.removeAttribute(attribute.name);
         const attr = element.getAttribute(attribute.name);

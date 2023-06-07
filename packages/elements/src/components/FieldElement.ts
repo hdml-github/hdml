@@ -1,5 +1,4 @@
 /**
- * @fileoverview The `FieldElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -7,20 +6,19 @@
 
 import { html, TemplateResult } from "lit";
 import {
-  CommonOptsData,
-  DecimalOptsData,
-  DateOptsData,
-  TimeOptsData,
-  TimestampOptsData,
-  TypeData,
+  CommonOptsDef,
+  DecimalOptsDef,
+  DateOptsDef,
+  TimeOptsDef,
+  TimestampOptsDef,
+  TypeDef,
+  FieldDef,
   DataType,
-  FieldData,
   DateUnit,
   TimeUnit,
   TimeZone,
   AggType,
 } from "@hdml/schema";
-
 import {
   FIELD_NAME_REGEXP,
   FIELD_ORIGIN_REGEXP,
@@ -45,14 +43,17 @@ import {
 import { UnifiedElement } from "./UnifiedElement";
 
 /**
- * An `hdml-field` element event detail interface.
+ * `hdml-field:connected`, `hdml-field:changed`, `hdml-field:request`,
+ * `hdml-field:disconnected` events details interface.
  */
-export interface FieldEventDetail {
+export interface FieldDetail {
   field: FieldElement;
 }
 
 /**
- * The `FieldElement` class.
+ * `FieldElement` class. Adds an `HTML` tag (`hdml-field` by default),
+ * which is the base element for describing a data field of a table or
+ * data frame.
  */
 export class FieldElement extends UnifiedElement {
   /**
@@ -60,7 +61,7 @@ export class FieldElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -71,7 +72,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `origin` property definition.
+     * The `origin` property definition.
      */
     origin: {
       type: String,
@@ -82,7 +83,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `clause` property definition.
+     * The `clause` property definition.
      */
     clause: {
       type: String,
@@ -93,7 +94,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `type` property definition.
+     * The `type` property definition.
      */
     type: {
       type: String,
@@ -104,7 +105,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `nullable` property definition.
+     * The `nullable` property definition.
      */
     nullable: {
       type: String,
@@ -115,7 +116,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `scale` property definition.
+     * The `scale` property definition.
      */
     scale: {
       type: String,
@@ -126,7 +127,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `precision` property definition.
+     * The `precision` property definition.
      */
     precision: {
       type: String,
@@ -137,7 +138,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `bitWidth` property definition.
+     * The `bitWidth` property definition.
      */
     bitWidth: {
       type: String,
@@ -148,7 +149,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `unit` property definition.
+     * The `unit` property definition.
      */
     unit: {
       type: String,
@@ -159,7 +160,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `timezone` property definition.
+     * The `timezone` property definition.
      */
     timezone: {
       type: String,
@@ -170,7 +171,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `agg` property definition.
+     * The `agg` property definition.
      */
     agg: {
       type: String,
@@ -181,7 +182,7 @@ export class FieldElement extends UnifiedElement {
     },
 
     /**
-     * A `asc` property definition.
+     * The `asc` property definition.
      */
     asc: {
       type: String,
@@ -193,73 +194,73 @@ export class FieldElement extends UnifiedElement {
   };
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * A `origin` private property.
+   * The `origin` private property.
    */
   private _origin: null | string = null;
 
   /**
-   * A `clause` private property.
+   * The `clause` private property.
    */
   private _clause: null | string = null;
 
   /**
-   * A `type` private property.
+   * The `type` private property.
    */
   private _type: null | string = null;
 
   /**
-   * A `nullable` private property.
+   * The `nullable` private property.
    */
   private _nullable: null | string = null;
 
   /**
-   * A `scale` private property.
+   * The `scale` private property.
    */
   private _scale: null | string = null;
 
   /**
-   * A `precision` private property.
+   * The `precision` private property.
    */
   private _precision: null | string = null;
 
   /**
-   * A `bitWidth` private property.
+   * The `bitWidth` private property.
    */
   private _bitWidth: null | string = null;
 
   /**
-   * A `unit` private property.
+   * The `unit` private property.
    */
   private _unit: null | string = null;
 
   /**
-   * A `timezone` private property.
+   * The `timezone` private property.
    */
   private _timezone: null | string = null;
 
   /**
-   * A `agg` private property.
+   * The `agg` private property.
    */
   private _agg: null | string = null;
 
   /**
-   * A `asc` private property.
+   * The `asc` private property.
    */
   private _asc: null | string = null;
 
   /**
-   * An assosiated `hdml-table`, `hdml-frame`, `hdml-group-by`,
-   * `hdml-group-by` or `hdml-sort-by` element.
+   * The assosiated parent `TableElement`, `FrameElement`,
+   * `GroupByElement`, or `SortByElement` element.
    */
   private _parent: null | Element = null;
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || FIELD_NAME_REGEXP.test(val)) {
@@ -282,14 +283,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * A `origin` setter.
+   * The `origin` setter.
    */
   public set origin(val: null | string) {
     if (val === null || val === "" || FIELD_ORIGIN_REGEXP.test(val)) {
@@ -312,14 +313,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `origin` getter.
+   * The `origin` getter.
    */
   public get origin(): null | string {
     return this._origin;
   }
 
   /**
-   * A `clause` setter.
+   * The `clause` setter.
    */
   public set clause(val: null | string) {
     if (val === null || val === "" || FIELD_CLAUSE_REGEXP.test(val)) {
@@ -342,14 +343,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `clause` getter.
+   * The `clause` getter.
    */
   public get clause(): null | string {
     return this._clause ? this._clause.replaceAll("`", '"') : null;
   }
 
   /**
-   * A `type` setter.
+   * The `type` setter.
    */
   public set type(val: null | string) {
     if (val === null || val === "" || FIELD_TYPE_REGEXP.test(val)) {
@@ -372,14 +373,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `type` getter.
+   * The `type` getter.
    */
   public get type(): null | string {
     return this._type;
   }
 
   /**
-   * A `nullable` setter.
+   * The `nullable` setter.
    */
   public set nullable(val: null | string) {
     if (
@@ -406,14 +407,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `nullable` getter.
+   * The `nullable` getter.
    */
   public get nullable(): null | string {
     return this._nullable;
   }
 
   /**
-   * A `scale` setter.
+   * The `scale` setter.
    */
   public set scale(val: null | string) {
     if (val === null || val === "" || FIELD_SCALE_REGEXP.test(val)) {
@@ -436,14 +437,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `scale` getter.
+   * The `scale` getter.
    */
   public get scale(): null | string {
     return this._scale;
   }
 
   /**
-   * A `precision` setter.
+   * The `precision` setter.
    */
   public set precision(val: null | string) {
     if (
@@ -470,14 +471,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `precision` getter.
+   * The `precision` getter.
    */
   public get precision(): null | string {
     return this._precision;
   }
 
   /**
-   * A `bitWidth` setter.
+   * The `bitWidth` setter.
    */
   public set bitWidth(val: null | string) {
     if (
@@ -504,14 +505,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `bitWidth` getter.
+   * The `bitWidth` getter.
    */
   public get bitWidth(): null | string {
     return this._bitWidth;
   }
 
   /**
-   * A `unit` setter.
+   * The `unit` setter.
    */
   public set unit(val: null | string) {
     const RE =
@@ -538,14 +539,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `unit` getter.
+   * The `unit` getter.
    */
   public get unit(): null | string {
     return this._unit;
   }
 
   /**
-   * A `timezone` setter.
+   * The `timezone` setter.
    */
   public set timezone(val: null | string) {
     if (val === null || val === "" || FIELD_TZ_REGEXP.test(val)) {
@@ -568,14 +569,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `timezone` getter.
+   * The `timezone` getter.
    */
   public get timezone(): null | string {
     return this._timezone;
   }
 
   /**
-   * A `agg` setter.
+   * The `agg` setter.
    */
   public set agg(val: null | string) {
     if (val === null || val === "" || FIELD_AGG_REGEXP.test(val)) {
@@ -598,14 +599,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `agg` getter.
+   * The `agg` getter.
    */
   public get agg(): null | string {
     return this._agg;
   }
 
   /**
-   * A `asc` setter.
+   * The `asc` setter.
    */
   public set asc(val: null | string) {
     if (val === null || val === "" || FIELD_ASC_REGEXP.test(val)) {
@@ -628,16 +629,16 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * A `asc` getter.
+   * The `asc` getter.
    */
   public get asc(): null | string {
     return this._asc;
   }
 
   /**
-   * The `FieldData` object.
+   * The `FieldDef` object.
    */
-  public get data(): FieldData {
+  public get data(): FieldDef {
     if (!this.name) {
       throw new Error("A `name` property is required.");
     }
@@ -666,7 +667,7 @@ export class FieldElement extends UnifiedElement {
     this._parent = this._getParent();
     if (this._parent) {
       this._parent.dispatchEvent(
-        new CustomEvent<FieldEventDetail>("hdml-field:connected", {
+        new CustomEvent<FieldDetail>("hdml-field:connected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -696,7 +697,7 @@ export class FieldElement extends UnifiedElement {
   public disconnectedCallback(): void {
     if (this._parent) {
       this._parent.dispatchEvent(
-        new CustomEvent<FieldEventDetail>("hdml-field:disconnected", {
+        new CustomEvent<FieldDetail>("hdml-field:disconnected", {
           cancelable: false,
           composed: false,
           bubbles: false,
@@ -711,15 +712,14 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<!-- FieldElement -->`;
   }
 
   /**
-   * Returns an assosiated `hdml-table`, `hdml-frame`,
-   * `hdml-group-by` or `hdml-sort-by` element if exist or null
+   * Returns the assosiated parent element if exist or `null`
    * otherwise.
    */
   private _getParent(): null | Element {
@@ -742,7 +742,7 @@ export class FieldElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<FieldEventDetail>("hdml-field:changed", {
+      new CustomEvent<FieldDetail>("hdml-field:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -754,15 +754,15 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns the field type.
+   * Returns the field type definition if defined.
    */
-  private _getType(): undefined | TypeData {
+  private _getType(): undefined | TypeDef {
     let opts:
-      | CommonOptsData
-      | DecimalOptsData
-      | DateOptsData
-      | TimeOptsData
-      | TimestampOptsData;
+      | CommonOptsDef
+      | DecimalOptsDef
+      | DateOptsDef
+      | TimeOptsDef
+      | TimestampOptsDef;
     if (!this.type) {
       return undefined;
     } else {
@@ -797,7 +797,7 @@ export class FieldElement extends UnifiedElement {
         default:
           throw new Error("Unsupported `type` attribute value.");
       }
-      return <TypeData>{
+      return <TypeDef>{
         type: this._getDataType(),
         options: opts,
       };
@@ -805,7 +805,7 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns field data type code.
+   * Returns the field data type enum code.
    */
   private _getDataType(): DataType {
     switch (this.type) {
@@ -849,9 +849,9 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns common data type options object.
+   * Returns the common field data type definition.
    */
-  private _getCommonOpts(): CommonOptsData {
+  private _getCommonOpts(): CommonOptsDef {
     return {
       nullable:
         this.nullable && this.nullable !== "false" ? true : false,
@@ -859,9 +859,9 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns decimal data type options object.
+   * Returns the decimal field data type definition.
    */
-  private _getDecimalOpts(): DecimalOptsData {
+  private _getDecimalOpts(): DecimalOptsDef {
     if (!this.scale) {
       throw new Error("A `scale` property is required.");
     }
@@ -881,9 +881,9 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns date data type options object.
+   * Returns the date field data type definition.
    */
-  private _getDateOpts(): DateOptsData {
+  private _getDateOpts(): DateOptsDef {
     if (!this.unit) {
       throw new Error("A `unit` property is required.");
     }
@@ -906,9 +906,9 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns time data type options object.
+   * Returns the time field data type definition.
    */
-  private _getTimeOpts(): TimeOptsData {
+  private _getTimeOpts(): TimeOptsDef {
     if (!this.unit) {
       throw new Error("A `unit` property is required.");
     }
@@ -937,9 +937,9 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns timestamp data type options object.
+   * Returns the timestamp field data type definition.
    */
-  private _getTimestampOpts(): TimestampOptsData {
+  private _getTimestampOpts(): TimestampOptsDef {
     if (!this.unit) {
       throw new Error("A `unit` property is required.");
     }
@@ -2759,7 +2759,7 @@ export class FieldElement extends UnifiedElement {
   }
 
   /**
-   * Returns field agg value.
+   * Returns the field aggregation type if defined.
    */
   private _getAgg(): undefined | AggType {
     if (!this.agg) {

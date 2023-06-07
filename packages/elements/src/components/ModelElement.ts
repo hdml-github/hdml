@@ -1,28 +1,29 @@
 /**
- * @fileoverview The `ModelElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { ModelData, TableData, JoinData } from "@hdml/schema";
-
+import { ModelDef, TableDef, JoinDef } from "@hdml/schema";
 import { MODEL_NAME_REGEXP } from "../helpers/constants";
 import { getTableTag, getJoinTag } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import { TableElement, TableEventDetail } from "./TableElement";
-import { JoinElement, JoinEventDetail } from "./JoinElement";
+import { TableElement, TableDetail } from "./TableElement";
+import { JoinElement, JoinDetail } from "./JoinElement";
 
 /**
- * An `hdml-model` element event detail interface.
+ * `hdml-model:connected`, `hdml-model:changed`, `hdml-model:request`,
+ * `hdml-model:disconnected` events details interface.
  */
-export interface ModelEventDetail {
+export interface ModelDetail {
   model: ModelElement;
 }
 
 /**
- * The `ModelElement` class.
+ * `ModelElement` class. Adds an `HTML` tag (default `hdml-model`)
+ * which is the root tag for describing the underlying query model.
+ * This model is a set of tables and a set of their joins.
  */
 export class ModelElement extends UnifiedElement {
   /**
@@ -30,7 +31,7 @@ export class ModelElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -42,22 +43,22 @@ export class ModelElement extends UnifiedElement {
   };
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * Attached `hdml-table` elements map.
+   * A map of attached `TableElement` elements.
    */
   private _tables: Map<string, TableElement> = new Map();
 
   /**
-   * Attached `hdml-join` elements map.
+   * A map of attached `JoinElement` elements.
    */
   private _joins: Map<string, JoinElement> = new Map();
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || MODEL_NAME_REGEXP.test(val)) {
@@ -80,30 +81,29 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * The `ModelData` object.
+   * The `ModelDef` object.
    */
-  public get data(): ModelData {
+  public get data(): ModelDef {
     if (!this.name) {
       throw new Error("A `name` property is required.");
     }
-    const tables: TableData[] = [];
+    const tables: TableDef[] = [];
     this._tables.forEach((table) => {
       tables.push(table.data);
     });
-    const joins: JoinData[] = [];
+    const joins: JoinDef[] = [];
     this._joins.forEach((join) => {
       joins.push(join.data);
     });
     return {
       name: this.name,
-      host: "",
       tables,
       joins,
     };
@@ -115,7 +115,7 @@ export class ModelElement extends UnifiedElement {
   public connectedCallback(): void {
     super.connectedCallback();
     document.body.dispatchEvent(
-      new CustomEvent<ModelEventDetail>("hdml-model:connected", {
+      new CustomEvent<ModelDetail>("hdml-model:connected", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -147,7 +147,7 @@ export class ModelElement extends UnifiedElement {
     this._unwatchTables();
     this._unwatchJoins();
     document.body.dispatchEvent(
-      new CustomEvent<ModelEventDetail>("hdml-model:disconnected", {
+      new CustomEvent<ModelDetail>("hdml-model:disconnected", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -160,18 +160,18 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 
   /**
-   * Initiates request.
+   * Initializes a request by raising the `hdml-model:request` event.
    */
-  public request(): void {
+  public query(): void {
     this.dispatchEvent(
-      new CustomEvent<ModelEventDetail>("hdml-model:request", {
+      new CustomEvent<ModelDetail>("hdml-model:request", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -183,7 +183,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-table` elements changes.
+   * Starts tracking changes to `TableElement` elements.
    */
   private _watchTables(): void {
     this.queryHdmlChildren<TableElement>(getTableTag()).forEach(
@@ -202,7 +202,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-join` elements changes.
+   * Starts tracking changes to `JoinElement` elements.
    */
   private _watchJoins(): void {
     this.queryHdmlChildren<JoinElement>(getJoinTag()).forEach(
@@ -221,7 +221,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-table` elements changes.
+   * Stops watching for changes to `TableElement` elements.
    */
   private _unwatchTables(): void {
     this.removeEventListener(
@@ -239,7 +239,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-join` elements changes.
+   * Stops watching for changes to `JoinElement` elements.
    */
   private _unwatchJoins(): void {
     this.removeEventListener(
@@ -257,65 +257,61 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-table:connected` event listener.
+   * `hdml-table:connected` event listener.
    */
   private _tableConnectedListener = (
-    event: CustomEvent<TableEventDetail>,
+    event: CustomEvent<TableDetail>,
   ) => {
     const table = event.detail.table;
     this._attachTable(table);
   };
 
   /**
-   * The `hdml-join:connected` event listener.
+   * `hdml-join:connected` event listener.
    */
   private _joinConnectedListener = (
-    event: CustomEvent<JoinEventDetail>,
+    event: CustomEvent<JoinDetail>,
   ) => {
     const join = event.detail.join;
     this._attachJoin(join);
   };
 
   /**
-   * The `hdml-table:disconnected` event listener.
+   * `hdml-table:disconnected` event listener.
    */
   private _tableDisconnectedListener = (
-    event: CustomEvent<TableEventDetail>,
+    event: CustomEvent<TableDetail>,
   ) => {
     const table = event.detail.table;
     this._detachTable(table);
   };
 
   /**
-   * The `hdml-join:disconnected` event listener.
+   * `hdml-join:disconnected` event listener.
    */
   private _joinDisconnectedListener = (
-    event: CustomEvent<JoinEventDetail>,
+    event: CustomEvent<JoinDetail>,
   ) => {
     const join = event.detail.join;
     this._detachJoin(join);
   };
 
   /**
-   * The `hdml-model:changed` event listener.
+   * `hdml-model:changed` event listener.
    */
-  private _tableChangedListener = (
-    event: CustomEvent<TableEventDetail>,
-  ) => {
+  private _tableChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * The `hdml-join:changed` event listener.
+   * `hdml-join:changed` event listener.
    */
-  private _joinChangedListener = (
-    event: CustomEvent<JoinEventDetail>,
-  ) => {
+  private _joinChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * Attaches `hdml-table` element to the tables map.
+   * Attaches a `TableElement` element to the tables map.
    */
   private _attachTable(table: TableElement) {
     if (table.uid && !this._tables.has(table.uid)) {
@@ -329,7 +325,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Attaches `hdml-join` element to the joins map.
+   * Attaches a `JoinElement` element to the joins map.
    */
   private _attachJoin(join: JoinElement) {
     if (join.uid && !this._joins.has(join.uid)) {
@@ -343,7 +339,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-table` element from the tables map.
+   * Detaches `TableElement` element from the tables map.
    */
   private _detachTable(table: TableElement) {
     if (table.uid && this._tables.has(table.uid)) {
@@ -357,7 +353,7 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-join` element from the joins map.
+   * Detaches `JoinElement` element from the joins map.
    */
   private _detachJoin(join: JoinElement) {
     if (join.uid && this._joins.has(join.uid)) {
@@ -375,7 +371,7 @@ export class ModelElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<ModelEventDetail>("hdml-model:changed", {
+      new CustomEvent<ModelDetail>("hdml-model:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,

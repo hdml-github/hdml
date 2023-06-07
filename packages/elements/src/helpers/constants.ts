@@ -1,5 +1,4 @@
 /**
- * @fileoverview Declaration of the getSignature function.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0

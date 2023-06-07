@@ -1,13 +1,11 @@
 /**
- * @fileoverview The `FrameElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
 import { html, TemplateResult } from "lit";
-import { FieldData, FrameData } from "@hdml/schema";
-
+import { FieldDef, FrameDef } from "@hdml/schema";
 import {
   FRAME_NAME_REGEXP,
   FRAME_SOURCE_REGEXP,
@@ -21,23 +19,23 @@ import {
   getSortByTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import { FieldElement, FieldEventDetail } from "./FieldElement";
-import {
-  FilterByElement,
-  FilterByEventDetail,
-} from "./FilterByElement";
-import { GroupByElement, GroupByEventDetail } from "./GroupByElement";
-import { SortByElement, SortByEventDetail } from "./SortByElement";
+import { FieldElement, FieldDetail } from "./FieldElement";
+import { FilterByElement, FilterByDetail } from "./FilterByElement";
+import { GroupByElement, GroupByDetail } from "./GroupByElement";
+import { SortByElement, SortByDetail } from "./SortByElement";
 
 /**
- * An `hdml-frame` element event detail interface.
+ * `hdml-frame:connected`, `hdml-frame:changed`, `hdml-frame:request`,
+ * `hdml-frame:disconnected` events details interface.
  */
-export interface FrameEventDetail {
+export interface FrameDetail {
   frame: FrameElement;
 }
 
 /**
- * The `FrameElement` class.
+ * `FrameElement` class. Adds an `HTML` tag (`hdml-frame` by default),
+ * which is the root tag for describing the request data frame. The
+ * data frame is a set of fields, filters, sorting and grouping.
  */
 export class FrameElement extends UnifiedElement {
   /**
@@ -45,7 +43,7 @@ export class FrameElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -56,7 +54,7 @@ export class FrameElement extends UnifiedElement {
     },
 
     /**
-     * A `source` property definition.
+     * The `source` property definition.
      */
     source: {
       type: String,
@@ -67,7 +65,7 @@ export class FrameElement extends UnifiedElement {
     },
 
     /**
-     * A `offset` property definition.
+     * The `offset` property definition.
      */
     offset: {
       type: String,
@@ -78,7 +76,7 @@ export class FrameElement extends UnifiedElement {
     },
 
     /**
-     * A `limit` property definition.
+     * The `limit` property definition.
      */
     limit: {
       type: String,
@@ -90,47 +88,47 @@ export class FrameElement extends UnifiedElement {
   };
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * A `source` private property.
+   * The `source` private property.
    */
   private _source: null | string = null;
 
   /**
-   * A `offset` private property.
+   * The `offset` private property.
    */
   private _offset: null | string = null;
 
   /**
-   * A `source` private property.
+   * The `source` private property.
    */
   private _limit: null | string = null;
 
   /**
-   * Attached `hdml-field` elements map.
+   * A map of attached `FieldElement` elements.
    */
   private _fields: Map<string, FieldElement> = new Map();
 
   /**
-   * Attached `hdml-filter-by` element map.
+   * The attached `FilterByElement` element.
    */
   private _filterBy: null | FilterByElement = null;
 
   /**
-   * Attached `hdml-group-by` element map.
+   * The attached `GroupByElement` element.
    */
   private _groupBy: null | GroupByElement = null;
 
   /**
-   * Attached `hdml-sort-by` element map.
+   * The attached `SortByElement` element.
    */
   private _sortBy: null | SortByElement = null;
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || FRAME_NAME_REGEXP.test(val)) {
@@ -153,14 +151,14 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * A `source` setter.
+   * The `source` setter.
    */
   public set source(val: null | string) {
     if (
@@ -192,14 +190,14 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * A `source` getter.
+   * The `source` getter.
    */
   public get source(): null | string {
     return this._source ? this._source.replaceAll("`", '"') : null;
   }
 
   /**
-   * A `offset` setter.
+   * The `offset` setter.
    */
   public set offset(val: null | string) {
     if (val === null || val === "" || FRAME_OFFSET_REGEXP.test(val)) {
@@ -222,14 +220,14 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * A `offset` getter.
+   * The `offset` getter.
    */
   public get offset(): null | string {
     return this._offset;
   }
 
   /**
-   * A `limit` setter.
+   * The `limit` setter.
    */
   public set limit(val: null | string) {
     if (val === null || val === "" || FRAME_LIMIT_REGEXP.test(val)) {
@@ -252,29 +250,28 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * A `limit` getter.
+   * The `limit` getter.
    */
   public get limit(): null | string {
     return this._limit;
   }
 
   /**
-   * The `FrameData` object.
+   * The `FrameDef` object.
    */
-  public get data(): FrameData {
+  public get data(): FrameDef {
     if (!this.name) {
       throw new Error("A `name` property is required.");
     }
     if (!this.source) {
       throw new Error("A `source` property is required.");
     }
-    const fields: FieldData[] = [];
+    const fields: FieldDef[] = [];
     this._fields.forEach((field) => {
       fields.push(field.data);
     });
     return {
       name: this.name,
-      host: "",
       source: this.source,
       offset: parseInt(this.offset || "0", 10),
       limit: parseInt(this.limit || "50000", 10),
@@ -293,7 +290,7 @@ export class FrameElement extends UnifiedElement {
   public connectedCallback(): void {
     super.connectedCallback();
     document.body.dispatchEvent(
-      new CustomEvent<FrameEventDetail>("hdml-frame:connected", {
+      new CustomEvent<FrameDetail>("hdml-frame:connected", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -329,7 +326,7 @@ export class FrameElement extends UnifiedElement {
     this._unwatchGroupBy();
     this._unwatchSortBy();
     document.body.dispatchEvent(
-      new CustomEvent<FrameEventDetail>("hdml-frame:disconnected", {
+      new CustomEvent<FrameDetail>("hdml-frame:disconnected", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -342,18 +339,18 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<slot></slot>`;
   }
 
   /**
-   * Initiates request.
+   * Initializes a request by raising the `hdml-frame:request` event.
    */
-  public request(): void {
+  public query(): void {
     this.dispatchEvent(
-      new CustomEvent<FrameEventDetail>("hdml-frame:request", {
+      new CustomEvent<FrameDetail>("hdml-frame:request", {
         cancelable: false,
         composed: false,
         bubbles: false,
@@ -365,7 +362,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-field` elements changes.
+   * Starts tracking changes to `FieldElement` elements.
    */
   private _watchFields(): void {
     this.queryHdmlChildren<FieldElement>(getFieldTag()).forEach(
@@ -384,7 +381,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-filter-by` element changes.
+   * Starts tracking changes to `FilterByElement` element.
    */
   private _watchFilterBy(): void {
     const filterBy = this.querySelector(getFilterByTag());
@@ -402,7 +399,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-group-by` element changes.
+   * Starts tracking changes to `GroupByElement` element.
    */
   private _watchGroupBy(): void {
     const groupBy = this.querySelector(getGroupByTag());
@@ -420,7 +417,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-sort-by` element changes.
+   * Starts tracking changes to `SortByElement` element.
    */
   private _watchSortBy(): void {
     const sortBy = this.querySelector(getSortByTag());
@@ -438,7 +435,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-field` elements changes.
+   * Stops watching for changes to `FieldElement` elements.
    */
   private _unwatchFields(): void {
     this.removeEventListener(
@@ -456,7 +453,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-filter-by` elements changes.
+   * Stops watching for changes to `FilterByElement` element.
    */
   private _unwatchFilterBy(): void {
     this.removeEventListener(
@@ -473,7 +470,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-group-by` elements changes.
+   * Stops watching for changes to `GroupByElement` element.
    */
   private _unwatchGroupBy(): void {
     this.removeEventListener(
@@ -490,7 +487,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-sort-by` elements changes.
+   * Stops watching for changes to `SortByElement` element.
    */
   private _unwatchSortBy(): void {
     this.removeEventListener(
@@ -507,117 +504,109 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-field:connected` event listener.
+   * `hdml-field:connected` event listener.
    */
   private _fieldConnectedListener = (
-    event: CustomEvent<FieldEventDetail>,
+    event: CustomEvent<FieldDetail>,
   ) => {
     const field = event.detail.field;
     this._attachField(field);
   };
 
   /**
-   * The `hdml-filter-by:connected` event listener.
+   * `hdml-filter-by:connected` event listener.
    */
   private _filterByConnectedListener = (
-    event: CustomEvent<FilterByEventDetail>,
+    event: CustomEvent<FilterByDetail>,
   ) => {
     this._attachFilterBy(event.detail.filterBy);
   };
 
   /**
-   * The `hdml-group-by:connected` event listener.
+   * `hdml-group-by:connected` event listener.
    */
   private _groupByConnectedListener = (
-    event: CustomEvent<GroupByEventDetail>,
+    event: CustomEvent<GroupByDetail>,
   ) => {
     this._attachGroupBy(event.detail.groupBy);
   };
 
   /**
-   * The `hdml-sort-by:connected` event listener.
+   * `hdml-sort-by:connected` event listener.
    */
   private _sortByConnectedListener = (
-    event: CustomEvent<SortByEventDetail>,
+    event: CustomEvent<SortByDetail>,
   ) => {
     this._attachSortBy(event.detail.sortBy);
   };
 
   /**
-   * The `hdml-field:disconnected` event listener.
+   * `hdml-field:disconnected` event listener.
    */
   private _fieldDisconnectedListener = (
-    event: CustomEvent<FieldEventDetail>,
+    event: CustomEvent<FieldDetail>,
   ) => {
     const field = event.detail.field;
     this._detachField(field);
   };
 
   /**
-   * The `hdml-filter-by:disconnected` event listener.
+   * `hdml-filter-by:disconnected` event listener.
    */
   private _filterByDisconnectedListener = (
-    event: CustomEvent<FilterByEventDetail>,
+    event: CustomEvent<FilterByDetail>,
   ) => {
     this._detachFilterBy(event.detail.filterBy);
   };
 
   /**
-   * The `hdml-group-by:disconnected` event listener.
+   * `hdml-group-by:disconnected` event listener.
    */
   private _groupByDisconnectedListener = (
-    event: CustomEvent<GroupByEventDetail>,
+    event: CustomEvent<GroupByDetail>,
   ) => {
     this._detachGroupBy(event.detail.groupBy);
   };
 
   /**
-   * The `hdml-sort-by:disconnected` event listener.
+   * `hdml-sort-by:disconnected` event listener.
    */
   private _sortByDisconnectedListener = (
-    event: CustomEvent<SortByEventDetail>,
+    event: CustomEvent<SortByDetail>,
   ) => {
     this._detachSortBy(event.detail.sortBy);
   };
 
   /**
-   * The `hdml-field:changed` event listener.
+   * `hdml-field:changed` event listener.
    */
-  private _fieldChangedListener = (
-    event: CustomEvent<FieldEventDetail>,
-  ) => {
+  private _fieldChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * The `hdml-filter-by:changed` event listener.
+   * `hdml-filter-by:changed` event listener.
    */
-  private _filterByChangedListener = (
-    event: CustomEvent<FilterByEventDetail>,
-  ) => {
+  private _filterByChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * The `hdml-group-by:changed` event listener.
+   * `hdml-group-by:changed` event listener.
    */
-  private _groupByChangedListener = (
-    event: CustomEvent<GroupByEventDetail>,
-  ) => {
+  private _groupByChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * The `hdml-sort-by:changed` event listener.
+   * `hdml-sort-by:changed` event listener.
    */
-  private _sortByChangedListener = (
-    event: CustomEvent<SortByEventDetail>,
-  ) => {
+  private _sortByChangedListener = () => {
     this._dispatchChangedEvent();
   };
 
   /**
-   * Attaches `hdml-field` element to the fields map.
+   * Attaches a `FieldElement` element to the fields map.
    */
   private _attachField(field: FieldElement) {
     if (field.uid && !this._fields.has(field.uid)) {
@@ -631,7 +620,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Attaches `hdml-filter-by` element.
+   * Attaches a `FilterByElement` element.
    */
   private _attachFilterBy(filterBy: FilterByElement) {
     if (!this._filterBy) {
@@ -645,7 +634,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Attaches `hdml-group-by` element.
+   * Attaches a `GroupByElement` element.
    */
   private _attachGroupBy(groupBy: GroupByElement) {
     if (!this._groupBy) {
@@ -659,7 +648,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Attaches `hdml-sort-by` element.
+   * Attaches a `SortByElement` element.
    */
   private _attachSortBy(sortBy: SortByElement) {
     if (!this._sortBy) {
@@ -673,7 +662,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-field` element from the fields map.
+   * Detaches `FieldElement` element from the fields map.
    */
   private _detachField(field: FieldElement) {
     if (field.uid && this._fields.has(field.uid)) {
@@ -687,7 +676,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-filter-by` element.
+   * Detaches `FilterByElement` element.
    */
   private _detachFilterBy(filterBy: FilterByElement) {
     if (this._filterBy && this._filterBy.uid === filterBy.uid) {
@@ -701,7 +690,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-group-by` element.
+   * Detaches `GroupByElement` element.
    */
   private _detachGroupBy(groupBy: GroupByElement) {
     if (this._groupBy && this._groupBy.uid === groupBy.uid) {
@@ -715,7 +704,7 @@ export class FrameElement extends UnifiedElement {
   }
 
   /**
-   * Detaches `hdml-sort-by` element.
+   * Detaches `SortByElement` element.
    */
   private _detachSortBy(sortBy: SortByElement) {
     if (this._sortBy && this._sortBy.uid === sortBy.uid) {
@@ -733,7 +722,7 @@ export class FrameElement extends UnifiedElement {
    */
   private _dispatchChangedEvent(): void {
     this.dispatchEvent(
-      new CustomEvent<FrameEventDetail>("hdml-frame:changed", {
+      new CustomEvent<FrameDetail>("hdml-frame:changed", {
         cancelable: false,
         composed: false,
         bubbles: false,

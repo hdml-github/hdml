@@ -1,5 +1,4 @@
 /**
- * @fileoverview The `IoElement` class types definition.
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
@@ -9,13 +8,7 @@ import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
 import { Table } from "apache-arrow";
-import {
-  Document,
-  DocumentData,
-  ModelData,
-  FrameData,
-} from "@hdml/schema";
-
+import { Query, QueryDef, ModelDef, FrameDef } from "@hdml/schema";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,
@@ -27,31 +20,33 @@ import {
   getFrameTag,
 } from "../helpers/elementsRegister";
 import { UnifiedElement } from "./UnifiedElement";
-import { ModelEventDetail, ModelElement } from "./ModelElement";
-import { FrameEventDetail, FrameElement } from "./FrameElement";
+import { ModelDetail, ModelElement } from "./ModelElement";
+import { FrameDetail, FrameElement } from "./FrameElement";
 import { Client } from "../services/Client";
 
 /**
- * An `hdml-data` event detail interface.
+ * An `hdml-data` event details interface.
  */
-export interface DataEventDetail {
+export interface DataDetail {
   table: Table;
 }
 
 /**
- * An `IoElement` `json` representation.
+ * A definition of the `HDML` elements retrieved from the current
+ * `HTML` document.
  */
-export type ElementsData = {
+export type ElementsDef = {
   models: {
-    [name: string]: ModelData;
+    [name: string]: ModelDef;
   };
   frames: {
-    [name: string]: FrameData;
+    [name: string]: FrameDef;
   };
 };
 
 /**
- * The `IoElement` class.
+ * `IoElement` class. Responsible for session initialization, as well
+ * as network interaction with the `io`-server.
  */
 export class IoElement extends UnifiedElement {
   /**
@@ -59,7 +54,7 @@ export class IoElement extends UnifiedElement {
    */
   public static properties = {
     /**
-     * A `name` property definition.
+     * The `name` property definition.
      */
     name: {
       type: String,
@@ -70,7 +65,7 @@ export class IoElement extends UnifiedElement {
     },
 
     /**
-     * A `host` property definition.
+     * The `host` property definition.
      */
     host: {
       type: String,
@@ -81,7 +76,7 @@ export class IoElement extends UnifiedElement {
     },
 
     /**
-     * A `tenant` property definition.
+     * The `tenant` property definition.
      */
     tenant: {
       type: String,
@@ -92,7 +87,7 @@ export class IoElement extends UnifiedElement {
     },
 
     /**
-     * A `token` property definition.
+     * The `token` property definition.
      */
     token: {
       type: String,
@@ -104,43 +99,43 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
-   * A `name` private property.
+   * The `name` private property.
    */
   private _name: null | string = null;
 
   /**
-   * A `host` private property.
+   * The `host` private property.
    */
   private _host: null | string = null;
 
   /**
-   * A `tenant` private property.
+   * The `tenant` private property.
    */
   private _tenant: null | string = null;
 
   /**
-   * A `token` private property.
+   * The `token` private property.
    */
   private _token: null | string = null;
 
   /**
-   * Attached `hdml-model` elements map.
+   * Attached `ModelElement` elements map.
    */
   private _models: Map<string, ModelElement> = new Map();
 
   /**
-   * Attached `hdml-frame` elements map.
+   * Attached `FrameElement` elements map.
    */
   private _frames: Map<string, FrameElement> = new Map();
 
   /**
-   * Parsed `hdml` documents map.
+   * Queries map.
    */
-  private _documents: Map<string, Document> = new Map();
+  private _queries: Map<string, Query> = new Map();
 
   /**
-   * Promises that are resolved once all `hdml-model` or `hdml-frame`
-   * updates are done.
+   * Promises that resolve after all updates to `ModelElement` or
+   * `FrameElement` have been performed.
    */
   private _updatesPromises: {
     model: {
@@ -167,22 +162,22 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
-   * The `hdml-model` update debouncer.
+   * `ModelElement` update debouncer.
    */
   private _updateModel: null | debounce<() => Promise<void>> = null;
 
   /**
-   * The `hdml-frame` update debouncer.
+   * `FrameElement` update debouncer.
    */
   private _updateFrame: null | debounce<() => Promise<void>> = null;
 
   /**
-   * Data client.
+   * Network client.
    */
   private _client: null | Client = null;
 
   /**
-   * A `name` setter.
+   * The `name` setter.
    */
   public set name(val: null | string) {
     if (val === null || val === "" || IO_NAME_REGEXP.test(val)) {
@@ -205,14 +200,14 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * A `name` getter.
+   * The `name` getter.
    */
   public get name(): null | string {
     return this._name;
   }
 
   /**
-   * A `host` setter.
+   * The `host` setter.
    */
   public set host(val: null | string) {
     if (val === null || val === "" || IO_HOST_REGEXP.test(val)) {
@@ -235,14 +230,14 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * A `host` getter.
+   * The `host` getter.
    */
   public get host(): null | string {
     return this._host;
   }
 
   /**
-   * A `tenant` setter.
+   * The `tenant` setter.
    */
   public set tenant(val: null | string) {
     if (val === null || val === "" || IO_TENANT_REGEXP.test(val)) {
@@ -265,14 +260,14 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * A `tenant` getter.
+   * The `tenant` getter.
    */
   public get tenant(): null | string {
     return this._tenant;
   }
 
   /**
-   * A `token` setter.
+   * The `token` setter.
    */
   public set token(val: null | string) {
     if (val === null || val === "" || IO_TOKEN_REGEXP.test(val)) {
@@ -295,7 +290,7 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * A `token` getter.
+   * The `token` getter.
    */
   public get token(): null | string {
     return this._token;
@@ -358,24 +353,21 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Component template.
+   * Component renderer.
    */
   public render(): TemplateResult<1> {
     return html`<!-- IoElement -->`;
   }
 
   /**
-   * Returns data objects of the `model`s and `frame`s elements
-   * available in the current `html` document. Throws if detects local
-   * `frame`s links disintegrity (i.e when a local `frame` specified
-   * in the `source` attribute of another local `frame` is missed in
-   * the document).
+   * Returns a definition of the `HDML` elements retrieved from the
+   * current `HTML` document.
    * @throws
    */
-  public async getElementsData(): Promise<ElementsData> {
+  public async getElementsDef(): Promise<ElementsDef> {
     await this._updates();
-    const models: { [name: string]: ModelData } = {};
-    const frames: { [name: string]: FrameData } = {};
+    const models: { [name: string]: ModelDef } = {};
+    const frames: { [name: string]: FrameDef } = {};
 
     // models
     this._models.forEach((model) => {
@@ -416,23 +408,21 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Returns `hdml` document specified by the `uid` if it exist in the
-   * current `html` document, `null` otherwise.
+   * Returns a query generated with respect to the `HDML` element
+   * (`ModelElement` or `FrameElement`) whose identifier is specified
+   * in the `uid` parameter.
    */
-  public async getHdmlDocument(
-    uid: string,
-  ): Promise<null | Document> {
+  public async getQuery(uid: string): Promise<null | Query> {
     await this._updates();
-    if (!this._documents.has(uid)) {
+    if (!this._queries.has(uid)) {
       return null;
     } else {
-      const document = <Document>this._documents.get(uid);
-      return document;
+      return <Query>this._queries.get(uid);
     }
   }
 
   /**
-   * Starts watching for the `hdml-model` elements changes.
+   * Starts tracking changes to `ModelElement` elements.
    */
   private _watchModels(): void {
     document.querySelectorAll(getModelTag()).forEach((model) => {
@@ -449,7 +439,7 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Starts watching for the `hdml-frame` elements changes.
+   * Starts tracking changes to `FrameElement` elements.
    */
   private _watchFrames(): void {
     document.querySelectorAll(getFrameTag()).forEach((frame) => {
@@ -466,7 +456,7 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-model` elements changes.
+   * Stops watching for changes to `ModelElement` elements.
    */
   private _unwatchModels(): void {
     document.body.removeEventListener(
@@ -484,7 +474,7 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Stops watching for the `hdml-frame` elements changes.
+   * Stops watching for changes to `FrameElement` elements.
    */
   private _unwatchFrames(): void {
     document.body.removeEventListener(
@@ -502,87 +492,83 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-model:connected` event listener.
+   * `hdml-model:connected` event listener.
    */
   private _modelConnectedListener = (
-    event: CustomEvent<ModelEventDetail>,
+    event: CustomEvent<ModelDetail>,
   ) => {
     const model = event.detail.model;
     this._attachModel(model);
   };
 
   /**
-   * The `hdml-frame:connected` event listener.
+   * `hdml-frame:connected` event listener.
    */
   private _frameConnectedListener = (
-    event: CustomEvent<FrameEventDetail>,
+    event: CustomEvent<FrameDetail>,
   ) => {
     const frame = event.detail.frame;
     this._attachFrame(frame);
   };
 
   /**
-   * The `hdml-model:disconnected` event listener.
+   * `hdml-model:disconnected` event listener.
    */
   private _modelDisconnectedListener = (
-    event: CustomEvent<ModelEventDetail>,
+    event: CustomEvent<ModelDetail>,
   ) => {
     const model = event.detail.model;
     this._detachModel(model);
   };
 
   /**
-   * The `hdml-frame:disconnected` event listener.
+   * `hdml-frame:disconnected` event listener.
    */
   private _frameDisconnectedListener = (
-    event: CustomEvent<FrameEventDetail>,
+    event: CustomEvent<FrameDetail>,
   ) => {
     const frame = event.detail.frame;
     this._detachFrame(frame);
   };
 
   /**
-   * The `hdml-model:changed` event listener.
+   * `hdml-model:changed` event listener.
    */
-  private _modelChangedListener = (
-    event: CustomEvent<ModelEventDetail>,
-  ) => {
-    this._processModel();
+  private _modelChangedListener = () => {
+    this._handleModelsUpdates();
   };
 
   /**
-   * The `hdml-model:request` event listener.
+   * `hdml-model:request` event listener.
    */
   private _modelRequestListener = (
-    event: CustomEvent<ModelEventDetail>,
+    event: CustomEvent<ModelDetail>,
   ) => {
-    this._processRequest(event.detail.model.uid).catch((reason) => {
+    this._handleQuery(event.detail.model.uid).catch((reason) => {
       console.error(reason);
     });
   };
 
   /**
-   * The `hdml-frame:changed` event listener.
+   * `hdml-frame:changed` event listener.
    */
-  private _frameChangedListener = (
-    event: CustomEvent<FrameEventDetail>,
-  ) => {
-    this._processFrame();
+  private _frameChangedListener = () => {
+    this._handleFramesUpdates();
   };
 
   /**
-   * The `hdml-frame:request` event listener.
+   * `hdml-frame:request` event listener.
    */
   private _frameRequestListener = (
-    event: CustomEvent<FrameEventDetail>,
+    event: CustomEvent<FrameDetail>,
   ) => {
-    this._processRequest(event.detail.frame.uid).catch((reason) => {
+    this._handleQuery(event.detail.frame.uid).catch((reason) => {
       console.error(reason);
     });
   };
 
   /**
-   * Attaches `hdml-model` element to the models map.
+   * Attaches a `ModelElement` element to the models map.
    */
   private _attachModel(model: ModelElement) {
     if (model.uid && !this._models.has(model.uid)) {
@@ -595,12 +581,12 @@ export class IoElement extends UnifiedElement {
         "hdml-model:request",
         this._modelRequestListener,
       );
-      this._processModel();
+      this._handleModelsUpdates();
     }
   }
 
   /**
-   * Attaches `hdml-frame` element to the frames map.
+   * Attaches `FrameElement` element to the frames map.
    */
   private _attachFrame(frame: FrameElement) {
     if (frame.uid && !this._frames.has(frame.uid)) {
@@ -613,12 +599,12 @@ export class IoElement extends UnifiedElement {
         "hdml-frame:request",
         this._frameRequestListener,
       );
-      this._processFrame();
+      this._handleFramesUpdates();
     }
   }
 
   /**
-   * Detaches `hdml-model` element from the models map.
+   * Detaches `ModelElement` element from the models map.
    */
   private _detachModel(model: ModelElement) {
     if (model.uid && this._models.has(model.uid)) {
@@ -631,12 +617,12 @@ export class IoElement extends UnifiedElement {
         this._modelRequestListener,
       );
       this._models.delete(model.uid);
-      this._documents.delete(model.uid);
+      this._queries.delete(model.uid);
     }
   }
 
   /**
-   * Detaches `hdml-frame` element from the frames map.
+   * Detaches `FrameElement` element from the frames map.
    */
   private _detachFrame(frame: FrameElement) {
     if (frame.uid && this._frames.has(frame.uid)) {
@@ -649,14 +635,14 @@ export class IoElement extends UnifiedElement {
         this._frameRequestListener,
       );
       this._frames.delete(frame.uid);
-      this._documents.delete(frame.uid);
+      this._queries.delete(frame.uid);
     }
   }
 
   /**
-   * Processes models.
+   * Handles models updates.
    */
-  private _processModel() {
+  private _handleModelsUpdates() {
     if (this._updateModel) {
       if (!this._updatesPromises.model.promise) {
         this._updatesPromises.model.promise = new Promise(
@@ -671,9 +657,9 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Processes frames.
+   * Handles frames updates.
    */
-  private _processFrame() {
+  private _handleFramesUpdates() {
     if (this._updateFrame) {
       if (!this._updatesPromises.frame.promise) {
         this._updatesPromises.frame.promise = new Promise(
@@ -688,23 +674,23 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Process request.
+   * Handles query.
    * @throws
    */
-  private async _processRequest(uid: string): Promise<void> {
+  private async _handleQuery(uid: string): Promise<void> {
     await this._updates();
-    if (!this._documents.has(uid)) {
-      throw new Error(`Document is missing: ${uid}`);
+    if (!this._queries.has(uid)) {
+      throw new Error(`Query is missing: ${uid}`);
     } else {
-      const doc = <Document>this._documents.get(uid);
+      const query = <Query>this._queries.get(uid);
       if (!this._client) {
         throw new Error("Client is missing");
       } else {
-        const name = await this._client.hdmlPost(
+        const name = await this._client.postQuery(
           uid,
-          <Buffer>doc.buffer,
+          <Buffer>query.buffer,
         );
-        const table = await this._client.hdmlGet(uid, name);
+        const table = await this._client.getFile(uid, name);
         let target: false | Element = false;
         if (this._models.has(uid)) {
           target = <ModelElement>this._models.get(uid);
@@ -714,7 +700,7 @@ export class IoElement extends UnifiedElement {
         }
         if (target) {
           target.dispatchEvent(
-            new CustomEvent<DataEventDetail>("hdml-data", {
+            new CustomEvent<DataDetail>("hdml-data", {
               cancelable: false,
               composed: false,
               bubbles: false,
@@ -729,17 +715,14 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * The `hdml-model` changed debouncer callback.
+   * Callback of the `ModelElement` changes debouncer.
    */
   private _modelDebounceCallback = () => {
     this._models.forEach((model) => {
-      const data: DocumentData = {
-        name: "",
-        tenant: "",
-        token: "",
+      const queryDef: QueryDef = {
         model: model.data,
       };
-      this._documents.set(model.uid, new Document(data));
+      this._queries.set(model.uid, new Query(queryDef));
     });
     this._updatesPromises.model.resolve &&
       this._updatesPromises.model.resolve();
@@ -751,16 +734,13 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
-   * The `hdml-frame` changed debouncer callback.
+   * Callback of the `FrameElement` changes debouncer.
    */
   private _frameDebounceCallback = () => {
     this._frames.forEach((frame) => {
       let source = frame.source;
       let _frame = frame.data;
-      const data: DocumentData = {
-        name: "",
-        tenant: "",
-        token: "",
+      const queryDef: QueryDef = {
         frame: _frame,
       };
       while (source && source.indexOf("?") === 0) {
@@ -768,7 +748,7 @@ export class IoElement extends UnifiedElement {
           const [, modelName] = source.split("?hdml-model=");
           this._models.forEach((model) => {
             if (model.name === modelName) {
-              data.model = model.data;
+              queryDef.model = model.data;
             }
           });
           source = null;
@@ -790,7 +770,7 @@ export class IoElement extends UnifiedElement {
           throw new Error(`Invalid \`source\` value: ${source}`);
         }
       }
-      this._documents.set(frame.uid, new Document(data));
+      this._queries.set(frame.uid, new Query(queryDef));
     });
     this._updatesPromises.frame.resolve &&
       this._updatesPromises.frame.resolve();
@@ -802,7 +782,8 @@ export class IoElement extends UnifiedElement {
   };
 
   /**
-   * Awaits the `hdml-model` and `hdml-frame` elements updates.
+   * Waits for the updates of the `ModelElement` and `FrameElement` to
+   * complete.
    */
   private async _updates(): Promise<void> {
     const promises: Promise<void>[] = [];
