@@ -84,7 +84,7 @@ export class Queries {
    * Returns a completed `html` fragment describing the specified
    * `query` for the specified `tenant`.
    */
-  public getCompletedHtmlFragment(
+  private getCompletedHtmlFragment(
     tenant: string,
     file: TenantFile,
     query: HdmlQuery,
@@ -95,7 +95,7 @@ export class Queries {
   /**
    * Returns complete query.
    */
-  public completeQuery(
+  private completeQuery(
     tenant: string,
     file: TenantFile,
     query: HdmlQuery,
@@ -141,7 +141,7 @@ export class Queries {
    * Returns stored query definition specified by the `uri` for the
    * specified `tenant`, or `null` otherwise.
    */
-  public getStoredQueryDef(
+  private getStoredQueryDef(
     tenant: string,
     file: TenantFile,
     uri: string,

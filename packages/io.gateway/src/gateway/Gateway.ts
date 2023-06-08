@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Module } from "@nestjs/common";
 import { Options } from "./services/Options";
 import { Tenants } from "./services/Tenants";
