@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { Query } from "@hdml/schema";
 import {
@@ -8,17 +14,17 @@ import {
   Consumer,
 } from "@hdml/io.common";
 import { Options } from "./Options";
-import { TrinoDataset } from "../../executor/TrinoDataset";
+import { SqlEngineDataset } from "../../executor/SqlEngineDataset";
 
 /**
  * Gateway queue service class.
  */
 @Injectable()
-export class QuerierQueue extends BaseQueue implements OnModuleInit {
+export class Queue extends BaseQueue implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new BaseLogger(QuerierQueue.name, {
+  private readonly _logger = new BaseLogger("Queue(querier)", {
     timestamp: true,
   });
 
@@ -54,7 +60,7 @@ export class QuerierQueue extends BaseQueue implements OnModuleInit {
   }
 
   /**
-   * Runs async workflow.
+   * Runs async initialization workflow.
    */
   private async runWorkflow(): Promise<void> {
     await this.ensureQueries();
@@ -67,6 +73,9 @@ export class QuerierQueue extends BaseQueue implements OnModuleInit {
     );
   }
 
+  /**
+   * Handles an incoming request message and processes it.
+   */
   private async queryHandler(
     message: Message,
     consumer: Consumer,
@@ -75,13 +84,13 @@ export class QuerierQueue extends BaseQueue implements OnModuleInit {
     const stats = await this.stats(name);
     if (stats) {
       const producer = await this.dataProducer(name);
-      const dataset = new TrinoDataset(
+      const dataset = new SqlEngineDataset(
         new Query(message.getData()),
         this._options,
       );
       for await (const batch of dataset) {
         const properties: { [key: string]: string } = {
-          state: batch.state,
+          state: JSON.stringify(batch.state),
         };
         if (batch.error) {
           properties.error = batch.error;

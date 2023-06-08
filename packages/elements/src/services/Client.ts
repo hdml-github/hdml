@@ -128,7 +128,7 @@ export class Client {
   ): Promise<string> {
     const resp = await this.fetch({
       method: "POST",
-      api: "hdml",
+      api: "query",
       signal,
       body,
     });
@@ -150,7 +150,7 @@ export class Client {
   ): Promise<Table> {
     const response = await this.fetch({
       method: "GET",
-      api: "hdml",
+      api: "query",
       path: `/${name}`,
       signal,
     });
@@ -167,7 +167,7 @@ export class Client {
    */
   private async fetch(config: {
     method: "GET" | "POST" | "PUT" | "DELETE";
-    api: "session" | "hdml";
+    api: "session" | "query";
     path?: string;
     params?: Record<string, string>;
     signal?: AbortSignal;

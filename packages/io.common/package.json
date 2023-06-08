@@ -24,7 +24,7 @@
     "test_node": "npm run compile_tst && ../../node_modules/.bin/jest --config ../../.jestrc.js --roots ./packages/io.common/tst --coverageDirectory ./packages/io.common/coverage",
     "test_web": "",
     "test": "npm run test_node",
-    "clear": "rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
+    "clear": "rm -rf tst && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
     "web": "",
     "svc": ""

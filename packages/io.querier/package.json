@@ -28,8 +28,8 @@
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_bin && npm run compile_dts",
     "test_node": "npm run compile_tst && ../../node_modules/.bin/jest --config ../../.jestrc.js --roots ./packages/io.querier/tst --coverageDirectory ./packages/io.querier/coverage",
     "test_web": "",
-    "test": "npm run test_node",
-    "clear": "rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
+    "test": "npm run test_node && npm run test_web",
+    "clear": "rm -rf tst && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
     "web": "",
     "svc": "clear && npm run compile_cjs && node ./cjs/querier"

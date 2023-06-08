@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
   RecordBatch,
   RecordBatchStreamWriter,
@@ -11,45 +17,34 @@ import {
   Utf8,
   Uint32,
 } from "apache-arrow";
-import { Query } from "@hdml/schema";
+import { Query, FileState } from "@hdml/schema";
 import { getSQL } from "@hdml/orchestrator";
 import { Options } from "../querier/services/Options";
 import {
-  TrinoClient,
+  SqlEngineClient,
   DataResponse,
   DataColumn,
   DataRow,
-} from "./TrinoClient";
-
-/**
- * The state of the `TrinoDataset`.
- */
-export enum State {
-  PROCESSING = "PROCESSING",
-  SCHEMA = "SCHEMA",
-  CHUNK = "CHUNK",
-  DONE = "DONE",
-  FAIL = "FAIL",
-}
+} from "./SqlEngineClient";
 
 /**
  * Fragment of the response to the published query.
  */
 export type Chunk = {
-  state: State;
+  state: FileState;
   warning?: string;
   error?: string;
   data?: Uint8Array;
 };
 
 /**
- * An asynchronous iterator that returns pieces of data from a
- * published query.
+ * An asynchronous iterator that returns chunks of data from a
+ * published request.
  */
-export class TrinoDataset implements AsyncIterable<Chunk> {
+export class SqlEngineDataset implements AsyncIterable<Chunk> {
   private _options: Options;
-  private _client: TrinoClient;
-  private _state: State = State.PROCESSING;
+  private _client: SqlEngineClient;
+  private _state: FileState = FileState.PROCESSING;
   private _promise: null | Promise<DataResponse> = null;
   private _next: null | string = null;
   private _schema: null | Schema = null;
@@ -59,18 +54,21 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
    */
   public constructor(query: Query, options: Options) {
     this._options = options;
-    this._client = new TrinoClient({
+    this._client = new SqlEngineClient({
       engine: "trino",
-      host: this._options.getTrinoHost(),
-      port: this._options.getTrinoPort(),
-      catalog: this._options.getTrinoCatalog(),
-      schema: this._options.getTrinoSchema(),
+      host: this._options.getSqlEngineHost(),
+      port: this._options.getSqlEnginePort(),
+      catalog: this._options.getSqlEngineCatalog(),
+      schema: this._options.getSqlEngineSchema(),
       user: "hdml",
       source: "TrinoDataset (AsyncIterableDataset)",
     });
     this._promise = this._client.post(getSQL(query), {});
   }
 
+  /**
+   * Async iterator.
+   */
   public async *[Symbol.asyncIterator](): AsyncGenerator<Chunk> {
     let res: DataResponse;
     if (this._promise) {
@@ -87,7 +85,7 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
       this._next = next;
       this._state = state;
       if (!this._schema && schema) {
-        this._state = State.SCHEMA;
+        this._state = FileState.SCHEMA;
         this._schema = schema;
         yield {
           state: this._state,
@@ -95,17 +93,17 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
         };
       }
       if (chunk) {
-        this._state = State.CHUNK;
+        this._state = FileState.CHUNK;
         yield {
           state: this._state,
           data: chunk,
         };
       }
-      if (state === State.DONE) {
+      if (state === FileState.DONE) {
         this._state = state;
         yield { state: this._state };
       }
-      if (state === State.FAIL) {
+      if (state === FileState.FAIL) {
         this._state = state;
         const error =
           `Type: ${res.error?.errorType || "n/a"}\n` +
@@ -119,7 +117,7 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
 
   private responseHandler(
     res: DataResponse,
-  ): [string | null, State, Schema | null, Uint8Array | null] {
+  ): [string | null, FileState, Schema | null, Uint8Array | null] {
     const next = res.nextUri || null;
     const state = this.parseState(res);
     const schema = this.parseSchema(res.columns);
@@ -127,19 +125,19 @@ export class TrinoDataset implements AsyncIterable<Chunk> {
     return [next, state, schema, chunk];
   }
 
-  private parseState(res: DataResponse): State {
+  private parseState(res: DataResponse): FileState {
     switch (res.stats.state) {
       default:
       case "QUEUED":
       case "PLANNING":
       case "STARTING":
       case "RUNNING":
-        return State.PROCESSING;
+        return FileState.PROCESSING;
       case "FINISHED":
       case "CANCELED":
-        return State.DONE;
+        return FileState.DONE;
       case "FAILED":
-        return State.FAIL;
+        return FileState.FAIL;
     }
   }
 

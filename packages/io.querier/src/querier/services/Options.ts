@@ -1,36 +1,42 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Injectable } from "@nestjs/common";
 import { BaseOptions } from "@hdml/io.common";
 
 /**
- * Options service.
+ * Options of the `Querier` service.
  */
 @Injectable()
 export class Options extends BaseOptions {
   /**
-   * Returns Trino host.
+   * Returns the SQL engine host.
    */
-  public getTrinoHost(): string {
+  public getSqlEngineHost(): string {
     return "localhost";
   }
 
   /**
-   * Returns Trino port.
+   * Returns the SQL engine port.
    */
-  public getTrinoPort(): number {
+  public getSqlEnginePort(): number {
     return 8080;
   }
 
   /**
-   * Returns Trino catalog to query from.
+   * Returns the SQL engine catalog.
    */
-  public getTrinoCatalog(): undefined | string {
+  public getSqlEngineCatalog(): undefined | string {
     return;
   }
 
   /**
-   * Returns Trino schema to query from.
+   * Returns SQL engine schema.
    */
-  public getTrinoSchema(): undefined | string {
+  public getSqlEngineSchema(): undefined | string {
     return;
   }
 }

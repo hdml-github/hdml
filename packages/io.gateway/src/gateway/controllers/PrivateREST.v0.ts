@@ -1,15 +1,13 @@
-import {
-  Controller,
-  Get,
-  Param,
-  Query,
-  HttpException,
-  HttpStatus,
-} from "@nestjs/common";
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
+import { Controller, Get, Param, Query } from "@nestjs/common";
 import { BaseLogger } from "@hdml/io.common";
-import { Filer } from "../services/Filer";
+import { Tenants } from "../services/Tenants";
 import { Tokens } from "../services/Tokens";
-import { Options } from "../services/Options";
 
 /**
  * Private REST API controller.
@@ -27,9 +25,8 @@ export class PrivateREST {
    * Class constructor.
    */
   constructor(
-    private readonly _filer: Filer,
     private readonly _tokens: Tokens,
-    private readonly _options: Options,
+    private readonly _tenants: Tenants,
   ) {}
 
   /**
@@ -51,7 +48,7 @@ export class PrivateREST {
     });
     try {
       return this._tokens.getAccessToken(
-        this._filer.getPublicKey(tenant),
+        this._tenants.getPublicKey(tenant),
         ttl,
         scope,
       );

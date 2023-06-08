@@ -1,23 +1,20 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Dir, stat, opendir, readdir, readFile } from "fs";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { KeyLike } from "jose";
 import { NodeVM, VMScript } from "vm2";
-import {
-  Injectable,
-  Logger,
-  OnModuleInit,
-  HttpException,
-  HttpStatus,
-  StreamableFile,
-} from "@nestjs/common";
-import { ModelData, FrameData, Document } from "@hdml/schema";
-import { getHTML } from "@hdml/orchestrator";
-import { ElementsData } from "@hdml/elements";
+import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { ModelDef, FrameDef, QueryDef } from "@hdml/schema";
+import { ElementsDef } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
 import { HookFn, Compiler } from "./Compiler";
-import { GatewayQueue } from "./GatewayQueue";
 
 /**
  * List of the standard environment variables keys.
@@ -34,15 +31,15 @@ export type EnvTable = {
 /**
  * Tenant files data.
  */
-export type TenantFiles = {
+export type TenantFile = {
   env: EnvTable;
   key: KeyLike;
   pub: KeyLike;
   hook: HookFn;
-  docs: {
+  defs: {
     [path: string]: {
-      model?: ModelData;
-      frame?: FrameData;
+      model?: ModelDef;
+      frame?: FrameDef;
     };
   };
 };
@@ -51,11 +48,11 @@ export type TenantFiles = {
  * Files system service.
  */
 @Injectable()
-export class Filer implements OnModuleInit {
+export class Tenants implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new Logger(Filer.name, {
+  private readonly _logger = new Logger(Tenants.name, {
     timestamp: true,
   });
 
@@ -67,7 +64,7 @@ export class Filer implements OnModuleInit {
   /**
    * Tenants files map.
    */
-  private _tenants: Map<string, TenantFiles> = new Map();
+  private _tenants: Map<string, TenantFile> = new Map();
 
   /**
    * Class constructor.
@@ -76,7 +73,6 @@ export class Filer implements OnModuleInit {
     private readonly _options: Options,
     private readonly _tokens: Tokens,
     private readonly _compiler: Compiler,
-    private readonly _queue: GatewayQueue,
   ) {}
 
   /**
@@ -102,7 +98,7 @@ export class Filer implements OnModuleInit {
    */
   public getEnvTable(tenant: string): null | EnvTable {
     if (this._tenants.has(tenant)) {
-      return (<TenantFiles>this._tenants.get(tenant)).env;
+      return (<TenantFile>this._tenants.get(tenant)).env;
     } else {
       return null;
     }
@@ -114,7 +110,7 @@ export class Filer implements OnModuleInit {
    */
   public getPublicKey(tenant: string): null | KeyLike {
     if (this._tenants.has(tenant)) {
-      return (<TenantFiles>this._tenants.get(tenant)).pub;
+      return (<TenantFile>this._tenants.get(tenant)).pub;
     } else {
       return null;
     }
@@ -126,129 +122,18 @@ export class Filer implements OnModuleInit {
    */
   public getPrivateKey(tenant: string): null | KeyLike {
     if (this._tenants.has(tenant)) {
-      return (<TenantFiles>this._tenants.get(tenant)).key;
+      return (<TenantFile>this._tenants.get(tenant)).key;
     } else {
       return null;
     }
   }
 
   /**
-   * Posts specified `hdml` `document` and returns its unique
-   * identifier.
-   * @throws
+   * Returns tenant file if exists, or `null` otherwise.
    */
-  public async postHdmlDocument(
-    tenant: string,
-    context: object,
-    document: Document,
-  ): Promise<StreamableFile> {
+  public getTenantFile(tenant: string): null | TenantFile {
     if (this._tenants.has(tenant)) {
-      const hook = <HookFn>this._tenants.get(tenant)?.hook;
-      const html = this.getHtmlDocument(tenant, document);
-      const hdml = await this._compiler.getHdmlDocument(
-        html,
-        hook,
-        context,
-      );
-      if (hdml) {
-        try {
-          return this._queue.postHdmlDocument(hdml);
-        } catch (error) {
-          const message = (<Error>error).message;
-          throw new HttpException(
-            message,
-            HttpStatus.FAILED_DEPENDENCY,
-          );
-        }
-      } else {
-        throw new HttpException(
-          `HdmlDocument was not completed`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-    } else {
-      throw new HttpException(
-        `Tenant files are missed: ${tenant}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  /**
-   * Returns document's `file` stream.
-   */
-  public async getHdmlDocumentFile(
-    file: string,
-  ): Promise<StreamableFile> {
-    return this._queue.getHdmlDocumentFile(file);
-  }
-
-  /**
-   * Returns complete queried `html` document for the specified
-   * `tenant`.
-   */
-  public getHtmlDocument(tenant: string, document: Document): string {
-    return getHTML(this.getHdmlDocument(tenant, document));
-  }
-
-  /**
-   * Returns complete queried `hdml` document for the specified
-   * `tenant`.
-   */
-  public getHdmlDocument(
-    tenant: string,
-    document: Document,
-  ): Document {
-    if (!this.isValidDocument(document)) {
-      throw new HttpException(
-        "Invalid document",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    if (this.isCompleteDocument(document)) {
-      return document;
-    } else {
-      const frame = <FrameData>document.frame;
-      let parent = frame;
-      while (parent.parent) parent = parent.parent;
-      const data = this.getHdmlDocumentData(tenant, parent.source);
-      if (!data) {
-        throw new HttpException(
-          `DocumentData is missing: ${parent.source}`,
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      if (!data.model) {
-        throw new HttpException(
-          `Document model is missing: ${parent.source}`,
-          HttpStatus.NOT_FOUND,
-        );
-      }
-      parent.parent = data.frame;
-      return new Document({
-        name: "",
-        tenant: "",
-        token: "",
-        model: data.model,
-        frame,
-      });
-    }
-  }
-
-  /**
-   * Returns `hdml` document for the specified `tenant` by the
-   * specified `uri`, or `null` otherwise.
-   */
-  public getHdmlDocumentData(
-    tenant: string,
-    uri: string,
-  ): null | {
-    model?: ModelData;
-    frame?: FrameData;
-  } {
-    if (this._tenants.has(tenant)) {
-      const doc = (<TenantFiles>this._tenants.get(tenant)).docs[uri];
-      return doc || null;
+      return <TenantFile>this._tenants.get(tenant);
     } else {
       return null;
     }
@@ -298,15 +183,15 @@ export class Filer implements OnModuleInit {
         const key = await this.loadKey(tenant);
         const pub = await this.loadPub(tenant);
         const hook = await this.loadHook(tenant);
-        const docs = this.completeDocs(
-          await this.loadFragments(tenant),
+        const defs = this.completeDefs(
+          await this.loadFragmentsDefs(tenant),
         );
         this._tenants.set(tenant, {
           env,
           key,
           pub,
           hook,
-          docs,
+          defs,
         });
       }
     }
@@ -386,11 +271,12 @@ export class Filer implements OnModuleInit {
   }
 
   /**
-   * Load tenant `hdml` fragments hash map object.
+   * Loads the tenant `html` fragments and returns the hash map of
+   * their elements definitions.
    */
-  private async loadFragments(
+  private async loadFragmentsDefs(
     tenant: string,
-  ): Promise<{ [dir: string]: ElementsData }> {
+  ): Promise<{ [dir: string]: ElementsDef }> {
     const root = path.resolve(
       this._options.getProjectPath(),
       tenant,
@@ -400,27 +286,27 @@ export class Filer implements OnModuleInit {
       (file) =>
         file.indexOf(`.${this._options.getTenantDocumentsExt()}`) > 0,
     );
-    const hdmls = await this.loadHdmls(
+    const defs = await this.loadFilesDefs(
       tenant,
       this._options.getTenantDocumentsPath(),
       files,
     );
-    return hdmls;
+    return defs;
   }
 
   /**
-   * Loads `hdml` files recursively starting from the specified `dir`.
-   * Returns a hash map with the keys equal to a file path and value
-   * equal to a file content.
+   * Loads specified `files`, compiles them to the `ElementsDef` and
+   * returns a hash map with the keys equal to the file path and the
+   * value equal to the file `ElementsDef`.
    */
-  private async loadHdmls(
+  private async loadFilesDefs(
     tenant: string,
-    directory: string,
+    root: string,
     files: string[],
-  ): Promise<{ [dir: string]: ElementsData }> {
-    const docs: { [dir: string]: ElementsData } = {};
+  ): Promise<{ [dir: string]: ElementsDef }> {
+    const defs: { [dir: string]: ElementsDef } = {};
     const promises = files.map((file) => {
-      return new Promise<ElementsData>((resolve, reject) => {
+      return new Promise<ElementsDef>((resolve, reject) => {
         readFile(file, { encoding: "utf8" }, (err, hdml) => {
           if (err) {
             reject(err);
@@ -430,22 +316,18 @@ export class Filer implements OnModuleInit {
         });
       });
     });
-    const datas = await Promise.all<ElementsData>(promises);
+    const datas = await Promise.all<ElementsDef>(promises);
     files.forEach((file, i) => {
       const key = file.split(
-        path.resolve(
-          this._options.getProjectPath(),
-          tenant,
-          directory,
-        ),
+        path.resolve(this._options.getProjectPath(), tenant, root),
       )[1];
-      docs[key] = datas[i];
+      defs[key] = datas[i];
     });
-    return docs;
+    return defs;
   }
 
   /**
-   * Loads file from disk and returns its content.
+   * Loads file from the disk and returns its content.
    */
   private async loadFile(file: string): Promise<string> {
     if (!(await this.isFileExist(file))) {
@@ -464,7 +346,7 @@ export class Filer implements OnModuleInit {
   }
 
   /**
-   * Recursive find all files in specified `directory`.
+   * Recursively finds all files in the specified `directory`.
    */
   private async getFilesList(directory: string): Promise<string[]> {
     return new Promise((resolve, reject) => {
@@ -499,7 +381,7 @@ export class Filer implements OnModuleInit {
   }
 
   /**
-   * Determine is specified `directory` exist or not.
+   * Determines is specified `directory` exist or not.
    */
   private async isDirExist(directory: string): Promise<boolean> {
     return new Promise((resolve) => {
@@ -514,7 +396,7 @@ export class Filer implements OnModuleInit {
   }
 
   /**
-   * Determine is specified `file` exist or not.
+   * Determines is specified `file` exist or not.
    */
   private async isFileExist(file: string): Promise<boolean> {
     return new Promise((resolve) => {
@@ -529,27 +411,22 @@ export class Filer implements OnModuleInit {
   }
 
   /**
-   * Completes fragments to a document's state.
+   * Completes the `html` fragments definitions by resolving the
+   * `source` attributes of the `FrameElement` elements.
    */
-  private completeDocs(fragments: { [path: string]: ElementsData }): {
-    [path: string]: {
-      model?: ModelData;
-      frame?: FrameData;
-    };
+  private completeDefs(defs: { [path: string]: ElementsDef }): {
+    [path: string]: QueryDef;
   } {
-    const documents: {
-      [path: string]: {
-        model?: ModelData;
-        frame?: FrameData;
-      };
+    const completed: {
+      [path: string]: QueryDef;
     } = {};
-    Object.keys(fragments).forEach((path: string) => {
-      const fragment = fragments[path];
+    Object.keys(defs).forEach((path: string) => {
+      const fragment = defs[path];
       const models = Object.keys(fragment.models);
       const frames = Object.keys(fragment.frames);
       if (models.length) {
         models.forEach((name) => {
-          documents[`${path}?hdml-model=${name}`] = {
+          completed[`${path}?hdml-model=${name}`] = {
             model: fragment.models[name],
           };
         });
@@ -559,21 +436,21 @@ export class Filer implements OnModuleInit {
           const uri = `${path}?hdml-frame=${name}`;
           const frame = fragment.frames[name];
           const source = frame.source;
-          documents[uri] = {
-            model: this.lookupModel(fragments, path, source),
+          completed[uri] = {
+            model: this.lookupModel(defs, path, source),
             frame: frame,
           };
           if (source.indexOf("/") === 0) {
             if (source.indexOf("?hdml-frame=") > 0) {
               const [path, name] = source.split("?hdml-frame=");
-              const parent = fragments[path]?.frames[name];
-              (<FrameData>documents[uri].frame).parent = parent;
+              const parent = defs[path]?.frames[name];
+              (<FrameDef>completed[uri].frame).parent = parent;
             }
           }
         });
       }
     });
-    return documents;
+    return completed;
   }
 
   /**
@@ -581,26 +458,26 @@ export class Filer implements OnModuleInit {
    * specified `fragment`.
    */
   private lookupModel(
-    fragments: { [path: string]: ElementsData },
+    defs: { [path: string]: ElementsDef },
     current: string,
     source: string,
-  ): ModelData {
+  ): ModelDef {
     let cnt = 0;
     let src: null | string = source;
     let curr = current;
     while (src && cnt < 100) {
       cnt++;
-      this.assertSource(fragments, curr, src);
+      this.assertSource(defs, curr, src);
       const index = src.indexOf("?hdml-frame=");
       if (index >= 0) {
         const [path, name]: string[] = src.split("?hdml-frame=");
         const uri: string = index === 0 ? curr : path;
-        src = fragments[uri]?.frames[name]?.source;
+        src = defs[uri]?.frames[name]?.source;
         curr = uri;
       } else {
         const [path, name] = src.split("?hdml-model=");
         const uri: string = path.length === 0 ? curr : path;
-        return fragments[uri]?.models[name];
+        return defs[uri]?.models[name];
       }
     }
     throw new Error(
@@ -613,7 +490,7 @@ export class Filer implements OnModuleInit {
    * specified `fragments`.
    */
   private assertSource(
-    fragments: { [path: string]: ElementsData },
+    defs: { [path: string]: ElementsDef },
     current: string,
     source: string,
   ): void {
@@ -627,41 +504,27 @@ export class Filer implements OnModuleInit {
     }
     if (modelIndex === 0) {
       const [, name] = source.split("?hdml-model=");
-      if (!fragments[current]?.models[name]) {
+      if (!defs[current]?.models[name]) {
         throw new Error(`Specified \`model\` is missing: ${source}`);
       }
     }
     if (modelIndex > 0) {
       const [path, name] = source.split("?hdml-model=");
-      if (!fragments[path]?.models[name]) {
+      if (!defs[path]?.models[name]) {
         throw new Error(`Specified \`model\` is missing: ${source}`);
       }
     }
     if (frameIndex === 0) {
       const [, name] = source.split("?hdml-frame=");
-      if (!fragments[current]?.frames[name]) {
+      if (!defs[current]?.frames[name]) {
         throw new Error(`Specified \`frame\` is missing: ${source}`);
       }
     }
     if (frameIndex > 0) {
       const [path, name] = source.split("?hdml-frame=");
-      if (!fragments[path]?.frames[name]) {
+      if (!defs[path]?.frames[name]) {
         throw new Error(`Specified \`frame\` is missing: ${source}`);
       }
     }
-  }
-
-  /**
-   * Determine whether specified `document` is valid or not.
-   */
-  private isValidDocument(document: Document): boolean {
-    return !!document.model || !!document.frame;
-  }
-
-  /**
-   * Determine whether specified `document` is complete or not.
-   */
-  private isCompleteDocument(document: Document): boolean {
-    return !!document.model;
   }
 }

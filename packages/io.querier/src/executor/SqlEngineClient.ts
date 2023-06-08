@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { URL } from "url";
 import { Agent as HttpAgent, request as HttpRequest } from "http";
 import { Agent as HttpsAgent, request as HttpsRequest } from "https";
@@ -116,7 +122,7 @@ const TrinoHeaders: HeadersDict = {
 };
 
 /**
- * Presto/Trino response state.
+ * Status of the SQL engine response.
  */
 export type ResponseState =
   | "QUEUED"
@@ -128,7 +134,7 @@ export type ResponseState =
   | "FAILED";
 
 /**
- * Presto/Trino data column definition.
+ * SQL engine data column definition.
  */
 export type DataColumn = {
   name: string;
@@ -143,12 +149,12 @@ export type DataColumn = {
 };
 
 /**
- * Presto/Trino data row definition.
+ * SQL engine data row definition.
  */
 export type DataRow = Array<null | number | string>;
 
 /**
- * Presto/Trino data response definition.
+ * SQL engine data response definition.
  */
 export interface DataResponse {
   id: string;
@@ -224,9 +230,9 @@ export interface DataResponse {
 }
 
 /**
- * An `HttpClient` options.
+ * SQL engine client settings.
  */
-export type ClientOptions = {
+export type Options = {
   engine: "presto" | "trino";
   host?: string;
   port?: number;
@@ -247,9 +253,9 @@ export type ClientOptions = {
 };
 
 /**
- * An http client for the Presto/Trino SQL query engine.
+ * HTTP client for the SQL query engine.
  */
-export class TrinoClient {
+export class SqlEngineClient {
   private _version = "0.0.0";
   private _headers: HeadersDict;
   private _userAgent: string;
@@ -271,7 +277,7 @@ export class TrinoClient {
   /**
    * Class constructor.
    */
-  constructor(options: ClientOptions) {
+  constructor(options: Options) {
     if (options.custom_auth && options.basic_auth) {
       throw new Error(
         "Both params `custom_auth` and `basic_auth` are specified.",
@@ -282,7 +288,6 @@ export class TrinoClient {
         "A catalog is required if a schema is provided.",
       );
     }
-
     this._headers =
       options.engine === "presto" ? PrestoHeaders : TrinoHeaders;
     this._userAgent = `hdml-client@${this._version}`;
@@ -303,19 +308,17 @@ export class TrinoClient {
           `${options.basic_auth.user}:${options.basic_auth.password}`,
         ).toString("base64");
     }
-
     if (!options.ssl) {
       this._protocol = "http:";
     } else {
       this._protocol = "https:";
       this._ssl = options.ssl;
     }
-
     this._adapter = getAdapter(this._protocol);
   }
 
   /**
-   * Returns status of an engine cluster.
+   * Returns the status of the engine cluster.
    */
   public async getClusterInfo(): Promise<unknown> {
     const [code, data] = await this.request({
@@ -330,8 +333,7 @@ export class TrinoClient {
   }
 
   /**
-   * Fetches active or failed cluster nodes.
-   * @throws
+   * Returns active or failed cluster nodes.
    */
   public async getNodesInfo(failed: boolean): Promise<unknown> {
     const [code, data] = await this.request({
@@ -346,8 +348,7 @@ export class TrinoClient {
   }
 
   /**
-   * Fetches a query info by provided identifier.
-   * @throws
+   * Retrieves information about the query by the provided `id`.
    */
   public async getQueryInfo(id: string): Promise<unknown> {
     const [code, data] = await this.request({
@@ -362,8 +363,7 @@ export class TrinoClient {
   }
 
   /**
-   * Fetches a query info by provided identifier.
-   * @throws
+   * Delete the query by the provided `id`.
    */
   public async deleteQuery(id: string): Promise<unknown> {
     const [code, data] = await this.request({
@@ -378,8 +378,7 @@ export class TrinoClient {
   }
 
   /**
-   * Posts SQL statement on an engine.
-   * @throws
+   * Posts the SQL `statement`.
    */
   public async post(
     statement: string,
@@ -407,7 +406,6 @@ export class TrinoClient {
         .map((s, i) => `query${i}=${encodeURIComponent(s)}`)
         .join(",");
     }
-
     const [code, data] = <[number, DataResponse]>await this.request({
       method: "POST",
       path: "/v1/statement",
@@ -415,7 +413,6 @@ export class TrinoClient {
       body: statement,
       user: this._user,
     });
-
     if (code !== 200) {
       throw new Error(`Statement execution error: ${code}.`);
     }
@@ -428,19 +425,16 @@ export class TrinoClient {
     if (!data.infoUri) {
       throw new Error("Query info URI is missing.");
     }
-
     return data;
   }
 
   /**
-   * Fetches the next chunk of requested data from the engine.
-   * @throws
+   * Fetches the next chunk of the requested data.
    */
   public async fetch(next: string): Promise<DataResponse> {
     const [code, data] = <[number, DataResponse]>(
       await this.request({ uri: next })
     );
-
     if (code !== 200) {
       throw new Error(`Fetch next error: ${code}.`);
     }
@@ -450,13 +444,11 @@ export class TrinoClient {
     if (!data.infoUri) {
       throw new Error("Info URI is missing.");
     }
-
     return data;
   }
 
   /**
-   * Cancel the next chunk.
-   * @throws
+   * Cancels the next chunk of the requested data.
    */
   public async cancel(next: string): Promise<boolean> {
     const [code] = await this.request({
@@ -471,8 +463,7 @@ export class TrinoClient {
   }
 
   /**
-   * Sends a request to an engine.
-   * @throws
+   * Sends the request to the engine.
    */
   private async request(options: {
     uri?: string;

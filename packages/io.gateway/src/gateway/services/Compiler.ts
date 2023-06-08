@@ -1,14 +1,23 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { TextEncoder, TextDecoder } from "util";
 import { JSDOM, DOMWindow } from "jsdom";
 import { Injectable, Logger } from "@nestjs/common";
-import { Document } from "@hdml/schema";
+import { Query } from "@hdml/schema";
 import {
   UnifiedElement,
   IoElement,
-  ElementsData,
+  ElementsDef,
 } from "@hdml/elements";
 import { Options } from "./Options";
 
+/**
+ * The function of intercepting the `html` document.
+ */
 export type HookFn = (
   scope: object,
   window: DOMWindow,
@@ -37,8 +46,7 @@ export class Compiler {
   constructor(private readonly _options: Options) {}
 
   /**
-   * Bootstrap service by running headless browser and preparing pages
-   * pool.
+   * Service bootstrap method.
    */
   public async bootstrap(script: string): Promise<void> {
     this._script = script;
@@ -47,34 +55,35 @@ export class Compiler {
   }
 
   /**
-   * Gracefully shutting down service.
+   * Gracefully shutting down of the service.
    */
   public async shutdown(): Promise<void> {
     return Promise.resolve();
   }
 
   /**
-   * Compiles provided `html` string to an `ElementsData` object.
+   * Compiles the provided `html` string into an `ElementsDef` object.
    */
-  public async compile(html: string): Promise<ElementsData> {
+  public async compile(html: string): Promise<ElementsDef> {
     const dom = this.getDOM(html);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );
-    const data = await io.getElementsData();
+    const data = await io.getElementsDef();
     dom.window.close();
     return data;
   }
 
   /**
-   * Patches provided `hdml` document.
+   * Compiles the provided `html` string into a `Query` object and
+   * returns it.
    */
-  public async getHdmlDocument(
-    hdml: string,
+  public async getQuery(
+    html: string,
     hook: HookFn,
     context: object,
-  ): Promise<null | Document> {
-    const dom = this.getDOM(hdml);
+  ): Promise<null | Query> {
+    const dom = this.getDOM(html);
     await hook(context, dom.window);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
@@ -82,12 +91,14 @@ export class Compiler {
     const root = <UnifiedElement>(
       dom.window.document.querySelector("[root=root]")
     );
-    const document = await io.getHdmlDocument(root.uid);
-    return document;
+    return await io.getQuery(root.uid);
   }
 
-  private getDOM(hdml: string): JSDOM {
-    return new JSDOM(this.getHTML(hdml), {
+  /**
+   * Returns a `JSDOM` object for the provided `html` string.
+   */
+  private getDOM(html: string): JSDOM {
+    return new JSDOM(this.getHtmlPage(html), {
       runScripts: "dangerously",
       beforeParse(window) {
         window.TextEncoder = TextEncoder;
@@ -96,7 +107,11 @@ export class Compiler {
     });
   }
 
-  private getHTML(hdml: string): string {
+  /**
+   * Returns the complete source text of the `html` page for the
+   * provided `html` fragment.
+   */
+  private getHtmlPage(hdml: string): string {
     return `
       <!DOCTYPE html>
       <html>

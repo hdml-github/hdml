@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { PassThrough } from "stream";
 import {
   Injectable,
@@ -6,7 +12,7 @@ import {
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
-import { Document, Name } from "@hdml/schema";
+import { Query, File, FileState } from "@hdml/schema";
 import { getSQL } from "@hdml/orchestrator";
 import { BaseLogger, BaseOptions, BaseQueue } from "@hdml/io.common";
 import { Options } from "./Options";
@@ -15,11 +21,11 @@ import { Options } from "./Options";
  * Gateway queue service class.
  */
 @Injectable()
-export class GatewayQueue extends BaseQueue implements OnModuleInit {
+export class Queue extends BaseQueue implements OnModuleInit {
   /**
    * Service logger.
    */
-  private readonly _logger = new BaseLogger(GatewayQueue.name, {
+  private readonly _logger = new BaseLogger("Queue(gateway)", {
     timestamp: true,
   });
 
@@ -63,14 +69,11 @@ export class GatewayQueue extends BaseQueue implements OnModuleInit {
   }
 
   /**
-   * Posts specified `hdml` document to the queue and returns its
-   * unique identifier.
-   * @throws
+   * Sends the specified `query` to the queue and returns the name of
+   * the result `hdml` file.
    */
-  public async postHdmlDocument(
-    hdml: Document,
-  ): Promise<StreamableFile> {
-    const sql = getSQL(hdml);
+  public async postQuery(query: Query): Promise<StreamableFile> {
+    const sql = getSQL(query);
     const hash = this.getHashname(sql);
     const time = this.getHashtime(Date.now());
     const name = `${hash}.${time}.hdml`;
@@ -79,39 +82,39 @@ export class GatewayQueue extends BaseQueue implements OnModuleInit {
       await this.create(name);
       const writer = await this.queriesProducer();
       await writer.send({
-        data: Buffer.from(hdml.buffer),
+        data: Buffer.from(query.buffer),
         properties: { name },
       });
     }
-    return new StreamableFile(new Name(name).buffer);
+    return new StreamableFile(new File({ name }).buffer);
   }
 
   /**
-   * Returns document's `file` stream.
+   * Returns the result `file` stream.
    */
-  public async getHdmlDocumentFile(
+  public async getResultFileStream(
     file: string,
   ): Promise<StreamableFile> {
-    // This function is a workaround required to avoid uses of the
-    // reader callback that is cause "segmentation fault (core
-    // dumped)" error.
     const read = async (stream: PassThrough) => {
-      const reader = await this.dataReader(file, stream);
+      const reader = await this.dataReader(file);
       let message = await reader.readNext();
       let state = message.getProperties().state;
       while (
         message &&
         state &&
-        state !== "DONE" &&
-        state !== "FAIL"
+        state !== FileState.DONE.toString() &&
+        state !== FileState.FAIL.toString()
       ) {
-        if (state === "SCHEMA" || state === "CHUNK") {
+        if (
+          state === FileState.SCHEMA.toString() ||
+          state === FileState.CHUNK.toString()
+        ) {
           stream.write(message.getData());
         }
         message = await reader.readNext();
         state = message.getProperties().state;
       }
-      if (state === "FAIL") {
+      if (state === FileState.FAIL.toString()) {
         stream.destroy(
           new HttpException(
             message.getProperties().error,
@@ -123,7 +126,6 @@ export class GatewayQueue extends BaseQueue implements OnModuleInit {
       }
       await reader.close();
     };
-
     const stream = new PassThrough();
     read(stream).catch((reason) => {
       this.logger().error(reason);

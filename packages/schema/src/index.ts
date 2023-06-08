@@ -16,6 +16,7 @@ import {
   FilterName,
   FilterType,
   FilterOperator,
+  FileState,
 } from "./enums";
 import {
   CommonOptsDef,
@@ -44,6 +45,7 @@ export {
   DecBitWidth,
   File,
   FileDef,
+  FileState,
   Query,
   QueryDef,
   CommonOptsDef,

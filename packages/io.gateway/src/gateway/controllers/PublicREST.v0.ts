@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import * as rawbody from "raw-body";
 import {
   Controller,
@@ -14,9 +20,9 @@ import {
 import { Request } from "express";
 import { Query as HdmlQuery } from "@hdml/schema";
 import { BaseLogger } from "@hdml/io.common";
-import { Filer } from "../services/Filer";
+import { Tenants } from "../services/Tenants";
 import { Tokens } from "../services/Tokens";
-import { Options } from "../services/Options";
+import { Queries } from "../services/Queries";
 
 /**
  * Public REST API controller.
@@ -34,9 +40,9 @@ export class PublicREST {
    * Class constructor.
    */
   constructor(
-    private readonly _filer: Filer,
+    private readonly _tenants: Tenants,
     private readonly _tokens: Tokens,
-    private readonly _options: Options,
+    private readonly _queries: Queries,
   ) {}
 
   /**
@@ -53,8 +59,8 @@ export class PublicREST {
     this._logger.debug("Session requested");
     try {
       return this._tokens.getSessionToken(
-        this._filer.getPublicKey(tenant),
-        this._filer.getPrivateKey(tenant),
+        this._tenants.getPublicKey(tenant),
+        this._tenants.getPrivateKey(tenant),
         token,
       );
     } catch (error) {
@@ -64,11 +70,11 @@ export class PublicREST {
   }
 
   /**
-   * `POST /hdml` endpoint handler.
+   * `POST /query` endpoint handler.
    */
-  @Post("hdml")
+  @Post("query")
   @Header("Access-Control-Allow-Origin", "*")
-  public async postHdml(
+  public async postQuery(
     @Param("tenant")
     tenant: string,
     @Req()
@@ -78,20 +84,29 @@ export class PublicREST {
     try {
       if (!request.readable) {
         throw new HttpException(
-          "Bad request (non-readable)",
+          "Not readable request",
           HttpStatus.BAD_REQUEST,
         );
       }
-      const body = await rawbody(request);
+      const query = await rawbody(request);
       const context = await this._tokens.getContext(
-        this._filer.getPrivateKey(tenant),
+        this._tenants.getPrivateKey(tenant),
         request.header("Session"),
       );
-      return await this._filer.postHdmlDocument(
-        tenant,
-        context,
-        new HdmlQuery(body),
-      );
+      const file = this._tenants.getTenantFile(tenant);
+      if (!file) {
+        throw new HttpException(
+          "Tenant file is missed",
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        return await this._queries.postQuery(
+          tenant,
+          file,
+          context,
+          new HdmlQuery(query),
+        );
+      }
     } catch (error) {
       this._logger.error(error);
       throw error;
@@ -99,25 +114,25 @@ export class PublicREST {
   }
 
   /**
-   * `GET /hdml/:document` endpoint handler.
+   * `GET /query/:file` endpoint handler.
    */
-  @Get("hdml/:document")
+  @Get("query/:file")
   @Header("Access-Control-Allow-Origin", "*")
   public async getHdml(
     @Param("tenant")
     tenant: string,
-    @Param("document")
-    document: string,
+    @Param("file")
+    file: string,
     @Req()
     request: Request,
   ): Promise<StreamableFile> {
-    this._logger.debug("Document requested");
+    this._logger.debug("Query result file requested");
     try {
       await this._tokens.getContext(
-        this._filer.getPrivateKey(tenant),
+        this._tenants.getPrivateKey(tenant),
         request.header("Session"),
       );
-      return await this._filer.getHdmlDocumentFile(document);
+      return await this._queries.getResultFileStream(file);
     } catch (error) {
       this._logger.error(error);
       throw error;

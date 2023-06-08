@@ -1,13 +1,22 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import { Injectable, OnModuleInit } from "@nestjs/common";
 import { BaseOptions } from "@hdml/io.common";
 import { program } from "commander";
 
+/**
+ * The `CLI` options type.
+ */
 type CliOptions = {
   project: string;
 };
 
 /**
- * Options service.
+ * Options of the `Gateway` (`Hideway`) service.
  */
 @Injectable()
 export class Options extends BaseOptions implements OnModuleInit {
@@ -20,7 +29,7 @@ export class Options extends BaseOptions implements OnModuleInit {
   }
 
   /**
-   * Returns project directory path.
+   * Returns the path to the project root directory.
    */
   public getProjectPath(): string {
     return this._cliOptions?.project || ".";

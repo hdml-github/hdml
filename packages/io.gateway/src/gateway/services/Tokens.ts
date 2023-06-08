@@ -1,3 +1,9 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache-2.0
+ */
+
 import {
   importSPKI,
   importPKCS8,
@@ -14,7 +20,7 @@ import {
 import { Options } from "./Options";
 
 /**
- * JWE tokens service.
+ * Tokens service.
  */
 @Injectable()
 export class Tokens {
@@ -24,7 +30,7 @@ export class Tokens {
   constructor(private readonly _options: Options) {}
 
   /**
-   * Returns `KeyLike` object for the private key `content`.
+   * Returns the `KeyLike` object for the private key `content`.
    */
   public async getPrivateKey(content: string): Promise<KeyLike> {
     return await importPKCS8(
@@ -34,7 +40,7 @@ export class Tokens {
   }
 
   /**
-   * Returns `KeyLike` object for the public key `content`.
+   * Returns the `KeyLike` object for the public key `content`.
    */
   public async getPublicKey(content: string): Promise<KeyLike> {
     return await importSPKI(
@@ -44,7 +50,8 @@ export class Tokens {
   }
 
   /**
-   * Returns a token with a provided `sub`, `ttl` (in sec) and `data`.
+   * Returns the token with the provided `sub`, `ttl` (in sec) and
+   * `scope`.
    */
   public async stringlify(
     pub: KeyLike,
@@ -77,21 +84,25 @@ export class Tokens {
   }
 
   /**
-   * Decrypt token and returns decripted payload. Throws if token is
-   * not valid.
-   * @throws
+   * Decrypts `token` and returns its decripted payload.
    */
   public async parse(
     key: KeyLike,
     token: string,
   ): Promise<JWTPayload> {
-    const jwt = await jwtDecrypt(decodeURIComponent(token), key);
-    return jwt.payload;
+    try {
+      const jwt = await jwtDecrypt(decodeURIComponent(token), key);
+      return jwt.payload;
+    } catch (error) {
+      throw new HttpException(
+        (<Error>error).message,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   /**
    * Returns access token.
-   * @throws
    */
   public async getAccessToken(
     pub: null | KeyLike,
@@ -148,7 +159,6 @@ export class Tokens {
 
   /**
    * Returns session token.
-   * @throws
    */
   public async getSessionToken(
     pub: null | KeyLike,
@@ -201,7 +211,7 @@ export class Tokens {
   }
 
   /**
-   * Returns session context. Throws if decryption failed.
+   * Returns session context.
    */
   public async getContext(
     key: null | KeyLike,

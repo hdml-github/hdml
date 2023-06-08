@@ -15,6 +15,7 @@ import { FilterName } from "./.fbs/enum.FilterName_generated";
 import { FilterType } from "./.fbs/enum.FilterType_generated";
 import { FilterOperator } from "./.fbs/enum.FilterOperator_generated";
 import { DecBitWidth } from "./.fbs/enum.DecBitWidth_generated";
+import { FileState } from "./.fbs/enum.FileState_generated";
 
 export {
   TableType,
@@ -28,4 +29,5 @@ export {
   FilterName,
   FilterType,
   FilterOperator,
+  FileState,
 };
