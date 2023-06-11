@@ -60,6 +60,7 @@
   "scripts": {
     "envup": "clear && docker compose -f ./dev.environment/compose.yaml up -d",
     "envdown": "clear && docker compose -f ./dev.environment/compose.yaml down",
+    "bootstrap": "lerna bootstrap",
     "dev": "lerna run dev",
     "lint": "lerna run lint",
     "docs": "lerna run docs",
@@ -74,6 +75,8 @@
     "test_dbg": "lerna run test_dbg",
     "clear": "lerna run clear",
     "build": "lerna run build",
-    "version": "lerna version"
+    "version": "lerna version",
+    "build:testing": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
+    "debug:testing": "docker run --network host -p 8888:8888 -v ${PWD}:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh"
   }
 }
