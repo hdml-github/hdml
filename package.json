@@ -77,6 +77,6 @@
     "build": "lerna run build",
     "version": "lerna version",
     "build:testing": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
-    "debug:testing": "docker run --network host -p 8888:8888 -v ${PWD}:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh"
+    "debug:testing": "clear && docker run --network host -p 8888:8888 -v /home/buntarb/Projects/hdml-github/hdml/dev.project:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh"
   }
 }
