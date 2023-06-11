@@ -58,8 +58,6 @@
     "typescript": "^4.6.3"
   },
   "scripts": {
-    "envup": "clear && docker compose -f ./dev.environment/compose.yaml up -d",
-    "envdown": "clear && docker compose -f ./dev.environment/compose.yaml down",
     "bootstrap": "lerna bootstrap",
     "dev": "lerna run dev",
     "lint": "lerna run lint",
@@ -76,7 +74,14 @@
     "clear": "lerna run clear",
     "build": "lerna run build",
     "version": "lerna version",
+    
+    "up:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml up -d",
+    "down:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml down",
+    
+    "up:testing": "clear && docker compose -f ./dev.project/compose:testing.yaml up -d",
+    "down:testing": "clear && docker compose -f ./dev.project/compose:testing.yaml down",
     "build:testing": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
-    "debug:testing": "clear && docker run --network host -p 8888:8888 -v /home/buntarb/Projects/hdml-github/hdml/dev.project:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh"
+    "debug:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v /home/buntarb/Projects/hdml-github/hdml/dev.project:/var/lib/hdml -v /home/buntarb/Projects/hdml-github/hdml/dev.project/.catalog:/etc/trino/catalog -it imazzine/hdml.io:testing /bin/sh",
+    "exec:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v /home/buntarb/Projects/hdml-github/hdml/dev.project:/var/lib/hdml -v /home/buntarb/Projects/hdml-github/hdml/dev.project/.catalog:/etc/trino/catalog imazzine/hdml.io:testing"
   }
 }

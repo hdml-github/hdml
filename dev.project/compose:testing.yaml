@@ -1,39 +1,23 @@
 version: "2.2"
 services:
 
-  # Apache Pulsar
-  pulsar:
-    container_name: hdml-pulsar
-    image: apachepulsar/pulsar:3.0.0
+  # Standalone hdml.io
+  hdml:
+    container_name: hdml.io
+    image: imazzine/hdml.io:testing
     ports:
-      - "6650:6650"
-      - "9090:8080"
-    depends_on:
-      - trino
-    links:
-      - trino
-    command: bin/pulsar standalone
-    restart: always
-
-  # Trino Query Engine
-  trino:
-    container_name: hdml-trino
-    image: trinodb/trino
-    ports:
-      - "8080:8080"
+      - "8887:8887"
+      - "8888:8888"
     volumes:
-      - ./catalog:/etc/trino/catalog
+      - ./:/var/lib/hdml
+      - ./.catalog:/trino/etc/catalog
     depends_on:
       - postgres
-      # - mysql
-      # - mongo
     links:
       - postgres
-      # - mysql
-      # - mongo
     restart: always
 
-  # Postgres Databse
+  # Postgres Database
   postgres:
     container_name: hdml-postgres
     image: postgres:latest
