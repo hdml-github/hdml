@@ -74,9 +74,13 @@
     "clear": "lerna run clear",
     "build": "lerna run build",
     "version": "lerna version",
+    "publish": "lerna publish from-package --yes --no-verify-access",
     
     "up:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml up -d",
     "down:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml down",
+
+    "build:devtools": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
+    "debug:devtools": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
     
     "up:testing": "rm -rf ./dev.project/.log/*.log && clear && docker compose -f ./dev.project/compose:testing.yaml up -d",
     "down:testing": "clear && docker compose -f ./dev.project/compose:testing.yaml down",

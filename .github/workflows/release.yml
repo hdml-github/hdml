@@ -2,7 +2,7 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-name: Publish new release
+name: Release the new version
 
 on:
   push:
@@ -30,7 +30,9 @@ jobs:
         run: lerna bootstrap
       - name: Build project
         run: npm run build
+
+  
       - name: Publish project
-        run: lerna publish from-package --yes --no-verify-access
+        run: npm run publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
