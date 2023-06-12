@@ -1,0 +1,281 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="module" src="/bin/orchestrator.min.js"></script>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect, assert } from "@esm-bundle/chai";
+      const { getHTML } = window['@hdml/orchestrator'];
+
+      const queryDef = {
+        model: {
+          name: "model",
+          tables: [
+            {
+              name: "tables",
+              type: 2,
+              source: "tenant_postgres.information_schema.tables",
+              fields: [
+                {
+                  name: "catalog",
+                  origin: "table_catalog",
+                },
+                {
+                  name: "schema",
+                  origin: "table_schema",
+                },
+                {
+                  name: "table",
+                  origin: "table_name",
+                },
+                {
+                  name: "full",
+                  clause:
+                    `concat("table_catalog", '-', ` +
+                    `"table_schema", '-', "table_name")`,
+                },
+                {
+                  name: "hash",
+                  clause:
+                    `concat("table_catalog", '-', ` +
+                    `"table_schema", '-', "table_name")`,
+                  type: {
+                    type: 15,
+                    options: {
+                      nullable: false,
+                    },
+                  },
+                },
+                {
+                  name: "type",
+                  origin: "table_type",
+                },
+              ],
+            },
+            {
+              name: "columns",
+              type: 3,
+              source:
+                "select * from tenant_postgres.information_schema.columns",
+              fields: [
+                {
+                  name: "catalog",
+                  origin: "table_catalog",
+                },
+                {
+                  name: "schema",
+                  origin: "table_schema",
+                },
+                {
+                  name: "table",
+                  origin: "table_name",
+                },
+                {
+                  name: "column",
+                  origin: "column_name",
+                },
+                {
+                  name: "position",
+                  origin: "ordinal_position",
+                  type: {
+                    type: 2,
+                    options: {
+                      nullable: false,
+                    },
+                  },
+                },
+                {
+                  name: "default",
+                  origin: "column_default",
+                },
+                {
+                  name: "nullable",
+                  origin: "is_nullable",
+                },
+                {
+                  name: "type",
+                  origin: "data_type",
+                },
+              ],
+            },
+          ],
+          joins: [
+            {
+              type: 1,
+              left: "tables",
+              right: "columns",
+              clause: {
+                type: 1,
+                filters: [
+                  {
+                    type: 1,
+                    options: {
+                      left: "catalog",
+                      right: "catalog",
+                    },
+                  },
+                  {
+                    type: 1,
+                    options: {
+                      left: "schema",
+                      right: "schema",
+                    },
+                  },
+                  {
+                    type: 1,
+                    options: {
+                      left: "table",
+                      right: "table",
+                    },
+                  },
+                ],
+                children: [
+                  {
+                    type: 0,
+                    filters: [
+                      {
+                        type: 0,
+                        options: {
+                          clause: `"columns"."table" = 'applicable_roles'`,
+                        },
+                      },
+                      {
+                        type: 0,
+                        options: {
+                          clause: `"columns"."table" = 'tables'`,
+                        },
+                      },
+                    ],
+                    children: [],
+                  },
+                ],
+              },
+            },
+          ],
+        },
+        frame: {
+          name: "query",
+          source: "frame",
+          offset: 1,
+          limit: 1,
+          fields: [
+            {
+              name: "catalog",
+            },
+            {
+              name: "schema",
+            },
+            {
+              name: "table",
+            },
+            {
+              name: "sum",
+              origin: "count",
+              agg: 4,
+            },
+          ],
+          filterBy: {
+            type: 1,
+            filters: [
+              {
+                type: 0,
+                options: {
+                  clause: `"catalog" = 'tenant_postgres'`,
+                },
+              },
+              {
+                type: 0,
+                options: {
+                  clause: `"schema" = 'information_schema'`,
+                },
+              },
+            ],
+            children: [],
+          },
+          groupBy: [
+            {
+              name: "catalog",
+            },
+            {
+              name: "schema",
+            },
+            {
+              name: "table",
+            },
+          ],
+          sortBy: [
+            {
+              name: "catalog",
+            },
+            {
+              name: "schema",
+            },
+            {
+              name: "table",
+              asc: false,
+            },
+          ],
+          parent: {
+            name: "frame",
+            source: "model",
+            offset: 0,
+            limit: 1000,
+            fields: [
+              {
+                name: "catalog",
+                origin: "columns_catalog",
+              },
+              {
+                name: "schema",
+                origin: "columns_schema",
+              },
+              {
+                name: "table",
+                origin: "columns_table",
+              },
+              {
+                name: "column",
+                origin: "columns_column",
+              },
+              {
+                name: "count",
+                origin: "columns_column",
+                agg: 1,
+              },
+            ],
+            groupBy: [
+              {
+                name: "catalog",
+              },
+              {
+                name: "schema",
+              },
+              {
+                name: "table",
+              },
+              {
+                name: "column",
+              },
+            ],
+          },
+        },
+      };
+
+      runTests(async () => {
+        describe("Orchestrator", () => {
+          it("must be constructible and parsable", () => {
+            const sql = getHTML(queryDef);
+            console.log(sql);
+          });
+        });
+      });
+    </script>
+  </head>
+    <body></body>
+</html>

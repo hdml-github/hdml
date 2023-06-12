@@ -1,0 +1,19 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query aggregations enum.
+enum AggType: byte {
+  None = 0,
+  Count,
+  CountDistinct,
+  CountDistinctApprox,
+  Sum,
+  Avg,
+  Min,
+  Max,
+}

@@ -1,0 +1,15 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query table types enum.
+enum TableType: byte {
+  Json,
+  Csv,
+  Table,
+  Query,
+}

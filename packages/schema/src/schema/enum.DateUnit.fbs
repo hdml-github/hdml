@@ -1,0 +1,13 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query date units enum.
+enum DateUnit: byte {
+  second,
+  millisecond,
+}

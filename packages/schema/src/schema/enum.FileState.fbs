@@ -1,0 +1,16 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol response file state enum.
+enum FileState: byte {
+  PROCESSING,
+  SCHEMA,
+  CHUNK,
+  DONE,
+  FAIL,
+}

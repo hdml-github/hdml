@@ -1,0 +1,94 @@
+<hdml-frame
+  name="query"
+  source="/frames/frame.html?hdml-frame=frame">
+
+  <div>
+    <hdml-field
+      name="catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema">
+    </hdml-field>
+    <hdml-field
+      name="table">
+    </hdml-field>
+    <hdml-field
+      name="sum"
+      origin="count"
+      agg="sum">
+    </hdml-field>
+  </div>
+
+  <div>
+    <hdml-filter-by>
+      <hdml-connective
+        operator="and">
+        <hdml-filter
+          type="expr"
+          clause="`catalog` = 'tenant_postgres'">
+        </hdml-filter>
+        <hdml-filter
+          type="expr"
+          clause="`schema` = 'information_schema'">
+        </hdml-filter>
+      </hdml-connective>
+    </hdml-filter-by>
+  </div>
+
+  <div>
+    <hdml-group-by>
+      <hdml-field
+        name="catalog">
+      </hdml-field>
+      <hdml-field
+        name="schema">
+      </hdml-field>
+      <hdml-field
+        name="table">
+      </hdml-field>
+    </hdml-group-by>
+  </div>
+
+  <div>
+    <hdml-sort-by>
+      <hdml-field
+        name="catalog">
+      </hdml-field>
+      <hdml-field
+        name="schema">
+      </hdml-field>
+      <hdml-field
+        name="table"
+        asc="false">
+      </hdml-field>
+    </hdml-sort-by>
+  </div>
+</hdml-frame>
+
+<hdml-frame
+  name="top"
+  source="/frames/query.html?hdml-frame=query">
+
+  <div>
+    <hdml-field
+      name="catalog">
+    </hdml-field>
+    <hdml-field
+      name="schema">
+    </hdml-field>
+    <hdml-field
+      name="table">
+    </hdml-field>
+    <hdml-field
+      name="sum">
+    </hdml-field>
+  </div>
+
+  <div>
+    <hdml-sort-by>
+      <hdml-field
+        name="sum">
+      </hdml-field>
+    </hdml-sort-by>
+  </div>
+</hdml-frame>

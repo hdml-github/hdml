@@ -1,0 +1,60 @@
+version: "2.2"
+services:
+
+  # Standalone hdml.io
+  hdml:
+    container_name: hdml.io
+    image: imazzine/hdml.io:testing
+    ports:
+      - "8887:8887"
+      - "8888:8888"
+    volumes:
+      - ./:/var/lib/hdml
+      - ./.catalog:/trino/etc/catalog
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    restart: always
+
+  # Postgres Database
+  postgres:
+    container_name: hdml-postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=hdml
+      - POSTGRES_USER=hdml
+      - POSTGRES_PASSWORD=hdml
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.data/postgres:/var/lib/postgresql/data
+    restart: always
+
+  # MySQL Database
+  # mysql:
+  #   container_name: hdml-mysql
+  #   image: mysql:8
+  #   environment:
+  #     - MYSQL_DATABASE=hdml
+  #     - MYSQL_ROOT_PASSWORD=hdml
+  #   command: mysqld --default-authentication-plugin=mysql_native_password
+  #   ports:
+  #     - "3306:3306"
+  #   volumes:
+  #     - ./.data/mysql:/var/lib/mysql
+  #   restart: always
+
+  # Mongo Database
+  # mongo:
+  #   container_name: hdml-mongo
+  #   image: mongo:latest
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: hdml
+  #     MONGO_INITDB_ROOT_PASSWORD: hdml
+  #   ports:
+  #     - "27017:27017"
+  #   volumes:
+  #     - ./.data/mongo:/data/db
+  #   restart: always

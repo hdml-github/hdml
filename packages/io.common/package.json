@@ -1,0 +1,35 @@
+{
+  "name": "@hdml/io.common",
+  "version": "0.0.0-alpha.1",
+  "license": "Apache-2.0",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.0.0",
+    "pulsar-client": "^1.8.2"
+  },
+  "scripts": {
+    "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",
+    "docs": "../../node_modules/.bin/typedoc ./src/index.ts --tsconfig ./tsconfig/cjs.json --out ./docs --includes ./",
+    "compile_fbs": "",
+    "compile_cjs": "tsc -b ./tsconfig/cjs.json",
+    "compile_esm": "tsc -b ./tsconfig/esm.json",
+    "compile_dts": "tsc -b ./tsconfig/dts.json",
+    "compile_tst": "tsc -b ./tsconfig/tst.json",
+    "compile_bin": "",
+    "compile_web": "",
+    "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts",
+    "test_node": "npm run compile_tst && ../../node_modules/.bin/jest --config ../../.jestrc.js --roots ./packages/io.common/tst --coverageDirectory ./packages/io.common/coverage",
+    "test_web": "",
+    "test": "npm run test_node",
+    "clear": "rm -rf tst && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
+    "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
+    "web": "",
+    "svc": ""
+  },
+  "types": "dts/index.d.ts",
+  "module": "esm/index.js",
+  "main": "cjs/index.js"
+}

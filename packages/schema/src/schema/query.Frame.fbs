@@ -1,0 +1,24 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+include "./query.Field.fbs";
+include "./query.FilterClause.fbs";
+
+namespace query;
+
+/// `HDML` network protocol query data-frame structure.
+table Frame {
+  name: string;
+  source: string;
+  offset: ulong;
+  limit: ulong;
+  fields: [query.Field];
+  filter_by: query.FilterClause;
+  group_by: [query.Field];
+  split_by: [query.Field];
+  sort_by: [query.Field];
+  parent: Frame;
+}

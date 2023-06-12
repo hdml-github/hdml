@@ -1,0 +1,28 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// `HDML` network protocol query data types enum.
+enum DataType: byte {
+  Int8,
+  Int16,
+  Int32,
+  Int64,
+  Uint8,
+  Uint16,
+  Uint32,
+  Uint64,
+  Float16,
+  Float32,
+  Float64,
+  Decimal,
+  Date,
+  Time,
+  Timestamp,
+  Binary,
+  Utf8,
+}

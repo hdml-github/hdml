@@ -1,0 +1,58 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<html>
+  <head>
+    <script type="module" src="/bin/elements.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+
+      const { getUid, UnifiedElement } = window['@hdml/elements'];
+      const UID = /^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})|[0-9]+$/;
+      
+      runTests(async () => {
+        describe("Unified element", () => {
+          before(async () => {
+            customElements.define("unified-element", UnifiedElement);
+            await customElements.whenDefined("unified-element");
+          });
+
+          describe("instantiated in script", () => {
+            it("must contain a valid `uid` property", () => {
+              const element = new UnifiedElement();
+              expect(
+                element.uid,
+                "uid property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                UID.test(element.uid),
+                "uid property is invalid",
+              ).to.be.true;
+            });
+          });
+
+          describe("instantiated in HTML", () => {
+            it("must contain a valid `uid` property", () => {
+              window.document.body.innerHTML = `<unified-element/>`;
+              const element = document.querySelector("unified-element");
+              expect(
+                element.uid,
+                "uid property is undefined",
+              ).not.to.be.undefined;
+              expect(
+                UID.test(element.uid),
+                "uid property is invalid",
+              ).to.be.true;
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

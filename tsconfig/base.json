@@ -1,8 +1,14 @@
 {
-  "include": ["../packages/**/src/**/*.ts"],
+  "include": [
+    "../packages/**/src/**/*.ts",
+    "../packages/**/src/**/*.tsx"
+  ],
   "exclude": ["../packages/**/src/**/*.test.ts"],
   "compilerOptions": {
     "lib": [ "esnext", "esnext.intl", "esnext.asynciterable", "dom" ],
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "emitDeclarationOnly": false,
     "downlevelIteration": true,
     "resolveJsonModule": true,
@@ -12,7 +18,7 @@
     "declarationMap": false,
     "importHelpers": true,
     "stripInternal": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "declaration": false,
     "incremental": true,
     "composite": false,

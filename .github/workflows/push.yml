@@ -1,13 +1,21 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
 name: Push and PR to master
 
 on:
   push:
     paths:
-      - '.github/workflows/push.yml'
+      - '.github/workflows/**'
+      - 'docker/**'
       - 'packages/**'
+      - 'tsconfig/**'
       - '.eslintrc.js'
+      - '.gitignore'
+      - '.jestrc.js'
       - '.rollup.config.js'
-      - '.web-test.config.js'
+      - '.test.config.js'
       - 'lerna.json'
       - 'package-lock.json'
       - 'package.json'
@@ -16,11 +24,15 @@ on:
       - 'master'
   pull_request:
     paths:
-      - '.github/workflows/push.yml'
+      - '.github/workflows/**'
+      - 'docker/**'
       - 'packages/**'
+      - 'tsconfig/**'
       - '.eslintrc.js'
+      - '.gitignore'
+      - '.jestrc.js'
       - '.rollup.config.js'
-      - '.web-test.config.js'
+      - '.test.config.js'
       - 'lerna.json'
       - 'package-lock.json'
       - 'package.json'
@@ -28,20 +40,28 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
-    timeout-minutes: 10
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Install Node.js
+      - name: Installing build essential
+        run: sudo apt-get -y install --no-install-recommends git cmake gcc g++ build-essential
+      - name: Cloning `flatbuffers`
+        run: mkdir ~flatc && git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git ~flatc
+      - name: Building `flatc`
+        run: cd ~flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
+      - name: Linking `flatc`
+        run: ln -s ~flatc/flatc /usr/local/bin/flatc && chmod +x ~flatc/flatc
+      - name: Installing `Node.js`
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-      - name: Install development dependencies
-        run: npm ci
-      - name: Install Playwright dependencies
+          node-version: 18
+      - name: Installing `playwright` dependencies
         run: npx playwright install-deps
-      - name: Bootstrap project
-        run: lerna bootstrap
-      - name: Build project
+      - name: Installing `hdml` dependencies
+        run: npm ci
+      - name: Bootstraping `hdml`
+        run: npm run bootstrap
+      - name: Building `hdml`
         run: npm run build

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="450px" preserveAspectRatio="none" style="width:602px;height:450px;background:#FFFFFF;" version="1.1" viewBox="0 0 602 450" width="602px" zoomAndPan="magnify"><defs/><g><!--MD5=[caa23b357ae01bc0277befea4ddcc100]
+cluster hdml.fs--><g id="cluster_hdml.fs"><rect fill="none" height="437" rx="35" ry="35" style="stroke:#181818;stroke-width:1.0;" width="589" x="7" y="7"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="58" x="272.5" y="26.9951">hdml.fs</text></g><!--MD5=[3fb92fba1735106d511c1d05a9f83ed2]
+cluster root--><g id="cluster_root"><path d="M33.5,50 L67.5,50 A3.75,3.75 0 0 1 70,52.5 L77,72.2969 L569.5,72.2969 A2.5,2.5 0 0 1 572,74.7969 L572,417.5 A2.5,2.5 0 0 1 569.5,420 L33.5,420 A2.5,2.5 0 0 1 31,417.5 L31,52.5 A2.5,2.5 0 0 1 33.5,50 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="31" x2="77" y1="72.2969" y2="72.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="33" x="35" y="64.9951">root</text></g><!--MD5=[4cbdae22ae30805c8ceb6d57ff550507]
+cluster com--><g id="cluster_com"><path d="M57.5,93 L125.5,93 A3.75,3.75 0 0 1 128,95.5 L135,115.2969 L545.5,115.2969 A2.5,2.5 0 0 1 548,117.7969 L548,393.5 A2.5,2.5 0 0 1 545.5,396 L57.5,396 A2.5,2.5 0 0 1 55,393.5 L55,95.5 A2.5,2.5 0 0 1 57.5,93 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="55" x2="135" y1="115.2969" y2="115.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="67" x="59" y="107.9951">common</text></g><!--MD5=[131d9fb5e1523c9f0a6f3471ba2a918e]
+cluster com_hdml--><g id="cluster_com_hdml"><path d="M81.5,189 L120.5,189 A3.75,3.75 0 0 1 123,191.5 L130,211.2969 L250.5,211.2969 A2.5,2.5 0 0 1 253,213.7969 L253,369.5 A2.5,2.5 0 0 1 250.5,372 L81.5,372 A2.5,2.5 0 0 1 79,369.5 L79,191.5 A2.5,2.5 0 0 1 81.5,189 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="79" x2="130" y1="211.2969" y2="211.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="38" x="83" y="203.9951">hdml</text></g><!--MD5=[077d2d58af02267827627ef7144cf575]
+cluster com_keys--><g id="cluster_com_keys"><path d="M279.5,189 L317.5,189 A3.75,3.75 0 0 1 320,191.5 L327,211.2969 L380.5,211.2969 A2.5,2.5 0 0 1 383,213.7969 L383,369.5 A2.5,2.5 0 0 1 380.5,372 L279.5,372 A2.5,2.5 0 0 1 277,369.5 L277,191.5 A2.5,2.5 0 0 1 279.5,189 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="277" x2="327" y1="211.2969" y2="211.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="37" x="281" y="203.9951">keys</text></g><!--MD5=[fdf86458e6139b15f5fa0e7b7fe05704]
+cluster com_mws--><g id="cluster_com_mws"><path d="M409.5,189 L511.5,189 A3.75,3.75 0 0 1 514,191.5 L521,211.2969 L521.5,211.2969 A2.5,2.5 0 0 1 524,213.7969 L524,369.5 A2.5,2.5 0 0 1 521.5,372 L409.5,372 A2.5,2.5 0 0 1 407,369.5 L407,191.5 A2.5,2.5 0 0 1 409.5,189 " fill="none" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="407" x2="521" y1="211.2969" y2="211.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="101" x="411" y="203.9951">middlewares</text></g><!--MD5=[9219cfd0095b329d7034e2ad786c9b55]
+entity com_env--><g id="elem_com_env"><path d="M305.5,130.5 L305.5,161.7969 A2.5,2.5 0 0 0 308,164.2969 L352,164.2969 A2.5,2.5 0 0 0 354.5,161.7969 L354.5,138 L344.5,128 L308,128 A2.5,2.5 0 0 0 305.5,130.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M344.5,128 L344.5,135.5 A2.5,2.5 0 0 0 347,138 L354.5,138 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="29" x="315.5" y="150.9951">.env</text></g><!--MD5=[444e4a69b016cc8a4b6f1fd147239bb6]
+entity com_sales--><g id="elem_com_sales"><path d="M131,226.5 L131,257.7969 A2.5,2.5 0 0 0 133.5,260.2969 L222.5,260.2969 A2.5,2.5 0 0 0 225,257.7969 L225,234 L215,224 L133.5,224 A2.5,2.5 0 0 0 131,226.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M215,224 L215,231.5 A2.5,2.5 0 0 0 217.5,234 L225,234 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="74" x="141" y="246.9951">sales.hdml</text></g><!--MD5=[45436eecbb843306473839607a92e723]
+entity com_ecom--><g id="elem_com_ecom"><path d="M95.5,322.5 L95.5,353.7969 A2.5,2.5 0 0 0 98,356.2969 L234,356.2969 A2.5,2.5 0 0 0 236.5,353.7969 L236.5,330 L226.5,320 L98,320 A2.5,2.5 0 0 0 95.5,322.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M226.5,320 L226.5,327.5 A2.5,2.5 0 0 0 229,330 L236.5,330 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="121" x="105.5" y="342.9951">ecommerce.hdml</text></g><!--MD5=[7e4b97db0e1d22d1b73e1198862af765]
+entity com_key--><g id="elem_com_key"><path d="M308,226.5 L308,257.7969 A2.5,2.5 0 0 0 310.5,260.2969 L349.5,260.2969 A2.5,2.5 0 0 0 352,257.7969 L352,234 L342,224 L310.5,224 A2.5,2.5 0 0 0 308,226.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M342,224 L342,231.5 A2.5,2.5 0 0 0 344.5,234 L352,234 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="24" x="318" y="246.9951">key</text></g><!--MD5=[4d0319a58eebf8f116cdf1f988f44473]
+entity com_pub--><g id="elem_com_pub"><path d="M292.5,322.5 L292.5,353.7969 A2.5,2.5 0 0 0 295,356.2969 L365,356.2969 A2.5,2.5 0 0 0 367.5,353.7969 L367.5,330 L357.5,320 L295,320 A2.5,2.5 0 0 0 292.5,322.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M357.5,320 L357.5,327.5 A2.5,2.5 0 0 0 360,330 L367.5,330 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="55" x="302.5" y="342.9951">key.pub</text></g><!--MD5=[84e71c41a00ef0a5ef3d35531a65fa1d]
+entity com_auth--><g id="elem_com_auth"><path d="M424,226.5 L424,257.7969 A2.5,2.5 0 0 0 426.5,260.2969 L487.5,260.2969 A2.5,2.5 0 0 0 490,257.7969 L490,234 L480,224 L426.5,224 A2.5,2.5 0 0 0 424,226.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M480,224 L480,231.5 A2.5,2.5 0 0 0 482.5,234 L490,234 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="46" x="434" y="246.9951">auth.js</text></g><!--MD5=[95d81910bf329e621914ed2223c24e2e]
+entity com_patch--><g id="elem_com_patch"><path d="M423.5,322.5 L423.5,353.7969 A2.5,2.5 0 0 0 426,356.2969 L490,356.2969 A2.5,2.5 0 0 0 492.5,353.7969 L492.5,330 L482.5,320 L426,320 A2.5,2.5 0 0 0 423.5,322.5 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><path d="M482.5,320 L482.5,327.5 A2.5,2.5 0 0 0 485,330 L492.5,330 " fill="#F1F1F1" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="49" x="433.5" y="342.9951">hdml.js</text></g><!--MD5=[51528d50e17cfccf920c47062d6c33b8]
+link com_sales to com_ecom--><!--MD5=[c1ff6bcbb9b12eeea636a34fb8799310]
+link com_key to com_pub--><!--MD5=[4151775db8777f514a1c811d4def78c2]
+link com_auth to com_patch--><!--MD5=[eaef3ed2439cf1ab9b40bda4cef8e712]
+link com_env to com_key--><!--MD5=[3668d71a45bafc7863ba69faea3ea456]
+link com_env to com_auth--><!--MD5=[670c69ea5fe471443e185bdce16d11a4]
+link com_env to com_sales--><!--MD5=[eb6a5e8061f756911eaf546f94908038]
+@startuml hdml_fs
+  storage "hdml.fs" {
+    folder "root" {
+      folder "common" as com {
+        file ".env" as com_env
+        folder "hdml" as com_hdml {
+          file "sales.hdml" as com_sales
+          file "ecommerce.hdml" as com_ecom
+          com_sales -[hidden]- com_ecom
+        }
+        folder "keys" as com_keys {
+          file "key" as com_key
+          file "key.pub" as com_pub
+          com_key -[hidden]- com_pub
+        }
+        folder "middlewares" as com_mws {
+          file "auth.js" as com_auth
+          file "hdml.js" as com_patch
+          com_auth -[hidden]- com_patch
+        }
+
+        com_env -[hidden]- com_key
+        com_env -[hidden]- com_auth
+        com_env -[hidden]- com_sales
+      }
+    }
+  }
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 10:01:30 PDT 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

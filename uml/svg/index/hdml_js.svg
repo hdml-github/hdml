@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="188px" preserveAspectRatio="none" style="width:324px;height:188px;background:#FFFFFF;" version="1.1" viewBox="0 0 324 188" width="324px" zoomAndPan="magnify"><defs/><g><ellipse cx="161" cy="20" fill="#222222" rx="10" ry="10" style="stroke:#222222;stroke-width:1.0;"/><polygon fill="#F1F1F1" points="30,50,302,50,292,83.9688,20,83.9688" style="stroke:#181818;stroke-width:0.5;"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="262" x="30" y="71.1387">env: Env, user: any, hdml: HDMLDocument</text><rect fill="#F1F1F1" height="33.9688" style="stroke:#181818;stroke-width:0.5;" width="197" x="62.5" y="103.9688"/><line style="stroke:#181818;stroke-width:0.5;" x1="67.5" x2="67.5" y1="103.9688" y2="137.9375"/><line style="stroke:#181818;stroke-width:0.5;" x1="254.5" x2="254.5" y1="103.9688" y2="137.9375"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacing" textLength="177" x="72.5" y="125.1074">await hdml(env, user, hdml);</text><ellipse cx="161" cy="167.9375" fill="none" rx="10" ry="10" style="stroke:#222222;stroke-width:1.5;"/><line style="stroke:#222222;stroke-width:2.5;" x1="154.8128" x2="167.1872" y1="161.7503" y2="174.1247"/><line style="stroke:#222222;stroke-width:2.5;" x1="167.1872" x2="154.8128" y1="161.7503" y2="174.1247"/><line style="stroke:#181818;stroke-width:1.0;" x1="161" x2="161" y1="30" y2="50"/><polygon fill="#181818" points="157,40,161,50,165,40,161,44" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="161" x2="161" y1="83.9688" y2="103.9688"/><polygon fill="#181818" points="157,93.9688,161,103.9688,165,93.9688,161,97.9688" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="161" x2="161" y1="137.9375" y2="157.9375"/><polygon fill="#181818" points="157,147.9375,161,157.9375,165,147.9375,161,151.9375" style="stroke:#181818;stroke-width:1.0;"/><!--MD5=[aa136bb7d5b524719c1f62a7ec59001e]
+@startuml hdml_js
+  start
+  :env: Env, user: any, hdml: HDMLDocument/
+  :await hdml(env, user, hdml);|
+  end
+@enduml
+
+PlantUML version 1.2022.7(Mon Aug 22 10:01:30 PDT 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
