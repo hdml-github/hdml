@@ -52,4 +52,4 @@ jobs:
       - name: Bootstrap `hdml`
         run: npm run bootstrap
       - name: Build `hdml`
-        run: npm run build
+        run: HOME=/root npm run build
