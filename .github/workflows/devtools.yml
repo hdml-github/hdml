@@ -8,11 +8,12 @@ on:
   push:
     paths:
       - '.github/workflows/devtools.yml'
+      - 'docker/devtools/Dockerfile'
     branches:
       - 'master'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
