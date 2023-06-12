@@ -2,7 +2,7 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-name: Push and PR to the `master` branch
+name: master
 
 on:
   push:
