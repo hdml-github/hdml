@@ -47,9 +47,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Installing `hdml` dependencies
+      - name: Install `hdml` dependencies
         run: npm ci
-      - name: Bootstraping `hdml`
+      - name: Bootstrap `hdml`
         run: npm run bootstrap
-      - name: Building `hdml`
+      - name: Build `hdml`
         run: npm run build
