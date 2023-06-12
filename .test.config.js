@@ -2,7 +2,7 @@ const { playwrightLauncher } = require("@web/test-runner-playwright");
 const { esbuildPlugin } = require("@web/dev-server-esbuild");
 
 module.exports = {
-  concurrency: 1,
+  concurrency: 10,
   nodeResolve: {
     exportConditions: ["development"],
   },
