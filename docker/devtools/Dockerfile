@@ -2,11 +2,11 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-# Build environment image
-FROM ubuntu:jammy AS build-env
-RUN export DEBIAN_FRONTEND=noninteractive && \
-    export TZ=Etc/UTC && \
-    apt-get update && \
+# Development tools image
+FROM mcr.microsoft.com/playwright:v1.31.1-jammy AS devtools
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TZ=Etc/UTC
+RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \
       mc \
@@ -28,4 +28,3 @@ RUN git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.g
 RUN cd flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
 RUN ln -s /flatc/flatc /usr/local/bin/flatc
 RUN chmod +x /flatc/flatc
-RUN npx playwright install-deps
