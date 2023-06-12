@@ -22,11 +22,11 @@
     "compile_web": "npm run compile_esm && npm run compile_bin",
     "compile_all": "npm run compile_cjs && npm run compile_esm && npm run compile_dts && npm run compile_bin",
     "test_node": "npm run compile_tst && ../../node_modules/.bin/jest --config ../../.jestrc.js --roots ./packages/database/tst --coverageDirectory ./packages/database/coverage",
-    "test_web": "npm run compile_web && ../../node_modules/.bin/wtr --config ../../.web-test.config.js \"src/**/*.test.html\"",
+    "test_web": "npm run compile_web && ../../node_modules/.bin/wtr --config ../../.test.config.js \"src/**/*.test.html\"",
     "test": "npm run test_node && npm run test_web",
     "clear": "rm -rf tst && rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run test -- --coverage && npm run compile_all && npm run docs",
-    "web": "../../node_modules/.bin/web-dev-server --config ../../.web-dev.config.js --open ./index.html"
+    "web": "../../node_modules/.bin/web-dev-server --config ../../.web.config.js --open ./index.html"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

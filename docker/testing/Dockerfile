@@ -65,7 +65,7 @@ COPY ./tsconfig /hdml/tsconfig/
 COPY ./.eslintrc.js /hdml
 COPY ./.jestrc.js /hdml
 COPY ./.rollup.config.js /hdml
-COPY ./.web-test.config.js /hdml
+COPY ./.test.config.js /hdml
 COPY ./lerna.json /hdml
 RUN cd /hdml && npm run bootstrap
 RUN cd /hdml && npm run build

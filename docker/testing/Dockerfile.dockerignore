@@ -19,7 +19,7 @@ packages/*/README.md
 specs/
 uml/
 .gitignore
-.web-dev.config.js
+.web.config.js
 init_git.sh
 init_playwright.sh
 LICENSE
