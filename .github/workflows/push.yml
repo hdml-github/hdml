@@ -48,20 +48,20 @@ jobs:
       - name: Installing build essential
         run: sudo apt-get -y install --no-install-recommends git cmake gcc g++ build-essential
       - name: Cloning `flatbuffers`
-        run: mkdir flatc && git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git flatc
+        run: mkdir /flatc && git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git /flatc
       - name: Building `flatc`
-        run: cd flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
+        run: cd /flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
       - name: Linking `flatc`
         run: ln -s /flatc/flatc /usr/local/bin/flatc && chmod +x /flatc/flatc
-      - name: Installing Node.js
+      - name: Installing `Node.js`
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Installing development dependencies
-        run: npm ci
-      - name: Installing `Playwright` dependencies
+      - name: Installing `playwright` dependencies
         run: npx playwright install-deps
-      - name: Bootstraping project
+      - name: Installing `hdml` dependencies
+        run: npm ci
+      - name: Bootstraping `hdml`
         run: npm run bootstrap
-      - name: Building project
+      - name: Building `hdml`
         run: npm run build
