@@ -7,7 +7,8 @@ name: Push and PR to the `master` branch
 on:
   push:
     paths:
-      - '.github/workflows/**'
+      - '.github/workflows/master.yml'
+      - '.github/workflows/release.yml'
       - 'docker/**'
       - 'packages/**'
       - 'tsconfig/**'
@@ -40,7 +41,7 @@ on:
 
 jobs:
   build:
-    runs-on: imazzine/hdml.io-devtools
+    runs-on: imazzine/hdml.io-devtools:latest
     timeout-minutes: 30
     steps:
       - name: Checkout
