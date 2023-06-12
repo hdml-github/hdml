@@ -47,12 +47,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Installing `Node.js`
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - name: Installing `playwright` dependencies
-        run: npx playwright install-deps
       - name: Installing `hdml` dependencies
         run: npm ci
       - name: Bootstraping `hdml`
