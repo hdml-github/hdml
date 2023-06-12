@@ -48,11 +48,11 @@ jobs:
       - name: Installing build essential
         run: sudo apt-get -y install --no-install-recommends git cmake gcc g++ build-essential
       - name: Cloning `flatbuffers`
-        run: mkdir /flatc && git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git /flatc
+        run: mkdir ~flatc && git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git ~flatc
       - name: Building `flatc`
-        run: cd /flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
+        run: cd ~flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
       - name: Linking `flatc`
-        run: ln -s /flatc/flatc /usr/local/bin/flatc && chmod +x /flatc/flatc
+        run: ln -s ~flatc/flatc /usr/local/bin/flatc && chmod +x ~flatc/flatc
       - name: Installing `Node.js`
         uses: actions/setup-node@v3
         with:
