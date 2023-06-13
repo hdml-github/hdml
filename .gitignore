@@ -23,5 +23,6 @@
 /.vscode
 /cert
 /node_modules
+.token
 lerna-debug.log
 npm-debug.log
