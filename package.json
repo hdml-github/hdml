@@ -74,7 +74,7 @@
     "clear": "lerna run clear",
     "build": "lerna run build",
     "version": "lerna version",
-    "publish": "lerna publish from-package --yes --no-verify-access",
+    "publish": "lerna publish from-package --yes",
     
     "up:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml up -d",
     "down:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml down",

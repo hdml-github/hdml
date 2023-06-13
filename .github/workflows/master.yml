@@ -5,10 +5,6 @@
 name: Master Branch
 
 on:
-  workflow_run:
-    workflows: [Devtools Image]
-    types:
-      - completed
   push:
     paths:
       - '.github/workflows/master.yml'
