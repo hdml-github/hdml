@@ -6,3 +6,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 # [0.0.0-alpha.0](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.1...v0.0.0-alpha.0) (2023-06-13)
 
 **Note:** Version bump only for package @hdml/orchestrator
+
+# [0.0.0-alpha.0](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.1...v0.0.0-alpha.0) (2023-06-13)
+
+**Note:** Version bump only for package @hdml/orchestrator
