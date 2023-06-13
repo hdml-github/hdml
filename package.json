@@ -73,7 +73,6 @@
     "test_dbg": "lerna run test_dbg",
     "clear": "lerna run clear",
     "build": "lerna run build",
-    "publish": "lerna publish from-package --yes --no-verify-access",
     
     "up:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml up -d",
     "down:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml down",
