@@ -50,6 +50,6 @@ jobs:
       - name: Install `hdml` dependencies
         run: npm ci
       - name: Bootstrap `hdml`
-        run: npm run bootstrap
+        run: ./node_modules/.bin/lerna bootstrap
       - name: Build `hdml`
-        run: HOME=/root npm run build
+        run: HOME=/root ./node_modules/.bin/lerna run build
