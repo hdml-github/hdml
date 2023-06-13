@@ -2,9 +2,13 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-name: master
+name: Master Branch
 
 on:
+  workflow_run:
+    workflows: [Devtools Image]
+    types:
+      - completed
   push:
     paths:
       - '.github/workflows/master.yml'

@@ -2,7 +2,7 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-name: Push devtools image
+name: Devtools Image
 
 on:
   push:
