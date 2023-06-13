@@ -1,13 +1,13 @@
 {
   "name": "@hdml/orchestrator",
-  "version": "0.0.0-alpha.3",
+  "version": "0.0.0-alpha.4",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "dependencies": {
-    "@hdml/schema": "^0.0.0-alpha.3"
+    "@hdml/schema": "^0.0.0-alpha.4"
   },
   "scripts": {
     "lint": "node ../../node_modules/.bin/eslint -c ../../.eslintrc.js --fix --parser-options=tsconfigRootDir:'./tsconfig' 'src/**/*.ts'",

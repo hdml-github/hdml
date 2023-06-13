@@ -1,6 +1,6 @@
 {
   "name": "@hdml/database",
-  "version": "0.0.0-alpha.3",
+  "version": "0.0.0-alpha.4",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
