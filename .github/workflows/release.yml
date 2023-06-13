@@ -25,7 +25,7 @@ jobs:
       - name: Bootstrap `hdml`
         run: npm run bootstrap
       - name: Build `hdml`
-        run: HOME=/root npm run compile_all
+        run: HOME=/root npm run build
       - name: Set `npm` token
         run: echo //registry.npmjs.org/:_authToken=$NPM_TOKEN > ~/.npmrc
         env:
