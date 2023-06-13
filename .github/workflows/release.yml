@@ -2,7 +2,7 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-name: Release
+name: Release Version
 
 on:
   push:
@@ -11,7 +11,7 @@ on:
       - 'v*.*.*-*'
 
 jobs:
-  build:
+  release_npm:
     runs-on: ubuntu-latest
     container: imazzine/hdml.io-devtools:latest
     timeout-minutes: 30
