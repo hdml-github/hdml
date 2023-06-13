@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.0.0-alpha.8](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.7...v0.0.0-alpha.8) (2023-06-13)
+
+**Note:** Version bump only for package @hdml/io.common
+
 # [0.0.0-alpha.7](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.6...v0.0.0-alpha.7) (2023-06-13)
 
 **Note:** Version bump only for package @hdml/io.common
