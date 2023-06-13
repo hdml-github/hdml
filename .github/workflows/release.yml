@@ -23,12 +23,12 @@ jobs:
       - name: Install `hdml` dependencies
         run: npm ci
       - name: Bootstrap `hdml`
-        run: ./node_modules/.bin/lerna bootstrap
+        run: npm run bootstrap
       - name: Build `hdml`
-        run: HOME=/root ./node_modules/.bin/lerna run compile_all
+        run: HOME=/root npm run compile_all
       - name: Set `npm` token
         run: echo //registry.npmjs.org/:_authToken=$NPM_TOKEN > ~/.npmrc
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish `hdml`
-        run: ./node_modules/.bin/lerna publish from-package --yes --no-verify-access
+        run: ./node_modules/.bin/lerna publish from-package --yes --no-verify-access --no-git-reset
