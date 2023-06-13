@@ -17,4 +17,4 @@ if [ "v$RELEASE" == "v" ]; then
   RELEASE=patch
 fi
 
-./node_modules/.bin/lerna version --create-release=github $RELEASE
+./node_modules/.bin/lerna version --create-release=github --conventional-commits $RELEASE
