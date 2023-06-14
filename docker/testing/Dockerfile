@@ -2,10 +2,8 @@
 # @copyright Artem Lytvynov
 # @license Apache-2.0
 
-# JDK, Python, NVM, Node, tools.
+# JDK, Python, Node.js, tools.
 FROM azul/zulu-openjdk:17-latest AS base
-ENV NVM_DIR=.nvm
-RUN mkdir .nvm
 RUN apt-get update && \
     apt-get -y dist-upgrade && \
     apt-get -y install --no-install-recommends \

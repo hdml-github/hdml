@@ -78,17 +78,26 @@
     "build:devtools": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
     "debug:devtools": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
 
-    "build:service": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/services/Dockerfile -t imazzine/hdml.io-service:latest",
-    "debug:service": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -it imazzine/hdml.io-service:latest /bin/sh",
+    "build:gateway": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/services/Dockerfile.gateway -t imazzine/hdml.io-gateway:latest",
+    "debug:gateway": "clear && docker run --network host -p 8888:8888 -v ./hdml.io:/var/lib/hdml.io -it imazzine/hdml.io-gateway:latest /bin/sh",
+    "exec:gateway": "clear && docker run --network host -p 8888:8888 -v ./hdml.io:/var/lib/hdml.io imazzine/hdml.io-gateway:latest",
+    
+    "build:hideway": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/services/Dockerfile.hideway -t imazzine/hdml.io-hideway:latest",
+    "debug:hideway": "clear && docker run --network host -p 8887:8887 -v ./hdml.io:/var/lib/hdml.io -it imazzine/hdml.io-hideway:latest /bin/sh",
+    "exec:hideway": "clear && docker run --network host -p 8887:8887 -v ./hdml.io:/var/lib/hdml.io imazzine/hdml.io-hideway:latest",
+    
+    "build:querier": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/services/Dockerfile.querier -t imazzine/hdml.io-querier:latest",
+    "debug:querier": "clear && docker run --network host -p 8887:8887 -it imazzine/hdml.io-querier:latest /bin/sh",
+    "exec:querier": "clear && docker run --network host -p 8887:8887 imazzine/hdml.io-querier:latest",
     
     "build:testing": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
-    "debug:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./dev.project:/var/lib/hdml -v ./dev.project/.catalog:/etc/trino/catalog -it imazzine/hdml.io:testing /bin/sh",
-    "exec:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./dev.project:/var/lib/hdml -v ./dev.project/.catalog:/etc/trino/catalog imazzine/hdml.io:testing",
+    "debug:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./hdml.io:/var/lib/hdml -v ./hdml.io/.catalog:/etc/trino/catalog -it imazzine/hdml.io:testing /bin/sh",
+    "exec:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./hdml.io:/var/lib/hdml -v ./hdml.io/.catalog:/etc/trino/catalog imazzine/hdml.io:testing",
     
-    "up:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml up -d",
-    "down:develop": "clear && docker compose -f ./dev.project/compose:develop.yaml down",
+    "up:develop": "clear && docker compose -f ./hdml.io/compose:develop.yaml up -d",
+    "down:develop": "clear && docker compose -f ./hdml.io/compose:develop.yaml down",
     
-    "up:testing": "rm -rf ./dev.project/.log/*.log && clear && docker compose -f ./dev.project/compose:testing.yaml up -d",
-    "down:testing": "clear && docker compose -f ./dev.project/compose:testing.yaml down"
+    "up:testing": "rm -rf ./hdml.io/.log/*.log && clear && docker compose -f ./hdml.io/compose:testing.yaml up -d",
+    "down:testing": "clear && docker compose -f ./hdml.io/compose:testing.yaml down"
   }
 }

@@ -1,0 +1,17 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+FROM node:18.16.0-alpine3.18 AS hideway
+
+RUN apk add mc rxvt-unicode
+RUN npm i -g @hdml/io.gateway@latest
+RUN ln -s /usr/local/lib/node_modules/@hdml/io.gateway/cjs/hideway.js /usr/local/bin/hideway
+RUN chmod +x /usr/local/lib/node_modules/@hdml/io.gateway/cjs/hideway.js
+
+ENV TERM rxvt-unicode
+ENV NODE_ENV production
+
+EXPOSE 8887
+
+CMD ["hideway", "--project", "/var/lib/hdml.io"]
