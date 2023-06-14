@@ -40,8 +40,8 @@
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
     "web": "",
     "svc": "npm run gateway",
-    "gateway": "clear && npm run compile_cjs && node ./cjs/gateway --project /home/buntarb/Projects/hdml-github/hdml/dev.project",
-    "hideway": "clear && npm run compile_cjs && node ./cjs/hideway --project /home/buntarb/Projects/hdml-github/hdml/dev.project"
+    "gateway": "clear && npm run compile_cjs && node ./cjs/gateway --project /home/buntarb/Projects/hdml-github/hdml/hdml.io",
+    "hideway": "clear && npm run compile_cjs && node ./cjs/hideway --project /home/buntarb/Projects/hdml-github/hdml/hdml.io"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

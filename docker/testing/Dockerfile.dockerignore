@@ -1,6 +1,6 @@
 .github/
 dev.environment/
-dev.project/
+hdml.io/
 docker/standalone
 node_modules/
 packages/*/bin
