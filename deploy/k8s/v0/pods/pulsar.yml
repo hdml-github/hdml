@@ -1,0 +1,18 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pulsar
+  labels:
+    side: external
+    type: statefull
+spec:
+  containers:
+    - name: pulsar
+      image: imazzine/hdml.io-pulsar:v0.0.0-alpha.12
+      ports:
+        - containerPort: 9090
+        - containerPort: 6650

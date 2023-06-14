@@ -7,10 +7,11 @@ kind: Pod
 metadata:
   name: querier
   labels:
+    side: internal
     type: stateless
 spec:
   containers:
     - name: querier
-      image: imazzine/hdml.io-querier:v0.0.0-alpha.11
+      image: imazzine/hdml.io-querier:v0.0.0-alpha.12
       ports:
         - containerPort: 8886

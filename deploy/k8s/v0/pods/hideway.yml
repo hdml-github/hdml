@@ -7,10 +7,11 @@ kind: Pod
 metadata:
   name: hideway
   labels:
+    side: internal
     type: stateless
 spec:
   containers:
     - name: hideway
-      image: imazzine/hdml.io-hideway:v0.0.0-alpha.11
+      image: imazzine/hdml.io-hideway:v0.0.0-alpha.12
       ports:
         - containerPort: 8887
