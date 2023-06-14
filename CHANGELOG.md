@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.0.0-alpha.12](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.11...v0.0.0-alpha.12) (2023-06-14)
+
+### Features
+
+- Docker images of `Trino` and `Pulsar` services have been added to the release ([#7](https://github.com/hdml-github/hdml/issues/7)) ([9ba10f2](https://github.com/hdml-github/hdml/commit/9ba10f2c9d4311b94cbda7deb13ff4cf338e310e))
+
 # [0.0.0-alpha.11](https://github.com/hdml-github/hdml/compare/v0.0.0-alpha.10...v0.0.0-alpha.11) (2023-06-14)
 
 **Note:** Version bump only for package @hdml/hdml

@@ -1,16 +1,16 @@
 {
   "name": "@hdml/io.gateway",
-  "version": "0.0.0-alpha.11",
+  "version": "0.0.0-alpha.12",
   "license": "Apache-2.0",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
   },
   "dependencies": {
-    "@hdml/elements": "^0.0.0-alpha.11",
-    "@hdml/io.common": "^0.0.0-alpha.11",
-    "@hdml/orchestrator": "^0.0.0-alpha.11",
-    "@hdml/schema": "^0.0.0-alpha.11",
+    "@hdml/elements": "^0.0.0-alpha.12",
+    "@hdml/io.common": "^0.0.0-alpha.12",
+    "@hdml/orchestrator": "^0.0.0-alpha.12",
+    "@hdml/schema": "^0.0.0-alpha.12",
     "@nestjs/common": "^9.0.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
