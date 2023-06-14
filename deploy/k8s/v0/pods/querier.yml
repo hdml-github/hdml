@@ -1,0 +1,16 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: querier
+  labels:
+    type: stateless
+spec:
+  containers:
+    - name: querier
+      image: imazzine/hdml.io-querier:v0.0.0-alpha.11
+      ports:
+        - containerPort: 8886
