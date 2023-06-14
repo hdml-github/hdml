@@ -1,0 +1,27 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+FROM azul/zulu-openjdk:17-latest AS trino
+
+RUN apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get -y install --no-install-recommends \
+      mc \
+      curl \
+      wget \
+      python3 \
+      python3-kazoo \
+      python3-pip
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN mkdir -p /downloads && mkdir -p /trino/data && mkdir -p /trino/etc/catalog
+RUN wget -P /downloads https://repo1.maven.org/maven2/io/trino/trino-server/418/trino-server-418.tar.gz
+RUN tar -xf /downloads/trino-server-418.tar.gz -C /downloads/
+RUN mv /downloads/trino-server-418/* /trino/ && rm -rf /downloads
+
+COPY ./docker/services/trino/* /trino/etc/
+
+EXPOSE 8080
+
+CMD ["/trino/bin/launcher", "run"]
