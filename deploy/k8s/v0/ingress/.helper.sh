@@ -8,11 +8,11 @@ sudo nano /etc/hosts
 
 # Apply configuration folder/file
 kubectl apply -f .
-kubectl apply -f ./gateway.yml
+kubectl apply -f ./hdml.io.yml
 
 # Delete configuration folder
 kubectl delete -f .
-kubectl delete -f ./gateway.yml
+kubectl delete -f ./hdml.io.yml
 
 # Get list of ingress controllers
 kubectl get ingress

@@ -109,6 +109,9 @@
     "down:testing": "clear && docker compose -f ./hdml.io/compose:testing.yaml down",
 
     "cleanup:orphans": "docker rmi -f $(docker images --filter \"dangling=true\" -q --no-trunc)",
-    "cleanup:all": "docker system prune -a -f"
+    "cleanup:all": "docker system prune -a -f",
+
+    "cluster:up": "minikube start && supervisord -c ./deploy/k8s/v0/supervisord.conf",
+    "cluster:down": "minikube stop"
   }
 }

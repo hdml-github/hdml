@@ -25,5 +25,12 @@ spec:
       containers:
         - name: hideway
           image: imazzine/hdml.io-hideway:v0.0.0-alpha.12
+          volumeMounts:
+            - mountPath: "/var/lib/hdml.io"
+              name: hdml-io
           ports:
             - containerPort: 8887
+      volumes:
+        - name: hdml-io
+          persistentVolumeClaim:
+            claimName: hdml.io

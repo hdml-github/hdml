@@ -25,5 +25,12 @@ spec:
       containers:
         - name: querier
           image: imazzine/hdml.io-querier:v0.0.0-alpha.12
+          volumeMounts:
+            - mountPath: "/var/lib/hdml.io"
+              name: hdml-io
           ports:
             - containerPort: 8886
+      volumes:
+        - name: hdml-io
+          persistentVolumeClaim:
+            claimName: hdml.io

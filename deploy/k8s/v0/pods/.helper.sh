@@ -16,3 +16,6 @@ kubectl describe pods gateway
 kubectl port-forward gateway 80:8888
 kubectl port-forward hideway 80:8887
 kubectl port-forward querier 80:8886
+
+# Run pod's shell
+kubectl exec -it gateway /bin/sh
