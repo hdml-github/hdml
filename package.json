@@ -106,6 +106,9 @@
     "down:develop": "clear && docker compose -f ./hdml.io/compose:develop.yaml down",
     
     "up:testing": "rm -rf ./hdml.io/.log/*.log && clear && docker compose -f ./hdml.io/compose:testing.yaml up -d",
-    "down:testing": "clear && docker compose -f ./hdml.io/compose:testing.yaml down"
+    "down:testing": "clear && docker compose -f ./hdml.io/compose:testing.yaml down",
+
+    "cleanup:orphans": "docker rmi -f $(docker images --filter \"dangling=true\" -q --no-trunc)",
+    "cleanup:all": "docker system prune -a -f"
   }
 }

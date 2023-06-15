@@ -10,7 +10,7 @@ metadata:
     side: internal
     type: stateless
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     role: pulsar
     side: external
