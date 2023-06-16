@@ -10,7 +10,7 @@ metadata:
     side: internal
     type: stateless
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     role: hideway
     side: internal
