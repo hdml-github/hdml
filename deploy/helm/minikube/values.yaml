@@ -1,0 +1,107 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+namespace: "hdml"
+
+config:
+  name: env
+  map:
+    HDML_GATEWAY_PORT: "8888"
+    HDML_HIDEWAY_PORT: "8887"
+    HDML_QUERIER_PORT: "8886"
+    HDML_TENANT_ENV_NAME: ".env"
+    HDML_TENANT_KEYS_PATH: "keys"
+    HDML_TENANT_PRIVATE_KEY_NAME: "key"
+    HDML_TENANT_PUBLIC_KEY_NAME: "key.pub"
+    HDML_TENANT_HOOK_PATH: "hook"
+    HDML_TENANT_DOCUMENTS_PATH: "hdml"
+    HDML_TENANT_DOCUMENTS_EXT: "html"
+    HDML_TOKENS_KEY_IMPORT_ALG: "ES256"
+    HDML_TOKENS_ALG: "RSA-OAEP-256"
+    HDML_TOKENS_ENC: "A256GCM"
+    HDML_TOKENS_ISS: "TokensSvc"
+    HDML_TOKENS_ACCESS_SUB: "Access Token"
+    HDML_TOKENS_SESSION_SUB: "Session Token"
+    HDML_TOKENS_SESSION_LENGTH: "1440"
+    HDML_QUEUE_HOST: "pulsar"
+    HDML_QUEUE_PORT: "6650"
+    HDML_QUEUE_REST_PORT: "9090"
+    HDML_QUEUE_TENANT: "public"
+    HDML_QUEUE_NAMESPACE: "default"
+    HDML_QUEUE_CACHE_TIMEOUT: "10000"
+    HDML_SQL_ENGINE_HOST: "trino"
+    HDML_SQL_ENGINE_PORT: "8080"
+    HDML_SQL_ENGINE_CATALOG: ""
+    HDML_SQL_ENGINE_SCHEMA: ""
+    HDML_PROJECT_PATH: "/var/lib/hdml.io"
+
+ingress:
+  name: "hdml.io"
+  host: "hdml.io"
+
+volume:
+  name: "hdml"
+  class: "standard"
+  labels:
+    type: "project-data"
+  path: "/data/hdml.io/"
+  access: "ReadWriteOnce"
+  capacity: "1M"
+
+deployments:
+  gateway:
+    name: "gateway"
+    labels:
+      role: "gateway"
+      type: "stateless"
+      access: "public"
+    replicas: 2
+    image: "imazzine/hdml.io-gateway:v0.0.0-alpha.12"
+  hideway:
+    name: "hideway"
+    labels:
+      role: "hideway"
+      type: "stateless"
+      access: "private"
+    replicas: 2
+    image: "imazzine/hdml.io-hideway:v0.0.0-alpha.12"
+  querier:
+    name: "querier"
+    labels:
+      role: "querier"
+      type: "stateless"
+      access: "private"
+    replicas: 2
+    image: "imazzine/hdml.io-querier:v0.0.0-alpha.12"
+
+hpa:
+  gateway:
+    name: "gateway"
+    minReplicas: 2
+    maxReplicas: 4
+  hideway:
+    name: "hideway"
+    minReplicas: 2
+    maxReplicas: 4
+  querier:
+    name: "querier"
+    minReplicas: 2
+    maxReplicas: 4
+
+services:
+  gateway:
+    name: "gateway"
+    type: "ClusterIP"
+    port: "rest-api"
+    protocol: "TCP"
+  hideway:
+    name: "hideway"
+    type: "ClusterIP"
+    port: "rest-api"
+    protocol: "TCP"
+  querier:
+    name: "querier"
+    type: "ClusterIP"
+    port: "rest-api"
+    protocol: "TCP"

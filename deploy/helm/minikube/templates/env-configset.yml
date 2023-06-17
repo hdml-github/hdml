@@ -1,0 +1,13 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.config.name }}
+{{- with .Values.config.map }}
+data:
+  {{- toYaml . | nindent 2 }}
+{{- end}}

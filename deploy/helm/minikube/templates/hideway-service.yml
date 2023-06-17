@@ -1,0 +1,24 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.services.hideway.name }}
+  {{- with .Values.deployments.hideway.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end}}
+spec:
+  type: {{ .Values.services.hideway.type }}
+  {{- with .Values.deployments.hideway.labels }}
+  selector:
+    {{- toYaml . | nindent 4 }}
+  {{- end}}
+  ports:
+    - name: {{ .Values.services.hideway.port }}
+      protocol: {{ .Values.services.hideway.protocol }}
+      port: {{ .Values.config.map.HDML_HIDEWAY_PORT }}
+      targetPort: {{ .Values.config.map.HDML_HIDEWAY_PORT }}

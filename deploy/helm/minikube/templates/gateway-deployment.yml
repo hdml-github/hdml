@@ -1,0 +1,43 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.deployments.gateway.name }}
+  {{- with .Values.deployments.gateway.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end}}
+spec:
+  replicas: {{ .Values.deployments.gateway.replicas }}
+  selector:
+    {{- with .Values.deployments.gateway.labels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+    {{- end}}
+  template:
+    metadata:
+      namespace: {{ .Values.namespace }}
+      {{- with .Values.deployments.gateway.labels }}
+      labels:
+        {{- toYaml . | nindent 8 }}
+      {{- end}}
+    spec:
+      containers:
+        - name: {{ .Values.deployments.gateway.name }}
+          image: {{ .Values.deployments.gateway.image }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.config.name }}
+          volumeMounts:
+            - mountPath: {{ .Values.config.map.HDML_PROJECT_PATH }}
+              name: {{ .Values.volume.name }}
+          ports:
+            - containerPort: {{ .Values.config.map.HDML_GATEWAY_PORT }}
+      volumes:
+        - name: {{ .Values.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

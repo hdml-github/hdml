@@ -1,0 +1,10 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v2
+name: hdml
+description: An example of the `hdml.io` cluster.
+type: application
+version: 0.0.0
+appVersion: "0.0.0"
