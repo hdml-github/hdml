@@ -1,0 +1,43 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.deployments.hideway.name }}
+  {{- with .Values.deployments.hideway.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end}}
+spec:
+  replicas: {{ .Values.deployments.hideway.replicas }}
+  selector:
+    {{- with .Values.deployments.hideway.labels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+    {{- end}}
+  template:
+    metadata:
+      namespace: {{ .Values.namespace }}
+      {{- with .Values.deployments.hideway.labels }}
+      labels:
+        {{- toYaml . | nindent 8 }}
+      {{- end}}
+    spec:
+      containers:
+        - name: {{ .Values.deployments.hideway.name }}
+          image: {{ .Values.deployments.hideway.image }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Values.config.name }}
+          volumeMounts:
+            - mountPath: {{ .Values.config.map.HDML_PROJECT_PATH }}
+              name: {{ .Values.volume.name }}
+          ports:
+            - containerPort: {{ .Values.config.map.HDML_HIDEWAY_PORT }}
+      volumes:
+        - name: {{ .Values.volume.name }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.volume.name }}

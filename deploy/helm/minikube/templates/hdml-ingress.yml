@@ -1,0 +1,32 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.ingress.name }}
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+        - path: /public(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Values.deployments.gateway.name }}
+              port:
+                number: {{ .Values.config.map.HDML_GATEWAY_PORT }}
+        - path: /private(/|$)(.*)
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ .Values.deployments.hideway.name }}
+              port:
+                number: {{ .Values.config.map.HDML_HIDEWAY_PORT }}
+  ingressClassName: nginx

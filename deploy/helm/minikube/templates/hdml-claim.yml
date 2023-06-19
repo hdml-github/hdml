@@ -1,0 +1,21 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: {{ .Values.volume.name }}
+spec:
+  storageClassName: {{ .Values.volume.class }}
+  accessModes:
+    - {{ .Values.volume.access }}
+  resources:
+    requests:
+      storage: {{ .Values.volume.capacity }}
+  selector:
+    {{- with .Values.volume.labels }}
+    matchLabels:
+      {{- toYaml . | nindent 6 }}
+    {{- end}}

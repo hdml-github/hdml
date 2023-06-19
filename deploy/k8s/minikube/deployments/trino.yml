@@ -1,0 +1,29 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trino
+  labels:
+    side: external
+    type: statefull
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      side: external
+      type: statefull
+  template:
+    metadata:
+      labels:
+        role: trino
+        side: external
+        type: statefull
+    spec:
+      containers:
+        - name: trino
+          image: imazzine/hdml.io-trino:v0.0.0-alpha.12
+          ports:
+            - containerPort: 8080

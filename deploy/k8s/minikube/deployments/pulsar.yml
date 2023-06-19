@@ -1,0 +1,30 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pulsar
+  labels:
+    side: external
+    type: statefull
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      side: external
+      type: statefull
+  template:
+    metadata:
+      labels:
+        role: pulsar
+        side: external
+        type: statefull
+    spec:
+      containers:
+        - name: pulsar
+          image: imazzine/hdml.io-pulsar:v0.0.0-alpha.12
+          ports:
+            - containerPort: 9090
+            - containerPort: 6650

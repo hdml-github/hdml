@@ -1,0 +1,39 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hideway
+  labels:
+    side: internal
+    type: stateless
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      side: internal
+      type: stateless
+  template:
+    metadata:
+      labels:
+        role: hideway
+        side: internal
+        type: stateless
+    spec:
+      containers:
+        - name: hideway
+          image: imazzine/hdml.io-hideway:v0.0.0-alpha.12
+          envFrom:
+            - configMapRef:
+                name: env
+          volumeMounts:
+            - mountPath: "/var/lib/hdml.io"
+              name: hdml-io
+          ports:
+            - containerPort: 8887
+      volumes:
+        - name: hdml-io
+          persistentVolumeClaim:
+            claimName: hdml.io

@@ -7,10 +7,11 @@ kind: Pod
 metadata:
   name: gateway
   labels:
+    side: internal
     type: stateless
 spec:
   containers:
     - name: gateway
-      image: imazzine/hdml.io-gateway:v0.0.0-alpha.11
+      image: imazzine/hdml.io-gateway:v0.0.0-alpha.12
       ports:
         - containerPort: 8888

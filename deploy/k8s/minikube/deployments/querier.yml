@@ -1,0 +1,39 @@
+# @author Artem Lytvynov
+# @copyright Artem Lytvynov
+# @license Apache-2.0
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: querier
+  labels:
+    side: internal
+    type: stateless
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      side: internal
+      type: stateless
+  template:
+    metadata:
+      labels:
+        role: querier
+        side: internal
+        type: stateless
+    spec:
+      containers:
+        - name: querier
+          image: imazzine/hdml.io-querier:v0.0.0-alpha.12
+          envFrom:
+            - configMapRef:
+                name: env
+          volumeMounts:
+            - mountPath: "/var/lib/hdml.io"
+              name: hdml-io
+          ports:
+            - containerPort: 8886
+      volumes:
+        - name: hdml-io
+          persistentVolumeClaim:
+            claimName: hdml.io
