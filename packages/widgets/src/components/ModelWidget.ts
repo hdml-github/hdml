@@ -12,8 +12,6 @@ import cxtmenu from "cytoscape-cxtmenu";
 import { debounce } from "throttle-debounce";
 import { lit, ModelElement } from "@hdml/elements";
 import {
-  TableDef,
-  FieldDef,
   JoinDef,
   JoinType,
   FilterClauseDef,
@@ -21,6 +19,8 @@ import {
   FilterDef,
   FilterType,
 } from "@hdml/schema";
+import { getTablesEles } from "../helpers/getTablesEles";
+import { getJoinsEles } from "../helpers/getJoinsEles";
 
 cytoscape.use(<cytoscape.Ext>cise);
 cytoscape.use(cxtmenu);
@@ -118,192 +118,13 @@ export class ModelWidget extends ModelElement {
   private renderGraph = async () => {
     const cy = await this.getCy();
     if (cy) {
-      await this.addTables();
-      await this.processJoins();
-      await this.updateCy();
+      const eles = [
+        ...getTablesEles(cy, this),
+        ...getJoinsEles(cy, this),
+      ];
+      await this.updateCy(eles);
     }
   };
-
-  private async addTables() {
-    await macrotask();
-    const cy = await this.getCy();
-    if (cy) {
-      Promise.all(
-        this.data.tables.map((t) => this.processTable(t)),
-      ).catch(console.error);
-    }
-  }
-
-  private async removeUnusedTables() {
-    const cy = await this.getCy();
-    if (cy) {
-      cy.filter(".table").forEach(
-        (ele: cytoscape.SingularElementReturnValue) => {
-          if (!this.querySelector(`hdml-table[name=${ele.id()}]`)) {
-            ele.remove();
-          }
-        },
-      );
-    }
-  }
-
-  private async processTable(table: TableDef) {
-    await macrotask();
-    const cy = await this.getCy();
-    if (cy) {
-      let tbl = cy.$id(table.name)[0];
-      if (!tbl) {
-        tbl = cy.add({
-          group: "nodes",
-          classes: ["table"],
-          data: {
-            id: table.name,
-            name: table.name,
-            type: table.type,
-            source: table.source,
-          },
-        });
-      } else {
-        tbl.data("name", table.name);
-        tbl.data("type", table.type);
-        tbl.data("source", table.source);
-      }
-      await this.processFields(table);
-    }
-  }
-
-  private async processFields(table: TableDef) {
-    const cy = await this.getCy();
-    if (cy) {
-      await this.removeUnusedFields(table);
-      await Promise.all(
-        table.fields.map((f) => this.processField(table, f)),
-      );
-    }
-  }
-
-  private async removeUnusedFields(table: TableDef) {
-    const cy = await this.getCy();
-    if (cy) {
-      cy.filter(`node.field[table="${table.name}"]`).forEach(
-        (ele: cytoscape.SingularElementReturnValue) => {
-          if (
-            !this.querySelector(
-              `hdml-table[name=${table.name}] ` +
-                `hdml-field[name=${<string>ele.data("name")}]`,
-            )
-          ) {
-            ele.remove();
-          }
-        },
-      );
-    }
-  }
-
-  private async processField(table: TableDef, field: FieldDef) {
-    const cy = await this.getCy();
-    if (cy) {
-      let fld = cy.$id(`${table.name}.${field.name}`)[0];
-      if (!fld) {
-        fld = cy.add({
-          group: "nodes",
-          classes: ["field"],
-          data: {
-            id: `${table.name}.${field.name}`,
-            table: table.name,
-            name: field.name,
-            description: field.description,
-            origin: field.origin,
-            clause: field.clause,
-            type: field.type,
-            agg: field.agg,
-            asc: field.asc,
-          },
-        });
-      } else {
-        fld.data("table", table.name);
-        fld.data("name", field.name);
-        fld.data("description", field.description);
-        fld.data("origin", field.origin);
-        fld.data("clause", field.clause);
-        fld.data("type", field.type);
-        fld.data("agg", field.agg);
-        fld.data("asc", field.asc);
-      }
-      let lnk = cy.$id(
-        `${table.name}-${table.name}.${field.name}`,
-      )[0];
-      if (!lnk) {
-        lnk = cy.add({
-          group: "edges",
-          classes: ["table-field"],
-          data: {
-            id: `${table.name}-${table.name}.${field.name}`,
-            source: table.name,
-            target: `${table.name}.${field.name}`,
-          },
-        });
-      }
-    }
-  }
-
-  private async processJoins() {
-    const cy = await this.getCy();
-    if (cy) {
-      console.log(this.data.joins);
-      // this.removeUnusedTables();
-      // this.data.tables.forEach(this.processTable.bind(this));
-      await Promise.all(
-        this.data.joins.map((j) => this.processJoin(j)),
-      );
-    }
-  }
-
-  private async processJoin(join: JoinDef) {
-    const cy = await this.getCy();
-    if (cy) {
-      const left = cy.$id(join.left)[0];
-      const right = cy.$id(join.right)[0];
-      if (!left || !right) {
-        // TODO
-        console.error("table missing");
-      } else {
-        const id = `${join.left}:${join.right}`;
-        let jn = cy.$id(id)[0];
-        if (!jn) {
-          jn = cy.add({
-            group: "nodes",
-            classes: ["join"],
-            data: {
-              id: id,
-              left: join.left,
-              right: join.right,
-              type: this.getJoinName(join.type),
-            },
-          });
-        } else {
-          jn.data("left", join.left);
-          jn.data("right", join.right);
-          jn.data("type", this.getJoinName(join.type));
-        }
-        [join.left, join.right].forEach((tbl) => {
-          let lnk = cy.$id(`${tbl}-${id}`)[0];
-          if (!lnk) {
-            lnk = cy.add({
-              group: "edges",
-              classes: ["join-table"],
-              data: {
-                id: `${tbl}-${id}`,
-                source: tbl,
-                target: id,
-              },
-            });
-          }
-        });
-        await this.processClause(0, id, join.clause, join);
-      }
-    }
-  }
 
   private async processClause(
     index: number,
@@ -443,9 +264,12 @@ export class ModelWidget extends ModelElement {
     return Promise.resolve();
   }
 
-  private async updateCy(): Promise<void> {
+  private async updateCy(
+    eles: cytoscape.ElementDefinition[],
+  ): Promise<void> {
     const cy = await this.getCy();
     if (cy) {
+      cy.add(eles);
       cy.layout({
         name: "cose",
         animate: false,
@@ -470,6 +294,7 @@ export class ModelWidget extends ModelElement {
   }
 
   private async getCy(): Promise<null | cytoscape.Core> {
+    await macrotask();
     if (this._cy) {
       return this._cy;
     } else {
