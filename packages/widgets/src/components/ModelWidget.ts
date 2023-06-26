@@ -11,10 +11,25 @@ import cise from "cytoscape-cise";
 import cxtmenu from "cytoscape-cxtmenu";
 import { debounce } from "throttle-debounce";
 import { lit, ModelElement } from "@hdml/elements";
-import { TableDef, FieldDef, JoinDef, JoinType } from "@hdml/schema";
+import {
+  TableDef,
+  FieldDef,
+  JoinDef,
+  JoinType,
+  FilterClauseDef,
+  FilterOperator,
+  FilterDef,
+  FilterType,
+} from "@hdml/schema";
 
 cytoscape.use(<cytoscape.Ext>cise);
 cytoscape.use(cxtmenu);
+
+async function macrotask(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 0);
+  });
+}
 
 export class ModelWidget extends ModelElement {
   /**
@@ -103,25 +118,19 @@ export class ModelWidget extends ModelElement {
   private renderGraph = async () => {
     const cy = await this.getCy();
     if (cy) {
-      await this.processTables();
+      await this.addTables();
       await this.processJoins();
       await this.updateCy();
     }
   };
 
-  private async processTables() {
+  private async addTables() {
+    await macrotask();
     const cy = await this.getCy();
     if (cy) {
-      await this.removeUnusedTables();
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          Promise.all(
-            this.data.tables.map((t) => this.processTable(t)),
-          )
-            .then(() => resolve())
-            .catch(console.error);
-        }, 0);
-      });
+      Promise.all(
+        this.data.tables.map((t) => this.processTable(t)),
+      ).catch(console.error);
     }
   }
 
@@ -139,6 +148,7 @@ export class ModelWidget extends ModelElement {
   }
 
   private async processTable(table: TableDef) {
+    await macrotask();
     const cy = await this.getCy();
     if (cy) {
       let tbl = cy.$id(table.name)[0];
@@ -258,13 +268,14 @@ export class ModelWidget extends ModelElement {
         // TODO
         console.error("table missing");
       } else {
-        let jn = cy.$id(`${join.left}:${join.right}`)[0];
+        const id = `${join.left}:${join.right}`;
+        let jn = cy.$id(id)[0];
         if (!jn) {
           jn = cy.add({
             group: "nodes",
             classes: ["join"],
             data: {
-              id: `${join.left}:${join.right}`,
+              id: id,
               left: join.left,
               right: join.right,
               type: this.getJoinName(join.type),
@@ -276,42 +287,160 @@ export class ModelWidget extends ModelElement {
           jn.data("type", this.getJoinName(join.type));
         }
         [join.left, join.right].forEach((tbl) => {
-          let lnk = cy.$id(`${tbl}-${join.left}:${join.right}`)[0];
+          let lnk = cy.$id(`${tbl}-${id}`)[0];
           if (!lnk) {
             lnk = cy.add({
               group: "edges",
               classes: ["join-table"],
               data: {
-                id: `${tbl}-${join.left}:${join.right}`,
+                id: `${tbl}-${id}`,
                 source: tbl,
-                target: `${join.left}:${join.right}`,
+                target: id,
               },
             });
           }
+        });
+        await this.processClause(0, id, join.clause, join);
+      }
+    }
+  }
+
+  private async processClause(
+    index: number,
+    parent: string,
+    clause: FilterClauseDef,
+    join: JoinDef,
+  ) {
+    const cy = await this.getCy();
+    if (cy) {
+      const nid = `${parent}:${this.getClauseName(
+        clause.type,
+      )}:${index}`;
+      const eid = `${parent}-${nid}`;
+      let cls = cy.$id(nid)[index];
+      if (!cls) {
+        cls = cy.add({
+          group: "nodes",
+          classes: ["clause"],
+          data: {
+            id: nid,
+            name: this.getClauseName(clause.type),
+          },
+        });
+      } else {
+        cls.data("name", this.getClauseName(clause.type));
+      }
+      let lnk = cy.$id(eid)[0];
+      if (!lnk) {
+        lnk = cy.add({
+          group: "edges",
+          classes: ["join-clause"],
+          data: {
+            id: `${eid}`,
+            source: parent,
+            target: nid,
+          },
+        });
+      }
+      await Promise.all(
+        clause.filters.map((filter, index) =>
+          this.processFilter(index, nid, filter, join),
+        ),
+      );
+      await Promise.all(
+        clause.children.map((child, index) =>
+          this.processClause(index, nid, child, join),
+        ),
+      );
+    }
+  }
+
+  private async processFilter(
+    index: number,
+    parent: string,
+    filter: FilterDef,
+    join: JoinDef,
+  ) {
+    switch (filter.type) {
+      case FilterType.Expr:
+        return await this.processFilterExpr(
+          index,
+          parent,
+          filter,
+          join,
+        );
+      case FilterType.Keys:
+        return await this.processFilterOn(
+          index,
+          parent,
+          filter,
+          join,
+        );
+      case FilterType.Named:
+        return await this.processFilterNamed(
+          index,
+          parent,
+          filter,
+          join,
+        );
+    }
+  }
+
+  private async processFilterOn(
+    index: number,
+    parent: string,
+    filter: FilterDef,
+    join: JoinDef,
+  ): Promise<void> {
+    const cy = await this.getCy();
+    if (cy) {
+      const name = this.getFilterName(filter.type);
+      const nid = `${parent}:${name}:${index}`;
+      const eid = `${parent}-${nid}`;
+      let flt = cy.$id(nid)[index];
+      if (!flt) {
+        flt = cy.add({
+          group: "nodes",
+          classes: ["filter", name],
+          data: {
+            id: nid,
+            name,
+          },
+        });
+      } else {
+        flt.data("name", name);
+      }
+      let lnk = cy.$id(eid)[0];
+      if (!lnk) {
+        lnk = cy.add({
+          group: "edges",
+          classes: ["clause-filter"],
+          data: {
+            id: `${eid}`,
+            source: parent,
+            target: nid,
+          },
         });
       }
     }
   }
 
-  private getJoinName(type: JoinType): string {
-    switch (type) {
-      case JoinType.Cross:
-        return "cross";
-      case JoinType.Full:
-        return "full";
-      case JoinType.FullOuter:
-        return "full outer";
-      case JoinType.Inner:
-        return "inner";
-      case JoinType.Left:
-        return "left";
-      case JoinType.LeftOuter:
-        return "left outer";
-      case JoinType.Right:
-        return "right";
-      case JoinType.RightOuter:
-        return "right outer";
-    }
+  private async processFilterExpr(
+    index: number,
+    parent: string,
+    filter: FilterDef,
+    join: JoinDef,
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  private async processFilterNamed(
+    index: number,
+    parent: string,
+    filter: FilterDef,
+    join: JoinDef,
+  ): Promise<void> {
+    return Promise.resolve();
   }
 
   private async updateCy(): Promise<void> {
@@ -354,6 +483,7 @@ export class ModelWidget extends ModelElement {
                 zoom: 1,
                 zoomingEnabled: false,
                 style: [
+                  // node.table
                   {
                     selector: "node.table",
                     style: {
@@ -378,6 +508,7 @@ export class ModelWidget extends ModelElement {
                       "border-width": "4px",
                     },
                   },
+                  // node.field
                   {
                     selector: "node.field",
                     style: {
@@ -402,6 +533,7 @@ export class ModelWidget extends ModelElement {
                       "border-width": "4px",
                     },
                   },
+                  // edge.table-field
                   {
                     selector: "edge.table-field",
                     style: {
@@ -415,6 +547,7 @@ export class ModelWidget extends ModelElement {
                       width: "4px",
                     },
                   },
+                  // node.join
                   {
                     selector: "node.join",
                     style: {
@@ -440,6 +573,7 @@ export class ModelWidget extends ModelElement {
                       "border-width": "2px",
                     },
                   },
+                  // edge.join-table
                   {
                     selector: "edge.join-table",
                     style: {
@@ -450,6 +584,83 @@ export class ModelWidget extends ModelElement {
                   },
                   {
                     selector: "edge.join-table:selected",
+                    style: {
+                      width: "2px",
+                    },
+                  },
+                  // node.clause
+                  {
+                    selector: "node.clause",
+                    style: {
+                      label: "data(name)",
+                      width: "24px",
+                      height: "24px",
+                      "font-size": "18px",
+                      "font-weight": "normal",
+                      "font-family": `${this._styles.fontFamily}`,
+                      "text-valign": "center",
+                      "text-halign": "center",
+                      "border-color": "black",
+                      "border-width": "1px",
+                      "background-color": "white",
+                      // @ts-ignore
+                      "overlay-shape": "ellipse",
+                    },
+                  },
+                  {
+                    selector: "node.clause:selected",
+                    style: {
+                      "border-width": "2px",
+                    },
+                  },
+                  // edge.join-clause
+                  {
+                    selector: "edge.join-clause",
+                    style: {
+                      width: "1px",
+                      "line-color": "black",
+                    },
+                  },
+                  {
+                    selector: "edge.join-clause:selected",
+                    style: {
+                      width: "2px",
+                    },
+                  },
+                  // node.filter
+                  {
+                    selector: "node.filter",
+                    style: {
+                      label: "data(name)",
+                      width: "40px",
+                      height: "40px",
+                      "font-size": "18px",
+                      "font-weight": "normal",
+                      "font-family": `${this._styles.fontFamily}`,
+                      "text-valign": "center",
+                      "text-halign": "center",
+                      "border-color": "black",
+                      "border-width": "1px",
+                      "background-color": "white",
+                      // @ts-ignore
+                      "overlay-shape": "ellipse",
+                    },
+                  },
+                  {
+                    selector: "node.filter:selected",
+                    style: {
+                      "border-width": "2px",
+                    },
+                  },
+                  {
+                    selector: "edge.clause-filter",
+                    style: {
+                      width: "1px",
+                      "line-color": "black",
+                    },
+                  },
+                  {
+                    selector: "edge.clause-filter:selected",
                     style: {
                       width: "2px",
                     },
@@ -499,6 +710,49 @@ export class ModelWidget extends ModelElement {
           resolve(this._cy);
         }, 0);
       });
+    }
+  }
+
+  private getJoinName(type: JoinType): string {
+    switch (type) {
+      case JoinType.Cross:
+        return "cross";
+      case JoinType.Full:
+        return "full";
+      case JoinType.FullOuter:
+        return "full outer";
+      case JoinType.Inner:
+        return "inner";
+      case JoinType.Left:
+        return "left";
+      case JoinType.LeftOuter:
+        return "left outer";
+      case JoinType.Right:
+        return "right";
+      case JoinType.RightOuter:
+        return "right outer";
+    }
+  }
+
+  private getClauseName(type: FilterOperator): string {
+    switch (type) {
+      case FilterOperator.Or:
+        return "|";
+      case FilterOperator.And:
+        return "&";
+      case FilterOperator.None:
+        return "none";
+    }
+  }
+
+  private getFilterName(type: FilterType): string {
+    switch (type) {
+      case FilterType.Expr:
+        return "expr";
+      case FilterType.Keys:
+        return "on";
+      case FilterType.Named:
+        return "named";
     }
   }
 }

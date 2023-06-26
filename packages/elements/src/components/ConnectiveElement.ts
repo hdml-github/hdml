@@ -105,6 +105,20 @@ export class ConnectiveElement extends UnifiedElement {
   }
 
   /**
+   * An iterable iterator of the connective's child connectives.
+   */
+  public get connectives(): IterableIterator<ConnectiveElement> {
+    return this._connectives.values();
+  }
+
+  /**
+   * An iterable iterator of the connective's child filters.
+   */
+  public get filters(): IterableIterator<FilterElement> {
+    return this._filters.values();
+  }
+
+  /**
    * The `FilterClauseDef` object.
    */
   public get data(): FilterClauseDef {
