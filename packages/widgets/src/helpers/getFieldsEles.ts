@@ -48,7 +48,7 @@ function getFieldEles(
     });
     result.push({
       group: "edges",
-      classes: ["table-field"],
+      classes: ["field"],
       data: {
         id: `${table.uid}-${field.uid}`,
         source: table.uid,

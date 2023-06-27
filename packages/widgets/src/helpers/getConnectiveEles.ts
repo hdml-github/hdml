@@ -5,46 +5,72 @@
  */
 
 import { Core, ElementDefinition } from "cytoscape";
-import { JoinElement, ConnectiveElement } from "@hdml/elements";
+import {
+  ModelElement,
+  JoinElement,
+  ConnectiveElement,
+} from "@hdml/elements";
 import { FilterOperator } from "@hdml/schema";
+import { getFilterEles } from "./getFilterEles";
 
 export function getConnectiveEles(
   cy: Core,
+  model: ModelElement,
   parent: JoinElement | ConnectiveElement,
-  clause: null | ConnectiveElement,
+  connective: null | ConnectiveElement,
 ): ElementDefinition[] {
   let result: ElementDefinition[] = [];
-  if (clause) {
-    const node = cy.$id(clause.uid);
+  if (connective) {
+    const node = cy.$id(connective.uid);
     if (node.length === 0) {
       result.push({
         group: "nodes",
         classes: ["clause"],
         data: {
-          id: clause.uid,
-          name: getClauseName(clause.data.type),
+          id: connective.uid,
+          name: getConnectiveName(connective.data.type),
+          element: connective,
         },
       });
       result.push({
         group: "edges",
-        classes: ["join-clause"],
+        classes: ["clause", "target"],
         data: {
-          id: `${parent.uid}-${clause.uid}`,
+          id: `${parent.uid}-${connective.uid}`,
           source: parent.uid,
-          target: clause.uid,
+          target: connective.uid,
         },
       });
+      const cb = (event: Event) => {
+        const evt = <CustomEvent<{ conn: ConnectiveElement }>>event;
+        const conn = evt.detail.conn;
+        if (conn.uid === connective.uid) {
+          parent.removeEventListener("hdml-join:disconnected", cb);
+          cy.$id(connective.uid).remove();
+          cy.$id(`${parent.uid}-${connective.uid}`).remove();
+        }
+      };
+      parent.addEventListener("hdml-connective:disconnected", cb);
     } else {
-      node.data("name", getClauseName(clause.data.type));
+      node.data("name", getConnectiveName(connective.data.type));
     }
-    for (const conn of clause.connectives) {
-      result = [...result, ...getConnectiveEles(cy, clause, conn)];
+    for (const filter of connective.filters) {
+      result = [
+        ...result,
+        ...getFilterEles(cy, model, parent, connective, filter),
+      ];
+    }
+    for (const conn of connective.connectives) {
+      result = [
+        ...result,
+        ...getConnectiveEles(cy, model, connective, conn),
+      ];
     }
   }
   return result;
 }
 
-function getClauseName(type: FilterOperator): string {
+function getConnectiveName(type: FilterOperator): string {
   switch (type) {
     case FilterOperator.Or:
       return "|";

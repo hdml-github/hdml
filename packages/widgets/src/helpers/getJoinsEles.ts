@@ -43,15 +43,15 @@ function getJoinEles(
         element: join,
       },
     });
-    const cbJoin = (event: Event) => {
+    const cb = (event: Event) => {
       const evt = <CustomEvent<{ join: JoinElement }>>event;
       const jn = evt.detail.join;
       if (jn.uid === join.uid) {
-        model.removeEventListener("hdml-join:disconnected", cbJoin);
+        model.removeEventListener("hdml-join:disconnected", cb);
         cy.$id(join.uid).remove();
       }
     };
-    model.addEventListener("hdml-join:disconnected", cbJoin);
+    model.addEventListener("hdml-join:disconnected", cb);
   } else {
     node.data("left", join.data.left);
     node.data("right", join.data.right);
@@ -59,8 +59,8 @@ function getJoinEles(
   }
   result = [
     ...result,
-    ...getJoinEdgesEles(cy, model, join),
-    ...getConnectiveEles(cy, join, join.connective),
+    // ...getJoinEdgesEles(cy, model, join),
+    ...getConnectiveEles(cy, model, join, join.connective),
   ];
   return result;
 }
@@ -77,7 +77,7 @@ function getJoinEdgesEles(
       if (edge.length === 0) {
         result.push({
           group: "edges",
-          classes: ["join-table"],
+          classes: ["join", "target"],
           data: {
             id: `${join.uid}-${table.uid}`,
             source: join.uid,
