@@ -4,17 +4,12 @@
  * @license Apache-2.0
  */
 
-import cytoscape from "cytoscape";
-import cise from "cytoscape-cise";
-import cxtmenu from "cytoscape-cxtmenu";
+import { Core, ElementDefinition } from "cytoscape";
 import { debounce } from "throttle-debounce";
 import { lit, ModelElement } from "@hdml/elements";
 import { getCytoscape } from "../helpers/getCytoscape";
 import { getTablesEles } from "../helpers/getTablesEles";
 import { getJoinsEles } from "../helpers/getJoinsEles";
-
-cytoscape.use(<cytoscape.Ext>cise);
-cytoscape.use(cxtmenu);
 
 async function macrotask(): Promise<void> {
   await new Promise<void>((resolve) => {
@@ -65,7 +60,7 @@ export class ModelWidget extends ModelElement {
     }
   `;
 
-  private _cy: null | cytoscape.Core = null;
+  private _cy: null | Core = null;
 
   private _render: null | debounce<() => void> = null;
 
@@ -116,9 +111,7 @@ export class ModelWidget extends ModelElement {
     }
   };
 
-  private async updateCy(
-    eles: cytoscape.ElementDefinition[],
-  ): Promise<void> {
+  private async updateCy(eles: ElementDefinition[]): Promise<void> {
     const cy = await this.getCy();
     if (cy) {
       cy.add(eles);
@@ -145,12 +138,12 @@ export class ModelWidget extends ModelElement {
     }
   }
 
-  private async getCy(): Promise<null | cytoscape.Core> {
+  private async getCy(): Promise<null | Core> {
     await macrotask();
     if (this._cy) {
       return this._cy;
     } else {
-      return await new Promise<cytoscape.Core | null>((resolve) => {
+      return await new Promise<Core | null>((resolve) => {
         setTimeout(() => {
           if (!this._cy) {
             const host = this.renderRoot?.querySelector("#cy");

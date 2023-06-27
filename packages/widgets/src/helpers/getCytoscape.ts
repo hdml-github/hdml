@@ -19,6 +19,7 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "node",
         style: {
+          display: "element",
           width: "80px",
           height: "80px",
           label: "data(name)",
@@ -50,7 +51,7 @@ export function getCytoscape(container: HTMLElement): Core {
           "target-arrow-shape": "vee",
           "target-arrow-color": "black",
           "target-arrow-fill": "filled",
-          "arrow-scale": 1,
+          "arrow-scale": 1.5,
         },
       },
       // edge.source
@@ -96,6 +97,7 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "node.join",
         style: {
+          // display: "none",
           label: "data(type)",
           width: "80px",
           height: "80px",
@@ -106,7 +108,7 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "edge.join",
         style: {
-          display: "none",
+          // display: "none",
           "line-style": "dashed",
         },
       },
@@ -114,6 +116,7 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "node.clause",
         style: {
+          // display: "none",
           width: "24px",
           height: "24px",
           "font-size": "18px",
@@ -123,9 +126,11 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "node.filter.on",
         style: {
-          width: "40px",
-          height: "40px",
+          // display: "none",
+          width: "25px",
+          height: "25px",
           "font-size": "18px",
+          "border-style": "dashed",
         },
       },
       // edge.filter.on
@@ -139,6 +144,7 @@ export function getCytoscape(container: HTMLElement): Core {
       {
         selector: "node.filter.expr",
         style: {
+          // display: "none", // element
           width: "12px",
           height: "12px",
           "background-color": "black",

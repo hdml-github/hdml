@@ -10,10 +10,8 @@
     "@hdml/elements": "0.0.0-alpha.12",
     "@hdml/schema": "0.0.0-alpha.12",
     "@types/cytoscape": "^3.19.10",
-    "@types/cytoscape-cxtmenu": "^3.4.0",
     "cytoscape": "^3.25.0",
     "cytoscape-cise": "^1.0.0",
-    "cytoscape-cxtmenu": "^3.5.0",
     "throttle-debounce": "^5.0.0"
   },
   "scripts": {

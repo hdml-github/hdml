@@ -13,6 +13,14 @@
       hdml-model.basic-model {
         height: 100vh;
       }
+      /* hdml-model.basic-model > hdml-table[name=tables] {
+        height: 250px;
+        width: 250px;
+      }
+      .cols {
+        height: 300px;
+        width: 300px;
+      } */
     </style>
   </head>
     <body>
@@ -62,6 +70,7 @@
           <hdml-table
             name="columns"
             type="query"
+            class="cols"
             source="select * from `tenant_postgres`.`information_schema`.`columns`">
 
             <hdml-field

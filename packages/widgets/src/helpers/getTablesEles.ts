@@ -7,6 +7,7 @@
 import { Core, ElementDefinition } from "cytoscape";
 import { ModelElement, TableElement } from "@hdml/elements";
 import { getFieldsEles } from "./getFieldsEles";
+import { adjustStyles } from "./adjustStyles";
 
 export function getTablesEles(
   cy: Core,
@@ -36,12 +37,18 @@ function getTableEles(
         type: table.data.type,
         source: table.data.source,
         element: table,
+        css: window.getComputedStyle(table),
       },
     });
+    const interval = setInterval(() => {
+      cy.$id(table.uid);
+      adjustStyles(cy, table.uid);
+    }, 200);
     const cb = (event: Event) => {
       const evt = <CustomEvent<{ table: TableElement }>>event;
       const tbl = evt.detail.table;
       if (tbl.uid === table.uid) {
+        clearInterval(interval);
         cy.getElementById(tbl.uid).remove();
         model.removeEventListener("hdml-table:disconnected", cb);
       }
