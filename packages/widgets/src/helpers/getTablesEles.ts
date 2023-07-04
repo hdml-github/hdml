@@ -30,14 +30,14 @@ function getTableEles(
   if (node.length === 0) {
     result.push({
       group: "nodes",
-      classes: ["table"],
       data: {
         id: table.uid,
+        kind: "table",
         name: table.data.name,
         type: table.data.type,
         source: table.data.source,
         element: table,
-        css: window.getComputedStyle(table),
+        style: window.getComputedStyle(table),
       },
     });
     const interval = setInterval(() => {

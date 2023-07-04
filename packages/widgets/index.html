@@ -13,13 +13,20 @@
       hdml-model.basic-model {
         height: 100vh;
       }
-      /* hdml-model.basic-model > hdml-table[name=tables] {
-        height: 250px;
-        width: 250px;
-      }
-      .cols {
-        height: 300px;
-        width: 300px;
+      /* hdml-table {
+        display: block;
+        height: 150px;
+        width: 150px;
+        color: black;
+        font-size: 24px;
+        font-weight: 600;
+        font-family: 'Times New Roman', Times, serif;
+        text-align: center;
+        vertical-align: middle;
+        border-style: solid;
+        border-width: 2px;
+        border-color: black;
+        background-color: white;
       } */
     </style>
   </head>
@@ -38,7 +45,8 @@
           <hdml-table
             name="tables"
             type="table"
-            source="`tenant_postgres`.`information_schema`.`tables`">
+            source="`tenant_postgres`.`information_schema`.`tables`"
+            onmouseover="console.log('!!!')">
 
             <hdml-field
               name="catalog"
@@ -70,7 +78,6 @@
           <hdml-table
             name="columns"
             type="query"
-            class="cols"
             source="select * from `tenant_postgres`.`information_schema`.`columns`">
 
             <hdml-field

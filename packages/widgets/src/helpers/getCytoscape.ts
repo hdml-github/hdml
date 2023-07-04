@@ -22,7 +22,7 @@ export function getCytoscape(container: HTMLElement): Core {
           display: "element",
           width: "80px",
           height: "80px",
-          label: "data(name)",
+          // label: "data(name)",
           "border-width": "1px",
           "border-color": "black",
           "background-color": "white",
