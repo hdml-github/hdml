@@ -195,6 +195,7 @@ export function adjustStyles(cy: Core, uid: string): void {
 function adjustDisplay(node: NodeSingular): void {
   const style = <CSSStyleDeclaration>node.data("style");
   const display = style.display === "none" ? "none" : "element";
+
   node.style("display", display);
 }
 
@@ -207,16 +208,8 @@ function adjustSize(node: NodeSingular): void {
 
   switch (kind) {
     case "table":
-      if (width) {
-        width = `${width[1]}px`;
-      } else {
-        width = DefaultStyles.node.table.width;
-      }
-      if (height) {
-        height = `${height[1]}px`;
-      } else {
-        height = DefaultStyles.node.table.height;
-      }
+      width = width ? `${width[1]}px` : "150px";
+      height = height ? `${height[1]}px` : "150px";
       break;
   }
   if (node.style("width") !== width) {
@@ -228,7 +221,6 @@ function adjustSize(node: NodeSingular): void {
 }
 
 function adjustBox(node: NodeSingular): void {
-  const kind = <Kind>node.data("kind") || "default";
   const style = <CSSStyleDeclaration>node.data("style");
   const bgColorArr = style.backgroundColor.split("(");
   const bgColorType = bgColorArr[0];
@@ -243,56 +235,54 @@ function adjustBox(node: NodeSingular): void {
   const bgOpacity =
     bgColorType === "rgba" ? Number(bgColorValue[3]) : 1;
 
-  switch (kind) {
-    case "table":
-      node.style(
-        "border-style",
-        style.borderStyle === "double"
-          ? "double"
-          : style.borderStyle === "dashed"
-          ? "dashed"
-          : style.borderStyle === "dotted"
-          ? "dotted"
-          : style.borderStyle === "solid"
-          ? "solid"
-          : undefined,
-      );
-      node.style("border-width", style.borderWidth);
-      node.style("border-color", style.borderColor);
-      node.style("background-color", bgColor);
-      node.style("background-opacity", bgOpacity);
-      node.style("overlay-shape", "ellipse");
-      break;
-  }
+  node.style(
+    "border-style",
+    style.borderStyle === "double"
+      ? "double"
+      : style.borderStyle === "dashed"
+      ? "dashed"
+      : style.borderStyle === "dotted"
+      ? "dotted"
+      : style.borderStyle === "solid"
+      ? "solid"
+      : undefined,
+  );
+  node.style("border-width", style.borderWidth);
+  node.style("border-color", style.borderColor);
+  node.style("background-color", bgColor);
+  node.style("background-opacity", bgOpacity);
+  node.style("overlay-shape", "ellipse");
 }
 
 function adjustLabel(node: NodeSingular): void {
   const kind = <Kind>node.data("kind") || "default";
   const style = <CSSStyleDeclaration>node.data("style");
+  let label = "label";
 
   switch (kind) {
     case "table":
-      node.style("label", node.data("name"));
-      node.style("color", style.color);
-      node.style("font-size", style.fontSize);
-      node.style("font-weight", style.fontWeight);
-      node.style("font-family", style.fontFamily);
-      node.style(
-        "text-valign",
-        style.verticalAlign === "top"
-          ? "top"
-          : style.verticalAlign === "bottom"
-          ? "bottom"
-          : "center",
-      );
-      node.style(
-        "text-halign",
-        style.textAlign === "left"
-          ? "left"
-          : style.textAlign === "right"
-          ? "right"
-          : "center",
-      );
+      label = <string>node.data("name");
       break;
   }
+  node.style("label", label);
+  node.style("color", style.color);
+  node.style("font-size", style.fontSize);
+  node.style("font-weight", style.fontWeight);
+  node.style("font-family", style.fontFamily);
+  node.style(
+    "text-valign",
+    style.verticalAlign === "top"
+      ? "top"
+      : style.verticalAlign === "bottom"
+      ? "bottom"
+      : "center",
+  );
+  node.style(
+    "text-halign",
+    style.textAlign === "left"
+      ? "left"
+      : style.textAlign === "right"
+      ? "right"
+      : "center",
+  );
 }

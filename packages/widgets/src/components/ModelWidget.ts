@@ -64,8 +64,6 @@ export class ModelWidget extends ModelElement {
 
   private _render: null | debounce<() => void> = null;
 
-  private _styles = window.getComputedStyle(this);
-
   public connectedCallback(): void {
     super.connectedCallback();
     this._render = debounce(50, this.renderGraph);
