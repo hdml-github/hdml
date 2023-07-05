@@ -257,6 +257,35 @@
           </div>
         </hdml-frame>
 
+        <canvas id="myChart"></canvas>
+
+        <hdml-view>
+          <cartesian-plane for="?hdml-frame=frame">
+            <categorical-scale for="table" max="10">
+              <linerial-scale for="sum" min="0" max="100">
+
+                <x-axis>
+                  <axis-ticks step="10"></axis-ticks>
+                  <axis-labels></axis-labels>
+                </x-axis>
+
+                <y-axis>
+                  <axis-ticks step="10"></axis-ticks>
+                  <axis-labels></axis-labels>
+                </y-axis>
+
+                <bar-chart>
+                  <data-point></data-point>
+                  <data-point></data-point>
+                  <data-point></data-point>
+                  <data-point></data-point>
+                </bar-chart>
+
+              </linerial-scale>
+            </categorical-scale>
+          </cartesian-plane>
+        </hdml-view>
+
       <script>
         // const m = document.querySelector("hdml-model");
         // const f1 = document.querySelector("hdml-frame[name=frame]");
