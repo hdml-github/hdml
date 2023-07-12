@@ -16,6 +16,43 @@
       hdml-model.basic-model {
         height: 100vh;
       }
+      scale-grid {
+        display: block;
+        border-color: rgb(0, 0, 255);
+        border-width: 1px;
+        border-style: dashed;
+        z-index: 1;
+      }
+      scale-label {
+        display: block;
+        padding: 5px;
+        line-height: 20px;
+        color: white;
+        background-color: rgb(0, 0, 255);
+        font-size: 16px;
+        font-family: 'Courier New', Courier, monospace;
+        font-style: normal;
+        font-weight: bold;
+      }
+
+      hdml-palette.my-palette > color-item:nth-child(1) {
+        background-color: rgb(255, 0, 0);
+      }
+      hdml-palette.my-palette > color-item:nth-child(2) {
+        background-color: rgb(0, 255, 0);
+      }
+      hdml-palette.my-palette > color-item:nth-child(3) {
+        background-color: rgb(0, 0, 255);
+      }
+      hdml-palette.my-palette > color-item:nth-child(4) {
+        background-color: rgb(255, 255, 0);
+      }
+      hdml-palette.my-palette > color-item:nth-child(5) {
+        background-color: rgb(255, 0, 255);
+      }
+      hdml-palette.my-palette > color-item:nth-child(6) {
+        background-color: rgb(0, 255, 255);
+      }
     </style>
   </head>
     <body>
@@ -259,31 +296,48 @@
 
         <canvas id="myChart"></canvas>
 
+        <hdml-palette class="my-palette">
+          <color-item></color-item>
+          <color-item></color-item>
+          <color-item></color-item>
+          <color-item></color-item>
+          <color-item></color-item>
+          <color-item></color-item>
+        </hdml-palette>
+        
         <hdml-view>
-          <cartesian-plane for="?hdml-frame=frame">
-            <categorical-scale for="table" max="10">
-              <linerial-scale for="sum" min="0" max="100">
+          <polar-plane for="?hdml-frame=frame" angle="0">
+            <categorical-scale for="table" max="3">
+              <scale-grid></scale-grid>
+              <scale-label
+                centered="false"
+                padding="25"
+                value="(value, index) => `${index + 1}: ${value}`;">
+              </scale-label>
 
-                <x-axis>
-                  <axis-ticks step="10"></axis-ticks>
-                  <axis-labels></axis-labels>
-                </x-axis>
+              <linerial-scale for="sum" min="0" max="20">
+                <scale-grid
+                  circular="true"
+                  count="5">
+                </scale-grid>
+                <scale-label
+                  padding="25"
+                  value="(value, index) => `${index + 1}: ${value}`;">
+                </scale-label>
 
-                <y-axis>
-                  <axis-ticks step="10"></axis-ticks>
-                  <axis-labels></axis-labels>
-                </y-axis>
-
-                <bar-chart>
-                  <data-point></data-point>
-                  <data-point></data-point>
-                  <data-point></data-point>
-                  <data-point></data-point>
-                </bar-chart>
-
+                <polar-chart>
+                  <data-point
+                    palette="my-palette">
+                    <data-label
+                      align="right"
+                      offset="15px"
+                      angle="0">
+                    </data-label>
+                  </data-point>
+                </polar-chart>
               </linerial-scale>
             </categorical-scale>
-          </cartesian-plane>
+          </polar-plane>
         </hdml-view>
 
       <script>

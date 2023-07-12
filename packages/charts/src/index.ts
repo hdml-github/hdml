@@ -4,9 +4,11 @@
  * @license Apache-2.0
  */
 
-import { Chart, registerables, ChartDataset } from "chart.js";
+import { Chart, registerables } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 Chart.register(...registerables);
+Chart.register(ChartDataLabels);
 
 setTimeout(() => {
   const ctx = <HTMLCanvasElement>document.getElementById("myChart");
@@ -53,46 +55,95 @@ setTimeout(() => {
             "rgba(201, 203, 207, 0.2)",
           ],
         },
-        // {
-        //   type: "bar",
+        {
+          type: "bar",
 
-        //   xAxisID: "xAxisBar",
-        //   yAxisID: "yAxisBar",
-        //   data: [30, 10, 20],
+          xAxisID: "xAxisBar",
+          yAxisID: "yAxisBar",
+          data: [30, 10, 20, 15],
 
-        //   // barThickness: 15,
-        //   barPercentage: 0.9,
-        //   categoryPercentage: 1,
-        //   backgroundColor: [
-        //     "rgba(255, 99, 132, 0.2)",
-        //     "rgba(255, 159, 64, 0.2)",
-        //     "rgba(255, 205, 86, 0.2)",
-        //   ],
-        //   hoverBackgroundColor: [
-        //     "rgba(54, 162, 235, 0.2)",
-        //     "rgba(153, 102, 255, 0.2)",
-        //     "rgba(201, 203, 207, 0.2)",
-        //   ],
-        // },
+          // barThickness: 15,
+          barPercentage: 0.9,
+          categoryPercentage: 1,
+        },
         {
           type: "line",
           label: "Line Dataset",
           xAxisID: "xAxisLine",
           yAxisID: "yAxisLine",
-          data: [-50, 50, -50, 50],
+          data: [
+            { x: 0, y: -50 },
+            { x: 2.5, y: 50 },
+            { x: 5, y: -50 },
+            { x: 10, y: 50 },
+          ],
+          datalabels: {
+            display: true,
+            align: "right",
+            anchor: "center",
+            offset: 15,
+            rotation: -0,
+            color: "white",
+            borderWidth: 1,
+            borderColor: "white",
+            borderRadius: 3,
+            backgroundColor: "grey",
+            font: {
+              size: 16,
+              family: "Arial",
+              style: "normal",
+              weight: "bold",
+              lineHeight: "16px",
+            },
+          },
         },
         {
           type: "polarArea",
           label: "Polar Dataset",
-          // xAxisID: "xAxisRadar",
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           rAxisID: "rAxisRadar",
-          data: [11, 16, 7, 3],
+          data: [11, 16, 7],
+          borderColor: [
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(153, 102, 255, 0.2)",
+            "rgba(201, 203, 207, 0.2)",
+          ],
+          hoverBorderColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(255, 159, 64, 0.2)",
+            "rgba(255, 205, 86, 0.2)",
+          ],
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(255, 159, 64, 0.2)",
+            "rgba(255, 205, 86, 0.2)",
+          ],
+          hoverBackgroundColor: [
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(153, 102, 255, 0.2)",
+            "rgba(201, 203, 207, 0.2)",
+          ],
+          datalabels: {
+            align: "center",
+            anchor: "center",
+            color: "white",
+            borderWidth: 1,
+            borderColor: "white",
+            borderRadius: 3,
+            backgroundColor: "red",
+            font: {
+              size: 16,
+              family: "Arial",
+              style: "normal",
+              weight: "bold",
+              lineHeight: "16px",
+            },
+          },
         },
       ],
-      labels: ["January", "February", "March", "April"],
+      labels: [null, null, null],
     },
     options: {
       scales: {
@@ -100,7 +151,22 @@ setTimeout(() => {
           type: "category",
           display: true,
           position: "bottom",
-          labels: ["January", "February", "March"],
+          labels: ["January", "February", "March", "April"],
+          title: {
+            display: true,
+            text: "X axis",
+          },
+          grid: {
+            display: true,
+            color: "rgb(0, 255, 0)",
+            tickColor: "rgb(0, 0, 255)",
+          },
+          ticks: {
+            maxTicksLimit: 10,
+            color: "rgb(255, 0, 0)",
+            showLabelBackdrop: true,
+            backdropColor: "rgb(0, 255, 0)",
+          },
         },
         yAxisBar: {
           type: "logarithmic",
@@ -108,12 +174,23 @@ setTimeout(() => {
           position: "left",
           min: -100,
           max: 100,
+          title: {
+            display: true,
+            text: "Y axis",
+          },
+          ticks: {
+            color: "rgb(255, 255, 0)",
+            showLabelBackdrop: true,
+            backdropColor: "rgb(255, 0, 0)",
+          },
         },
         xAxisLine: {
-          type: "category",
+          type: "linear",
           display: true,
           position: "top",
-          labels: ["January", "February", "March", "April"],
+          min: 0,
+          max: 10,
+          // labels: ["one", "two", "three", "four"],
         },
         yAxisLine: {
           type: "linear",
@@ -125,23 +202,63 @@ setTimeout(() => {
         rAxisRadar: {
           type: "radialLinear",
           display: true,
-          min: 0,
-          max: 20,
+
+          // X axis
+          startAngle: 0,
+          angleLines: {
+            display: true,
+            color: "rgb(0, 0, 255)",
+            lineWidth: 1,
+            // borderDash: () => [13, 8],
+          },
           pointLabels: {
             display: true,
-            // color: "red",
+            font: {
+              size: 16,
+              family: "Arial",
+              style: "normal",
+              weight: "bold",
+              lineHeight: "16px",
+            },
+            color: "white",
+            backdropColor: "rgb(0, 0, 255)",
+            backdropPadding: 5,
+            callback: (label: string, index: number) => {
+              return ["January", "February", "March", "April"][index];
+            },
+            centerPointLabels: false,
+            padding: 0,
+          },
+
+          // Y axis
+          min: 0,
+          max: 20,
+          grid: {
+            display: true,
+            circular: true,
+            color: "rgb(255, 0, 0)",
+            lineWidth: 1,
+          },
+          ticks: {
+            display: true,
+            count: 5,
+            z: 1,
+            font: {
+              size: 16,
+              family: "Arial",
+              style: "normal",
+              weight: "bold",
+              lineHeight: 1.2,
+            },
+            color: "white",
+            backdropColor: "rgb(255, 0, 0)",
+            backdropPadding: 5,
+            callback: (scale, value, index) => {
+              return `${scale}.0`;
+            },
           },
         },
       },
-      // events: [
-      //   // "mouseenter",
-      //   // "mouseover",
-      //   "mousemove",
-      //   "mouseout",
-      //   "click",
-      //   "touchstart",
-      //   "touchmove",
-      // ],
       interaction: {
         mode: "point",
       },
@@ -157,25 +274,37 @@ setTimeout(() => {
         },
       },
       onHover(event, elements, chart) {
-        console.log(elements);
-        // if (elements.length) {
-        //   const bgc = <string>(
-        //     elements[0].element.options.backgroundColor
-        //   );
-        //   chart.config.data.datasets[
-        //     elements[0].datasetIndex
-        //   ].hoverBackgroundColor = "rgb(0, 0, 0)";
-        // }
+        type Parsed = { x: number; y: number } | { r: number };
+        if (elements.length > 0) {
+          elements.forEach((el) => {
+            const meta = chart.getDatasetMeta(el.datasetIndex);
+            const parsed = meta._parsed[el.index] as Parsed;
+            console.log(meta);
+            console.log({
+              type: meta.type,
+
+              xAxisID: meta.xAxisID,
+              xAxisType: meta.xScale?.type,
+              xAxisTicks: meta.xScale?.ticks,
+
+              yAxisID: meta.yAxisID,
+              yAxisType: meta.yScale?.type,
+              yAxisTicks: meta.yScale?.ticks,
+
+              rAxisID: meta.rAxisID,
+              rAxisType: meta.rScale?.type,
+              rAxisTicks: meta.rScale?.ticks,
+
+              lAxisID: "lAxisID",
+              lAxisType: "lAxisType",
+              lAxisTicks: chart.data.labels,
+
+              ...parsed,
+            });
+          });
+        }
       },
     },
-    // plugins: [
-    //   {
-    //     id: "hdml",
-    //     beforeEvent: (chart, args, pluginOptions) => {
-    //       // console.log(chart, args, pluginOptions);
-    //       console.log(args.event);
-    //     },
-    //   },
-    // ],
+    plugins: [ChartDataLabels],
   });
 }, 10);
