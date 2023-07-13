@@ -16,6 +16,10 @@
       hdml-model.basic-model {
         height: 100vh;
       }
+
+      polar-plane {
+        rotate: 0deg;
+      }
       scale-grid {
         display: block;
         border-color: rgb(0, 0, 255);
@@ -35,22 +39,22 @@
         font-weight: bold;
       }
 
-      hdml-palette.my-palette > color-item:nth-child(1) {
+      hdml-palette.my-palette > hdml-color:nth-child(1) {
         background-color: rgb(255, 0, 0);
       }
-      hdml-palette.my-palette > color-item:nth-child(2) {
+      hdml-palette.my-palette > hdml-color:nth-child(2) {
         background-color: rgb(0, 255, 0);
       }
-      hdml-palette.my-palette > color-item:nth-child(3) {
+      hdml-palette.my-palette > hdml-color:nth-child(3) {
         background-color: rgb(0, 0, 255);
       }
-      hdml-palette.my-palette > color-item:nth-child(4) {
+      hdml-palette.my-palette > hdml-color:nth-child(4) {
         background-color: rgb(255, 255, 0);
       }
-      hdml-palette.my-palette > color-item:nth-child(5) {
+      hdml-palette.my-palette > hdml-color:nth-child(5) {
         background-color: rgb(255, 0, 255);
       }
-      hdml-palette.my-palette > color-item:nth-child(6) {
+      hdml-palette.my-palette > hdml-color:nth-child(6) {
         background-color: rgb(0, 255, 255);
       }
     </style>
@@ -297,41 +301,62 @@
         <canvas id="myChart"></canvas>
 
         <hdml-palette class="my-palette">
-          <color-item></color-item>
-          <color-item></color-item>
-          <color-item></color-item>
-          <color-item></color-item>
-          <color-item></color-item>
-          <color-item></color-item>
+          <hdml-color></hdml-color>
+          <hdml-color></hdml-color>
+          <hdml-color></hdml-color>
+          <hdml-color></hdml-color>
+          <hdml-color></hdml-color>
+          <hdml-color></hdml-color>
         </hdml-palette>
         
         <hdml-view>
-          <polar-plane for="?hdml-frame=frame" angle="0">
-            <categorical-scale for="table" max="3">
-              <scale-grid></scale-grid>
-              <scale-label
-                centered="false"
-                padding="25"
-                value="(value, index) => `${index + 1}: ${value}`;">
-              </scale-label>
+          <polar-plane for="?hdml-frame=frame">
+            <categorical-scale for="table" count="3">
+              <scale-title
+                anchor="start|center|end"
+                text="Tables Axis">
+              </scale-title>
+              <scale-grid
+                type="straight"
+                count="3"
+                filter="(value, index, length) => true;">
+              </scale-grid>
+              <scale-ticks
+                type="rectangle|ellipse"
+                filter="(value, index, length) => true;">
+              </scale-ticks>
+              <scale-labels
+                anchor="center"
+                filter="(value, index, length) => true;"
+                map="(value, index) => `${value}`;">
+              </scale-labels>
 
               <linerial-scale for="sum" min="0" max="20">
+                <scale-title
+                  anchor="start|center|end"
+                  text="Sum Axis">
+                </scale-title>
                 <scale-grid
-                  circular="true"
-                  count="5">
+                  type="circular"
+                  count="10"
+                  filter="(value, index, length) => true;">
                 </scale-grid>
+                <scale-ticks
+                  type="rectangle|ellipse"
+                  filter="(value, index, length) => true;">
+                </scale-ticks>
                 <scale-label
-                  padding="25"
-                  value="(value, index) => `${index + 1}: ${value}`;">
+                  anchor="tick"
+                  filter="(value, index, length) => true;"
+                  map="(value, index) => `${value}`;">
                 </scale-label>
 
                 <polar-chart>
                   <data-point
                     palette="my-palette">
                     <data-label
-                      align="right"
-                      offset="15px"
-                      angle="0">
+                      filter="(value, index, length) => true;"
+                      map="(value, index) => `${value}`;">
                     </data-label>
                   </data-point>
                 </polar-chart>

@@ -104,7 +104,7 @@ setTimeout(() => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           rAxisID: "rAxisRadar",
-          data: [11, 16, 7],
+          data: [11, 16, 7, 9, 12],
           borderColor: [
             "rgba(54, 162, 235, 0.2)",
             "rgba(153, 102, 255, 0.2)",
@@ -143,12 +143,13 @@ setTimeout(() => {
           },
         },
       ],
-      labels: [null, null, null],
+      labels: [null, null, null, null, null],
     },
     options: {
       scales: {
         xAxisBar: {
           type: "category",
+          stacked: true,
           display: true,
           position: "bottom",
           labels: ["January", "February", "March", "April"],
@@ -159,9 +160,17 @@ setTimeout(() => {
           grid: {
             display: true,
             color: "rgb(0, 255, 0)",
+
+            tickLength: 10,
+            tickWidth: 2,
             tickColor: "rgb(0, 0, 255)",
           },
           ticks: {
+            align: "center",
+            crossAlign: "center",
+            padding: 0,
+            labelOffset: 0,
+
             maxTicksLimit: 10,
             color: "rgb(255, 0, 0)",
             showLabelBackdrop: true,
@@ -170,6 +179,7 @@ setTimeout(() => {
         },
         yAxisBar: {
           type: "logarithmic",
+          stacked: true,
           display: true,
           position: "left",
           min: -100,
@@ -189,7 +199,7 @@ setTimeout(() => {
           display: true,
           position: "top",
           min: 0,
-          max: 10,
+          max: 15,
           // labels: ["one", "two", "three", "four"],
         },
         yAxisLine: {
@@ -226,7 +236,7 @@ setTimeout(() => {
             callback: (label: string, index: number) => {
               return ["January", "February", "March", "April"][index];
             },
-            centerPointLabels: false,
+            centerPointLabels: true,
             padding: 0,
           },
 
