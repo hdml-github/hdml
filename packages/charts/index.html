@@ -7,363 +7,343 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="/bin/charts.min.js"></script>
-    <!-- <script type="module" src="/esm/index.js"></script> -->
     <style>
       body {
         margin: 0;
       }
-      hdml-model.basic-model {
-        height: 100vh;
+
+      hdml-view {
+        display: inline-block;
+        box-sizing: border-box;
+        overflow: hidden;
+        width: 75%;
+        height: 250px;
+      }
+      hdml-view > slot {
+        display: flex;
+        width: 100%;
+        height: 100%;
+      }
+
+      cartesian-plane {
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        width: 50%;
+        height: 100%;
+        padding: 20px 20px 30px 55px;
+        background: rgba(0, 0, 0, .02);
+      }
+      cartesian-plane > div {
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+      }
+      cartesian-plane > div > slot {
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+      }
+
+      ordinal-scale,
+      linear-scale,
+      chromatic-scale,
+      ordinal-scale > slot,
+      linear-scale > slot,
+      chromatic-scale > slot { 
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+      }
+
+      horizontal-axis {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        width: 100%;
+        height: 0;
+        border: 1px solid black;
+      }
+      horizontal-axis[anchor=top] {
+        top: 0;
+      }
+      horizontal-axis[anchor=center] {
+        top: 50%;
+      }
+      horizontal-axis[anchor=bottom] {
+        bottom: 0;
+      }
+      horizontal-axis axis-grid {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        border: 1px solid rgba(0, 0, 0, .2);
+        width: 1px;
+        height: 15px;
+        left: 50%;
+      }
+      horizontal-axis[anchor=top] axis-grid {
+        top: 0;
+      }
+      horizontal-axis[anchor=center] axis-grid,
+      horizontal-axis[anchor=bottom] axis-grid {
+        bottom: 0;
+      }
+      horizontal-axis axis-tick {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        border: 1px solid black;
+        width: 1px;
+        height: 5px;
+        left: 50%;
+      }
+      horizontal-axis[anchor=top] axis-tick {
+        bottom: 0;
+      }
+      horizontal-axis[anchor=center] axis-tick,
+      horizontal-axis[anchor=bottom] axis-tick {
+        top: 0;
+      }
+      horizontal-axis axis-tick > slot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      horizontal-axis tick-label {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+      }
+      horizontal-axis[anchor=top] tick-label {
+        bottom: 5px;
+      }
+      horizontal-axis[anchor=center] tick-label {
+        top: 5px;
+      }
+      horizontal-axis[anchor=bottom] tick-label {
+        top: 5px;
+      }
+      horizontal-axis axis-title {
+        display: flex;
+        position: relative;
+        flex-direction: row;
+        align-items: flex-start;
+        width: 100%;
+        height: 0;
+      }
+      horizontal-axis axis-title > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        width: 100%;
+        white-space: nowrap;
+      }
+
+      vertical-axis {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        width: 0;
+        height: 100%;
+        border: 1px solid black;
+      }
+      vertical-axis[anchor=left] {
+        left: 0;
+      }
+      vertical-axis[anchor=center] {
+        left: 50%;
+      }
+      vertical-axis[anchor=right] {
+        right: 0;
+      }
+      vertical-axis axis-grid {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        border: 1px solid rgba(0, 0, 0, .2);
+        width: 15px;
+        height: 1px;
+        top: 50%;
+      }
+      vertical-axis[anchor=left] axis-grid,
+      vertical-axis[anchor=center] axis-grid {
+        left: 0;
+      }
+      vertical-axis[anchor=right] axis-grid {
+        right: 0;
+      }
+      vertical-axis axis-tick {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+        border: 1px solid black;
+        width: 5px;
+        height: 1px;
+        right: 0;
+        top: 50%;
+      }
+      vertical-axis[anchor=left] axis-tick,
+      vertical-axis[anchor=center] axis-tick {
+        right: 0;
+      }
+      vertical-axis[anchor=right] axis-tick {
+        left: 0;
+      }
+      vertical-axis axis-tick > slot {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      vertical-axis tick-label {
+        display: block;
+        position: absolute;
+        box-sizing: border-box;
+      }
+      vertical-axis[anchor=left] tick-label,
+      vertical-axis[anchor=center] tick-label {
+        right: 5px;
+      }
+      vertical-axis[anchor=right] tick-label {
+        left: 5px;
+      }
+      vertical-axis axis-title {
+        display: flex;
+        position: relative;
+        flex-direction: column;
+        align-items: flex-end;
+        width: 0;
+        height: 100%;
+      }
+      vertical-axis axis-title > div {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        height: 100%;
+        white-space: nowrap;
       }
 
       polar-plane {
-        rotate: 0deg;
-      }
-      scale-grid {
         display: block;
-        border-color: rgb(0, 0, 255);
-        border-width: 1px;
-        border-style: dashed;
-        z-index: 1;
-      }
-      scale-label {
-        display: block;
-        padding: 5px;
-        line-height: 20px;
-        color: white;
-        background-color: rgb(0, 0, 255);
-        font-size: 16px;
-        font-family: 'Courier New', Courier, monospace;
-        font-style: normal;
-        font-weight: bold;
-      }
-
-      hdml-palette.my-palette > hdml-color:nth-child(1) {
-        background-color: rgb(255, 0, 0);
-      }
-      hdml-palette.my-palette > hdml-color:nth-child(2) {
-        background-color: rgb(0, 255, 0);
-      }
-      hdml-palette.my-palette > hdml-color:nth-child(3) {
-        background-color: rgb(0, 0, 255);
-      }
-      hdml-palette.my-palette > hdml-color:nth-child(4) {
-        background-color: rgb(255, 255, 0);
-      }
-      hdml-palette.my-palette > hdml-color:nth-child(5) {
-        background-color: rgb(255, 0, 255);
-      }
-      hdml-palette.my-palette > hdml-color:nth-child(6) {
-        background-color: rgb(0, 255, 255);
+        position: relative;
+        box-sizing: border-box;
+        width: 50%;
+        height: 100%;
+        background: rgba(255, 0, 0, .04);
       }
     </style>
   </head>
     <body>
-        <!-- <hdml-io
-          name="hdml.io"
-          host="http://localhost:8888"
-          tenant="common"
-          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.cLGnPoJVR-6AFWz4vKEX_cHppAt2WVmVyVCfhKhOywlsolvg6D4NvGc5bBLRpJeUgPKXmNBvKiFNG8KBmFXVlDqanu77iXyBIbo1BrRwnTDc8C9F5NQBPHBzNS8Xi9DIq0oQ5ceN2Rcq0T-7Bh5W9T3s9cjNZugURkX43dA1ev5uGiXMZVo7Q8uTcw0hhFnEiQP5O8QeCSIqrHylvK97QRNOiOAiwbtA2-C7_8w8hVRBfQ8CTC3-c9zuFSigFn97cdn_L-0xjg2Ihe-q5tIsW6JojFxXIsoeZ5dXSWWxeVdcP5eo_0I0ihiv_2-JUwmQQ1FSAgSuRWtqytMiTm81x0J9jgVB8tLcak08fORn8vENIgYBS9gLmLM8CdM9GXLSNYhB7SFJG7LQiHe_UsyIAe3ALN65vIYEyqVeA4jGztYq5w-w09LtszKYRK4NAC5sQ6yFdfrMkqj0FgYbVolH0KmxDWKdHIBzpUQJ4ooXPHJpCUzicrWi0B2-cQkvnXd7.pIulXHlCoZ-9zBUi.GQ_KGaAGSzHOkxaZ86DUJ_7qZYGaNSWGlRT9N6vBOPoAHu4wBD7ZBbzwPiZZPODxbxiKY0tyJxb8h4lFJQRw05lDo8HrDuf4FPnNH3WLN2sihECbjN2augqEp6sfl-Qjb0KfVRdsIyLGQBwHZZZAqAG9vNhT.j9SvG3qiwuTetm55-zvBGw">
-        </hdml-io> -->
 
-        <hdml-model
-          class="basic-model"
-          name="model">
-
-          <hdml-table
-            name="tables"
-            type="table"
-            source="`tenant_postgres`.`information_schema`.`tables`">
-
-            <hdml-field
-              name="catalog"
-              origin="table_catalog">
-            </hdml-field>
-            <hdml-field
-              name="schema"
-              origin="table_schema">
-            </hdml-field>
-            <hdml-field
-              name="table"
-              origin="table_name">
-            </hdml-field>
-            <hdml-field
-              name="full"
-              clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)">
-            </hdml-field>
-            <hdml-field
-              name="hash"
-              clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"
-              type="binary">
-            </hdml-field>
-            <hdml-field
-              name="type"
-              origin="table_type">
-            </hdml-field>
-          </hdml-table>
-
-          <hdml-table
-            name="columns"
-            type="query"
-            source="select * from `tenant_postgres`.`information_schema`.`columns`">
-
-            <hdml-field
-              name="catalog"
-              origin="table_catalog">
-            </hdml-field>
-            <hdml-field
-              name="schema"
-              origin="table_schema">
-            </hdml-field>
-            <hdml-field
-              name="table"
-              origin="table_name">
-            </hdml-field>
-            <hdml-field
-              name="column"
-              origin="column_name">
-            </hdml-field>
-            <hdml-field
-              name="position"
-              origin="ordinal_position"
-              type="int-32">
-            </hdml-field>
-            <hdml-field
-              name="default"
-              origin="column_default">
-            </hdml-field>
-            <hdml-field
-              name="nullable"
-              origin="is_nullable">
-            </hdml-field>
-            <hdml-field
-              name="type"
-              origin="data_type">
-            </hdml-field>
-          </hdml-table>
-
-          <hdml-join
-            type="inner"
-            left="tables"
-            right="columns">
-            <hdml-connective
-              operator="and">
-              <hdml-filter
-                type="keys"
-                left="catalog"
-                right="catalog">
-              </hdml-filter>
-              <hdml-filter
-                type="keys"
-                left="schema"
-                right="schema">
-              </hdml-filter>
-              <hdml-filter
-                type="keys"
-                left="table"
-                right="table">
-              </hdml-filter>            
-              <hdml-connective
-                operator="or">
-                <hdml-filter
-                  type="expr"
-                  clause="`columns`.`table` = 'applicable_roles'">
-                </hdml-filter>
-                <hdml-filter
-                  type="expr"
-                  clause="`columns`.`table` = 'tables'">
-                </hdml-filter>
-                <hdml-connective
-                  operator="or">
-                  <hdml-filter
-                    type="expr"
-                    clause="1 = 1">
-                </hdml-connective>
-              </hdml-connective>
-            </hdml-connective>
-          </hdml-join>
-        </hdml-model>
-
-        <hdml-frame
-          name="frame"
-          source="/models/model.html?hdml-model=model"
-          offset="0"
-          limit="1000">
-          <hdml-field
-            name="catalog"
-            origin="columns_catalog">
-          </hdml-field>
-          <hdml-field
-            name="schema"
-            origin="columns_schema">
-          </hdml-field>
-          <hdml-field
-            name="table"
-            origin="columns_table">
-          </hdml-field>
-          <hdml-field
-            name="column"
-            origin="columns_column">
-          </hdml-field>
-          <hdml-field
-            name="count"
-            origin="columns_column"
-            agg="count">
-          </hdml-field>
-
-          <hdml-group-by>
-            <hdml-field
-              name="catalog">
-            </hdml-field>
-            <hdml-field
-              name="schema">
-            </hdml-field>
-            <hdml-field
-              name="table">
-            </hdml-field>
-            <hdml-field
-              name="column">
-            </hdml-field>
-          </hdml-group-by>
-        </hdml-frame>
-
-        <hdml-frame
-          name="query"
-          source="/frames/frame.html?hdml-frame=frame">
-          <div>
+      My chart:
+      <hdml-view>
+        <slot>
+          <cartesian-plane>
             <div>
-              <hdml-field
-                name="catalog">
-              </hdml-field>
-              <hdml-field
-                name="schema">
-              </hdml-field>
-              <hdml-field
-                name="table">
-              </hdml-field>
-              <hdml-field
-                name="sum"
-                origin="count"
-                agg="sum">
-              </hdml-field>
+              <slot>
+                <ordinal-scale>
+                  <slot>
+                    <linear-scale>
+                      <slot>
+                        <chromatic-scale>
+                          <slot>
+                            <horizontal-axis anchor="bottom">
+                              <slot>
+                                <axis-grid></axis-grid>
+                                <axis-tick>
+                                  <slot>
+                                    <tick-label>1.0</tick-label>
+                                  </slot>
+                                </axis-tick>
+                                <axis-title>
+                                  <div>X axis</div>
+                                </axis-title>
+                              </slot>
+                            </horizontal-axis>
+                            <vertical-axis anchor="left">
+                              <slot>
+                                <axis-grid></axis-grid>
+                                <axis-tick>
+                                  <slot>
+                                    <tick-label>10.0</tick-label>
+                                  </slot>
+                                </axis-tick>
+                                <axis-title vertical="">
+                                  <div>Y axis</div>
+                                </axis-title>
+                              </slot>
+                            </vertical-axis>
+                          </slot>
+                        </chromatic-scale>
+                      </slot>
+                    </linear-scale>
+                  </slot>
+                </ordinal-scale>
+              </slot>
             </div>
-          </div>
+          </cartesian-plane>
+  
+          <polar-plane>
+            <!--  -->
+          </polar-plane>
+        </slot>
+      </hdml-view>
 
-          <div>
-            <hdml-filter-by>
-              <hdml-connective
-                operator="and">
-                <hdml-filter
-                  type="expr"
-                  clause="`catalog` = 'tenant_postgres'">
-                </hdml-filter>
-                <hdml-filter
-                  type="expr"
-                  clause="`schema` = 'information_schema'">
-                </hdml-filter>
-              </hdml-connective>
-            </hdml-filter-by>
-          </div>
 
-          <div>
-            <hdml-group-by>
-              <div>
-                <hdml-field
-                  name="catalog">
-                </hdml-field>
-                <hdml-field
-                  name="schema">
-                </hdml-field>
-                <hdml-field
-                  name="table">
-                </hdml-field>
-              </div>
-            </hdml-group-by>
-          </div>
+      <!-- <polar-plane for="?hdml-frame=frame">
+        <ordinal-scale for="table" count="3">
+          <linear-scale for="avg, sum" min="0" max="20">
 
-          <div>
-            <hdml-sort-by>
-              <hdml-field
-                name="catalog">
-              </hdml-field>
-              <hdml-field
-                name="schema">
-              </hdml-field>
-              <hdml-field
-                name="table"
-                asc="true">
-              </hdml-field>
-            </hdml-sort-by>
-          </div>
-        </hdml-frame>
-
-        <canvas id="myChart"></canvas>
-
-        <hdml-palette class="my-palette">
-          <hdml-color></hdml-color>
-          <hdml-color></hdml-color>
-          <hdml-color></hdml-color>
-          <hdml-color></hdml-color>
-          <hdml-color></hdml-color>
-          <hdml-color></hdml-color>
-        </hdml-palette>
-        
-        <hdml-view>
-          <polar-plane for="?hdml-frame=frame">
-            <categorical-scale for="table" count="3">
-              <scale-title
+            <x-axis>
+              <axis-title
                 anchor="start|center|end"
                 text="Tables Axis">
-              </scale-title>
-              <scale-grid
+              </axis-title>
+              <axis-grid
                 type="straight"
                 count="3"
+                filter="(value, index, length) => true;">
+              </axis-grid>
+              <axis-ticks
+                type="rectangle|ellipse"
+                filter="(value, index, length) => true;">
+              </axis-ticks>
+              <axis-labels
+                anchor="center"
+                filter="(value, index, length) => true;"
+                map="(value, index) => `${value}`;">
+              </axis-labels>
+            </x-axis>
+
+            <y-axis>
+              <scale-title
+                anchor="start|center|end"
+                text="Sum Axis">
+              </scale-title>
+              <scale-grid
+                type="circular"
+                count="10"
                 filter="(value, index, length) => true;">
               </scale-grid>
               <scale-ticks
                 type="rectangle|ellipse"
                 filter="(value, index, length) => true;">
               </scale-ticks>
-              <scale-labels
-                anchor="center"
+              <scale-label
+                anchor="tick"
                 filter="(value, index, length) => true;"
                 map="(value, index) => `${value}`;">
-              </scale-labels>
+              </scale-label>
+            </y-axis>
 
-              <linerial-scale for="sum" min="0" max="20">
-                <scale-title
-                  anchor="start|center|end"
-                  text="Sum Axis">
-                </scale-title>
-                <scale-grid
-                  type="circular"
-                  count="10"
-                  filter="(value, index, length) => true;">
-                </scale-grid>
-                <scale-ticks
-                  type="rectangle|ellipse"
-                  filter="(value, index, length) => true;">
-                </scale-ticks>
-                <scale-label
-                  anchor="tick"
-                  filter="(value, index, length) => true;"
-                  map="(value, index) => `${value}`;">
-                </scale-label>
-
-                <polar-chart>
-                  <data-point
-                    palette="my-palette">
-                    <data-label
-                      filter="(value, index, length) => true;"
-                      map="(value, index) => `${value}`;">
-                    </data-label>
-                  </data-point>
-                </polar-chart>
-              </linerial-scale>
-            </categorical-scale>
-          </polar-plane>
-        </hdml-view>
+          </linear-scale>
+        </ordinal-scale>
+      </polar-plane> -->
 
       <script>
         // const m = document.querySelector("hdml-model");
