@@ -10,8 +10,10 @@
     "@hdml/elements": "0.0.0-alpha.12",
     "@hdml/schema": "0.0.0-alpha.12",
     "@types/cytoscape": "^3.19.10",
+    "@types/d3": "^7.4.0",
     "chart.js": "^4.3.0",
     "chartjs-plugin-datalabels": "^2.2.0",
+    "d3": "^7.8.5",
     "throttle-debounce": "^5.0.0"
   },
   "scripts": {

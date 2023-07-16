@@ -7,291 +7,65 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="/bin/charts.min.js"></script>
     <style>
       body {
         margin: 0;
       }
-
       hdml-view {
-        display: inline-block;
-        box-sizing: border-box;
-        overflow: hidden;
-        width: 75%;
+        width: 500px;
         height: 250px;
       }
-      hdml-view > slot {
-        display: flex;
-        width: 100%;
-        height: 100%;
-      }
-
       cartesian-plane {
-        display: block;
-        position: relative;
-        box-sizing: border-box;
         width: 50%;
         height: 100%;
-        padding: 20px 20px 30px 55px;
-        background: rgba(0, 0, 0, .02);
+        padding: 0px 0px 25px 40px;
       }
-      cartesian-plane > div {
-        display: block;
-        position: relative;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-      }
-      cartesian-plane > div > slot {
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-      }
-
-      ordinal-scale,
-      linear-scale,
-      chromatic-scale,
-      ordinal-scale > slot,
-      linear-scale > slot,
-      chromatic-scale > slot { 
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        width: 100%;
-        height: 100%;
-      }
-
-      horizontal-axis {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        width: 100%;
-        height: 0;
-        border: 1px solid black;
-      }
-      horizontal-axis[anchor=top] {
-        top: 0;
-      }
-      horizontal-axis[anchor=center] {
-        top: 50%;
-      }
-      horizontal-axis[anchor=bottom] {
-        bottom: 0;
-      }
-      horizontal-axis axis-grid {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        border: 1px solid rgba(0, 0, 0, .2);
-        width: 1px;
-        height: 15px;
-        left: 50%;
-      }
-      horizontal-axis[anchor=top] axis-grid {
-        top: 0;
-      }
-      horizontal-axis[anchor=center] axis-grid,
-      horizontal-axis[anchor=bottom] axis-grid {
-        bottom: 0;
-      }
-      horizontal-axis axis-tick {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        border: 1px solid black;
-        width: 1px;
-        height: 5px;
-        left: 50%;
-      }
-      horizontal-axis[anchor=top] axis-tick {
-        bottom: 0;
-      }
-      horizontal-axis[anchor=center] axis-tick,
-      horizontal-axis[anchor=bottom] axis-tick {
-        top: 0;
-      }
-      horizontal-axis axis-tick > slot {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      horizontal-axis tick-label {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-      }
-      horizontal-axis[anchor=top] tick-label {
-        bottom: 5px;
-      }
-      horizontal-axis[anchor=center] tick-label {
-        top: 5px;
-      }
-      horizontal-axis[anchor=bottom] tick-label {
-        top: 5px;
-      }
-      horizontal-axis axis-title {
-        display: flex;
-        position: relative;
-        flex-direction: row;
-        align-items: flex-start;
-        width: 100%;
-        height: 0;
-      }
-      horizontal-axis axis-title > div {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        width: 100%;
-        white-space: nowrap;
-      }
-
-      vertical-axis {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        width: 0;
-        height: 100%;
-        border: 1px solid black;
-      }
-      vertical-axis[anchor=left] {
-        left: 0;
-      }
-      vertical-axis[anchor=center] {
-        left: 50%;
-      }
-      vertical-axis[anchor=right] {
-        right: 0;
-      }
-      vertical-axis axis-grid {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        border: 1px solid rgba(0, 0, 0, .2);
-        width: 15px;
-        height: 1px;
-        top: 50%;
-      }
-      vertical-axis[anchor=left] axis-grid,
-      vertical-axis[anchor=center] axis-grid {
-        left: 0;
-      }
-      vertical-axis[anchor=right] axis-grid {
-        right: 0;
-      }
-      vertical-axis axis-tick {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-        border: 1px solid black;
-        width: 5px;
-        height: 1px;
-        right: 0;
-        top: 50%;
-      }
-      vertical-axis[anchor=left] axis-tick,
-      vertical-axis[anchor=center] axis-tick {
-        right: 0;
-      }
-      vertical-axis[anchor=right] axis-tick {
-        left: 0;
-      }
-      vertical-axis axis-tick > slot {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-      }
-      vertical-axis tick-label {
-        display: block;
-        position: absolute;
-        box-sizing: border-box;
-      }
-      vertical-axis[anchor=left] tick-label,
-      vertical-axis[anchor=center] tick-label {
-        right: 5px;
-      }
-      vertical-axis[anchor=right] tick-label {
-        left: 5px;
-      }
-      vertical-axis axis-title {
-        display: flex;
-        position: relative;
-        flex-direction: column;
-        align-items: flex-end;
-        width: 0;
-        height: 100%;
-      }
-      vertical-axis axis-title > div {
-        display: flex;
-        flex-direction: row;
-        align-items: flex-start;
-        height: 100%;
-        white-space: nowrap;
-      }
-
       polar-plane {
-        display: block;
-        position: relative;
-        box-sizing: border-box;
         width: 50%;
         height: 100%;
+        left: 50%;
         background: rgba(255, 0, 0, .04);
       }
     </style>
   </head>
     <body>
-
+      <br><br><br>
       My chart:
       <hdml-view>
-        <slot>
-          <cartesian-plane>
-            <div>
-              <slot>
-                <ordinal-scale>
-                  <slot>
-                    <linear-scale>
-                      <slot>
-                        <chromatic-scale>
-                          <slot>
-                            <horizontal-axis anchor="bottom">
-                              <slot>
-                                <axis-grid></axis-grid>
-                                <axis-tick>
-                                  <slot>
-                                    <tick-label>1.0</tick-label>
-                                  </slot>
-                                </axis-tick>
-                                <axis-title>
-                                  <div>X axis</div>
-                                </axis-title>
-                              </slot>
-                            </horizontal-axis>
-                            <vertical-axis anchor="left">
-                              <slot>
-                                <axis-grid></axis-grid>
-                                <axis-tick>
-                                  <slot>
-                                    <tick-label>10.0</tick-label>
-                                  </slot>
-                                </axis-tick>
-                                <axis-title vertical="">
-                                  <div>Y axis</div>
-                                </axis-title>
-                              </slot>
-                            </vertical-axis>
-                          </slot>
-                        </chromatic-scale>
-                      </slot>
-                    </linear-scale>
-                  </slot>
-                </ordinal-scale>
-              </slot>
-            </div>
-          </cartesian-plane>
-  
-          <polar-plane>
-            <!--  -->
-          </polar-plane>
-        </slot>
+        <cartesian-plane>
+          <ordinal-scale
+            bandwidth="0.5"
+            values="['table_1', 'table_2', 'table_3', 'table_4']"
+            values="?hdml-frame=frame&hdml-field=table"
+            count="3"
+            rest="null">
+
+            <linear-scale>
+              <chromatic-scale>
+                
+                <horizontal-axis anchor="bottom">
+                  <axis-grid></axis-grid>
+                  <axis-tick>
+                    <tick-label>1.0</tick-label>
+                  </axis-tick>
+                  <axis-title>X axis</axis-title>
+                </horizontal-axis>
+                
+                <vertical-axis anchor="left">
+                  <axis-grid></axis-grid>
+                  <axis-tick>
+                    <tick-label>10.0</tick-label>
+                  </axis-tick>
+                  <axis-title vertical="">Y axis</axis-title>
+                </vertical-axis>
+              
+              </chromatic-scale>
+            </linear-scale>
+          </ordinal-scale>
+        </cartesian-plane>
+
+        <polar-plane></polar-plane>
       </hdml-view>
 
 
