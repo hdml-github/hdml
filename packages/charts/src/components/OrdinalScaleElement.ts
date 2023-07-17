@@ -4,9 +4,10 @@
  * @license Apache-2.0
  */
 
-import { lit, UnifiedElement } from "@hdml/elements";
+import { lit } from "@hdml/elements";
+import { BaseScaleElement } from "./BaseScaleElement";
 
-export class OrdinalScaleElement extends UnifiedElement {
+export class OrdinalScaleElement extends BaseScaleElement {
   /**
    * Component styles.
    */

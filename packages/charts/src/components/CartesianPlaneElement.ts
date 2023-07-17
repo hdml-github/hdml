@@ -4,9 +4,10 @@
  * @license Apache-2.0
  */
 
-import { lit, UnifiedElement } from "@hdml/elements";
+import { lit } from "@hdml/elements";
+import { BasePlaneElement } from "./BasePlaneElement";
 
-export class CartesianPlaneElement extends UnifiedElement {
+export class CartesianPlaneElement extends BasePlaneElement {
   /**
    * Component styles.
    */
@@ -34,8 +35,15 @@ export class CartesianPlaneElement extends UnifiedElement {
     height: 100%;
   }`;
 
+  /**
+   * Renders compomponent `DOM`.
+   */
   public render(): lit.TemplateResult<1> {
-    return lit.html`<div><slot></slot></div>`;
+    return lit.html`
+      <div>
+        <slot></slot>
+      </div>
+    `;
   }
 }
 customElements.define("cartesian-plane", CartesianPlaneElement);

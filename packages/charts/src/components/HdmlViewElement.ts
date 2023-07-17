@@ -4,10 +4,11 @@
  * @license Apache-2.0
  */
 
-import { lit, UnifiedElement } from "@hdml/elements";
-import * as d3 from "d3";
+import { lit } from "@hdml/elements";
+import { type Selection, select } from "d3";
+import { BaseUnifiedElement } from "./BaseUnifiedElement";
 
-export class HdmlViewElement extends UnifiedElement {
+export class HdmlViewElement extends BaseUnifiedElement {
   /**
    * Component styles.
    */
@@ -38,29 +39,32 @@ export class HdmlViewElement extends UnifiedElement {
     right: 0;
   }`;
 
-  private _root: null | d3.Selection<
+  private _svg: null | Selection<
     SVGSVGElement | null,
     unknown,
     null,
     undefined
   > = null;
 
-  private _compStyle = window.getComputedStyle(this);
-
   /**
-   * @override
+   * `D3` selection of the component's `svg:svg` element.
    */
-  public connectedCallback(): void {
-    super.connectedCallback();
+  get svg(): null | Selection<
+    SVGSVGElement | null,
+    unknown,
+    null,
+    undefined
+  > {
+    return this._svg;
   }
 
   /**
-   * @override
+   * Renders compomponent `DOM`.
    */
   public render(): lit.TemplateResult<1> {
     return lit.html`
-    <slot></slot>
-    <svg></svg>
+      <slot></slot>
+      <svg></svg>
     `;
   }
 
@@ -68,23 +72,13 @@ export class HdmlViewElement extends UnifiedElement {
    * Initialization callback.
    */
   public firstUpdated(): void {
-    this._root = d3.select(this.renderRoot.querySelector("svg"));
-    this._root.attr("viewBox", [
+    this._svg = select(this.renderRoot.querySelector("svg"));
+    this._svg.attr("viewBox", [
       0,
       0,
-      parseFloat(this._compStyle.width),
-      parseFloat(this._compStyle.height),
+      parseFloat(this.styles.width),
+      parseFloat(this.styles.height),
     ]);
-    this._root
-      .append("g")
-      .attr("fill", "steelblue")
-      .selectAll()
-      .data([0, 1, 2, 3, 4])
-      .join("rect")
-      .attr("x", (d) => d)
-      .attr("y", 0)
-      .attr("height", 10)
-      .attr("width", 10);
   }
 }
 customElements.define("hdml-view", HdmlViewElement);
