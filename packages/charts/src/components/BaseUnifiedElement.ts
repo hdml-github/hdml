@@ -17,44 +17,72 @@ export class BaseUnifiedElement extends UnifiedElement {
   }
 
   /**
-   * Plane width in pixels.
+   * Element `width` in pixels.
    */
   public get width(): number {
     return parseFloat(this.styles.width);
   }
 
   /**
-   * Plane height in pixels.
+   * Element `height` in pixels.
    */
   public get height(): number {
     return parseFloat(this.styles.height);
   }
 
   /**
-   * Plane top value in pixels.
+   * Element `top` value in pixels.
    */
   public get top(): number {
     return parseFloat(this.styles.top);
   }
 
   /**
-   * Plane right value in pixels.
+   * Element `right` value in pixels.
    */
   public get right(): number {
     return parseFloat(this.styles.right);
   }
 
   /**
-   * Plane bottom value in pixels.
+   * Element `bottom` value in pixels.
    */
   public get bottom(): number {
     return parseFloat(this.styles.bottom);
   }
 
   /**
-   * Plane left value in pixels.
+   * Element `left` value in pixels.
    */
   public get left(): number {
     return parseFloat(this.styles.left);
+  }
+
+  /**
+   * Element `padding-top` value in pixels.
+   */
+  public get paddingTop(): number {
+    return parseFloat(this.styles.paddingTop);
+  }
+
+  /**
+   * Element `padding-right` value in pixels.
+   */
+  public get paddingRight(): number {
+    return parseFloat(this.styles.paddingRight);
+  }
+
+  /**
+   * Element `padding-bottom` value in pixels.
+   */
+  public get paddingBottom(): number {
+    return parseFloat(this.styles.paddingBottom);
+  }
+
+  /**
+   * Element `padding-left` value in pixels.
+   */
+  public get paddingLeft(): number {
+    return parseFloat(this.styles.paddingLeft);
   }
 }

@@ -27,6 +27,9 @@
         left: 50%;
         background: rgba(255, 0, 0, .04);
       }
+      ordinal-scale {
+        padding: 0 15px;
+      }
     </style>
   </head>
     <body>
@@ -36,10 +39,9 @@
         <cartesian-plane>
           <ordinal-scale
             bandwidth="0.5"
-            values="['table_1', 'table_2', 'table_3', 'table_4']"
-            values="?hdml-frame=frame&hdml-field=table"
-            count="3"
-            rest="null">
+            source="?hdml-frame=frame&hdml-field=table"
+            values='["table_1", "table_2", "table_3", "table_4"]'
+            rest='null'>
 
             <linear-scale>
 

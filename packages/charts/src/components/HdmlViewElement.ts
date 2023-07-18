@@ -13,31 +13,32 @@ export class HdmlViewElement extends BaseUnifiedElement {
    * Component styles.
    */
   public static styles = lit.css`
-  :host {
-    display: inline-block;
-    position: relative;
-    box-sizing: border-box;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-  }
-  :host > slot {
-    display: block;
-    position: relative;
-    width: 100%;
-    height: 100%;
-    visibility: collapse;
-  }
-  :host > svg {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-  }`;
+    :host {
+      display: inline-block;
+      position: relative;
+      box-sizing: border-box;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+    :host > slot {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      visibility: collapse;
+    }
+    :host > svg {
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+    }
+  `;
 
   private _svg: null | Selection<
     SVGSVGElement | null,
@@ -81,4 +82,5 @@ export class HdmlViewElement extends BaseUnifiedElement {
     ]);
   }
 }
+
 customElements.define("hdml-view", HdmlViewElement);
