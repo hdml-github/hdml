@@ -6,9 +6,9 @@
 
 import { lit } from "@hdml/elements";
 import { type Selection, select } from "d3";
-import { BaseUnifiedElement } from "./BaseUnifiedElement";
+import { BaseChartElement } from "./BaseChartElement";
 
-export class HdmlViewElement extends BaseUnifiedElement {
+export class HdmlViewElement extends BaseChartElement {
   /**
    * Component styles.
    */
@@ -26,7 +26,7 @@ export class HdmlViewElement extends BaseUnifiedElement {
       position: relative;
       width: 100%;
       height: 100%;
-      visibility: collapse;
+      /* visibility: collapse; */
     }
     :host > svg {
       display: block;
@@ -74,12 +74,28 @@ export class HdmlViewElement extends BaseUnifiedElement {
    */
   public firstUpdated(): void {
     this._svg = select(this.renderRoot.querySelector("svg"));
-    this._svg.attr("viewBox", [
-      0,
-      0,
-      parseFloat(this.styles.width),
-      parseFloat(this.styles.height),
-    ]);
+    this.patchSvg();
+  }
+
+  /**
+   * @override
+   */
+  public trackedStylesChanged(): void {
+    this.patchSvg();
+  }
+
+  /**
+   * Updates `svg` element attributes.
+   */
+  private patchSvg(): void {
+    if (this._svg) {
+      this._svg.attr("viewBox", [
+        0,
+        0,
+        this.tracked.width,
+        this.tracked.height,
+      ]);
+    }
   }
 }
 

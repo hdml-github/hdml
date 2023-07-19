@@ -13,7 +13,7 @@
         margin: 0;
       }
       hdml-view {
-        width: 500px;
+        width: 600px;
         height: 250px;
       }
       cartesian-plane {
@@ -28,6 +28,9 @@
         background: rgba(255, 0, 0, .04);
       }
       ordinal-scale {
+        padding: 15px 0;
+      }
+      linear-scale {
         padding: 0 15px;
       }
     </style>
@@ -37,13 +40,15 @@
       My chart:
       <hdml-view>
         <cartesian-plane>
-          <ordinal-scale
-            bandwidth="0.5"
+
+          <linear-scale>
+            <ordinal-scale
+            bandwidth="0"
             source="?hdml-frame=frame&hdml-field=table"
             values='["table_1", "table_2", "table_3", "table_4"]'
             rest='null'>
 
-            <linear-scale>
+            <!-- <linear-scale> -->
 
               <horizontal-axis anchor="bottom">
                 <axis-grid></axis-grid>
@@ -61,8 +66,10 @@
                 <axis-title vertical="">Y axis</axis-title>
               </vertical-axis>
 
-            </linear-scale>
-          </ordinal-scale>
+            <!-- </linear-scale> -->
+            </ordinal-scale>
+          </linear-scale>
+          
         </cartesian-plane>
 
         <polar-plane>

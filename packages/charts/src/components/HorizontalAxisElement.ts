@@ -32,5 +32,12 @@ export class HorizontalAxisElement extends UnifiedElement {
   public render(): lit.TemplateResult<1> {
     return lit.html`<slot></slot>`;
   }
+
+  /**
+   * @override
+   */
+  public firstUpdated(): void {
+    //
+  }
 }
 customElements.define("horizontal-axis", HorizontalAxisElement);

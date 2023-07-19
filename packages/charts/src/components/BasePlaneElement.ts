@@ -4,6 +4,6 @@
  * @license Apache-2.0
  */
 
-import { BaseUnifiedElement } from "./BaseUnifiedElement";
+import { BaseChartElement } from "./BaseChartElement";
 
-export class BasePlaneElement extends BaseUnifiedElement {}
+export class BasePlaneElement extends BaseChartElement {}

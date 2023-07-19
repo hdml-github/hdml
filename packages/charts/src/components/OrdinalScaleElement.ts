@@ -5,6 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
+import { type ScaleBand, scaleBand, axisBottom, axisLeft } from "d3";
 import { BaseScaleElement } from "./BaseScaleElement";
 
 export class OrdinalScaleElement extends BaseScaleElement {
@@ -142,6 +143,7 @@ export class OrdinalScaleElement extends BaseScaleElement {
   private _bandwidth = 1;
   private _values: Array<string> = [];
   private _rest: null | string = null;
+  private _scale: null | ScaleBand<string> = null;
 
   /**
    * The `bandwidth` setter.
@@ -207,31 +209,44 @@ export class OrdinalScaleElement extends BaseScaleElement {
   }
 
   /**
+   * The `D3` scale object getter.
+   */
+  public get scale(): null | ScaleBand<string> {
+    return this._scale;
+  }
+
+  /**
    * @override
    */
-  public firstUpdated(): void {
+  protected firstUpdated(): void {
     super.firstUpdated();
 
-    // setup `bandwidth` attribute
     const attrBandwidth = this.getAttribute("bandwidth");
     const svalBandwidth = JSON.stringify(this.bandwidth);
     if (attrBandwidth !== svalBandwidth) {
       this.setAttribute("bandwidth", svalBandwidth);
     }
 
-    // setup `values` attribute
     const attrValues = this.getAttribute("values");
     const svalValues = JSON.stringify(this.values);
     if (attrValues !== svalValues) {
       this.setAttribute("values", svalValues);
     }
 
-    // setup `rest` attribute
     const attrRest = this.getAttribute("rest");
     const svalRest = JSON.stringify(this.rest);
     if (attrRest !== svalRest) {
       this.setAttribute("rest", svalRest);
     }
+
+    this.patchScale();
+  }
+
+  /**
+   * @override
+   */
+  public trackedStylesChanged(): void {
+    super.trackedStylesChanged();
   }
 
   /**
@@ -243,7 +258,42 @@ export class OrdinalScaleElement extends BaseScaleElement {
       changed.has("values") ||
       changed.has("rest")
     ) {
-      //
+      this.patchScale();
+    }
+  }
+
+  /**
+   * Recalculate and set private `_scale` property.
+   */
+  private patchScale(): void {
+    if (!this.values.length) {
+      this._scale = null;
+    } else {
+      const domain = [...this.values];
+      if (this.rest) {
+        domain.push(this.rest);
+      }
+      let fp = 0;
+      let op = 0;
+      let al = 0;
+      const scale = scaleBand(domain, this.range);
+      scale.paddingInner(1 - this.bandwidth);
+
+      if (this.direction === "x") {
+        fp = this.tracked.paddingLeft + this.tracked.paddingRight;
+        op = fp / (2 * (scale.step() - fp / domain.length));
+        al = fp ? this.tracked.paddingLeft / fp : 0.5;
+      }
+
+      if (this.direction === "y") {
+        fp = this.tracked.paddingTop + this.tracked.paddingBottom;
+        op = fp / (2 * (scale.step() - fp / domain.length));
+        al = fp ? this.tracked.paddingTop / fp : 0.5;
+      }
+
+      scale.paddingOuter(op);
+      scale.align(al);
+      this._scale = scale;
     }
   }
 }

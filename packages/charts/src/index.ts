@@ -4,6 +4,9 @@
  * @license Apache-2.0
  */
 
+import "./helpers/mobserver";
+import "./helpers/robserver";
+
 import "./components/HdmlViewElement";
 import "./components/CartesianPlaneElement";
 import "./components/PolarPlaneElement";

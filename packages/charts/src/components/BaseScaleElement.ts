@@ -5,10 +5,10 @@
  */
 
 import { lit } from "@hdml/elements";
-import { BaseUnifiedElement } from "./BaseUnifiedElement";
+import { BaseChartElement } from "./BaseChartElement";
 import { BasePlaneElement } from "./BasePlaneElement";
 
-export class BaseScaleElement extends BaseUnifiedElement {
+export class BaseScaleElement extends BaseChartElement {
   /**
    * The plane associated with the scale.
    */
@@ -21,7 +21,7 @@ export class BaseScaleElement extends BaseUnifiedElement {
         return parent;
       } else {
         cnt++;
-        parent = this.parentElement;
+        parent = parent.parentElement;
       }
     }
     return null;
@@ -30,7 +30,7 @@ export class BaseScaleElement extends BaseUnifiedElement {
   /**
    * Scale direction.
    */
-  public get direction(): null | "x" | "y" | "z" {
+  public get direction(): null | "x" | "y" | "z" | "i" | "j" {
     let cnt = 1;
     let parent: null | HTMLElement | BasePlaneElement =
       this.parentElement;
@@ -40,8 +40,12 @@ export class BaseScaleElement extends BaseUnifiedElement {
           return "x";
         } else if (cnt === 2) {
           return "y";
-        } else {
+        } else if (cnt === 3) {
           return "z";
+        } else if (cnt === 4) {
+          return "i";
+        } else {
+          return "j";
         }
       } else {
         cnt++;
@@ -52,169 +56,25 @@ export class BaseScaleElement extends BaseUnifiedElement {
   }
 
   /**
-   * @override
+   * Scale range in pixels.
    */
-  public get top(): number {
-    if (!this.plane) {
-      return super.top;
-    } else {
-      return super.top + this.plane.top + this.plane.paddingTop;
-    }
-  }
-
-  /**
-   * @override
-   */
-  public get right(): number {
-    if (!this.plane) {
-      return super.right;
-    } else {
-      return super.right + this.plane.right + this.plane.paddingRight;
-    }
-  }
-
-  /**
-   * @override
-   */
-  public get bottom(): number {
-    if (!this.plane) {
-      return super.bottom;
-    } else {
-      return (
-        super.bottom + this.plane.bottom + this.plane.paddingBottom
-      );
-    }
-  }
-
-  /**
-   * @override
-   */
-  public get left(): number {
-    if (!this.plane) {
-      return super.left;
-    } else {
-      return super.left + this.plane.left + this.plane.paddingLeft;
-    }
-  }
-
-  /**
-   * Element `margin-top` value in pixels.
-   */
-  public get marginTop(): number {
+  public get range(): [number, number] {
+    const res: [number, number] = [0, 1];
     if (this.direction === "x") {
-      return 0;
+      res[0] =
+        (this.plane?.tracked.left || 0) +
+        (this.plane?.tracked.paddingLeft || 0) +
+        this.tracked.left;
+      res[1] = res[0] + this.tracked.width;
     }
     if (this.direction === "y") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "x"
-      ) {
-        return -parent.paddingTop;
-      }
+      res[1] =
+        (this.plane?.tracked.top || 0) +
+        (this.plane?.tracked.paddingTop || 0) +
+        this.tracked.top;
+      res[0] = res[1] + this.tracked.height;
     }
-    if (this.direction === "z") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "y"
-      ) {
-        return -parent.paddingTop;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Element `margin-right` value in pixels.
-   */
-  public get marginRight(): number {
-    if (this.direction === "x") {
-      return 0;
-    }
-    if (this.direction === "y") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "x"
-      ) {
-        return -parent.paddingRight;
-      }
-    }
-    if (this.direction === "z") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "y"
-      ) {
-        return -parent.paddingRight;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Element `margin-bottom` value in pixels.
-   */
-  public get marginBottom(): number {
-    if (this.direction === "x") {
-      return 0;
-    }
-    if (this.direction === "y") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "x"
-      ) {
-        return -parent.paddingBottom;
-      }
-    }
-    if (this.direction === "z") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "y"
-      ) {
-        return -parent.paddingBottom;
-      }
-    }
-    return 0;
-  }
-
-  /**
-   * Element `margin-left` value in pixels.
-   */
-  public get marginLeft(): number {
-    if (this.direction === "x") {
-      return 0;
-    }
-    if (this.direction === "y") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "x"
-      ) {
-        return -parent.paddingLeft;
-      }
-    }
-    if (this.direction === "z") {
-      const parent = this.parentElement;
-      if (
-        parent &&
-        parent instanceof BaseScaleElement &&
-        parent.direction === "y"
-      ) {
-        return -parent.paddingLeft;
-      }
-    }
-    return 0;
+    return res;
   }
 
   /**
@@ -229,10 +89,34 @@ export class BaseScaleElement extends BaseUnifiedElement {
   /**
    * @override
    */
-  public firstUpdated(): void {
-    this.style.marginTop = `${this.marginTop}px`;
-    this.style.marginRight = `${this.marginRight}px`;
-    this.style.marginBottom = `${this.marginBottom}px`;
-    this.style.marginLeft = `${this.marginLeft}px`;
+  protected firstUpdated(): void {
+    this.patchShadowStyles();
+  }
+
+  /**
+   * @override
+   */
+  public trackedStylesChanged(): void {
+    this.patchShadowStyles();
+  }
+
+  private patchShadowStyles(): void {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const s = <{ styleSheet: CSSStyleSheet }>this.constructor.styles;
+    const sheet = new CSSStyleSheet();
+    sheet.insertRule(
+      `:host > slot {
+        margin:
+          -${this.tracked.paddingTop}px
+          -${this.tracked.paddingRight}px
+          -${this.tracked.paddingBottom}px
+          -${this.tracked.paddingLeft}px;
+      }`,
+    );
+    lit.adoptStyles(<ShadowRoot>this.renderRoot, [
+      s.styleSheet,
+      sheet,
+    ]);
   }
 }
