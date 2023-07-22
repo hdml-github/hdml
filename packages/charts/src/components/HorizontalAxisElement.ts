@@ -5,7 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
-import { type Selection, select, axisBottom } from "d3";
+import { type Selection, axisBottom } from "d3";
 import { BaseAxisElement } from "./BaseAxisElement";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
