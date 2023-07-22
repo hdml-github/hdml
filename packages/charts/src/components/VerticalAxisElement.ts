@@ -4,9 +4,10 @@
  * @license Apache-2.0
  */
 
-import { lit, UnifiedElement } from "@hdml/elements";
+import { lit } from "@hdml/elements";
+import { BaseChartElement } from "./BaseChartElement";
 
-export class VerticalAxisElement extends UnifiedElement {
+export class VerticalAxisElement extends BaseChartElement {
   /**
    * Component styles.
    */
@@ -19,13 +20,13 @@ export class VerticalAxisElement extends UnifiedElement {
     height: 100%;
     border: 1px solid black;
   }
-  :host([anchor=left]) {
+  :host([position=left]) {
     left: 0;
   }
-  :host([anchor=center]) {
+  :host([position=center]) {
     left: 50%;
   }
-  :host([anchor=right]) {
+  :host([position=right]) {
     right: 0;
   }`;
 

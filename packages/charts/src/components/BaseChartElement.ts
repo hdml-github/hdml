@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import { UnifiedElement } from "@hdml/elements";
+import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
 
 type TrackedStyles = {
@@ -18,6 +18,9 @@ type TrackedStyles = {
   paddingRight: number;
   paddingBottom: number;
   paddingLeft: number;
+  borderColor: string;
+  borderStyle: string;
+  borderWidth: number;
 };
 
 export class BaseChartElement extends UnifiedElement {
@@ -33,6 +36,9 @@ export class BaseChartElement extends UnifiedElement {
     paddingRight: 0,
     paddingBottom: 0,
     paddingLeft: 0,
+    borderColor: "rgba(0, 0, 0, 0)",
+    borderStyle: "none",
+    borderWidth: 0,
   };
 
   /**
@@ -100,6 +106,15 @@ export class BaseChartElement extends UnifiedElement {
       get paddingLeft(): number {
         return parseFloat(self.styles.paddingLeft);
       },
+      get borderColor(): string {
+        return self.styles.borderColor;
+      },
+      get borderStyle(): string {
+        return self.styles.borderStyle;
+      },
+      get borderWidth(): number {
+        return parseFloat(self.styles.borderWidth);
+      },
     };
   }
 
@@ -144,15 +159,31 @@ export class BaseChartElement extends UnifiedElement {
     if (changed.length) {
       this.trackedStylesChanged(changed);
       changed.forEach((p) => {
-        this._stored[p] = this.tracked[p];
+        // TODO: wtf with the types here?
+        this._stored[p] = <never>this.tracked[p];
       });
     }
   };
 
   /**
    * Callback to the styles changed event.
-   */
-  public trackedStylesChanged(styles: string[]): void {
+   */ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  protected trackedStylesChanged(styles: string[]): void {
     //
+  }
+
+  /**
+   * Patchs CSS rules for shadow DOM.
+   */
+  protected patchShadowStyles(css: string): void {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const s = <{ styleSheet: CSSStyleSheet }>this.constructor.styles;
+    const sheet = new CSSStyleSheet();
+    sheet.insertRule(css);
+    lit.adoptStyles(<ShadowRoot>this.renderRoot, [
+      s.styleSheet,
+      sheet,
+    ]);
   }
 }

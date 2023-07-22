@@ -13,13 +13,13 @@
         margin: 0;
       }
       hdml-view {
-        width: 600px;
+        width: 80%;
         height: 250px;
       }
       cartesian-plane {
         width: 50%;
         height: 100%;
-        padding: 0px 0px 25px 40px;
+        padding: 10px 10px 25px 40px;
       }
       polar-plane {
         width: 50%;
@@ -33,6 +33,9 @@
       linear-scale {
         padding: 0 15px;
       }
+      horizontal-axis[direction=x] {
+        border: 2px rgb(126, 188, 246) solid;
+      }
     </style>
   </head>
     <body>
@@ -41,32 +44,39 @@
       <hdml-view>
         <cartesian-plane>
 
-          <linear-scale>
+          <linear-scale
+            source="?hdml-frame=frame&hdml-field=table"
+            min="0"
+            max="100">
+
             <ordinal-scale
             bandwidth="0"
             source="?hdml-frame=frame&hdml-field=table"
             values='["table_1", "table_2", "table_3", "table_4"]'
             rest='null'>
 
-            <!-- <linear-scale> -->
-
-              <horizontal-axis anchor="bottom">
-                <axis-grid></axis-grid>
-                <axis-tick>
+              <horizontal-axis
+                direction="x"
+                position="bottom">
+                <axis-tick
+                  values="[0, 25, 50, 75, 100]">
+                  <axis-grid></axis-grid>
                   <tick-label>1.0</tick-label>
                 </axis-tick>
                 <axis-title>X axis</axis-title>
               </horizontal-axis>
 
-              <vertical-axis anchor="left">
-                <axis-grid></axis-grid>
-                <axis-tick>
-                  <tick-label>10.0</tick-label>
+              <vertical-axis
+                direction="y"
+                position="left">
+                <axis-tick
+                  count="10">
+                  <axis-grid></axis-grid>
+                  <tick-label>A</tick-label>
                 </axis-tick>
                 <axis-title vertical="">Y axis</axis-title>
               </vertical-axis>
 
-            <!-- </linear-scale> -->
             </ordinal-scale>
           </linear-scale>
           

@@ -26,7 +26,7 @@ export class HdmlViewElement extends BaseChartElement {
       position: relative;
       width: 100%;
       height: 100%;
-      /* visibility: collapse; */
+      visibility: collapse;
     }
     :host > svg {
       display: block;
@@ -48,7 +48,7 @@ export class HdmlViewElement extends BaseChartElement {
   > = null;
 
   /**
-   * `D3` selection of the component's `svg:svg` element.
+   * `D3` selection of the `svg:svg` element of the component.
    */
   get svg(): null | Selection<
     SVGSVGElement | null,
@@ -96,6 +96,13 @@ export class HdmlViewElement extends BaseChartElement {
         this.tracked.height,
       ]);
     }
+  }
+
+  /**
+   * Patchs CSS rules for shadow DOM.
+   */
+  public patchShadowStyles(css: string): void {
+    super.patchShadowStyles(css);
   }
 }
 

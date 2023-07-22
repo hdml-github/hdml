@@ -5,7 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
-import { type ScaleBand, scaleBand, axisBottom, axisLeft } from "d3";
+import { type ScaleBand, scaleBand } from "d3";
 import { BaseScaleElement } from "./BaseScaleElement";
 
 export class OrdinalScaleElement extends BaseScaleElement {
@@ -245,13 +245,6 @@ export class OrdinalScaleElement extends BaseScaleElement {
   /**
    * @override
    */
-  public trackedStylesChanged(): void {
-    super.trackedStylesChanged();
-  }
-
-  /**
-   * @override
-   */
   public updated(changed: Map<string, unknown>): void {
     if (
       changed.has("bandwidth") ||
@@ -260,6 +253,14 @@ export class OrdinalScaleElement extends BaseScaleElement {
     ) {
       this.patchScale();
     }
+  }
+
+  /**
+   * @override
+   */
+  protected trackedStylesChanged(): void {
+    super.trackedStylesChanged();
+    this.patchScale();
   }
 
   /**

@@ -32,18 +32,18 @@ export class AxisTickElement extends UnifiedElement {
     right: 0;
     top: 50%;
   }
-  :host-context(horizontal-axis[anchor=top]) {
+  :host-context(horizontal-axis[position=top]) {
     bottom: 0;
   }
-  :host-context(horizontal-axis[anchor=center]),
-  :host-context(horizontal-axis[anchor=bottom]) {
+  :host-context(horizontal-axis[position=center]),
+  :host-context(horizontal-axis[position=bottom]) {
     top: 0;
   }
-  :host-context(vertical-axis[anchor=left]),
-  :host-context(vertical-axis[anchor=center]) {
+  :host-context(vertical-axis[position=left]),
+  :host-context(vertical-axis[position=center]) {
     right: 0;
   }
-  :host-context(vertical-axis[anchor=right]) {
+  :host-context(vertical-axis[position=right]) {
     left: 0;
   }
   :host-context(horizontal-axis) > slot {

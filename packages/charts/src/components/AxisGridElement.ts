@@ -20,25 +20,23 @@ export class AxisGridElement extends UnifiedElement {
   :host-context(horizontal-axis) {
     width: 1px;
     height: 15px;
-    left: 50%;
   }
   :host-context(vertical-axis) {
     width: 15px;
     height: 1px;
-    top: 50%;
   }
-  :host-context(horizontal-axis[anchor=top]) {
+  :host-context(horizontal-axis[position=top]) {
     top: 0;
   }
-  :host-context(horizontal-axis[anchor=center]),
-  :host-context(horizontal-axis[anchor=bottom]) {
+  :host-context(horizontal-axis[position=center]),
+  :host-context(horizontal-axis[position=bottom]) {
     bottom: 0;
   }
-  :host-context(vertical-axis[anchor=left]),
-  :host-context(vertical-axis[anchor=center]) {
+  :host-context(vertical-axis[position=left]),
+  :host-context(vertical-axis[position=center]) {
     left: 0;
   }
-  :host-context(vertical-axis[anchor=right]) {
+  :host-context(vertical-axis[position=right]) {
     right: 0;
   }`;
 }

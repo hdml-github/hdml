@@ -16,18 +16,18 @@ export class TickLabelElement extends UnifiedElement {
     position: absolute;
     box-sizing: border-box;
   }
-  :host-context(horizontal-axis[anchor=top]) {
+  :host-context(horizontal-axis[position=top]) {
     bottom: 5px;
   }
-  :host-context(horizontal-axis[anchor=center]),
-  :host-context(horizontal-axis[anchor=bottom]) {
+  :host-context(horizontal-axis[position=center]),
+  :host-context(horizontal-axis[position=bottom]) {
     top: 5px;
   }
-  :host-context(vertical-axis[anchor=left]),
-  :host-context(vertical-axis[anchor=center]) {
+  :host-context(vertical-axis[position=left]),
+  :host-context(vertical-axis[position=center]) {
     right: 5px;
   }
-  :host-context(vertical-axis[anchor=right]) {
+  :host-context(vertical-axis[position=right]) {
     left: 5px;
   }`;
 

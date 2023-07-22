@@ -96,27 +96,17 @@ export class BaseScaleElement extends BaseChartElement {
   /**
    * @override
    */
-  public trackedStylesChanged(): void {
+  protected trackedStylesChanged(): void {
     this.patchShadowStyles();
   }
 
-  private patchShadowStyles(): void {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const s = <{ styleSheet: CSSStyleSheet }>this.constructor.styles;
-    const sheet = new CSSStyleSheet();
-    sheet.insertRule(
-      `:host > slot {
-        margin:
-          -${this.tracked.paddingTop}px
-          -${this.tracked.paddingRight}px
-          -${this.tracked.paddingBottom}px
-          -${this.tracked.paddingLeft}px;
-      }`,
-    );
-    lit.adoptStyles(<ShadowRoot>this.renderRoot, [
-      s.styleSheet,
-      sheet,
-    ]);
+  protected patchShadowStyles(): void {
+    super.patchShadowStyles(`:host > slot {
+      margin:
+        -${this.tracked.paddingTop}px
+        -${this.tracked.paddingRight}px
+        -${this.tracked.paddingBottom}px
+        -${this.tracked.paddingLeft}px;
+    }`);
   }
 }
