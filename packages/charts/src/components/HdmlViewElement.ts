@@ -46,6 +46,7 @@ export class HdmlViewElement extends BaseChartElement {
     null,
     undefined
   > = null;
+  private _stylesheetsMap: Map<string, CSSStyleSheet> = new Map();
 
   /**
    * `D3` selection of the `svg:svg` element of the component.
@@ -99,10 +100,24 @@ export class HdmlViewElement extends BaseChartElement {
   }
 
   /**
-   * Patchs CSS rules for shadow DOM.
+   * Adds `CSSStyleSheet` object to the `hdml-view` shadow `DOM`.
    */
-  public patchShadowStyles(css: string): void {
-    super.patchShadowStyles(css);
+  public addStyleSheet(uid: string, stylesheet: CSSStyleSheet): void {
+    if (this._stylesheetsMap.has(uid)) {
+      this._stylesheetsMap.delete(uid);
+    }
+    this._stylesheetsMap.set(uid, stylesheet);
+    this.setStyleSheet(Array.from(this._stylesheetsMap.values()));
+  }
+
+  /**
+   * Removes `CSSStyleSheet` object from the `hdml-view` shadow `DOM`.
+   */
+  public removeStyleSheet(uid: string): void {
+    if (this._stylesheetsMap.has(uid)) {
+      this._stylesheetsMap.delete(uid);
+    }
+    this.setStyleSheet(Array.from(this._stylesheetsMap.values()));
   }
 }
 

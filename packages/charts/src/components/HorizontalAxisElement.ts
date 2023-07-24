@@ -111,6 +111,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
     null,
     undefined
   > = null;
+  private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
 
   /**
    * `D3` selection of the root `svg:g` element of the component.
@@ -180,19 +181,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
     super.firstUpdated(changedProperties);
-
-    const attrDirection = this.getAttribute("direction");
-    const svalDirection = this.direction;
-    if (attrDirection !== svalDirection) {
-      this.setAttribute("direction", svalDirection);
-    }
-
-    const attrPosition = this.getAttribute("position");
-    const svalPosition = this.position;
-    if (attrPosition !== svalPosition) {
-      this.setAttribute("position", svalPosition);
-    }
-
+    this.syncAttrs();
     this.patchAxis();
   }
 
@@ -212,12 +201,27 @@ export class HorizontalAxisElement extends BaseAxisElement {
     this.patchAxis();
   }
 
+  private syncAttrs(): void {
+    const attrDirection = this.getAttribute("direction");
+    const attrPosition = this.getAttribute("position");
+    const svalDirection = this.direction;
+    const svalPosition = this.position;
+    if (attrDirection !== svalDirection) {
+      this.setAttribute("direction", svalDirection);
+    }
+    if (attrPosition !== svalPosition) {
+      this.setAttribute("position", svalPosition);
+    }
+  }
+
   private patchAxis(): void {
-    const view = this.view;
     const g = this.getGElement();
     const scale = this.getScaleElement();
-    if (view && g && scale && scale.scale) {
-      view.patchShadowStyles(this.getStyles());
+    if (g && scale && scale.scale) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this._stylesheet.replace(this.getStyles());
       g.attr("transform", `translate(0, ${this.getPosition()})`).call(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -226,23 +230,70 @@ export class HorizontalAxisElement extends BaseAxisElement {
     }
   }
 
-  private getGElement(): Selection<
+  private getGElement(): null | Selection<
     SVGGElement,
     unknown,
     null,
     undefined
-  > | null {
-    const svg = this.view?.svg;
-    if (!svg) {
-      this._element && this._element.remove();
-    } else {
-      if (!this._element) {
-        svg.append("g").attr("class", `${this.direction}-axis`);
-        this._element = svg.select(`g.${this.direction}-axis`);
-      }
-    }
+  > {
+    this.addGElement();
     return this._element;
   }
+
+  private addGElement(): void {
+    if (!this._element && this.view?.svg) {
+      this.view.addStyleSheet(this.uid, this._stylesheet);
+      this._stylesheet.insertRule(this.getStyles());
+      this._element = this.view.svg
+        .append("g")
+        .attr("class", `${this.direction}-axis`);
+      const el = this._element.node();
+      if (el) {
+        el.addEventListener("mouseenter", this.mouseoverListener);
+        el.addEventListener("mouseover", this.mouseoverListener);
+        el.addEventListener("mousemove", this.mouseoverListener);
+        el.addEventListener("mousedown", this.mousedownListener);
+        el.addEventListener("mouseup", this.mouseupListener);
+        el.addEventListener("mouseleave", this.mouseoutListener);
+        el.addEventListener("mouseout", this.mouseoutListener);
+      }
+    }
+  }
+
+  private removeGElement(): void {
+    if (this._element) {
+      this.view?.removeStyleSheet(this.uid);
+      const el = this._element.node();
+      if (el) {
+        el.addEventListener("mouseenter", this.mouseoverListener);
+        el.addEventListener("mouseover", this.mouseoverListener);
+        el.addEventListener("mousemove", this.mouseoverListener);
+        el.addEventListener("mousedown", this.mousedownListener);
+        el.addEventListener("mouseup", this.mouseupListener);
+        el.addEventListener("mouseleave", this.mouseoutListener);
+        el.addEventListener("mouseout", this.mouseoutListener);
+      }
+      this._element.remove();
+      this._element = null;
+    }
+  }
+
+  private mouseoverListener = () => {
+    this.classList.add("hover");
+  };
+
+  private mousedownListener = () => {
+    this.classList.add("active");
+  };
+
+  private mouseupListener = () => {
+    this.classList.remove("active");
+  };
+
+  private mouseoutListener = () => {
+    this.classList.remove("hover");
+    this.classList.remove("active");
+  };
 
   private getScaleElement():
     | null
@@ -291,7 +342,25 @@ export class HorizontalAxisElement extends BaseAxisElement {
   }
 
   private getStyles(): string {
-    let css = `:host > svg g.${this.direction}-axis path.domain {`;
+    let css = "";
+    if (
+      !this.classList.contains("hover") &&
+      !this.classList.contains("active")
+    ) {
+      css = `:host>svg g.${this.direction}-axis path.domain {`;
+    } else if (
+      this.classList.contains("hover") &&
+      !this.classList.contains("active")
+    ) {
+      css = `:host>svg g.${this.direction}-axis path.domain:hover {`;
+    } else if (
+      !this.classList.contains("hover") &&
+      this.classList.contains("active")
+    ) {
+      css = `:host>svg g.${this.direction}-axis path.domain:active {`;
+    } else {
+      css = `:host>svg g.${this.direction}-axis path.domain:active {`;
+    }
     if (this.tracked.borderStyle === "solid") {
       css =
         css +

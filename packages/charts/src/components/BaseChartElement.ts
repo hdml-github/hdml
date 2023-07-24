@@ -175,15 +175,17 @@ export class BaseChartElement extends UnifiedElement {
   /**
    * Patchs CSS rules for shadow DOM.
    */
-  protected patchShadowStyles(css: string): void {
+  protected setStyleSheet(stylesheets: CSSStyleSheet[]): void {
+    lit.adoptStyles(<ShadowRoot>this.renderRoot, [
+      this.getStaticStyleSheet(),
+      ...stylesheets,
+    ]);
+  }
+
+  private getStaticStyleSheet(): CSSStyleSheet {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const s = <{ styleSheet: CSSStyleSheet }>this.constructor.styles;
-    const sheet = new CSSStyleSheet();
-    sheet.insertRule(css);
-    lit.adoptStyles(<ShadowRoot>this.renderRoot, [
-      s.styleSheet,
-      sheet,
-    ]);
+    return s.styleSheet;
   }
 }

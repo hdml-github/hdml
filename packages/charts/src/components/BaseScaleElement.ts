@@ -9,6 +9,8 @@ import { BaseChartElement } from "./BaseChartElement";
 import { BasePlaneElement } from "./BasePlaneElement";
 
 export class BaseScaleElement extends BaseChartElement {
+  private _stylesheet: null | CSSStyleSheet = null;
+
   /**
    * The plane associated with the scale.
    */
@@ -100,8 +102,12 @@ export class BaseScaleElement extends BaseChartElement {
     this.patchShadowStyles();
   }
 
-  protected patchShadowStyles(): void {
-    super.patchShadowStyles(`:host > slot {
+  private patchShadowStyles(): void {
+    if (!this._stylesheet) {
+      this._stylesheet = new CSSStyleSheet();
+      this.setStyleSheet([this._stylesheet]);
+    }
+    this._stylesheet.insertRule(`:host > slot {
       margin:
         -${this.tracked.paddingTop}px
         -${this.tracked.paddingRight}px
