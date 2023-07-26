@@ -33,18 +33,39 @@
       linear-scale {
         padding: 0 15px;
       }
-      horizontal-axis[direction=x] {
-        border: 2px rgb(126, 188, 246) dotted;
+
+
+      .blue horizontal-axis[direction=x] {
+        border: 10px rgb(126, 188, 246) dashed;
       }
-      horizontal-axis.hover[direction=x] {
-        border: 2px rgb(28, 140, 244) dotted;
+      .blue horizontal-axis.hover[direction=x] {
+        border: 10px rgb(28, 140, 244) dashed;
       }
-      horizontal-axis.active[direction=x] {
-        border: 2px rgb(244, 28, 28) dotted;
+      .blue horizontal-axis.focus[direction=x] {
+        border: 10px rgb(245, 121, 121) dashed;
+      }
+      .blue horizontal-axis.active[direction=x] {
+        border: 10px rgb(244, 28, 28) dashed;
+      }
+
+
+      .green horizontal-axis[direction=x] {
+        border: 10px rgb(74, 225, 109) dashed;
+      }
+      .green horizontal-axis.hover[direction=x] {
+        border: 10px rgb(30, 185, 66) dashed;
+      }
+      .green horizontal-axis.focus[direction=x] {
+        border: 10px rgb(245, 121, 121) dashed;
+        outline: none;
+      }
+      .green horizontal-axis.active[direction=x] {
+        border: 10px rgb(244, 28, 28) dashed;
+        outline: none;
       }
     </style>
   </head>
-    <body>
+    <body class="blue">
       <br><br><br>
       My chart:
       <hdml-view>

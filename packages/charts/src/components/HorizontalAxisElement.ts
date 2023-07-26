@@ -15,23 +15,25 @@ export class HorizontalAxisElement extends BaseAxisElement {
    * Component styles.
    */
   public static styles = lit.css`
-  :host {
-    display: block;
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    height: 0;
-    border: 1px solid black;
-  }
-  :host([position=top]) {
-    top: 0;
-  }
-  :host([position=center]) {
-    top: 50%;
-  }
-  :host([position=bottom]) {
-    bottom: 0;
-  }`;
+    :host {
+      display: block;
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
+      height: 0;
+      border: 1px solid black;
+      cursor: pointer;
+    }
+    :host([position=top]) {
+      top: 0;
+    }
+    :host([position=center]) {
+      top: 50%;
+    }
+    :host([position=bottom]) {
+      bottom: 0;
+    }
+  `;
 
   /**
    * Reactive attributes.
@@ -218,15 +220,17 @@ export class HorizontalAxisElement extends BaseAxisElement {
     const g = this.getGElement();
     const scale = this.getScaleElement();
     if (g && scale && scale.scale) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this._stylesheet.replace(this.getStyles());
-      g.attr("transform", `translate(0, ${this.getPosition()})`).call(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        axisBottom(scale.scale).ticks(0).tickSize(0),
-      );
+      this.setSvgStyles();
+      g.attr("transform", `translate(0, ${this.getPosition()})`)
+        .call(
+          // eslint-disable-next-line max-len
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          axisBottom(scale.scale).ticks(0).tickSize(0),
+        )
+        .selectChild("path.domain");
+      //.attr("tabindex", "-1");
+      // TODO: do we need it to be focusable?
     }
   }
 
@@ -243,57 +247,20 @@ export class HorizontalAxisElement extends BaseAxisElement {
   private addGElement(): void {
     if (!this._element && this.view?.svg) {
       this.view.addStyleSheet(this.uid, this._stylesheet);
-      this._stylesheet.insertRule(this.getStyles());
+      this.setSvgStyles();
       this._element = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
-      const el = this._element.node();
-      if (el) {
-        el.addEventListener("mouseenter", this.mouseoverListener);
-        el.addEventListener("mouseover", this.mouseoverListener);
-        el.addEventListener("mousemove", this.mouseoverListener);
-        el.addEventListener("mousedown", this.mousedownListener);
-        el.addEventListener("mouseup", this.mouseupListener);
-        el.addEventListener("mouseleave", this.mouseoutListener);
-        el.addEventListener("mouseout", this.mouseoutListener);
-      }
     }
   }
 
   private removeGElement(): void {
     if (this._element) {
       this.view?.removeStyleSheet(this.uid);
-      const el = this._element.node();
-      if (el) {
-        el.addEventListener("mouseenter", this.mouseoverListener);
-        el.addEventListener("mouseover", this.mouseoverListener);
-        el.addEventListener("mousemove", this.mouseoverListener);
-        el.addEventListener("mousedown", this.mousedownListener);
-        el.addEventListener("mouseup", this.mouseupListener);
-        el.addEventListener("mouseleave", this.mouseoutListener);
-        el.addEventListener("mouseout", this.mouseoutListener);
-      }
       this._element.remove();
       this._element = null;
     }
   }
-
-  private mouseoverListener = () => {
-    this.classList.add("hover");
-  };
-
-  private mousedownListener = () => {
-    this.classList.add("active");
-  };
-
-  private mouseupListener = () => {
-    this.classList.remove("active");
-  };
-
-  private mouseoutListener = () => {
-    this.classList.remove("hover");
-    this.classList.remove("active");
-  };
 
   private getScaleElement():
     | null
@@ -341,50 +308,109 @@ export class HorizontalAxisElement extends BaseAxisElement {
     return 0;
   }
 
-  private getStyles(): string {
-    let css = "";
-    if (
-      !this.classList.contains("hover") &&
-      !this.classList.contains("active")
-    ) {
-      css = `:host>svg g.${this.direction}-axis path.domain {`;
-    } else if (
-      this.classList.contains("hover") &&
-      !this.classList.contains("active")
-    ) {
-      css = `:host>svg g.${this.direction}-axis path.domain:hover {`;
-    } else if (
-      !this.classList.contains("hover") &&
-      this.classList.contains("active")
-    ) {
-      css = `:host>svg g.${this.direction}-axis path.domain:active {`;
-    } else {
-      css = `:host>svg g.${this.direction}-axis path.domain:active {`;
+  private setSvgStyles(): void {
+    const [def, hov, foc, act] = this.getStyles();
+    for (let i = this._stylesheet.cssRules.length - 1; i >= 0; i--) {
+      this._stylesheet.deleteRule(i);
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    this._stylesheet.insertRule(act);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    this._stylesheet.insertRule(foc);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    this._stylesheet.insertRule(hov);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    this._stylesheet.insertRule(def);
+  }
+
+  private getStyles(): string[] {
+    const def = this.getDefaultStyles();
+    const hov = this.getHoverStyles();
+    const foc = this.getFocusStyles();
+    const act = this.getActiveStyles();
+    return [def, hov, foc, act];
+  }
+
+  private getDefaultStyles(): string {
+    let css = `:host > svg g.${this.direction}-axis path.domain { `;
+    css = css + this.getStyleProperties();
+    css = css + " }";
+    return css;
+  }
+
+  private getHoverStyles(): string {
+    this.classList.add("hover");
+    let css =
+      `:host > svg g.${this.direction}-axis ` +
+      "path.domain:hover { ";
+    css = css + this.getStyleProperties();
+    css = css + " }";
+    this.classList.remove("hover");
+    return css;
+  }
+
+  private getFocusStyles(): string {
+    this.classList.add("focus");
+    let css =
+      `:host > svg g.${this.direction}-axis ` +
+      "path.domain:focus { ";
+    css = css + this.getStyleProperties();
+    css = css + " }";
+    this.classList.remove("focus");
+    return css;
+  }
+
+  private getActiveStyles(): string {
+    this.classList.add("active");
+    let css =
+      `:host > svg g.${this.direction}-axis ` +
+      "path.domain:active { ";
+    css = css + this.getStyleProperties();
+    css = css + " }";
+    this.classList.remove("active");
+    return css;
+  }
+
+  private getStyleProperties(): string {
+    let css = "";
     if (this.tracked.borderStyle === "solid") {
       css =
         css +
-        `stroke: ${this.tracked.borderColor};\n` +
-        `stroke-width: ${this.tracked.borderWidth};\n`;
+        `stroke: ${this.tracked.borderColor}; ` +
+        `stroke-width: ${this.tracked.borderWidth}; ` +
+        `cursor: ${this.tracked.cursor}; `;
     } else if (this.tracked.borderStyle === "dashed") {
       css =
         css +
-        `stroke: ${this.tracked.borderColor};\n` +
-        `stroke-width: ${this.tracked.borderWidth};\n` +
+        `stroke: ${this.tracked.borderColor}; ` +
+        `stroke-width: ${this.tracked.borderWidth}; ` +
         `stroke-dasharray: ${2 * this.tracked.borderWidth + 1},` +
-        `${this.tracked.borderWidth + 1}\n`;
+        `${this.tracked.borderWidth + 1}; ` +
+        `cursor: ${this.tracked.cursor}; `;
     } else if (this.tracked.borderStyle === "dotted") {
       css =
         css +
-        `stroke: ${this.tracked.borderColor};\n` +
-        `stroke-width: ${this.tracked.borderWidth};\n` +
+        `stroke: ${this.tracked.borderColor}; ` +
+        `stroke-width: ${this.tracked.borderWidth}; ` +
         `stroke-dasharray: 1,` +
-        `${2 * this.tracked.borderWidth};\n` +
-        "stroke-linecap: round;\n";
+        `${2 * this.tracked.borderWidth};` +
+        "stroke-linecap: round; " +
+        `cursor: ${this.tracked.cursor}; `;
     } else {
-      css = css + `stroke: rgba(0, 0, 0, 0);\nstroke-width: 0;\n`;
+      css =
+        css +
+        `stroke: rgba(0, 0, 0, 0); stroke-width: 0; ` +
+        `cursor: ${this.tracked.cursor}; `;
     }
-    css = css + "}";
+    css = css + "outline: none;";
     return css;
   }
 }

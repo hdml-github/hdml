@@ -4,8 +4,31 @@
  * @license Apache-2.0
  */
 
+import { debounce } from "throttle-debounce";
+
+const dispatchImmediate = () => {
+  window.dispatchEvent(
+    new CustomEvent("styles-changed", {
+      cancelable: false,
+      composed: false,
+      bubbles: false,
+    }),
+  );
+};
+
+const dispatchDelayed = debounce(50, () => {
+  window.dispatchEvent(
+    new CustomEvent("styles-changed", {
+      cancelable: false,
+      composed: false,
+      bubbles: false,
+    }),
+  );
+});
+
 const mobserver = new MutationObserver((recs: MutationRecord[]) => {
   let dispatch = false;
+  let delayed = false;
   for (const rec of recs) {
     dispatch =
       dispatch ||
@@ -13,37 +36,33 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
         (rec.attributeName === "class" ||
           rec.attributeName === "style"));
 
-    if (dispatch) continue;
+    delayed =
+      rec.type === "attributes" && rec.attributeName === "class";
+
+    if (dispatch) break;
 
     if (rec.type === "childList" && rec.addedNodes.length) {
       for (const node of rec.addedNodes) {
         if (node.nodeName === "STYLE" || node.nodeName === "LINK") {
           dispatch = true;
-          continue;
+          break;
         }
       }
-      if (dispatch) continue;
+      if (dispatch) break;
     }
 
     if (rec.type === "childList" && rec.removedNodes.length) {
       for (const node of rec.removedNodes) {
         if (node.nodeName === "STYLE" || node.nodeName === "LINK") {
           dispatch = true;
-          continue;
+          break;
         }
       }
-      if (dispatch) continue;
+      if (dispatch) break;
     }
   }
 
-  dispatch &&
-    window.dispatchEvent(
-      new CustomEvent("styles-changed", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
+  dispatch && delayed ? dispatchDelayed() : dispatchImmediate();
 });
 
 mobserver.observe(document, {

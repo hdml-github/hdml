@@ -21,6 +21,7 @@ type TrackedStyles = {
   borderColor: string;
   borderStyle: string;
   borderWidth: number;
+  cursor: string;
 };
 
 export class BaseChartElement extends UnifiedElement {
@@ -39,6 +40,7 @@ export class BaseChartElement extends UnifiedElement {
     borderColor: "rgba(0, 0, 0, 0)",
     borderStyle: "none",
     borderWidth: 0,
+    cursor: "auto",
   };
 
   /**
@@ -114,6 +116,9 @@ export class BaseChartElement extends UnifiedElement {
       },
       get borderWidth(): number {
         return parseFloat(self.styles.borderWidth);
+      },
+      get cursor(): string {
+        return self.styles.cursor;
       },
     };
   }
