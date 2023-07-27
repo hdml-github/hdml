@@ -9,7 +9,7 @@ import { BaseChartElement } from "./BaseChartElement";
 import { BasePlaneElement } from "./BasePlaneElement";
 
 export class BaseScaleElement extends BaseChartElement {
-  private _stylesheet: null | CSSStyleSheet = null;
+  private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
 
   /**
    * The plane associated with the scale.
@@ -90,23 +90,25 @@ export class BaseScaleElement extends BaseChartElement {
 
   /**
    * @override
+   * @category updates
    */
   protected firstUpdated(): void {
-    this.patchShadowStyles();
+    this.resetShadowStylesheets([this._stylesheet]);
+    this.updateShadowStyles();
   }
 
   /**
    * @override
+   * @category comp-styles
    */
   protected trackedStylesChanged(): void {
-    this.patchShadowStyles();
+    this.updateShadowStyles();
   }
 
-  private patchShadowStyles(): void {
-    if (!this._stylesheet) {
-      this._stylesheet = new CSSStyleSheet();
-      this.setStyleSheet([this._stylesheet]);
-    }
+  /**
+   * @category comp-styles
+   */
+  private updateShadowStyles(): void {
     this._stylesheet.insertRule(`:host > slot {
       margin:
         -${this.tracked.paddingTop}px

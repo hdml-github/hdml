@@ -42,9 +42,12 @@ export class BaseChartElement extends UnifiedElement {
     borderWidth: 0,
     cursor: "auto",
   };
+  private _svgCSSSheet = new CSSStyleSheet();
 
   /**
    * The plane associated with the scale.
+   *
+   * @category hdml-elements
    */
   public get view(): null | HdmlViewElement {
     if (this instanceof HdmlViewElement) {
@@ -66,6 +69,8 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Computed styles of the component.
+   *
+   * @category comp-styles
    */
   public get styles(): CSSStyleDeclaration {
     return this._styles;
@@ -73,6 +78,8 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Tracked component styles.
+   *
+   * @category comp-styles
    */
   public get tracked(): TrackedStyles {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -125,13 +132,16 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Stored component styles.
+   *
+   * @category comp-styles
    */
-  public stored(): TrackedStyles {
+  public get stored(): TrackedStyles {
     return this._stored;
   }
 
   /**
    * @override
+   * @category lifecycle
    */
   public connectedCallback(): void {
     super.connectedCallback();
@@ -143,17 +153,39 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * @override
+   * @category updates
+   */
+  protected firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
+    super.firstUpdated(changedProperties);
+  }
+
+  /**
+   * @override
+   * @category updates
+   */
+  protected updated(changed: Map<string, unknown>): void {
+    super.update(changed);
+  }
+
+  /**
+   * @override
+   * @category lifecycle
    */
   public disconnectedCallback(): void {
     window.removeEventListener(
       "styles-changed",
       this.stylesChangedListener,
     );
+    this.view?.removeStylesheet(this._svgCSSSheet);
     super.disconnectedCallback();
   }
 
   /**
    * Callback to the interval for checking the monitored styles.
+   *
+   * @category comp-styles
    */
   private stylesChangedListener = () => {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
@@ -172,25 +204,162 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Callback to the styles changed event.
-   */ // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   *
+   * @category comp-styles
+   */
   protected trackedStylesChanged(styles: string[]): void {
     //
   }
 
   /**
-   * Patchs CSS rules for shadow DOM.
+   * Resets component shadow DOM stylesheets.
+   *
+   * @category comp-styles
    */
-  protected setStyleSheet(stylesheets: CSSStyleSheet[]): void {
+  protected resetShadowStylesheets(sheets: CSSStyleSheet[]): void {
     lit.adoptStyles(<ShadowRoot>this.renderRoot, [
-      this.getStaticStyleSheet(),
-      ...stylesheets,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      <{ styleSheet: CSSStyleSheet }>this.constructor.styles,
+      ...sheets,
     ]);
   }
 
-  private getStaticStyleSheet(): CSSStyleSheet {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const s = <{ styleSheet: CSSStyleSheet }>this.constructor.styles;
-    return s.styleSheet;
+  /**
+   * Updates the `CSS` stylesheet for the `SVG` elements specified
+   * by the selector.
+   *
+   * @category svg-styles
+   */
+  protected updateSvgStyles(selector: string): void {
+    if (this.view) {
+      this.view?.addStylesheet(this._svgCSSSheet);
+      const [def, hov, foc, act] = this.getSvgStyles(selector);
+      for (
+        let i = this._svgCSSSheet.cssRules.length - 1;
+        i >= 0;
+        i--
+      ) {
+        this._svgCSSSheet.deleteRule(i);
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this._svgCSSSheet.insertRule(act);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this._svgCSSSheet.insertRule(foc);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this._svgCSSSheet.insertRule(hov);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      this._svgCSSSheet.insertRule(def);
+    }
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgStyles(selector: string): string[] {
+    const def = this.getSvgSelectorStyles(selector);
+    const hov = this.getSvgSelectorStyles(selector, "hover");
+    const foc = this.getSvgSelectorStyles(selector, "focus");
+    const act = this.getSvgSelectorStyles(selector, "active");
+    return [def, hov, foc, act];
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgSelectorStyles(
+    selector: string,
+    state?: "hover" | "focus" | "active",
+  ): string {
+    state && this.classList.add(state);
+    const val =
+      `${selector}${state ? `:${state}` : ""} {\n` +
+      `\t${this.getSvgStrokeStyle()}\n` +
+      `\t${this.getSvgStrokeWidthStyle()}\n` +
+      `\t${this.getSvgStrokeDasharrayStyle()}\n` +
+      `\t${this.getSvgStrokeLinecapStyle()}\n` +
+      `\t${this.getSvgCursorStyle()}\n` +
+      `\t${this.getSvgOutlineStyle()}\n` +
+      `}`;
+    state && this.classList.remove(state);
+    return val;
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgStrokeStyle(): string {
+    return `stroke: ${this.tracked.borderColor};`;
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgStrokeWidthStyle(): string {
+    if (
+      this.tracked.borderStyle === "solid" ||
+      this.tracked.borderStyle === "dashed" ||
+      this.tracked.borderStyle === "dotted"
+    ) {
+      return `stroke-width: ${this.tracked.borderWidth};`;
+    } else {
+      return "stroke-width: 0;";
+    }
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgStrokeDasharrayStyle(): string {
+    if (this.tracked.borderStyle === "solid") {
+      return `stroke-dasharray: none;`;
+    } else if (this.tracked.borderStyle === "dashed") {
+      return (
+        `stroke-dasharray: ` +
+        `${2 * this.tracked.borderWidth + 1},` +
+        `${this.tracked.borderWidth + 1};`
+      );
+    } else if (this.tracked.borderStyle === "dotted") {
+      return `stroke-dasharray: 0, ${2 * this.tracked.borderWidth};`;
+    } else {
+      return `stroke-dasharray: none;`;
+    }
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgStrokeLinecapStyle(): string {
+    if (this.tracked.borderStyle === "solid") {
+      return `stroke-linecap: inherit;`;
+    } else if (this.tracked.borderStyle === "dashed") {
+      return `stroke-linecap: inherit;`;
+    } else if (this.tracked.borderStyle === "dotted") {
+      return `stroke-linecap: round;`;
+    } else {
+      return `stroke-linecap: inherit;`;
+    }
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgCursorStyle(): string {
+    return `cursor: ${this.tracked.cursor};`;
+  }
+
+  /**
+   * @category svg-styles
+   */
+  private getSvgOutlineStyle(): string {
+    return "outline: none;";
   }
 }

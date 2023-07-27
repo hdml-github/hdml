@@ -46,7 +46,7 @@ export class HdmlViewElement extends BaseChartElement {
     null,
     undefined
   > = null;
-  private _stylesheetsMap: Map<string, CSSStyleSheet> = new Map();
+  private _stylesheets: Set<CSSStyleSheet> = new Set();
 
   /**
    * `D3` selection of the `svg:svg` element of the component.
@@ -101,23 +101,30 @@ export class HdmlViewElement extends BaseChartElement {
 
   /**
    * Adds `CSSStyleSheet` object to the `hdml-view` shadow `DOM`.
+   *
+   * @category comp-styles
    */
-  public addStyleSheet(uid: string, stylesheet: CSSStyleSheet): void {
-    if (this._stylesheetsMap.has(uid)) {
-      this._stylesheetsMap.delete(uid);
+  public addStylesheet(stylesheet: CSSStyleSheet): void {
+    if (!this._stylesheets.has(stylesheet)) {
+      this._stylesheets.add(stylesheet);
+      this.resetShadowStylesheets(
+        Array.from(this._stylesheets.values()),
+      );
     }
-    this._stylesheetsMap.set(uid, stylesheet);
-    this.setStyleSheet(Array.from(this._stylesheetsMap.values()));
   }
 
   /**
    * Removes `CSSStyleSheet` object from the `hdml-view` shadow `DOM`.
+   *
+   * @category comp-styles
    */
-  public removeStyleSheet(uid: string): void {
-    if (this._stylesheetsMap.has(uid)) {
-      this._stylesheetsMap.delete(uid);
+  public removeStylesheet(stylesheet: CSSStyleSheet): void {
+    if (this._stylesheets.has(stylesheet)) {
+      this._stylesheets.delete(stylesheet);
+      this.resetShadowStylesheets(
+        Array.from(this._stylesheets.values()),
+      );
     }
-    this.setStyleSheet(Array.from(this._stylesheetsMap.values()));
   }
 }
 

@@ -36,32 +36,30 @@
 
 
       .blue horizontal-axis[direction=x] {
-        border: 10px rgb(126, 188, 246) dashed;
+        border: 2px rgb(126, 188, 246) dashed;
       }
       .blue horizontal-axis.hover[direction=x] {
-        border: 10px rgb(28, 140, 244) dashed;
+        border: 2px rgb(28, 140, 244) dashed;
       }
       .blue horizontal-axis.focus[direction=x] {
-        border: 10px rgb(245, 121, 121) dashed;
+        border: 2px rgb(245, 121, 121) dashed;
       }
       .blue horizontal-axis.active[direction=x] {
-        border: 10px rgb(244, 28, 28) dashed;
+        border: 2px rgb(244, 28, 28) dashed;
       }
 
 
       .green horizontal-axis[direction=x] {
-        border: 10px rgb(74, 225, 109) dashed;
+        border: 2px rgb(74, 225, 109) dashed;
       }
       .green horizontal-axis.hover[direction=x] {
-        border: 10px rgb(30, 185, 66) dashed;
+        border: 2px rgb(30, 185, 66) dashed;
       }
       .green horizontal-axis.focus[direction=x] {
-        border: 10px rgb(245, 121, 121) dashed;
-        outline: none;
+        border: 2px rgb(245, 121, 121) dashed;
       }
       .green horizontal-axis.active[direction=x] {
-        border: 10px rgb(244, 28, 28) dashed;
-        outline: none;
+        border: 2px rgb(244, 28, 28) dashed;
       }
     </style>
   </head>
@@ -77,31 +75,31 @@
             max="100">
 
             <ordinal-scale
-            bandwidth="0"
-            source="?hdml-frame=frame&hdml-field=table"
-            values='["table_1", "table_2", "table_3", "table_4"]'
-            rest='null'>
+              bandwidth="0"
+              source="?hdml-frame=frame&hdml-field=table"
+              values='["table_1", "table_2", "table_3", "table_4"]'
+              rest='null'>
 
               <horizontal-axis
                 direction="x"
                 position="bottom">
+                <axis-title>X axis</axis-title>
                 <axis-tick
                   values="[0, 25, 50, 75, 100]">
                   <axis-grid></axis-grid>
-                  <tick-label>1.0</tick-label>
+                  <tick-label></tick-label>
                 </axis-tick>
-                <axis-title>X axis</axis-title>
               </horizontal-axis>
 
               <vertical-axis
                 direction="y"
                 position="left">
+                <axis-title>Y axis</axis-title>
                 <axis-tick
                   count="10">
                   <axis-grid></axis-grid>
-                  <tick-label>A</tick-label>
+                  <tick-label></tick-label>
                 </axis-tick>
-                <axis-title vertical="">Y axis</axis-title>
               </vertical-axis>
 
             </ordinal-scale>

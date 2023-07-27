@@ -183,27 +183,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
     super.firstUpdated(changedProperties);
-    this.syncAttrs();
-    this.patchAxis();
-  }
-
-  /**
-   * @override
-   */
-  public updated(changed: Map<string, unknown>): void {
-    if (changed.has("direction") || changed.has("position")) {
-      this.patchAxis();
-    }
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.patchAxis();
-  }
-
-  private syncAttrs(): void {
     const attrDirection = this.getAttribute("direction");
     const attrPosition = this.getAttribute("position");
     const svalDirection = this.direction;
@@ -214,13 +193,39 @@ export class HorizontalAxisElement extends BaseAxisElement {
     if (attrPosition !== svalPosition) {
       this.setAttribute("position", svalPosition);
     }
+    this.updateSvgStyles(
+      `:host > svg g.${this.direction}-axis path.domain`,
+    );
+    this.patchAxis();
+  }
+
+  /**
+   * @override
+   */
+  protected updated(changed: Map<string, unknown>): void {
+    super.updated(changed);
+    this.updateSvgStyles(
+      `:host > svg g.${this.direction}-axis path.domain`,
+    );
+    if (changed.has("direction") || changed.has("position")) {
+      this.patchAxis();
+    }
+  }
+
+  /**
+   * @override
+   */
+  protected trackedStylesChanged(): void {
+    this.updateSvgStyles(
+      `:host > svg g.${this.direction}-axis path.domain`,
+    );
+    this.patchAxis();
   }
 
   private patchAxis(): void {
     const g = this.getGElement();
     const scale = this.getScaleElement();
     if (g && scale && scale.scale) {
-      this.setSvgStyles();
       g.attr("transform", `translate(0, ${this.getPosition()})`)
         .call(
           // eslint-disable-next-line max-len
@@ -246,8 +251,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
 
   private addGElement(): void {
     if (!this._element && this.view?.svg) {
-      this.view.addStyleSheet(this.uid, this._stylesheet);
-      this.setSvgStyles();
       this._element = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
@@ -256,7 +259,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
 
   private removeGElement(): void {
     if (this._element) {
-      this.view?.removeStyleSheet(this.uid);
       this._element.remove();
       this._element = null;
     }
@@ -306,112 +308,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
       }
     }
     return 0;
-  }
-
-  private setSvgStyles(): void {
-    const [def, hov, foc, act] = this.getStyles();
-    for (let i = this._stylesheet.cssRules.length - 1; i >= 0; i--) {
-      this._stylesheet.deleteRule(i);
-    }
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this._stylesheet.insertRule(act);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this._stylesheet.insertRule(foc);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this._stylesheet.insertRule(hov);
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    this._stylesheet.insertRule(def);
-  }
-
-  private getStyles(): string[] {
-    const def = this.getDefaultStyles();
-    const hov = this.getHoverStyles();
-    const foc = this.getFocusStyles();
-    const act = this.getActiveStyles();
-    return [def, hov, foc, act];
-  }
-
-  private getDefaultStyles(): string {
-    let css = `:host > svg g.${this.direction}-axis path.domain { `;
-    css = css + this.getStyleProperties();
-    css = css + " }";
-    return css;
-  }
-
-  private getHoverStyles(): string {
-    this.classList.add("hover");
-    let css =
-      `:host > svg g.${this.direction}-axis ` +
-      "path.domain:hover { ";
-    css = css + this.getStyleProperties();
-    css = css + " }";
-    this.classList.remove("hover");
-    return css;
-  }
-
-  private getFocusStyles(): string {
-    this.classList.add("focus");
-    let css =
-      `:host > svg g.${this.direction}-axis ` +
-      "path.domain:focus { ";
-    css = css + this.getStyleProperties();
-    css = css + " }";
-    this.classList.remove("focus");
-    return css;
-  }
-
-  private getActiveStyles(): string {
-    this.classList.add("active");
-    let css =
-      `:host > svg g.${this.direction}-axis ` +
-      "path.domain:active { ";
-    css = css + this.getStyleProperties();
-    css = css + " }";
-    this.classList.remove("active");
-    return css;
-  }
-
-  private getStyleProperties(): string {
-    let css = "";
-    if (this.tracked.borderStyle === "solid") {
-      css =
-        css +
-        `stroke: ${this.tracked.borderColor}; ` +
-        `stroke-width: ${this.tracked.borderWidth}; ` +
-        `cursor: ${this.tracked.cursor}; `;
-    } else if (this.tracked.borderStyle === "dashed") {
-      css =
-        css +
-        `stroke: ${this.tracked.borderColor}; ` +
-        `stroke-width: ${this.tracked.borderWidth}; ` +
-        `stroke-dasharray: ${2 * this.tracked.borderWidth + 1},` +
-        `${this.tracked.borderWidth + 1}; ` +
-        `cursor: ${this.tracked.cursor}; `;
-    } else if (this.tracked.borderStyle === "dotted") {
-      css =
-        css +
-        `stroke: ${this.tracked.borderColor}; ` +
-        `stroke-width: ${this.tracked.borderWidth}; ` +
-        `stroke-dasharray: 1,` +
-        `${2 * this.tracked.borderWidth};` +
-        "stroke-linecap: round; " +
-        `cursor: ${this.tracked.cursor}; `;
-    } else {
-      css =
-        css +
-        `stroke: rgba(0, 0, 0, 0); stroke-width: 0; ` +
-        `cursor: ${this.tracked.cursor}; `;
-    }
-    css = css + "outline: none;";
-    return css;
   }
 }
 
