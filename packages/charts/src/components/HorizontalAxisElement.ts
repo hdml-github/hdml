@@ -320,6 +320,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
       element.addEventListener("mouseup", this.eventListener);
       element.addEventListener("click", this.eventListener);
       element.addEventListener("focus", this.eventListener);
+      element.addEventListener("blur", this.eventListener);
     }
   }
 
@@ -337,6 +338,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
       element.removeEventListener("mouseup", this.eventListener);
       element.removeEventListener("click", this.eventListener);
       element.removeEventListener("focus", this.eventListener);
+      element.removeEventListener("blur", this.eventListener);
     }
   }
 
@@ -367,6 +369,9 @@ export class HorizontalAxisElement extends BaseAxisElement {
         this.dispatchEvent(new PointerEvent(evt.type));
         break;
       case "focus":
+        this.dispatchEvent(new FocusEvent(evt.type));
+        break;
+      case "blur":
         this.dispatchEvent(new FocusEvent(evt.type));
         break;
     }
