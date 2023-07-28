@@ -112,6 +112,20 @@
         </polar-plane>
       </hdml-view>
 
+      <script>
+        function eventListener(event) { console.log(event); }
+        const element = window.document.querySelector("horizontal-axis");
+        element.addEventListener("mouseenter", eventListener);
+        element.addEventListener("mouseleave", eventListener);
+        element.addEventListener("mousemove", eventListener);
+        element.addEventListener("mouseover", eventListener);
+        element.addEventListener("mouseout", eventListener);
+        element.addEventListener("mousedown", eventListener);
+        element.addEventListener("mouseup", eventListener);
+        element.addEventListener("click", eventListener);
+        element.addEventListener("focus", eventListener);
+      </script>
+
 
       <!-- <polar-plane for="?hdml-frame=frame">
         <ordinal-scale for="table" count="3">

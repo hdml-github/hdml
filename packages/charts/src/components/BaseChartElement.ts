@@ -25,6 +25,7 @@ type TrackedStyles = {
 };
 
 export class BaseChartElement extends UnifiedElement {
+  private _svgCSSSheet = new CSSStyleSheet();
   private _styles = window.getComputedStyle(this);
   private _stored: TrackedStyles = {
     width: 0,
@@ -42,12 +43,9 @@ export class BaseChartElement extends UnifiedElement {
     borderWidth: 0,
     cursor: "auto",
   };
-  private _svgCSSSheet = new CSSStyleSheet();
 
   /**
    * The plane associated with the scale.
-   *
-   * @category hdml-elements
    */
   public get view(): null | HdmlViewElement {
     if (this instanceof HdmlViewElement) {
@@ -69,8 +67,6 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Computed styles of the component.
-   *
-   * @category comp-styles
    */
   public get styles(): CSSStyleDeclaration {
     return this._styles;
@@ -78,8 +74,6 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Tracked component styles.
-   *
-   * @category comp-styles
    */
   public get tracked(): TrackedStyles {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -132,8 +126,6 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Stored component styles.
-   *
-   * @category comp-styles
    */
   public get stored(): TrackedStyles {
     return this._stored;
@@ -141,7 +133,6 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * @override
-   * @category lifecycle
    */
   public connectedCallback(): void {
     super.connectedCallback();
@@ -153,25 +144,6 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * @override
-   * @category updates
-   */
-  protected firstUpdated(
-    changedProperties: Map<PropertyKey, unknown>,
-  ): void {
-    super.firstUpdated(changedProperties);
-  }
-
-  /**
-   * @override
-   * @category updates
-   */
-  protected updated(changed: Map<string, unknown>): void {
-    super.update(changed);
-  }
-
-  /**
-   * @override
-   * @category lifecycle
    */
   public disconnectedCallback(): void {
     window.removeEventListener(
@@ -183,9 +155,23 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
+   * @override
+   */
+  protected firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
+    super.firstUpdated(changedProperties);
+  }
+
+  /**
+   * @override
+   */
+  protected updated(changed: Map<string, unknown>): void {
+    super.update(changed);
+  }
+
+  /**
    * Callback to the interval for checking the monitored styles.
-   *
-   * @category comp-styles
    */
   private stylesChangedListener = () => {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
@@ -194,7 +180,7 @@ export class BaseChartElement extends UnifiedElement {
       return this._stored[p] !== this.tracked[p];
     });
     if (changed.length) {
-      this.trackedStylesChanged(changed);
+      this.trackedStylesChanged();
       changed.forEach((p) => {
         // TODO: wtf with the types here?
         this._stored[p] = <never>this.tracked[p];
@@ -204,17 +190,13 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Callback to the styles changed event.
-   *
-   * @category comp-styles
    */
-  protected trackedStylesChanged(styles: string[]): void {
+  protected trackedStylesChanged(): void {
     //
   }
 
   /**
    * Resets component shadow DOM stylesheets.
-   *
-   * @category comp-styles
    */
   protected resetShadowStylesheets(sheets: CSSStyleSheet[]): void {
     lit.adoptStyles(<ShadowRoot>this.renderRoot, [
@@ -226,10 +208,7 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
-   * Updates the `CSS` stylesheet for the `SVG` elements specified
-   * by the selector.
-   *
-   * @category svg-styles
+   * Updates the `CSS` stylesheet for the `SVG` elements.
    */
   protected updateSvgStyles(selector: string): void {
     if (this.view) {
@@ -261,9 +240,6 @@ export class BaseChartElement extends UnifiedElement {
     }
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgStyles(selector: string): string[] {
     const def = this.getSvgSelectorStyles(selector);
     const hov = this.getSvgSelectorStyles(selector, "hover");
@@ -272,9 +248,6 @@ export class BaseChartElement extends UnifiedElement {
     return [def, hov, foc, act];
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgSelectorStyles(
     selector: string,
     state?: "hover" | "focus" | "active",
@@ -293,16 +266,10 @@ export class BaseChartElement extends UnifiedElement {
     return val;
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgStrokeStyle(): string {
     return `stroke: ${this.tracked.borderColor};`;
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgStrokeWidthStyle(): string {
     if (
       this.tracked.borderStyle === "solid" ||
@@ -315,9 +282,6 @@ export class BaseChartElement extends UnifiedElement {
     }
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgStrokeDasharrayStyle(): string {
     if (this.tracked.borderStyle === "solid") {
       return `stroke-dasharray: none;`;
@@ -334,9 +298,6 @@ export class BaseChartElement extends UnifiedElement {
     }
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgStrokeLinecapStyle(): string {
     if (this.tracked.borderStyle === "solid") {
       return `stroke-linecap: inherit;`;
@@ -349,16 +310,10 @@ export class BaseChartElement extends UnifiedElement {
     }
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgCursorStyle(): string {
     return `cursor: ${this.tracked.cursor};`;
   }
 
-  /**
-   * @category svg-styles
-   */
   private getSvgOutlineStyle(): string {
     return "outline: none;";
   }
