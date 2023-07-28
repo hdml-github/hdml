@@ -223,9 +223,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
       this.setAttribute("position", svalPosition);
     }
     this.renderSvgElements();
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgScale();
   }
 
   /**
@@ -233,11 +230,9 @@ export class HorizontalAxisElement extends BaseAxisElement {
    */
   protected updated(changed: Map<string, unknown>): void {
     super.updated(changed);
-    if (changed.has("direction") || changed.has("position")) {
-      this.updateSvgStyles();
-      this.updateSvgPosition();
-      this.updateSvgScale();
-    }
+    this.updateSvgStyles();
+    this.updateSvgPosition();
+    this.updateSvgScale();
   }
 
   /**
@@ -249,16 +244,8 @@ export class HorizontalAxisElement extends BaseAxisElement {
     this.updateSvgScale();
   }
 
-  /**
-   * @override
-   */
-  protected updateSvgStyles(): void {
-    super.updateSvgStyles(
-      `:host > svg g.${this.direction}-axis path.domain`,
-    );
-  }
-
   private renderSvgElements(): void {
+    this.updateSvgStyles();
     if (!this._svgGSelection && this.view?.svg) {
       this._svgGSelection = this.view.svg
         .append("g")
@@ -269,11 +256,38 @@ export class HorizontalAxisElement extends BaseAxisElement {
     }
   }
 
+  /**
+   * @override
+   */
+  protected updateSvgStyles(): void {
+    super.updateSvgStyles(
+      `:host > svg g.${this.direction}-axis path.domain`,
+    );
+  }
+
   private updateSvgPosition(): void {
-    if (this.svgGSelection && this.scale && this.scale.scale) {
+    if (
+      this.svgGSelection &&
+      this.scale &&
+      this.scale.scale &&
+      this.scale.plane
+    ) {
+      let position = 0;
+      switch (this.position) {
+        case "top":
+          position = this.scale.plane.tracked.paddingTop;
+          break;
+        case "center":
+        case "bottom":
+          position =
+            this.scale.plane.tracked.paddingTop +
+            this.tracked.top +
+            this.tracked.height;
+          break;
+      }
       this.svgGSelection.attr(
         "transform",
-        `translate(0, ${this.getPosition()})`,
+        `translate(0, ${position})`,
       );
     }
   }
@@ -290,23 +304,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
         .selectChild("path.domain")
         .attr("tabindex", "-1");
     }
-  }
-
-  private getPosition(): number {
-    if (this.scale && this.scale.plane) {
-      switch (this.position) {
-        case "top":
-          return this.scale.plane.tracked.paddingTop;
-        case "center":
-        case "bottom":
-          return (
-            this.scale.plane.tracked.paddingTop +
-            this.tracked.top +
-            this.tracked.height
-          );
-      }
-    }
-    return 0;
   }
 
   private attachListener(): void {
