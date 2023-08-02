@@ -219,8 +219,6 @@ export class OrdinalScaleElement extends BaseScaleElement {
    * @override
    */
   protected firstUpdated(): void {
-    super.firstUpdated();
-
     const attrBandwidth = this.getAttribute("bandwidth");
     const svalBandwidth = JSON.stringify(this.bandwidth);
     if (attrBandwidth !== svalBandwidth) {
@@ -239,7 +237,7 @@ export class OrdinalScaleElement extends BaseScaleElement {
       this.setAttribute("rest", svalRest);
     }
 
-    this.patchScale();
+    super.firstUpdated();
   }
 
   /**
@@ -251,22 +249,14 @@ export class OrdinalScaleElement extends BaseScaleElement {
       changed.has("values") ||
       changed.has("rest")
     ) {
-      this.patchScale();
+      super.update(changed);
     }
   }
 
   /**
    * @override
    */
-  protected trackedStylesChanged(): void {
-    super.trackedStylesChanged();
-    this.patchScale();
-  }
-
-  /**
-   * Recalculate and set private `_scale` property.
-   */
-  private patchScale(): void {
+  protected updateScale(): void {
     if (!this.values.length) {
       this._scale = null;
     } else {

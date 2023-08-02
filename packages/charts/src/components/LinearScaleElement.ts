@@ -150,8 +150,6 @@ export class LinearScaleElement extends BaseScaleElement {
    * @override
    */
   protected firstUpdated(): void {
-    super.firstUpdated();
-
     const attrMin = this.getAttribute("min");
     const svalMin = JSON.stringify(this.min);
     if (attrMin !== svalMin) {
@@ -164,15 +162,7 @@ export class LinearScaleElement extends BaseScaleElement {
       this.setAttribute("max", svalMax);
     }
 
-    this.patchScale();
-  }
-
-  /**
-   * @override
-   */
-  public trackedStylesChanged(): void {
-    super.trackedStylesChanged();
-    this.patchScale();
+    super.firstUpdated();
   }
 
   /**
@@ -180,14 +170,14 @@ export class LinearScaleElement extends BaseScaleElement {
    */
   public updated(changed: Map<string, unknown>): void {
     if (changed.has("min") || changed.has("max")) {
-      this.patchScale();
+      super.update(changed);
     }
   }
 
   /**
-   * Recalculate and set private `_scale` property.
+   * @override
    */
-  private patchScale(): void {
+  protected updateScale(): void {
     let fp = 0;
     let pv = 0;
     let lv = 0;

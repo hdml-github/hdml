@@ -90,24 +90,52 @@ export class BaseScaleElement extends BaseChartElement {
 
   /**
    * @override
-   * @category updates
    */
   protected firstUpdated(): void {
     this.resetShadowStylesheets([this._stylesheet]);
     this.updateShadowStyles();
+    this.updateScale();
+    this.dispatchEvent(
+      new CustomEvent("styles-changed", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+      }),
+    );
   }
 
   /**
    * @override
-   * @category comp-styles
    */
-  protected trackedStylesChanged(): void {
-    this.updateShadowStyles();
+  public updated(changed: Map<string, unknown>): void {
+    this.updateScale();
+    this.dispatchEvent(
+      new CustomEvent("styles-changed", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+      }),
+    );
   }
 
   /**
-   * @category comp-styles
+   * @override
    */
+  protected trackedStylesChanged(): void {
+    this.updateShadowStyles();
+    this.updateScale();
+  }
+
+  /**
+   * Calculates scale parameters.
+   * @abstract
+   */
+  protected updateScale(): void {
+    throw new TypeError(
+      "Method is not implemented: BaseScaleElement.updateScale() ",
+    );
+  }
+
   private updateShadowStyles(): void {
     this._stylesheet.insertRule(`:host > slot {
       margin:

@@ -198,7 +198,26 @@ export class HorizontalAxisElement extends BaseAxisElement {
   /**
    * @override
    */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    if (this.scale) {
+      this.scale.addEventListener(
+        "styles-changed",
+        this.scaleStylesChangedListener,
+      );
+    }
+  }
+
+  /**
+   * @override
+   */
   public disconnectedCallback(): void {
+    if (this.scale) {
+      this.scale.removeEventListener(
+        "styles-changed",
+        this.scaleStylesChangedListener,
+      );
+    }
     this.detachListener();
     this._svgGSelection?.remove();
     this._svgGSelection = null;
@@ -244,7 +263,10 @@ export class HorizontalAxisElement extends BaseAxisElement {
     this.updateSvgScale();
   }
 
-  private renderSvgElements(): void {
+  /**
+   * @override
+   */
+  protected renderSvgElements(): void {
     this.updateSvgStyles();
     if (!this._svgGSelection && this.view?.svg) {
       this._svgGSelection = this.view.svg
@@ -254,6 +276,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
       this.updateSvgScale();
       this.attachListener();
     }
+    super.renderSvgElements();
   }
 
   /**
@@ -264,6 +287,12 @@ export class HorizontalAxisElement extends BaseAxisElement {
       `:host > svg g.${this.direction}-axis path.domain`,
     );
   }
+
+  private scaleStylesChangedListener = () => {
+    this.updateSvgStyles();
+    this.updateSvgPosition();
+    this.updateSvgScale();
+  };
 
   private updateSvgPosition(): void {
     if (

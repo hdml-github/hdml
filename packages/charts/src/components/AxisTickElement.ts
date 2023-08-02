@@ -229,7 +229,11 @@ export class AxisTickElement extends BaseChartElement {
     //
   }
 
-  private renderSvgElements(): void {
+  /**
+   * @override
+   */
+  protected renderSvgElements(): void {
+    super.renderSvgElements();
     if (
       this.parentElement &&
       this.parentElement instanceof HorizontalAxisElement &&

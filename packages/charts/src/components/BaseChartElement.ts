@@ -171,7 +171,9 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
-   * Callback to the interval for checking the monitored styles.
+   * The `window` `styles-changed` event listener. Consequently
+   * dispatches the `styles-changed` event if element's styles were
+   * updated.
    */
   private stylesChangedListener = () => {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
@@ -185,18 +187,46 @@ export class BaseChartElement extends UnifiedElement {
         // TODO: wtf with the types here?
         this._stored[p] = <never>this.tracked[p];
       });
+      this.dispatchEvent(
+        new CustomEvent("styles-changed", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+        }),
+      );
     }
   };
 
   /**
-   * Callback to the styles changed event.
+   * Callback to run when the tracked styles have been changed.
    */
   protected trackedStylesChanged(): void {
     //
   }
 
   /**
-   * Resets component shadow DOM stylesheets.
+   * Renders `SVG`-elements in the `hdml-view` shadow `DOM` and
+   * dispatches `svg-rendered` event when the job was done.
+   *
+   * ```ts
+   * renderSvgElements() {
+   *   // render svg logic
+   *   super.renderSvgElements();
+   * }
+   * ```
+   */
+  protected renderSvgElements(): void {
+    this.dispatchEvent(
+      new CustomEvent("svg-rendered", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+      }),
+    );
+  }
+
+  /**
+   * Resets component shadow `DOM` stylesheets.
    */
   protected resetShadowStylesheets(sheets: CSSStyleSheet[]): void {
     lit.adoptStyles(<ShadowRoot>this.renderRoot, [
@@ -209,6 +239,12 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Updates the `CSS` stylesheet for the `SVG` elements.
+   *
+   * ```ts
+   * resetShadowStylesheets() {
+   *   super.resetShadowStylesheets(`:host > svg g`);
+   * }
+   * ```
    */
   protected updateSvgStyles(selector: string): void {
     if (this.view) {
