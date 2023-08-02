@@ -128,7 +128,6 @@ export abstract class AbstractScaleElement extends BaseChartElement {
 
   /**
    * Calculates scale parameters.
-   * @abstract
    */
   protected abstract updateScale(): void;
 
