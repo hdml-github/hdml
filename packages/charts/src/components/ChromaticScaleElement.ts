@@ -5,9 +5,9 @@
  */
 
 import { lit } from "@hdml/elements";
-import { BaseScaleElement } from "./BaseScaleElement";
+import { AbstractScaleElement } from "./AbstractScaleElement";
 
-export class ChromaticScaleElement extends BaseScaleElement {
+export class ChromaticScaleElement extends AbstractScaleElement {
   /**
    * Component styles.
    */
@@ -23,6 +23,10 @@ export class ChromaticScaleElement extends BaseScaleElement {
 
   public render(): lit.TemplateResult<1> {
     return lit.html`<slot></slot>`;
+  }
+
+  protected updateScale(): void {
+    //
   }
 }
 customElements.define("chromatic-scale", ChromaticScaleElement);

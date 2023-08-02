@@ -6,9 +6,9 @@
 
 import { lit } from "@hdml/elements";
 import { type ScaleLinear, scaleLinear } from "d3";
-import { BaseScaleElement } from "./BaseScaleElement";
+import { AbstractScaleElement } from "./AbstractScaleElement";
 
-export class LinearScaleElement extends BaseScaleElement {
+export class LinearScaleElement extends AbstractScaleElement {
   /**
    * Component styles.
    */

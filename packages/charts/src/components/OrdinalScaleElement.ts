@@ -6,9 +6,9 @@
 
 import { lit } from "@hdml/elements";
 import { type ScaleBand, scaleBand } from "d3";
-import { BaseScaleElement } from "./BaseScaleElement";
+import { AbstractScaleElement } from "./AbstractScaleElement";
 
-export class OrdinalScaleElement extends BaseScaleElement {
+export class OrdinalScaleElement extends AbstractScaleElement {
   /**
    * Component styles.
    */

@@ -5,41 +5,41 @@
  */
 
 import { BaseChartElement } from "./BaseChartElement";
-import { BaseScaleElement } from "./BaseScaleElement";
+import { AbstractScaleElement } from "./AbstractScaleElement";
 
 export class BaseAxisElement extends BaseChartElement {
   /**
    * Scale for `x` direction.
    */
-  public get scaleX(): null | BaseScaleElement {
+  public get scaleX(): null | AbstractScaleElement {
     return this.getScale("x");
   }
 
   /**
    * Scale for `y` direction.
    */
-  public get scaleY(): null | BaseScaleElement {
+  public get scaleY(): null | AbstractScaleElement {
     return this.getScale("y");
   }
 
   /**
    * Scale for `z` direction.
    */
-  public get scaleZ(): null | BaseScaleElement {
+  public get scaleZ(): null | AbstractScaleElement {
     return this.getScale("z");
   }
 
   /**
    * Scale for `i` direction.
    */
-  public get scaleI(): null | BaseScaleElement {
+  public get scaleI(): null | AbstractScaleElement {
     return this.getScale("i");
   }
 
   /**
    * Scale for `j` direction.
    */
-  public get scaleJ(): null | BaseScaleElement {
+  public get scaleJ(): null | AbstractScaleElement {
     return this.getScale("j");
   }
 
@@ -48,13 +48,13 @@ export class BaseAxisElement extends BaseChartElement {
    */
   private getScale(
     direction: "x" | "y" | "z" | "i" | "j",
-  ): null | BaseScaleElement {
+  ): null | AbstractScaleElement {
     let cnt = 0;
-    let parent: null | HTMLElement | BaseScaleElement =
+    let parent: null | HTMLElement | AbstractScaleElement =
       this.parentElement;
     while (parent && cnt <= 5) {
       if (
-        parent instanceof BaseScaleElement &&
+        parent instanceof AbstractScaleElement &&
         parent.direction === direction
       ) {
         return parent;
