@@ -205,7 +205,7 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
-   * Renders `SVG`-elements in the `hdml-view` shadow `DOM` and
+   * Renders `svg`-elements in the `hdml-view` shadow `DOM` and
    * dispatches `svg-rendered` event when the job was done.
    *
    * ```ts
@@ -238,7 +238,7 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
-   * Updates the `CSS` stylesheet for the `SVG` elements.
+   * Updates the `css` stylesheet for the `svg` elements.
    *
    * ```ts
    * resetShadowStylesheets() {

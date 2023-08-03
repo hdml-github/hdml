@@ -5,15 +5,14 @@
  */
 
 import { lit } from "@hdml/elements";
-import { type Selection, axisBottom } from "d3";
-import { BaseAxisElement } from "./BaseAxisElement";
-import { OrdinalScaleElement } from "./OrdinalScaleElement";
-import { LinearScaleElement } from "./LinearScaleElement";
+import { axisBottom } from "d3";
+import {
+  AbstractAxisElement,
+  GSelection,
+  ScaleElement,
+} from "./AbstractAxisElement";
 
-type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-type SVGGSelection = Selection<SVGGElement, unknown, null, undefined>;
-
-export class HorizontalAxisElement extends BaseAxisElement {
+export class HorizontalAxisElement extends AbstractAxisElement {
   /**
    * Component styles.
    */
@@ -110,39 +109,27 @@ export class HorizontalAxisElement extends BaseAxisElement {
 
   private _direction: "x" | "z" | "i" | "j" = "x";
   private _position: "bottom" | "center" | "top" = "bottom";
-  private _svgGSelection: null | SVGGSelection = null;
+  private _svgGSelection: null | GSelection = null;
 
   /**
-   * Associated scale element.
+   * @override
    */
   public get scale(): null | ScaleElement {
     const scaleElement =
       this.direction === "x"
-        ? (this.scaleX as
-            | null
-            | OrdinalScaleElement
-            | LinearScaleElement)
+        ? this.scaleX
         : this.direction === "z"
-        ? (this.scaleZ as
-            | null
-            | OrdinalScaleElement
-            | LinearScaleElement)
+        ? this.scaleZ
         : this.direction === "i"
-        ? (this.scaleI as
-            | null
-            | OrdinalScaleElement
-            | LinearScaleElement)
-        : (this.scaleJ as
-            | null
-            | OrdinalScaleElement
-            | LinearScaleElement);
-    return scaleElement;
+        ? this.scaleI
+        : this.scaleJ;
+    return scaleElement as ScaleElement;
   }
 
   /**
-   * `D3` selection of the root `svg:g` element of the component.
+   * @override
    */
-  public get svgGSelection(): null | SVGGSelection {
+  public get selection(): null | GSelection {
     return this._svgGSelection;
   }
 
@@ -161,7 +148,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
   }
 
   /**
-   * The `direction` getter.
+   * @override
    */
   public get direction(): "x" | "z" | "i" | "j" {
     return this._direction;
@@ -192,7 +179,9 @@ export class HorizontalAxisElement extends BaseAxisElement {
    * @override
    */
   public render(): lit.TemplateResult<1> {
-    return lit.html`<slot></slot>`;
+    return lit.html`
+      <slot></slot>
+    `;
   }
 
   /**
@@ -200,24 +189,12 @@ export class HorizontalAxisElement extends BaseAxisElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    if (this.scale) {
-      this.scale.addEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
-      );
-    }
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
-    if (this.scale) {
-      this.scale.removeEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
-      );
-    }
     this.detachListener();
     this._svgGSelection?.remove();
     this._svgGSelection = null;
@@ -251,7 +228,7 @@ export class HorizontalAxisElement extends BaseAxisElement {
     super.updated(changed);
     this.updateSvgStyles();
     this.updateSvgPosition();
-    this.updateSvgScale();
+    this.updateSvgAxis();
   }
 
   /**
@@ -260,20 +237,20 @@ export class HorizontalAxisElement extends BaseAxisElement {
   protected trackedStylesChanged(): void {
     this.updateSvgStyles();
     this.updateSvgPosition();
-    this.updateSvgScale();
+    this.updateSvgAxis();
   }
 
   /**
    * @override
    */
   protected renderSvgElements(): void {
-    this.updateSvgStyles();
     if (!this._svgGSelection && this.view?.svg) {
       this._svgGSelection = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
+      this.updateSvgStyles();
       this.updateSvgPosition();
-      this.updateSvgScale();
+      this.updateSvgAxis();
       this.attachListener();
     }
     super.renderSvgElements();
@@ -282,21 +259,9 @@ export class HorizontalAxisElement extends BaseAxisElement {
   /**
    * @override
    */
-  protected updateSvgStyles(): void {
-    super.updateSvgStyles(
-      `:host > svg g.${this.direction}-axis path.domain`,
-    );
-  }
-
-  private scaleStylesChangedListener = () => {
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgScale();
-  };
-
-  private updateSvgPosition(): void {
+  protected updateSvgPosition(): void {
     if (
-      this.svgGSelection &&
+      this.selection &&
       this.scale &&
       this.scale.scale &&
       this.scale.plane
@@ -314,16 +279,16 @@ export class HorizontalAxisElement extends BaseAxisElement {
             this.tracked.height;
           break;
       }
-      this.svgGSelection.attr(
-        "transform",
-        `translate(0, ${position})`,
-      );
+      this.selection.attr("transform", `translate(0, ${position})`);
     }
   }
 
-  private updateSvgScale(): void {
-    if (this.svgGSelection && this.scale && this.scale.scale) {
-      this.svgGSelection
+  /**
+   * @override
+   */
+  protected updateSvgAxis(): void {
+    if (this.selection && this.scale && this.scale.scale) {
+      this.selection
         .call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -334,77 +299,6 @@ export class HorizontalAxisElement extends BaseAxisElement {
         .attr("tabindex", "-1");
     }
   }
-
-  private attachListener(): void {
-    if (this.svgGSelection) {
-      const element = <SVGGElement>(
-        this.svgGSelection.selectChild("path.domain").node()
-      );
-      element.addEventListener("mouseenter", this.eventListener);
-      element.addEventListener("mouseleave", this.eventListener);
-      element.addEventListener("mousemove", this.eventListener);
-      element.addEventListener("mouseover", this.eventListener);
-      element.addEventListener("mouseout", this.eventListener);
-      element.addEventListener("mousedown", this.eventListener);
-      element.addEventListener("mouseup", this.eventListener);
-      element.addEventListener("click", this.eventListener);
-      element.addEventListener("focus", this.eventListener);
-      element.addEventListener("blur", this.eventListener);
-    }
-  }
-
-  private detachListener(): void {
-    if (this.svgGSelection) {
-      const element = <SVGGElement>(
-        this.svgGSelection.selectChild("path.domain").node()
-      );
-      element.removeEventListener("mouseenter", this.eventListener);
-      element.removeEventListener("mouseleave", this.eventListener);
-      element.removeEventListener("mousemove", this.eventListener);
-      element.removeEventListener("mouseover", this.eventListener);
-      element.removeEventListener("mouseout", this.eventListener);
-      element.removeEventListener("mousedown", this.eventListener);
-      element.removeEventListener("mouseup", this.eventListener);
-      element.removeEventListener("click", this.eventListener);
-      element.removeEventListener("focus", this.eventListener);
-      element.removeEventListener("blur", this.eventListener);
-    }
-  }
-
-  private eventListener = (evt: Event) => {
-    switch (evt.type) {
-      case "mouseenter":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mouseleave":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mousemove":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mouseover":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mouseout":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mousedown":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "mouseup":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
-      case "click":
-        this.dispatchEvent(new PointerEvent(evt.type));
-        break;
-      case "focus":
-        this.dispatchEvent(new FocusEvent(evt.type));
-        break;
-      case "blur":
-        this.dispatchEvent(new FocusEvent(evt.type));
-        break;
-    }
-  };
 }
 
 customElements.define("horizontal-axis", HorizontalAxisElement);
