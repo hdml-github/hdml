@@ -4,8 +4,15 @@
  * @license Apache-2.0
  */
 
-import { type Selection } from "d3";
-import { BaseChartElement } from "./BaseChartElement";
+import { lit } from "@hdml/elements";
+import {
+  type Selection,
+  axisBottom,
+  axisTop,
+  axisLeft,
+  axisRight,
+} from "d3";
+import { AbstractChartElement } from "./AbstractChartElement";
 import { AbstractScaleElement } from "./AbstractScaleElement";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
@@ -17,62 +24,217 @@ export type GSelection = Selection<
   null,
   undefined
 >;
+export enum AxisType {
+  Horizontal,
+  Vertical,
+}
 
-export abstract class AbstractAxisElement extends BaseChartElement {
+// eslint-disable-next-line max-len
+export abstract class AbstractAxisElement extends AbstractChartElement {
+  private _selection: null | GSelection = null;
+
   /**
-   * Associated scale element.
+   * Axis type getter.
    */
-  public abstract get scale(): null | ScaleElement;
+  public abstract get type(): AxisType;
+
+  /**
+   * Axis `direction` setter.
+   */
+  public abstract set direction(val: "x" | "y" | "z" | "i" | "j");
+
+  /**
+   * Axis `direction` getter.
+   */
+  public abstract get direction(): "x" | "y" | "z" | "i" | "j";
+
+  /**
+   * Axis `position` setter.
+   */
+  public abstract set position(
+    val: "bottom" | "left" | "center" | "right" | "top",
+  );
+
+  /**
+   * Axis `position` getter.
+   */
+  public abstract get position():
+    | "bottom"
+    | "left"
+    | "center"
+    | "right"
+    | "top";
 
   /**
    * `D3` selection of the axis root `g` element.
    */
-  public abstract get selection(): null | GSelection;
+  public get selection(): null | GSelection {
+    return this._selection;
+  }
 
   /**
-   * The `direction` getter.
+   * Associated scale element.
    */
-  public abstract get direction(): "x" | "z" | "i" | "j";
+  public get scale(): null | ScaleElement {
+    const scaleElement =
+      this.direction === "x"
+        ? this.scaleX
+        : this.direction === "y"
+        ? this.scaleY
+        : this.direction === "z"
+        ? this.scaleZ
+        : this.direction === "i"
+        ? this.scaleI
+        : this.scaleJ;
+    return scaleElement as ScaleElement;
+  }
 
   /**
-   * Scale for `x` direction.
+   * Scale element for the `x` direction.
    */
   public get scaleX(): null | AbstractScaleElement {
-    return this.getScale("x");
+    return this.getScaleElement("x");
   }
 
   /**
-   * Scale for `y` direction.
+   * Scale element for the `y` direction.
    */
   public get scaleY(): null | AbstractScaleElement {
-    return this.getScale("y");
+    return this.getScaleElement("y");
   }
 
   /**
-   * Scale for `z` direction.
+   * Scale element for the `z` direction.
    */
   public get scaleZ(): null | AbstractScaleElement {
-    return this.getScale("z");
+    return this.getScaleElement("z");
   }
 
   /**
-   * Scale for `i` direction.
+   * Scale element for the `i` direction.
    */
   public get scaleI(): null | AbstractScaleElement {
-    return this.getScale("i");
+    return this.getScaleElement("i");
   }
 
   /**
-   * Scale for `j` direction.
+   * Scale element for the `j` direction.
    */
   public get scaleJ(): null | AbstractScaleElement {
-    return this.getScale("j");
+    return this.getScaleElement("j");
+  }
+
+  /**
+   * @override
+   */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    if (this.scale) {
+      this.scale.addEventListener(
+        "styles-changed",
+        this.scaleStylesChangedListener,
+      );
+    }
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedCallback(): void {
+    if (this.scale) {
+      this.scale.removeEventListener(
+        "styles-changed",
+        this.scaleStylesChangedListener,
+      );
+    }
+    this.detachListener();
+    super.disconnectedCallback();
+  }
+
+  /**
+   * @override
+   */
+  public render(): lit.TemplateResult<1> {
+    return lit.html`
+      <slot></slot>
+    `;
+  }
+
+  /**
+   * @override
+   */
+  protected firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
+    super.firstUpdated(changedProperties);
+    const attrDirection = this.getAttribute("direction");
+    const attrPosition = this.getAttribute("position");
+    const svalDirection = this.direction;
+    const svalPosition = this.position;
+    if (attrDirection !== svalDirection) {
+      this.setAttribute("direction", svalDirection);
+    }
+    if (attrPosition !== svalPosition) {
+      this.setAttribute("position", svalPosition);
+    }
+    this.renderSvgElements();
+  }
+
+  /**
+   * @override
+   */
+  protected updated(changed: Map<string, unknown>): void {
+    super.updated(changed);
+    this.updateSvgStyles();
+    this.updateSvgPosition();
+    this.updateSvgAxis();
+    this.dispatchEvent(
+      new CustomEvent("styles-changed", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+      }),
+    );
+  }
+
+  /**
+   * @override
+   */
+  protected trackedStylesChanged(): void {
+    this.updateSvgStyles();
+    this.updateSvgPosition();
+    this.updateSvgAxis();
+  }
+
+  /**
+   * @override
+   */
+  protected renderSvgElements(): void {
+    if (!this._selection && this.view?.svg) {
+      this._selection = this.view.svg
+        .append("g")
+        .attr("class", `${this.direction}-axis`);
+      this.updateSvgStyles();
+      this.updateSvgPosition();
+      this.updateSvgAxis();
+      this.attachListener();
+    }
+    super.renderSvgElements();
+  }
+
+  /**
+   * @override
+   */
+  protected updateSvgStyles(): void {
+    super.updateSvgStyles(
+      `:host > svg g.${this.direction}-axis path.domain`,
+    );
   }
 
   /**
    * Returns scale for the specified direction.
    */
-  private getScale(
+  private getScaleElement(
     direction: "x" | "y" | "z" | "i" | "j",
   ): null | AbstractScaleElement {
     let cnt = 0;
@@ -93,34 +255,6 @@ export abstract class AbstractAxisElement extends BaseChartElement {
   }
 
   /**
-   * @override
-   */
-  public connectedCallback(): void {
-    super.connectedCallback();
-
-    if (this.scale) {
-      this.scale.addEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
-      );
-    }
-  }
-
-  /**
-   * @override
-   */
-  public disconnectedCallback(): void {
-    if (this.scale) {
-      this.scale.removeEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
-      );
-    }
-
-    super.disconnectedCallback();
-  }
-
-  /**
    * The associated `scale` element `styles-changed` event listeners.
    */
   private scaleStylesChangedListener = () => {
@@ -130,28 +264,95 @@ export abstract class AbstractAxisElement extends BaseChartElement {
   };
 
   /**
-   * @override
-   */
-  protected updateSvgStyles(): void {
-    super.updateSvgStyles(
-      `:host > svg g.${this.direction}-axis path.domain`,
-    );
-  }
-
-  /**
    * Updates `svg` elements position.
    */
-  protected abstract updateSvgPosition(): void;
+  private updateSvgPosition(): void {
+    if (
+      this.selection &&
+      this.scale &&
+      this.scale.scale &&
+      this.scale.plane
+    ) {
+      let x = 0;
+      let y = 0;
+      if (this.type === AxisType.Horizontal) {
+        switch (this.position) {
+          case "top":
+            x = 0;
+            y = this.scale.plane.tracked.paddingTop;
+            break;
+          case "center":
+          case "bottom":
+            x = 0;
+            y =
+              this.scale.plane.tracked.paddingTop +
+              this.tracked.top +
+              this.tracked.height;
+            break;
+        }
+      } else if (this.type === AxisType.Vertical) {
+        switch (this.position) {
+          case "right":
+          case "center":
+            x =
+              this.scale.plane.tracked.paddingLeft +
+              this.tracked.left +
+              this.tracked.width;
+            y = 0;
+            break;
+          case "left":
+            x = this.scale.plane.tracked.paddingLeft;
+            y = 0;
+            break;
+        }
+      }
+      this.selection.attr("transform", `translate(${x}, ${y})`);
+    }
+  }
 
   /**
    * Updates `svg` axis elements.
    */
-  protected abstract updateSvgAxis(): void;
+  private updateSvgAxis(): void {
+    if (this.selection && this.scale && this.scale.scale) {
+      let axisFn;
+      if (this.type === AxisType.Horizontal) {
+        switch (this.position) {
+          case "top":
+            axisFn = axisTop;
+            break;
+          case "center":
+          case "bottom":
+            axisFn = axisBottom;
+            break;
+        }
+      } else if (this.type === AxisType.Vertical) {
+        switch (this.position) {
+          case "right":
+            axisFn = axisRight;
+            break;
+          case "center":
+          case "left":
+            axisFn = axisLeft;
+            break;
+        }
+      }
+      this.selection
+        .call(
+          // eslint-disable-next-line max-len
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          axisFn(this.scale.scale).ticks(0).tickSize(0),
+        )
+        .selectChild("path.domain")
+        .attr("tabindex", "-1");
+    }
+  }
 
   /**
    * Attaches event listeners to the associated `svg` element.
    */
-  protected attachListener(): void {
+  private attachListener(): void {
     if (this.selection) {
       const element = <SVGGElement>(
         this.selection.selectChild("path.domain").node()
@@ -172,7 +373,7 @@ export abstract class AbstractAxisElement extends BaseChartElement {
   /**
    * Detaches event listeners to the associated `svg` element.
    */
-  protected detachListener(): void {
+  private detachListener(): void {
     if (this.selection) {
       const element = <SVGGElement>(
         this.selection.selectChild("path.domain").node()

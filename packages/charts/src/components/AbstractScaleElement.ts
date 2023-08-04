@@ -5,21 +5,22 @@
  */
 
 import { lit } from "@hdml/elements";
-import { BaseChartElement } from "./BaseChartElement";
-import { BasePlaneElement } from "./BasePlaneElement";
+import { AbstractChartElement } from "./AbstractChartElement";
+import { AbstractPlaneElement } from "./AbstractPlaneElement";
 
-export abstract class AbstractScaleElement extends BaseChartElement {
+// eslint-disable-next-line max-len
+export abstract class AbstractScaleElement extends AbstractChartElement {
   private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
 
   /**
    * The plane associated with the scale.
    */
-  public get plane(): null | BasePlaneElement {
+  public get plane(): null | AbstractPlaneElement {
     let cnt = 1;
-    let parent: null | HTMLElement | BasePlaneElement =
+    let parent: null | HTMLElement | AbstractPlaneElement =
       this.parentElement;
     while (parent && cnt <= 5) {
-      if (parent instanceof BasePlaneElement) {
+      if (parent instanceof AbstractPlaneElement) {
         return parent;
       } else {
         cnt++;
@@ -34,10 +35,10 @@ export abstract class AbstractScaleElement extends BaseChartElement {
    */
   public get direction(): null | "x" | "y" | "z" | "i" | "j" {
     let cnt = 1;
-    let parent: null | HTMLElement | BasePlaneElement =
+    let parent: null | HTMLElement | AbstractPlaneElement =
       this.parentElement;
     while (parent && cnt <= 5) {
-      if (parent instanceof BasePlaneElement) {
+      if (parent instanceof AbstractPlaneElement) {
         if (cnt === 1) {
           return "x";
         } else if (cnt === 2) {

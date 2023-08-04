@@ -24,7 +24,7 @@ type TrackedStyles = {
   cursor: string;
 };
 
-export class BaseChartElement extends UnifiedElement {
+export abstract class AbstractChartElement extends UnifiedElement {
   private _svgCSSSheet = new CSSStyleSheet();
   private _styles = window.getComputedStyle(this);
   private _stored: TrackedStyles = {
@@ -200,9 +200,7 @@ export class BaseChartElement extends UnifiedElement {
   /**
    * Callback to run when the tracked styles have been changed.
    */
-  protected trackedStylesChanged(): void {
-    //
-  }
+  protected abstract trackedStylesChanged(): void;
 
   /**
    * Renders `svg`-elements in the `hdml-view` shadow `DOM` and
@@ -227,6 +225,12 @@ export class BaseChartElement extends UnifiedElement {
 
   /**
    * Resets component shadow `DOM` stylesheets.
+   *
+   * ```ts
+   * resetShadowStylesheets() {
+   *   super.resetShadowStylesheets(`:host > svg g`);
+   * }
+   * ```
    */
   protected resetShadowStylesheets(sheets: CSSStyleSheet[]): void {
     lit.adoptStyles(<ShadowRoot>this.renderRoot, [
@@ -238,13 +242,8 @@ export class BaseChartElement extends UnifiedElement {
   }
 
   /**
-   * Updates the `css` stylesheet for the `svg` elements.
-   *
-   * ```ts
-   * resetShadowStylesheets() {
-   *   super.resetShadowStylesheets(`:host > svg g`);
-   * }
-   * ```
+   * Attaches the component `svg` elements `css` stylesheet to the
+   * `hdml-view` `ShadowDOM`.
    */
   protected updateSvgStyles(selector: string): void {
     if (this.view) {

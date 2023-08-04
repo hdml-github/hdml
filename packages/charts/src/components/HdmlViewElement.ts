@@ -6,9 +6,9 @@
 
 import { lit } from "@hdml/elements";
 import { type Selection, select } from "d3";
-import { BaseChartElement } from "./BaseChartElement";
+import { AbstractChartElement } from "./AbstractChartElement";
 
-export class HdmlViewElement extends BaseChartElement {
+export class HdmlViewElement extends AbstractChartElement {
   /**
    * Component styles.
    */

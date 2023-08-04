@@ -34,32 +34,70 @@
         padding: 0 15px;
       }
 
-
-      .blue horizontal-axis[direction=x] {
+      .blue horizontal-axis,
+      .blue vertical-axis,
+      .blue axis-tick {
         border: 2px rgb(126, 188, 246) dashed;
       }
-      .blue horizontal-axis.hover[direction=x] {
+      .blue horizontal-axis.hover,
+      .blue vertical-axis.hover,
+      .blue axis-tick.hover {
         border: 2px rgb(28, 140, 244) dashed;
       }
-      .blue horizontal-axis.focus[direction=x] {
+      .blue horizontal-axis.focus,
+      .blue vertical-axis.focus,
+      .blue axis-tick.focus {
         border: 2px rgb(245, 121, 121) dashed;
       }
-      .blue horizontal-axis.active[direction=x] {
+      .blue horizontal-axis.active,
+      .blue vertical-axis.active,
+      .blue axis-tick.active {
         border: 2px rgb(244, 28, 28) dashed;
       }
 
 
-      .green horizontal-axis[direction=x] {
+      .green horizontal-axis,
+      .green vertical-axis,
+      .green axis-tick {
         border: 2px rgb(74, 225, 109) dashed;
       }
-      .green horizontal-axis.hover[direction=x] {
+      .green horizontal-axis.hover,
+      .green vertical-axis.hover,
+      .green axis-tick.hover {
         border: 2px rgb(30, 185, 66) dashed;
       }
-      .green horizontal-axis.focus[direction=x] {
+      .green horizontal-axis.focus,
+      .green vertical-axis.focus,
+      .green axis-tick.focus {
         border: 2px rgb(245, 121, 121) dashed;
       }
-      .green horizontal-axis.active[direction=x] {
+      .green horizontal-axis.active,
+      .green vertical-axis.active,
+      .green axis-tick.active {
         border: 2px rgb(244, 28, 28) dashed;
+      }
+
+      .blue horizontal-axis axis-tick,
+      .blue horizontal-axis axis-tick.hover,
+      .blue horizontal-axis axis-tick.focus,
+      .blue horizontal-axis axis-tick.active,
+      .green horizontal-axis axis-tick,
+      .green horizontal-axis axis-tick.hover,
+      .green horizontal-axis axis-tick.focus,
+      .green horizontal-axis axis-tick.active {
+        height: 10px;
+        border-style: solid;
+      }
+      .blue vertical-axis axis-tick,
+      .blue vertical-axis axis-tick.hover,
+      .blue vertical-axis axis-tick.focus,
+      .blue vertical-axis axis-tick.active,
+      .green vertical-axis axis-tick,
+      .green vertical-axis axis-tick.hover,
+      .green vertical-axis axis-tick.focus,
+      .green vertical-axis axis-tick.active {
+        width: 10px;
+        border-style: solid;
       }
     </style>
   </head>
@@ -96,7 +134,7 @@
                 position="left">
                 <!-- <axis-title>Y axis</axis-title> -->
                 <axis-tick
-                  count="10">
+                  count="4">
                   <axis-grid></axis-grid>
                   <tick-label></tick-label>
                 </axis-tick>
@@ -114,17 +152,30 @@
 
       <script>
         function eventListener(event) { console.log(event); }
-        const element = window.document.querySelector("horizontal-axis");
-        element.addEventListener("mouseenter", eventListener);
-        element.addEventListener("mouseleave", eventListener);
-        element.addEventListener("mousemove", eventListener);
-        element.addEventListener("mouseover", eventListener);
-        element.addEventListener("mouseout", eventListener);
-        element.addEventListener("mousedown", eventListener);
-        element.addEventListener("mouseup", eventListener);
-        element.addEventListener("click", eventListener);
-        element.addEventListener("focus", eventListener);
-        element.addEventListener("blur", eventListener);
+
+        const horizontal = window.document.querySelector("horizontal-axis");
+        horizontal.addEventListener("mouseenter", eventListener);
+        horizontal.addEventListener("mouseleave", eventListener);
+        horizontal.addEventListener("mousemove", eventListener);
+        horizontal.addEventListener("mouseover", eventListener);
+        horizontal.addEventListener("mouseout", eventListener);
+        horizontal.addEventListener("mousedown", eventListener);
+        horizontal.addEventListener("mouseup", eventListener);
+        horizontal.addEventListener("click", eventListener);
+        horizontal.addEventListener("focus", eventListener);
+        horizontal.addEventListener("blur", eventListener);
+
+        const vertical = window.document.querySelector("vertical-axis");
+        vertical.addEventListener("mouseenter", eventListener);
+        vertical.addEventListener("mouseleave", eventListener);
+        vertical.addEventListener("mousemove", eventListener);
+        vertical.addEventListener("mouseover", eventListener);
+        vertical.addEventListener("mouseout", eventListener);
+        vertical.addEventListener("mousedown", eventListener);
+        vertical.addEventListener("mouseup", eventListener);
+        vertical.addEventListener("click", eventListener);
+        vertical.addEventListener("focus", eventListener);
+        vertical.addEventListener("blur", eventListener);
       </script>
 
 

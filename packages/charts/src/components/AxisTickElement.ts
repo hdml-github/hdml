@@ -5,11 +5,13 @@
  */
 
 import { lit } from "@hdml/elements";
-import { type Selection, axisBottom } from "d3";
+import { axisBottom, axisTop, axisLeft, axisRight } from "d3";
 import { HorizontalAxisElement } from "./HorizontalAxisElement";
-import { BaseChartElement } from "./BaseChartElement";
+import { VerticalAxisElement } from "./VerticalAxisElement";
+import { AbstractChartElement } from "./AbstractChartElement";
+import { AxisType } from "./AbstractAxisElement";
 
-export class AxisTickElement extends BaseChartElement {
+export class AxisTickElement extends AbstractChartElement {
   /**
    * Component styles.
    */
@@ -179,8 +181,8 @@ export class AxisTickElement extends BaseChartElement {
   /**
    * @override
    */
-  public render(): lit.TemplateResult<1> {
-    return lit.html`<slot></slot>`;
+  public connectedCallback(): void {
+    super.connectedCallback();
   }
 
   /**
@@ -193,25 +195,29 @@ export class AxisTickElement extends BaseChartElement {
   /**
    * @override
    */
+  public render(): lit.TemplateResult<1> {
+    return lit.html`<slot></slot>`;
+  }
+
+  /**
+   * @override
+   */
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
     super.firstUpdated(changedProperties);
-
     const attrVals = this.getAttribute("values");
     const svalVals =
       this.values === null ? "" : JSON.stringify(this.values);
-    if (attrVals !== svalVals) {
-      this.setAttribute("values", svalVals);
-    }
-
     const attrCount = this.getAttribute("count");
     const svalCount =
       this.count === null ? "" : JSON.stringify(this.count);
+    if (attrVals !== svalVals) {
+      this.setAttribute("values", svalVals);
+    }
     if (attrCount !== svalCount) {
       this.setAttribute("count", svalCount);
     }
-
     this.renderSvgElements();
   }
 
@@ -220,50 +226,95 @@ export class AxisTickElement extends BaseChartElement {
    */
   protected updated(changed: Map<string, unknown>): void {
     super.updated(changed);
+    this.updateSvgStyles();
   }
 
   /**
    * @override
    */
   protected trackedStylesChanged(): void {
-    //
+    this.updateSvgStyles();
   }
 
   /**
    * @override
    */
   protected renderSvgElements(): void {
-    super.renderSvgElements();
     if (
       this.parentElement &&
-      this.parentElement instanceof HorizontalAxisElement &&
-      this.parentElement.svgGSelection
+      (this.parentElement instanceof HorizontalAxisElement ||
+        this.parentElement instanceof VerticalAxisElement) &&
+      this.parentElement.selection
     ) {
+      this.updateSvgStyles();
+      let size = 0;
+      let axisFn;
+      if (this.parentElement.type === AxisType.Horizontal) {
+        size = this.tracked.height;
+        switch (this.parentElement.position) {
+          case "top":
+            axisFn = axisTop;
+            break;
+          case "center":
+          case "bottom":
+            axisFn = axisBottom;
+            break;
+        }
+      } else if (this.parentElement.type === AxisType.Vertical) {
+        size = this.tracked.width;
+        switch (this.parentElement.position) {
+          case "right":
+            axisFn = axisRight;
+            break;
+          case "center":
+          case "left":
+            axisFn = axisLeft;
+            break;
+        }
+      }
       if (this.values?.length) {
-        this.parentElement.svgGSelection.call(
+        this.parentElement.selection.call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          axisBottom(this.parentElement.scale.scale)
+          axisFn(this.parentElement.scale.scale)
             // eslint-disable-next-line max-len
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             .tickValues(this.values)
-            .tickSizeInner(5)
+            .tickSizeInner(size)
             .tickSizeOuter(0),
         );
       } else {
         const count = this.count ? this.count : 5;
-        this.parentElement.svgGSelection.call(
+        this.parentElement.selection.call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          axisBottom(this.parentElement.scale.scale)
+          axisFn(this.parentElement.scale.scale)
             .ticks(count)
-            .tickSizeInner(5)
+            .tickSizeInner(size)
             .tickSizeOuter(0),
         );
       }
+    }
+    super.renderSvgElements();
+  }
+
+  /**
+   * @override
+   */
+  protected updateSvgStyles(): void {
+    if (
+      this.parentElement &&
+      (this.parentElement instanceof HorizontalAxisElement ||
+        this.parentElement instanceof VerticalAxisElement)
+    ) {
+      super.updateSvgStyles(
+        `:host > svg ` +
+          `g.${this.parentElement.direction}-axis ` +
+          `g.tick line`,
+      );
     }
   }
 }

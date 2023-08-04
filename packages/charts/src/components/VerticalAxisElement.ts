@@ -5,13 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
-import { type Selection, axisBottom } from "d3";
-import { AbstractAxisElement } from "./AbstractAxisElement";
-import { OrdinalScaleElement } from "./OrdinalScaleElement";
-import { LinearScaleElement } from "./LinearScaleElement";
-
-type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-type SVGGSelection = Selection<SVGGElement, unknown, null, undefined>;
+import { AxisType, AbstractAxisElement } from "./AbstractAxisElement";
 
 export class VerticalAxisElement extends AbstractAxisElement {
   /**
@@ -37,12 +31,127 @@ export class VerticalAxisElement extends AbstractAxisElement {
     }
   `;
 
-  public get scale(): null | ScaleElement {
-    return null;
+  /**
+   * Reactive attributes.
+   */
+  public static properties = {
+    /**
+     * The `direction` property definition.
+     */
+    direction: {
+      type: String,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (value: string): "y" | "z" | "i" | "j" => {
+          if (!value) {
+            return "y";
+          } else {
+            if (
+              value === "y" ||
+              value === "z" ||
+              value === "i" ||
+              value === "j"
+            ) {
+              return value;
+            } else {
+              return "y";
+            }
+          }
+        },
+        toAttribute: (value: string): string => {
+          return value;
+        },
+      },
+    },
+
+    /**
+     * The `position` property definition.
+     */
+    position: {
+      type: String,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): "left" | "center" | "right" => {
+          if (!value) {
+            return "left";
+          } else {
+            if (
+              value === "left" ||
+              value === "center" ||
+              value === "right"
+            ) {
+              return value;
+            } else {
+              return "left";
+            }
+          }
+        },
+        toAttribute: (value: string): string => {
+          return value;
+        },
+      },
+    },
+  };
+
+  private _direction: "y" | "z" | "i" | "j" = "y";
+  private _position: "left" | "center" | "right" = "left";
+
+  /**
+   * @override
+   */
+  public get type(): AxisType {
+    return AxisType.Vertical;
   }
 
-  public render(): lit.TemplateResult<1> {
-    return lit.html`<slot></slot>`;
+  /**
+   * @override
+   */
+  public set direction(val: "y" | "z" | "i" | "j") {
+    const attr = this.getAttribute("direction");
+    const sval = val;
+    if (attr !== sval) {
+      this.setAttribute("direction", sval);
+    }
+    const old = this._direction;
+    this._direction = val;
+    this.requestUpdate("direction", old);
+  }
+
+  /**
+   * @override
+   */
+  public get direction(): "y" | "z" | "i" | "j" {
+    return this._direction;
+  }
+
+  /**
+   * @override
+   */
+  public set position(val: "left" | "center" | "right") {
+    const attr = this.getAttribute("position");
+    const sval = val;
+    if (attr !== sval) {
+      this.setAttribute("position", sval);
+    }
+    const old = this._position;
+    this._position = val;
+    this.requestUpdate("position", old);
+  }
+
+  /**
+   * @override
+   */
+  public get position(): "left" | "center" | "right" {
+    return this._position;
   }
 }
+
 customElements.define("vertical-axis", VerticalAxisElement);

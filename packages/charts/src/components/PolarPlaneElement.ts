@@ -5,9 +5,9 @@
  */
 
 import { lit } from "@hdml/elements";
-import { BasePlaneElement } from "./BasePlaneElement";
+import { AbstractPlaneElement } from "./AbstractPlaneElement";
 
-export class PolarPlaneElement extends BasePlaneElement {
+export class PolarPlaneElement extends AbstractPlaneElement {
   /**
    * Component styles.
    */

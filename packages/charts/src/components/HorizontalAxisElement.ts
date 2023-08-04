@@ -5,12 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
-import { axisBottom } from "d3";
-import {
-  AbstractAxisElement,
-  GSelection,
-  ScaleElement,
-} from "./AbstractAxisElement";
+import { AxisType, AbstractAxisElement } from "./AbstractAxisElement";
 
 export class HorizontalAxisElement extends AbstractAxisElement {
   /**
@@ -109,32 +104,16 @@ export class HorizontalAxisElement extends AbstractAxisElement {
 
   private _direction: "x" | "z" | "i" | "j" = "x";
   private _position: "bottom" | "center" | "top" = "bottom";
-  private _svgGSelection: null | GSelection = null;
 
   /**
    * @override
    */
-  public get scale(): null | ScaleElement {
-    const scaleElement =
-      this.direction === "x"
-        ? this.scaleX
-        : this.direction === "z"
-        ? this.scaleZ
-        : this.direction === "i"
-        ? this.scaleI
-        : this.scaleJ;
-    return scaleElement as ScaleElement;
+  public get type(): AxisType {
+    return AxisType.Horizontal;
   }
 
   /**
    * @override
-   */
-  public get selection(): null | GSelection {
-    return this._svgGSelection;
-  }
-
-  /**
-   * The `direction` setter.
    */
   public set direction(val: "x" | "z" | "i" | "j") {
     const attr = this.getAttribute("direction");
@@ -155,7 +134,7 @@ export class HorizontalAxisElement extends AbstractAxisElement {
   }
 
   /**
-   * The `position` setter.
+   * @override
    */
   public set position(val: "bottom" | "center" | "top") {
     const attr = this.getAttribute("position");
@@ -169,135 +148,10 @@ export class HorizontalAxisElement extends AbstractAxisElement {
   }
 
   /**
-   * The `position` getter.
+   * @override
    */
   public get position(): "bottom" | "center" | "top" {
     return this._position;
-  }
-
-  /**
-   * @override
-   */
-  public render(): lit.TemplateResult<1> {
-    return lit.html`
-      <slot></slot>
-    `;
-  }
-
-  /**
-   * @override
-   */
-  public connectedCallback(): void {
-    super.connectedCallback();
-  }
-
-  /**
-   * @override
-   */
-  public disconnectedCallback(): void {
-    this.detachListener();
-    this._svgGSelection?.remove();
-    this._svgGSelection = null;
-    super.disconnectedCallback();
-  }
-
-  /**
-   * @override
-   */
-  protected firstUpdated(
-    changedProperties: Map<PropertyKey, unknown>,
-  ): void {
-    super.firstUpdated(changedProperties);
-    const attrDirection = this.getAttribute("direction");
-    const attrPosition = this.getAttribute("position");
-    const svalDirection = this.direction;
-    const svalPosition = this.position;
-    if (attrDirection !== svalDirection) {
-      this.setAttribute("direction", svalDirection);
-    }
-    if (attrPosition !== svalPosition) {
-      this.setAttribute("position", svalPosition);
-    }
-    this.renderSvgElements();
-  }
-
-  /**
-   * @override
-   */
-  protected updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgAxis();
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgAxis();
-  }
-
-  /**
-   * @override
-   */
-  protected renderSvgElements(): void {
-    if (!this._svgGSelection && this.view?.svg) {
-      this._svgGSelection = this.view.svg
-        .append("g")
-        .attr("class", `${this.direction}-axis`);
-      this.updateSvgStyles();
-      this.updateSvgPosition();
-      this.updateSvgAxis();
-      this.attachListener();
-    }
-    super.renderSvgElements();
-  }
-
-  /**
-   * @override
-   */
-  protected updateSvgPosition(): void {
-    if (
-      this.selection &&
-      this.scale &&
-      this.scale.scale &&
-      this.scale.plane
-    ) {
-      let position = 0;
-      switch (this.position) {
-        case "top":
-          position = this.scale.plane.tracked.paddingTop;
-          break;
-        case "center":
-        case "bottom":
-          position =
-            this.scale.plane.tracked.paddingTop +
-            this.tracked.top +
-            this.tracked.height;
-          break;
-      }
-      this.selection.attr("transform", `translate(0, ${position})`);
-    }
-  }
-
-  /**
-   * @override
-   */
-  protected updateSvgAxis(): void {
-    if (this.selection && this.scale && this.scale.scale) {
-      this.selection
-        .call(
-          // eslint-disable-next-line max-len
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          axisBottom(this.scale.scale).ticks(0).tickSize(0),
-        )
-        .selectChild("path.domain")
-        .attr("tabindex", "-1");
-    }
   }
 }
 
