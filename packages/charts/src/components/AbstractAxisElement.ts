@@ -188,13 +188,6 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
     this.updateSvgStyles();
     this.updateSvgPosition();
     this.updateSvgAxis();
-    this.dispatchEvent(
-      new CustomEvent("styles-changed", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
   }
 
   /**

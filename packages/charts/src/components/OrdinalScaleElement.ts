@@ -243,19 +243,6 @@ export class OrdinalScaleElement extends AbstractScaleElement {
   /**
    * @override
    */
-  public updated(changed: Map<string, unknown>): void {
-    if (
-      changed.has("bandwidth") ||
-      changed.has("values") ||
-      changed.has("rest")
-    ) {
-      super.update(changed);
-    }
-  }
-
-  /**
-   * @override
-   */
   protected updateScale(): void {
     if (!this.values.length) {
       this._scale = null;

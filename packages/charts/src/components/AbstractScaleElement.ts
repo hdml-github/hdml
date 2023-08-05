@@ -109,14 +109,8 @@ export abstract class AbstractScaleElement extends AbstractChartElement {
    * @override
    */
   public updated(changed: Map<string, unknown>): void {
+    super.updated(changed);
     this.updateScale();
-    this.dispatchEvent(
-      new CustomEvent("styles-changed", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
   }
 
   /**

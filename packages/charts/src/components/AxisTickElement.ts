@@ -179,16 +179,57 @@ export class AxisTickElement extends AbstractChartElement {
   }
 
   /**
+   * Associated axis element.
+   */
+  public get axis():
+    | null
+    | HorizontalAxisElement
+    | VerticalAxisElement {
+    if (
+      this.parentElement &&
+      (this.parentElement instanceof HorizontalAxisElement ||
+        this.parentElement instanceof VerticalAxisElement)
+    ) {
+      return this.parentElement;
+    }
+    return null;
+  }
+
+  /**
    * @override
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    if (this.axis) {
+      this.axis.addEventListener(
+        "styles-changed",
+        this.axisStylesChangedListener,
+      );
+      if (this.axis.scale) {
+        this.axis.scale.addEventListener(
+          "styles-changed",
+          this.axisStylesChangedListener,
+        );
+      }
+    }
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
+    if (this.axis) {
+      this.axis.removeEventListener(
+        "styles-changed",
+        this.axisStylesChangedListener,
+      );
+      if (this.axis.scale) {
+        this.axis.scale.removeEventListener(
+          "styles-changed",
+          this.axisStylesChangedListener,
+        );
+      }
+    }
     super.disconnectedCallback();
   }
 
@@ -226,6 +267,7 @@ export class AxisTickElement extends AbstractChartElement {
    */
   protected updated(changed: Map<string, unknown>): void {
     super.updated(changed);
+    this.renderSvgElements();
     this.updateSvgStyles();
   }
 
@@ -233,6 +275,7 @@ export class AxisTickElement extends AbstractChartElement {
    * @override
    */
   protected trackedStylesChanged(): void {
+    this.renderSvgElements();
     this.updateSvgStyles();
   }
 
@@ -240,18 +283,13 @@ export class AxisTickElement extends AbstractChartElement {
    * @override
    */
   protected renderSvgElements(): void {
-    if (
-      this.parentElement &&
-      (this.parentElement instanceof HorizontalAxisElement ||
-        this.parentElement instanceof VerticalAxisElement) &&
-      this.parentElement.selection
-    ) {
+    if (this.axis && this.axis.selection) {
       this.updateSvgStyles();
       let size = 0;
       let axisFn;
-      if (this.parentElement.type === AxisType.Horizontal) {
+      if (this.axis.type === AxisType.Horizontal) {
         size = this.tracked.height;
-        switch (this.parentElement.position) {
+        switch (this.axis.position) {
           case "top":
             axisFn = axisTop;
             break;
@@ -260,9 +298,9 @@ export class AxisTickElement extends AbstractChartElement {
             axisFn = axisBottom;
             break;
         }
-      } else if (this.parentElement.type === AxisType.Vertical) {
+      } else if (this.axis.type === AxisType.Vertical) {
         size = this.tracked.width;
-        switch (this.parentElement.position) {
+        switch (this.axis.position) {
           case "right":
             axisFn = axisRight;
             break;
@@ -273,11 +311,11 @@ export class AxisTickElement extends AbstractChartElement {
         }
       }
       if (this.values?.length) {
-        this.parentElement.selection.call(
+        this.axis.selection.call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          axisFn(this.parentElement.scale.scale)
+          axisFn(this.axis.scale.scale)
             // eslint-disable-next-line max-len
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
@@ -287,11 +325,11 @@ export class AxisTickElement extends AbstractChartElement {
         );
       } else {
         const count = this.count ? this.count : 5;
-        this.parentElement.selection.call(
+        this.axis.selection.call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
-          axisFn(this.parentElement.scale.scale)
+          axisFn(this.axis.scale.scale)
             .ticks(count)
             .tickSizeInner(size)
             .tickSizeOuter(0),
@@ -305,17 +343,21 @@ export class AxisTickElement extends AbstractChartElement {
    * @override
    */
   protected updateSvgStyles(): void {
-    if (
-      this.parentElement &&
-      (this.parentElement instanceof HorizontalAxisElement ||
-        this.parentElement instanceof VerticalAxisElement)
-    ) {
+    if (this.axis) {
       super.updateSvgStyles(
         `:host > svg ` +
-          `g.${this.parentElement.direction}-axis ` +
+          `g.${this.axis.direction}-axis ` +
           `g.tick line`,
       );
     }
   }
+
+  /**
+   * Associated axis `styles-changed` event listener.
+   */
+  private axisStylesChangedListener = () => {
+    this.renderSvgElements();
+    this.updateSvgStyles();
+  };
 }
 customElements.define("axis-tick", AxisTickElement);

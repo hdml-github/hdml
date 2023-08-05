@@ -167,7 +167,16 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * @override
    */
   protected updated(changed: Map<string, unknown>): void {
-    super.update(changed);
+    super.updated(changed);
+    setTimeout(() => {
+      this.dispatchEvent(
+        new CustomEvent("styles-changed", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+        }),
+      );
+    });
   }
 
   /**

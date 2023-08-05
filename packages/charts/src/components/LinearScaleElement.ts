@@ -168,15 +168,6 @@ export class LinearScaleElement extends AbstractScaleElement {
   /**
    * @override
    */
-  public updated(changed: Map<string, unknown>): void {
-    if (changed.has("min") || changed.has("max")) {
-      super.update(changed);
-    }
-  }
-
-  /**
-   * @override
-   */
   protected updateScale(): void {
     let fp = 0;
     let pv = 0;
