@@ -38,6 +38,9 @@ export class HdmlViewElement extends AbstractChartElement {
       bottom: 0;
       right: 0;
     }
+    text {
+      color: rgba(0, 0, 0, 0);
+    }
   `;
 
   private _svg: null | Selection<

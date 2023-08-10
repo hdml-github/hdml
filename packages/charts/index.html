@@ -19,7 +19,7 @@
       cartesian-plane {
         width: 50%;
         height: 100%;
-        padding: 10px 10px 25px 50px;
+        padding: 10px 10px 25px 70px;
       }
       polar-plane {
         width: 50%;
@@ -32,6 +32,14 @@
       }
       linear-scale {
         padding: 0 15px;
+      }
+
+      tick-label {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 14px;
+        font-weight: 600;
+        font-style: normal;
+        cursor: text;
       }
 
       .blue horizontal-axis,
@@ -53,6 +61,18 @@
       .blue vertical-axis.active,
       .blue axis-tick.active {
         border: 2px rgb(244, 28, 28) dashed;
+      }
+      .blue tick-label {
+        color:rgb(126, 188, 246);
+      }
+      .blue tick-label.hover {
+        color:rgb(28, 140, 244);
+      }
+      .blue tick-label.focus {
+        color:rgb(245, 121, 121);
+      }
+      .blue tick-label.active {
+        color:rgb(244, 28, 28);
       }
 
 

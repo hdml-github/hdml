@@ -22,6 +22,11 @@ type TrackedStyles = {
   borderStyle: string;
   borderWidth: number;
   cursor: string;
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  fontStyle: string;
+  color: string;
 };
 
 export abstract class AbstractChartElement extends UnifiedElement {
@@ -42,6 +47,11 @@ export abstract class AbstractChartElement extends UnifiedElement {
     borderStyle: "none",
     borderWidth: 0,
     cursor: "auto",
+    fontFamily: "Times New Roman",
+    fontSize: 0,
+    fontWeight: 0,
+    fontStyle: "normal",
+    color: "rgba(0, 0, 0, 0)",
   };
 
   /**
@@ -120,6 +130,21 @@ export abstract class AbstractChartElement extends UnifiedElement {
       },
       get cursor(): string {
         return self.styles.cursor;
+      },
+      get fontFamily(): string {
+        return self.styles.fontFamily;
+      },
+      get fontSize(): number {
+        return parseFloat(self.styles.fontSize);
+      },
+      get fontWeight(): number {
+        return parseFloat(self.styles.fontWeight);
+      },
+      get fontStyle(): string {
+        return self.styles.fontStyle;
+      },
+      get color(): string {
+        return self.styles.color;
       },
     };
   }
@@ -305,6 +330,11 @@ export abstract class AbstractChartElement extends UnifiedElement {
       `\t${this.getSvgStrokeLinecapStyle()}\n` +
       `\t${this.getSvgCursorStyle()}\n` +
       `\t${this.getSvgOutlineStyle()}\n` +
+      `\t${this.getSvgFontFamilyStyle()}\n` +
+      `\t${this.getSvgFontSizeStyle()}\n` +
+      `\t${this.getSvgFontWeightStyle()}\n` +
+      `\t${this.getSvgFontStyleStyle()}\n` +
+      `\t${this.getSvgFontColorStyle()}\n` +
       `}`;
     state && this.classList.remove(state);
     return val;
@@ -360,5 +390,25 @@ export abstract class AbstractChartElement extends UnifiedElement {
 
   private getSvgOutlineStyle(): string {
     return "outline: none;";
+  }
+
+  private getSvgFontFamilyStyle(): string {
+    return `font-family: ${this.tracked.fontFamily};`;
+  }
+
+  private getSvgFontSizeStyle(): string {
+    return `font-size: ${this.tracked.fontSize}px;`;
+  }
+
+  private getSvgFontWeightStyle(): string {
+    return `font-weight: ${this.tracked.fontWeight};`;
+  }
+
+  private getSvgFontStyleStyle(): string {
+    return `font-style: ${this.tracked.fontStyle};`;
+  }
+
+  private getSvgFontColorStyle(): string {
+    return `color: ${this.tracked.color};`;
   }
 }

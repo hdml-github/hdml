@@ -316,21 +316,17 @@ export class AxisTickElement extends AbstractChartElement {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           axisFn(this.axis.scale.scale)
-            // eslint-disable-next-line max-len
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .tickValues(this.values)
+            .tickValues(this.values as Iterable<string>)
             .tickSizeInner(size)
             .tickSizeOuter(0),
         );
       } else {
-        const count = this.count ? this.count : 5;
         this.axis.selection.call(
           // eslint-disable-next-line max-len
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           axisFn(this.axis.scale.scale)
-            .ticks(count)
+            .ticks(this.count ? this.count : 5)
             .tickSizeInner(size)
             .tickSizeOuter(0),
         );
@@ -360,4 +356,5 @@ export class AxisTickElement extends AbstractChartElement {
     this.updateSvgStyles();
   };
 }
+
 customElements.define("axis-tick", AxisTickElement);
