@@ -40,6 +40,10 @@ export class HdmlViewElement extends AbstractChartElement {
     }
     text {
       color: rgba(0, 0, 0, 0);
+      cursor: pointer;
+    }
+    text::selection {
+      background-color: rgba(0, 0, 0, 0);
     }
   `;
 

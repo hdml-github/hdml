@@ -19,6 +19,7 @@ export class TickLabelElement extends AbstractChartElement {
       display: block;
       position: absolute;
       box-sizing: border-box;
+      cursor: pointer;
     }
     :host-context(horizontal-axis[position=top]) {
       bottom: 5px;
