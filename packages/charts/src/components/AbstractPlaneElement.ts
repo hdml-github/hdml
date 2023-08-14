@@ -8,6 +8,6 @@ import { AbstractChartElement } from "./AbstractChartElement";
 
 export class AbstractPlaneElement extends AbstractChartElement {
   protected trackedStylesChanged(): void {
-    //
+    // TODO: delete me!!!
   }
 }

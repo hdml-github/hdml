@@ -78,25 +78,43 @@ export class HdmlViewElement extends AbstractChartElement {
   }
 
   /**
-   * Initialization callback.
+   * @override
    */
-  public firstUpdated(): void {
-    this._svg = select(this.renderRoot.querySelector("svg"));
-    this.patchSvg();
+  public firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
+    this.renderCanvas();
+    super.firstUpdated(changedProperties);
+  }
+
+  /**
+   * @override
+   */
+  public updated(changedProperties: Map<string, unknown>): void {
+    this.updateCanvas();
+    super.updated(changedProperties);
   }
 
   /**
    * @override
    */
   public trackedStylesChanged(): void {
-    this.patchSvg();
+    // TODO: delete me!!!
+  }
+
+  /**
+   * Initializes `svg` element.
+   */
+  private renderCanvas(): void {
+    this._svg = select(this.renderRoot.querySelector("svg"));
+    this.updateCanvas();
   }
 
   /**
    * Updates `svg` element attributes.
    */
-  private patchSvg(): void {
-    if (this._svg) {
+  private updateCanvas(): void {
+    if (this.isConnected && this._svg) {
       this._svg.attr("viewBox", [
         0,
         0,

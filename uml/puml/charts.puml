@@ -2,13 +2,15 @@
   title Table of content
 
   object Content {
-    +[[./init_workflow.svg Initial Workflow]]
-    +[[./append_hdml_view.svg Append <hdml-view/> element]]
+    +[[./init_workflow.svg Initial Workflow (observers)]]
+    +[[./hdml_view_append.svg <hdml-view/> append workflow]]
+    +[[./hdml_view_styles_changed.svg <hdml-view/> styles-changed workflow]]
+    +[[./hdml_view_remove.svg <hdml-view/> remove workflow]]
   }
 @enduml
 
 @startuml init_workflow
-  title Initial Workflow
+  title Initial Workflow (observers)
 
   actor User
   participant Window
@@ -17,7 +19,7 @@
   control dispatchImmediate
   control dispatchDelayed
 
-  group Init
+  group #b3e5fc Init
     User -> Window: open
 
     create dispatchDelayed
@@ -30,34 +32,36 @@
     Window -> robserver: enable
   end
 
-  group Window Resized
+  group #b3e5fc Window Resized
     User -> Window: resize
     Window -> robserver: trigger
     robserver -> dispatchImmediate: run
-    dispatchImmediate -> Window: dispatch "styles-changed"
+    dispatchImmediate -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
   end
 
-  group Style Changed
+  group #b3e5fc Style Changed
     User -> Window: interact
     Window -> Window: change DOM-element style
     Window -> mobserver: trigger
     mobserver -> dispatchImmediate: run
-    dispatchImmediate -> Window: dispatch "styles-changed"
+    dispatchImmediate -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
   end
 
-  group Class Changed
+  group #b3e5fc Class Changed
     User -> Window: interact
     Window -> Window: change DOM-element class
     Window -> mobserver: trigger
     mobserver -> dispatchDelayed: run
     ==async==
-    dispatchDelayed -> Window: dispatch "styles-changed"
+    dispatchDelayed -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
   end
 @enduml
 
-@startuml append_hdml_view
-  
-  title Append <hdml-view/> element
+@startuml hdml_view_append
+  title <hdml-view/> append workflow
 
   participant Window
 
@@ -73,11 +77,11 @@
     AbstractChartElement <- HdmlViewElement: runs super()
     Window <- AbstractChartElement: creates a shadow DOM
     Window <- AbstractChartElement: attaches styles to a shadow DOM
-    AbstractChartElement -> HdmlViewElement: runs connectedCallback()
 
     group #039be5 connectedCallback
+      AbstractChartElement -> HdmlViewElement: runs this.connectedCallback()
       AbstractChartElement <- HdmlViewElement: runs super.connectedCallback()
-      AbstractChartElement -> Window: runs addEventListener("styles-changed")
+      AbstractChartElement -> Window: runs addEventListener(<b>"styles-changed"</b>)
     end
 
     AbstractChartElement -> AbstractChartElement: runs requestUpdate()
@@ -90,23 +94,100 @@
     AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
     AbstractChartElement -> AbstractChartElement: runs willUpdate()
     AbstractChartElement -> AbstractChartElement: runs update()
-    AbstractChartElement -> HdmlViewElement: runs render()
-    AbstractChartElement <- HdmlViewElement: returns template
+    
+    group #039be5 render
+      AbstractChartElement -> HdmlViewElement: runs render()
+      AbstractChartElement <- HdmlViewElement: returns template
+    end
+
     Window <- AbstractChartElement: updates shadow tree
   end
 
   group #b3e5fc Post-Updated
-    AbstractChartElement -> HdmlViewElement: runs firstUpdated()
-    Window <- HdmlViewElement: initializes canvas in the shadow tree
-    AbstractChartElement -> AbstractChartElement: runs updated()
-    group #039be5 updated
-      AbstractChartElement -> AbstractChartElement: sets dispatch timeout
+    group #039be5 fistUpdated
+      AbstractChartElement -> HdmlViewElement: runs this.firstUpdated()
+      Window <- HdmlViewElement: render canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.firstUpdated()
     end
-    AbstractChartElement -> AbstractChartElement: resolves updateComplete
-    
-    ==async==
 
-    AbstractChartElement -> : dispatches "styles-changed" event
+    group #039be5 updated
+      AbstractChartElement -> HdmlViewElement: runs this.updated()
+      Window <- HdmlViewElement: updates canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml hdml_view_styles_changed
+  title <hdml-view/> styles-changed workflow
+
+  actor User
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    collections AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  User -> Window: interact
+  Window -> : dispatches <b>"styles-changed"</b> event
+  AbstractChartElement <- : handle <b>"styles-changed"</b> event
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
   end
 
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> HdmlViewElement: runs render()
+      AbstractChartElement <- HdmlViewElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 updated
+      AbstractChartElement -> HdmlViewElement: runs this.updated()
+      Window <- HdmlViewElement: updates canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml hdml_view_remove
+  title <hdml-view/> remove workflow
+
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    collections AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  -> Window: remove <hdml-view/>
+
+  group #b3e5fc Pre-Update
+
+    group #039be5 disconnectedCallback
+      AbstractChartElement -> HdmlViewElement: runs this.disconnectedCallback()
+      AbstractChartElement <- HdmlViewElement: runs super.disconnectedCallback()
+      AbstractChartElement -> Window: runs removeEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
 @enduml

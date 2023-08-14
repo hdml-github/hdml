@@ -171,12 +171,33 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * @override
    */
   public disconnectedCallback(): void {
+    super.disconnectedCallback();
     window.removeEventListener(
       "styles-changed",
       this.stylesChangedListener,
     );
     this.view?.removeStylesheet(this._svgCSSSheet);
-    super.disconnectedCallback();
+  }
+
+  /**
+   * The `window` `styles-changed` event listener. Runs the
+   * `requestUpdate` method passing the "styles-changed" string as a
+   * property key.
+   */
+  private stylesChangedListener = () => {
+    this.requestUpdate();
+  };
+
+  /**
+   * @override
+   */
+  public shouldUpdate(): boolean {
+    const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
+    const changed = props.filter((prop) => {
+      const p = prop;
+      return this._stored[p] !== this.tracked[p];
+    });
+    return !!changed.length;
   }
 
   /**
@@ -192,44 +213,19 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * @override
    */
   protected updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    setTimeout(() => {
-      this.dispatchEvent(
-        new CustomEvent("styles-changed", {
-          cancelable: false,
-          composed: false,
-          bubbles: false,
-        }),
-      );
-    });
-  }
-
-  /**
-   * The `window` `styles-changed` event listener. Consequently
-   * dispatches the `styles-changed` event if element's styles were
-   * updated.
-   */
-  private stylesChangedListener = () => {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
-    const changed = props.filter((prop) => {
-      const p = prop;
-      return this._stored[p] !== this.tracked[p];
+    props.forEach((p) => {
+      this._stored[p] = <never>this.tracked[p];
     });
-    if (changed.length) {
-      this.trackedStylesChanged();
-      changed.forEach((p) => {
-        // TODO: wtf with the types here?
-        this._stored[p] = <never>this.tracked[p];
-      });
-      this.dispatchEvent(
-        new CustomEvent("styles-changed", {
-          cancelable: false,
-          composed: false,
-          bubbles: false,
-        }),
-      );
-    }
-  };
+    super.updated(changed);
+    this.dispatchEvent(
+      new CustomEvent("updated", {
+        cancelable: false,
+        composed: false,
+        bubbles: false,
+      }),
+    );
+  }
 
   /**
    * Callback to run when the tracked styles have been changed.
