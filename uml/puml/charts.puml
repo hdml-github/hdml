@@ -1,0 +1,112 @@
+@startuml index
+  title Table of content
+
+  object Content {
+    +[[./init_workflow.svg Initial Workflow]]
+    +[[./append_hdml_view.svg Append <hdml-view/> element]]
+  }
+@enduml
+
+@startuml init_workflow
+  title Initial Workflow
+
+  actor User
+  participant Window
+  control robserver
+  control mobserver
+  control dispatchImmediate
+  control dispatchDelayed
+
+  group Init
+    User -> Window: open
+
+    create dispatchDelayed
+    Window -> dispatchDelayed: creates
+
+    create dispatchImmediate
+    Window -> dispatchImmediate: creates
+
+    Window -> mobserver: enable
+    Window -> robserver: enable
+  end
+
+  group Window Resized
+    User -> Window: resize
+    Window -> robserver: trigger
+    robserver -> dispatchImmediate: run
+    dispatchImmediate -> Window: dispatch "styles-changed"
+  end
+
+  group Style Changed
+    User -> Window: interact
+    Window -> Window: change DOM-element style
+    Window -> mobserver: trigger
+    mobserver -> dispatchImmediate: run
+    dispatchImmediate -> Window: dispatch "styles-changed"
+  end
+
+  group Class Changed
+    User -> Window: interact
+    Window -> Window: change DOM-element class
+    Window -> mobserver: trigger
+    mobserver -> dispatchDelayed: run
+    ==async==
+    dispatchDelayed -> Window: dispatch "styles-changed"
+  end
+@enduml
+
+@startuml append_hdml_view
+  
+  title Append <hdml-view/> element
+
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    collections AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  -> Window: append <hdml-view/>
+  Window -> HdmlViewElement: creates new HdmlViewElement()
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement <- HdmlViewElement: runs super()
+    Window <- AbstractChartElement: creates a shadow DOM
+    Window <- AbstractChartElement: attaches styles to a shadow DOM
+    AbstractChartElement -> HdmlViewElement: runs connectedCallback()
+
+    group #039be5 connectedCallback
+      AbstractChartElement <- HdmlViewElement: runs super.connectedCallback()
+      AbstractChartElement -> Window: runs addEventListener("styles-changed")
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    AbstractChartElement -> HdmlViewElement: runs render()
+    AbstractChartElement <- HdmlViewElement: returns template
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    AbstractChartElement -> HdmlViewElement: runs firstUpdated()
+    Window <- HdmlViewElement: initializes canvas in the shadow tree
+    AbstractChartElement -> AbstractChartElement: runs updated()
+    group #039be5 updated
+      AbstractChartElement -> AbstractChartElement: sets dispatch timeout
+    end
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+    
+    ==async==
+
+    AbstractChartElement -> : dispatches "styles-changed" event
+  end
+
+@enduml
