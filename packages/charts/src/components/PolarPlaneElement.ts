@@ -12,28 +12,29 @@ export class PolarPlaneElement extends AbstractPlaneElement {
    * Component styles.
    */
   public static styles = lit.css`
-  :host {
-    display: block;
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    background: rgba(0, 0, 0, 0);
-  }
-  :host > div {
-    display: block;
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-  }
-  :host > div > slot {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-  }`;
+    :host {
+      display: block;
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      background: rgba(0, 0, 0, 0);
+    }
+    :host > div {
+      display: block;
+      position: relative;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+    }
+    :host > div > slot {
+      display: block;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  `;
 
   /**
    * Renders compomponent `DOM`.
