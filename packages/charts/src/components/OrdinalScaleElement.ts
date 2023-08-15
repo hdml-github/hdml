@@ -218,26 +218,41 @@ export class OrdinalScaleElement extends AbstractScaleElement {
   /**
    * @override
    */
-  protected firstUpdated(): void {
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
+    if (
+      changedProperties.has("bandwidth") ||
+      changedProperties.has("values") ||
+      changedProperties.has("rest")
+    ) {
+      return true;
+    }
+    return super.shouldUpdate(changedProperties);
+  }
+
+  /**
+   * @override
+   */
+  protected firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     const attrBandwidth = this.getAttribute("bandwidth");
     const svalBandwidth = JSON.stringify(this.bandwidth);
+    const attrValues = this.getAttribute("values");
+    const svalValues = JSON.stringify(this.values);
+    const attrRest = this.getAttribute("rest");
+    const svalRest = JSON.stringify(this.rest);
     if (attrBandwidth !== svalBandwidth) {
       this.setAttribute("bandwidth", svalBandwidth);
     }
-
-    const attrValues = this.getAttribute("values");
-    const svalValues = JSON.stringify(this.values);
     if (attrValues !== svalValues) {
       this.setAttribute("values", svalValues);
     }
-
-    const attrRest = this.getAttribute("rest");
-    const svalRest = JSON.stringify(this.rest);
     if (attrRest !== svalRest) {
       this.setAttribute("rest", svalRest);
     }
-
-    super.firstUpdated();
+    super.firstUpdated(changedProperties);
   }
 
   /**

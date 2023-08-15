@@ -7,7 +7,24 @@
 import { AbstractChartElement } from "./AbstractChartElement";
 
 export class AbstractPlaneElement extends AbstractChartElement {
-  protected trackedStylesChanged(): void {
-    // TODO: delete me!!!
+  /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    return null;
+  }
+
+  /**
+   * @implements
+   */
+  protected renderGeometry(): void {
+    //
+  }
+
+  /**
+   * @implements
+   */
+  protected updateGeometry(): void {
+    //
   }
 }

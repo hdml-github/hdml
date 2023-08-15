@@ -56,9 +56,16 @@ export class HdmlViewElement extends AbstractChartElement {
   private _stylesheets: Set<CSSStyleSheet> = new Set();
 
   /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    return "svg";
+  }
+
+  /**
    * `D3` selection of the `svg:svg` element of the component.
    */
-  get svg(): null | Selection<
+  public get svg(): null | Selection<
     SVGSVGElement | null,
     unknown,
     null,
@@ -78,42 +85,16 @@ export class HdmlViewElement extends AbstractChartElement {
   }
 
   /**
-   * @override
+   * @implements
    */
-  public firstUpdated(
-    changedProperties: Map<PropertyKey, unknown>,
-  ): void {
-    this.renderCanvas();
-    super.firstUpdated(changedProperties);
-  }
-
-  /**
-   * @override
-   */
-  public updated(changedProperties: Map<string, unknown>): void {
-    this.updateCanvas();
-    super.updated(changedProperties);
-  }
-
-  /**
-   * @override
-   */
-  public trackedStylesChanged(): void {
-    // TODO: delete me!!!
-  }
-
-  /**
-   * Initializes `svg` element.
-   */
-  private renderCanvas(): void {
+  protected renderGeometry(): void {
     this._svg = select(this.renderRoot.querySelector("svg"));
-    this.updateCanvas();
   }
 
   /**
-   * Updates `svg` element attributes.
+   * @implements
    */
-  private updateCanvas(): void {
+  protected updateGeometry(): void {
     if (this.isConnected && this._svg) {
       this._svg.attr("viewBox", [
         0,
@@ -125,16 +106,15 @@ export class HdmlViewElement extends AbstractChartElement {
   }
 
   /**
-   * Adds `CSSStyleSheet` object to the `hdml-view` shadow `DOM`.
+   * Adds `CSSStyleSheet` object to the `hdml-view` shadow `DOM`. Do
+   * nothing if specified stylesheet was already added.
    *
    * @category comp-styles
    */
   public addStylesheet(stylesheet: CSSStyleSheet): void {
     if (!this._stylesheets.has(stylesheet)) {
       this._stylesheets.add(stylesheet);
-      this.resetShadowStylesheets(
-        Array.from(this._stylesheets.values()),
-      );
+      this.resetStylesheets(Array.from(this._stylesheets.values()));
     }
   }
 
@@ -146,9 +126,7 @@ export class HdmlViewElement extends AbstractChartElement {
   public removeStylesheet(stylesheet: CSSStyleSheet): void {
     if (this._stylesheets.has(stylesheet)) {
       this._stylesheets.delete(stylesheet);
-      this.resetShadowStylesheets(
-        Array.from(this._stylesheets.values()),
-      );
+      this.resetStylesheets(Array.from(this._stylesheets.values()));
     }
   }
 }

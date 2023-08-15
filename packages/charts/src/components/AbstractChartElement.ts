@@ -6,31 +6,14 @@
 
 import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
-
-type TrackedStyles = {
-  width: number;
-  height: number;
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-  paddingTop: number;
-  paddingRight: number;
-  paddingBottom: number;
-  paddingLeft: number;
-  borderColor: string;
-  borderStyle: string;
-  borderWidth: number;
-  cursor: string;
-  fontFamily: string;
-  fontSize: number;
-  fontWeight: number;
-  fontStyle: string;
-  color: string;
-};
+import {
+  TrackedStyles,
+  resetStylesheet,
+} from "../helpers/resetStylesheet";
 
 export abstract class AbstractChartElement extends UnifiedElement {
-  private _svgCSSSheet = new CSSStyleSheet();
+  private _view: null | HdmlViewElement = null;
+  private _ssheet = new CSSStyleSheet();
   private _styles = window.getComputedStyle(this);
   private _stored: TrackedStyles = {
     width: 0,
@@ -55,24 +38,32 @@ export abstract class AbstractChartElement extends UnifiedElement {
   };
 
   /**
-   * The plane associated with the scale.
+   * Component geometry selector.
+   */
+  protected abstract geometrySelector: null | string;
+
+  /**
+   * Associated `hdml-view` element if exist or `null` otherwise.
    */
   public get view(): null | HdmlViewElement {
-    if (this instanceof HdmlViewElement) {
-      return this;
-    }
-    let cnt = 1;
-    let parent: null | HTMLElement | HdmlViewElement =
-      this.parentElement;
-    while (parent && cnt <= 25) {
-      if (parent instanceof HdmlViewElement) {
-        return parent;
-      } else {
-        cnt++;
-        parent = parent.parentElement;
+    if (!this._view) {
+      if (this instanceof HdmlViewElement) {
+        this._view = this;
+      }
+      let cnt = 1;
+      let parent: null | HTMLElement | HdmlViewElement =
+        this.parentElement;
+      while (parent && cnt <= 25) {
+        if (parent instanceof HdmlViewElement) {
+          this._view = parent;
+          break;
+        } else {
+          cnt++;
+          parent = parent.parentElement;
+        }
       }
     }
-    return null;
+    return this._view;
   }
 
   /**
@@ -176,22 +167,17 @@ export abstract class AbstractChartElement extends UnifiedElement {
       "styles-changed",
       this.stylesChangedListener,
     );
-    this.view?.removeStylesheet(this._svgCSSSheet);
+    // TODO: what should we do with this?
+    this._view?.removeStylesheet(this._ssheet);
+    this._view = null;
   }
-
-  /**
-   * The `window` `styles-changed` event listener. Runs the
-   * `requestUpdate` method passing the "styles-changed" string as a
-   * property key.
-   */
-  private stylesChangedListener = () => {
-    this.requestUpdate();
-  };
 
   /**
    * @override
    */
-  public shouldUpdate(): boolean {
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
     const changed = props.filter((prop) => {
       const p = prop;
@@ -206,18 +192,15 @@ export abstract class AbstractChartElement extends UnifiedElement {
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
-    super.firstUpdated(changedProperties);
+    this.renderGeometry();
   }
 
   /**
    * @override
    */
   protected updated(changed: Map<string, unknown>): void {
-    const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
-    props.forEach((p) => {
-      this._stored[p] = <never>this.tracked[p];
-    });
-    super.updated(changed);
+    this.updateStyles();
+    this.updateGeometry();
     this.dispatchEvent(
       new CustomEvent("updated", {
         cancelable: false,
@@ -228,183 +211,54 @@ export abstract class AbstractChartElement extends UnifiedElement {
   }
 
   /**
-   * Callback to run when the tracked styles have been changed.
-   */
-  protected abstract trackedStylesChanged(): void;
-
-  /**
-   * Renders `svg`-elements in the `hdml-view` shadow `DOM` and
-   * dispatches `svg-rendered` event when the job was done.
-   *
-   * ```ts
-   * renderSvgElements() {
-   *   // render svg logic
-   *   super.renderSvgElements();
-   * }
-   * ```
-   */
-  protected renderSvgElements(): void {
-    this.dispatchEvent(
-      new CustomEvent("svg-rendered", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
-  }
-
-  /**
    * Resets component shadow `DOM` stylesheets.
-   *
-   * ```ts
-   * resetShadowStylesheets() {
-   *   super.resetShadowStylesheets(`:host > svg g`);
-   * }
-   * ```
    */
-  protected resetShadowStylesheets(sheets: CSSStyleSheet[]): void {
+  protected resetStylesheets(sheets: CSSStyleSheet[]): void {
     lit.adoptStyles(<ShadowRoot>this.renderRoot, [
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      <{ styleSheet: CSSStyleSheet }>this.constructor.styles,
+      this.getStaticStyles(),
       ...sheets,
     ]);
   }
 
   /**
-   * Attaches the component `svg` elements `css` stylesheet to the
-   * `hdml-view` `ShadowDOM`.
+   * Updates component stylesheet rules.
    */
-  protected updateSvgStyles(selector: string): void {
-    if (this.view) {
-      this.view?.addStylesheet(this._svgCSSSheet);
-      const [def, hov, foc, act] = this.getSvgStyles(selector);
-      for (
-        let i = this._svgCSSSheet.cssRules.length - 1;
-        i >= 0;
-        i--
-      ) {
-        this._svgCSSSheet.deleteRule(i);
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this._svgCSSSheet.insertRule(act);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this._svgCSSSheet.insertRule(foc);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this._svgCSSSheet.insertRule(hov);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      this._svgCSSSheet.insertRule(def);
+  protected updateStyles(): void {
+    const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
+    props.forEach((p) => {
+      this._stored[p] = <never>this.tracked[p];
+    });
+    if (this.view && this.geometrySelector) {
+      this.view?.addStylesheet(this._ssheet);
+      resetStylesheet(this, this._ssheet, this.geometrySelector);
     }
   }
 
-  private getSvgStyles(selector: string): string[] {
-    const def = this.getSvgSelectorStyles(selector);
-    const hov = this.getSvgSelectorStyles(selector, "hover");
-    const foc = this.getSvgSelectorStyles(selector, "focus");
-    const act = this.getSvgSelectorStyles(selector, "active");
-    return [def, hov, foc, act];
-  }
+  /**
+   * Renders geometry to the `hdml-view` shadow `DOM`.
+   */
+  protected abstract renderGeometry(): void;
 
-  private getSvgSelectorStyles(
-    selector: string,
-    state?: "hover" | "focus" | "active",
-  ): string {
-    state && this.classList.add(state);
-    const val =
-      `${selector}${state ? `:${state}` : ""} {\n` +
-      `\t${this.getSvgStrokeStyle()}\n` +
-      `\t${this.getSvgStrokeWidthStyle()}\n` +
-      `\t${this.getSvgStrokeDasharrayStyle()}\n` +
-      `\t${this.getSvgStrokeLinecapStyle()}\n` +
-      `\t${this.getSvgCursorStyle()}\n` +
-      `\t${this.getSvgOutlineStyle()}\n` +
-      `\t${this.getSvgFontFamilyStyle()}\n` +
-      `\t${this.getSvgFontSizeStyle()}\n` +
-      `\t${this.getSvgFontWeightStyle()}\n` +
-      `\t${this.getSvgFontStyleStyle()}\n` +
-      `\t${this.getSvgFontColorStyle()}\n` +
-      `}`;
-    state && this.classList.remove(state);
-    return val;
-  }
+  /**
+   * Updates geometry in the `hdml-view` shadow `DOM`.
+   */
+  protected abstract updateGeometry(): void;
 
-  private getSvgStrokeStyle(): string {
-    return `stroke: ${this.tracked.borderColor};`;
-  }
+  /**
+   * The `window` `styles-changed` event listener. Runs the
+   * `requestUpdate` method passing the "styles-changed" string as a
+   * property key.
+   */
+  private stylesChangedListener = () => {
+    this.requestUpdate();
+  };
 
-  private getSvgStrokeWidthStyle(): string {
-    if (
-      this.tracked.borderStyle === "solid" ||
-      this.tracked.borderStyle === "dashed" ||
-      this.tracked.borderStyle === "dotted"
-    ) {
-      return `stroke-width: ${this.tracked.borderWidth};`;
-    } else {
-      return "stroke-width: 0;";
-    }
-  }
-
-  private getSvgStrokeDasharrayStyle(): string {
-    if (this.tracked.borderStyle === "solid") {
-      return `stroke-dasharray: none;`;
-    } else if (this.tracked.borderStyle === "dashed") {
-      return (
-        `stroke-dasharray: ` +
-        `${2 * this.tracked.borderWidth + 1},` +
-        `${this.tracked.borderWidth + 1};`
-      );
-    } else if (this.tracked.borderStyle === "dotted") {
-      return `stroke-dasharray: 0, ${2 * this.tracked.borderWidth};`;
-    } else {
-      return `stroke-dasharray: none;`;
-    }
-  }
-
-  private getSvgStrokeLinecapStyle(): string {
-    if (this.tracked.borderStyle === "solid") {
-      return `stroke-linecap: inherit;`;
-    } else if (this.tracked.borderStyle === "dashed") {
-      return `stroke-linecap: inherit;`;
-    } else if (this.tracked.borderStyle === "dotted") {
-      return `stroke-linecap: round;`;
-    } else {
-      return `stroke-linecap: inherit;`;
-    }
-  }
-
-  private getSvgCursorStyle(): string {
-    return `cursor: ${this.tracked.cursor};`;
-  }
-
-  private getSvgOutlineStyle(): string {
-    return "outline: none;";
-  }
-
-  private getSvgFontFamilyStyle(): string {
-    return `font-family: ${this.tracked.fontFamily};`;
-  }
-
-  private getSvgFontSizeStyle(): string {
-    return `font-size: ${this.tracked.fontSize}px;`;
-  }
-
-  private getSvgFontWeightStyle(): string {
-    return `font-weight: ${this.tracked.fontWeight};`;
-  }
-
-  private getSvgFontStyleStyle(): string {
-    return `font-style: ${this.tracked.fontStyle};`;
-  }
-
-  private getSvgFontColorStyle(): string {
-    return `color: ${this.tracked.color};`;
+  /**
+   * Returns component static styles.
+   */
+  private getStaticStyles(): lit.CSSResult {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return <lit.CSSResult>this.constructor.styles;
   }
 }

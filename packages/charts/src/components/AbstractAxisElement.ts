@@ -34,6 +34,13 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
   private _selection: null | GSelection = null;
 
   /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    return `:host > svg g.${this.direction}-axis path.domain`;
+  }
+
+  /**
    * Axis type getter.
    */
   public abstract get type(): AxisType;
@@ -131,8 +138,8 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
     super.connectedCallback();
     if (this.scale) {
       this.scale.addEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
+        "updated",
+        this.scaleUpdatedListener,
       );
     }
   }
@@ -143,8 +150,8 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
   public disconnectedCallback(): void {
     if (this.scale) {
       this.scale.removeEventListener(
-        "styles-changed",
-        this.scaleStylesChangedListener,
+        "updated",
+        this.scaleUpdatedListener,
       );
     }
     this.detachListener();
@@ -163,10 +170,24 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
   /**
    * @override
    */
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
+    if (
+      changedProperties.has("direction") ||
+      changedProperties.has("position")
+    ) {
+      return true;
+    }
+    return super.shouldUpdate(changedProperties);
+  }
+
+  /**
+   * @override
+   */
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
-    super.firstUpdated(changedProperties);
     const attrDirection = this.getAttribute("direction");
     const attrPosition = this.getAttribute("position");
     const svalDirection = this.direction;
@@ -177,51 +198,29 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
     if (attrPosition !== svalPosition) {
       this.setAttribute("position", svalPosition);
     }
-    this.renderSvgElements();
+    super.firstUpdated(changedProperties);
   }
 
   /**
-   * @override
+   * @implements
    */
-  protected updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgAxis();
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgAxis();
-  }
-
-  /**
-   * @override
-   */
-  protected renderSvgElements(): void {
+  protected renderGeometry(): void {
     if (!this._selection && this.view?.svg) {
       this._selection = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
-      this.updateSvgStyles();
       this.updateSvgPosition();
       this.updateSvgAxis();
       this.attachListener();
     }
-    super.renderSvgElements();
   }
 
   /**
-   * @override
+   * @implements
    */
-  protected updateSvgStyles(): void {
-    super.updateSvgStyles(
-      `:host > svg g.${this.direction}-axis path.domain`,
-    );
+  protected updateGeometry(): void {
+    this.updateSvgPosition();
+    this.updateSvgAxis();
   }
 
   /**
@@ -248,12 +247,10 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
   }
 
   /**
-   * The associated `scale` element `styles-changed` event listeners.
+   * The associated `scale` element `updated` event listeners.
    */
-  private scaleStylesChangedListener = () => {
-    this.updateSvgStyles();
-    this.updateSvgPosition();
-    this.updateSvgAxis();
+  private scaleUpdatedListener = () => {
+    this.requestUpdate();
   };
 
   /**

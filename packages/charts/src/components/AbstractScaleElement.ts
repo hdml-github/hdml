@@ -8,9 +8,15 @@ import { lit } from "@hdml/elements";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { AbstractPlaneElement } from "./AbstractPlaneElement";
 
-// eslint-disable-next-line max-len
-export abstract class AbstractScaleElement extends AbstractChartElement {
+abstract class AbstractScaleElement extends AbstractChartElement {
   private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
+
+  /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    return null;
+  }
 
   /**
    * The plane associated with the scale.
@@ -92,41 +98,7 @@ export abstract class AbstractScaleElement extends AbstractChartElement {
   /**
    * @override
    */
-  protected firstUpdated(): void {
-    this.resetShadowStylesheets([this._stylesheet]);
-    this.updateShadowStyles();
-    this.updateScale();
-    this.dispatchEvent(
-      new CustomEvent("styles-changed", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
-  }
-
-  /**
-   * @override
-   */
-  public updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    this.updateScale();
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.updateShadowStyles();
-    this.updateScale();
-  }
-
-  /**
-   * Calculates scale parameters.
-   */
-  protected abstract updateScale(): void;
-
-  private updateShadowStyles(): void {
+  protected updateStyles(): void {
     this._stylesheet.insertRule(`:host > slot {
       margin:
         -${this.tracked.paddingTop}px
@@ -135,4 +107,25 @@ export abstract class AbstractScaleElement extends AbstractChartElement {
         -${this.tracked.paddingLeft}px;
     }`);
   }
+
+  /**
+   * @implements
+   */
+  protected renderGeometry(): void {
+    this.resetStylesheets([this._stylesheet]);
+  }
+
+  /**
+   * @implements
+   */
+  protected updateGeometry(): void {
+    this.updateScale();
+  }
+
+  /**
+   * Calculates scale parameters.
+   */
+  protected abstract updateScale(): void;
 }
+
+export { AbstractScaleElement };

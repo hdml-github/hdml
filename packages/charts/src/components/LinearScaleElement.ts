@@ -13,14 +13,15 @@ export class LinearScaleElement extends AbstractScaleElement {
    * Component styles.
    */
   public static styles = lit.css`
-  :host,
-  :host > slot {
-    display: block;
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-  }`;
+    :host,
+    :host > slot {
+      display: block;
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+    }
+  `;
 
   /**
    * Reactive attributes.
@@ -149,20 +150,35 @@ export class LinearScaleElement extends AbstractScaleElement {
   /**
    * @override
    */
-  protected firstUpdated(): void {
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
+    if (
+      changedProperties.has("max") ||
+      changedProperties.has("min")
+    ) {
+      return true;
+    }
+    return super.shouldUpdate(changedProperties);
+  }
+
+  /**
+   * @override
+   */
+  protected firstUpdated(
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
     const attrMin = this.getAttribute("min");
     const svalMin = JSON.stringify(this.min);
+    const attrMax = this.getAttribute("max");
+    const svalMax = JSON.stringify(this.max);
     if (attrMin !== svalMin) {
       this.setAttribute("min", svalMin);
     }
-
-    const attrMax = this.getAttribute("max");
-    const svalMax = JSON.stringify(this.max);
     if (attrMax !== svalMax) {
       this.setAttribute("max", svalMax);
     }
-
-    super.firstUpdated();
+    super.firstUpdated(changedProperties);
   }
 
   /**

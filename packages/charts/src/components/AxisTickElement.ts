@@ -137,6 +137,21 @@ export class AxisTickElement extends AbstractChartElement {
   private _values: null | number[] | string[] = null;
 
   /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    if (!this.axis) {
+      return null;
+    } else {
+      return (
+        `:host > svg ` +
+        `g.${this.axis.direction}-axis ` +
+        `g.tick line`
+      );
+    }
+  }
+
+  /**
    * The `count` setter.
    */
   public set count(val: null | number) {
@@ -201,14 +216,11 @@ export class AxisTickElement extends AbstractChartElement {
   public connectedCallback(): void {
     super.connectedCallback();
     if (this.axis) {
-      this.axis.addEventListener(
-        "styles-changed",
-        this.axisStylesChangedListener,
-      );
+      this.axis.addEventListener("updated", this.axisUpdatedListener);
       if (this.axis.scale) {
         this.axis.scale.addEventListener(
-          "styles-changed",
-          this.axisStylesChangedListener,
+          "updated",
+          this.axisUpdatedListener,
         );
       }
     }
@@ -220,13 +232,13 @@ export class AxisTickElement extends AbstractChartElement {
   public disconnectedCallback(): void {
     if (this.axis) {
       this.axis.removeEventListener(
-        "styles-changed",
-        this.axisStylesChangedListener,
+        "updated",
+        this.axisUpdatedListener,
       );
       if (this.axis.scale) {
         this.axis.scale.removeEventListener(
-          "styles-changed",
-          this.axisStylesChangedListener,
+          "updated",
+          this.axisUpdatedListener,
         );
       }
     }
@@ -243,10 +255,24 @@ export class AxisTickElement extends AbstractChartElement {
   /**
    * @override
    */
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
+    if (
+      changedProperties.has("count") ||
+      changedProperties.has("values")
+    ) {
+      return true;
+    }
+    return super.shouldUpdate(changedProperties);
+  }
+
+  /**
+   * @override
+   */
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
-    super.firstUpdated(changedProperties);
     const attrVals = this.getAttribute("values");
     const svalVals =
       this.values === null ? "" : JSON.stringify(this.values);
@@ -259,32 +285,21 @@ export class AxisTickElement extends AbstractChartElement {
     if (attrCount !== svalCount) {
       this.setAttribute("count", svalCount);
     }
-    this.renderSvgElements();
+    super.firstUpdated(changedProperties);
+  }
+
+  /**
+   * @implements
+   */
+  protected renderGeometry(): void {
+    //
   }
 
   /**
    * @override
    */
-  protected updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    this.renderSvgElements();
-    this.updateSvgStyles();
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.renderSvgElements();
-    this.updateSvgStyles();
-  }
-
-  /**
-   * @override
-   */
-  protected renderSvgElements(): void {
+  protected updateGeometry(): void {
     if (this.axis && this.axis.selection) {
-      this.updateSvgStyles();
       let size = 0;
       let axisFn;
       if (this.axis.type === AxisType.Horizontal) {
@@ -316,6 +331,9 @@ export class AxisTickElement extends AbstractChartElement {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           axisFn(this.axis.scale.scale)
+            // eslint-disable-next-line max-len
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             .tickValues(this.values as Iterable<string>)
             .tickSizeInner(size)
             .tickSizeOuter(0),
@@ -332,28 +350,13 @@ export class AxisTickElement extends AbstractChartElement {
         );
       }
     }
-    super.renderSvgElements();
-  }
-
-  /**
-   * @override
-   */
-  protected updateSvgStyles(): void {
-    if (this.axis) {
-      super.updateSvgStyles(
-        `:host > svg ` +
-          `g.${this.axis.direction}-axis ` +
-          `g.tick line`,
-      );
-    }
   }
 
   /**
    * Associated axis `styles-changed` event listener.
    */
-  private axisStylesChangedListener = () => {
-    this.renderSvgElements();
-    this.updateSvgStyles();
+  private axisUpdatedListener = () => {
+    this.requestUpdate();
   };
 }
 

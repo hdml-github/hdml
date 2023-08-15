@@ -38,6 +38,21 @@ export class TickLabelElement extends AbstractChartElement {
   `;
 
   /**
+   * @implements
+   */
+  protected get geometrySelector(): null | string {
+    if (!this.axis) {
+      return null;
+    } else {
+      return (
+        `:host > svg ` +
+        `g.${this.axis.direction}-axis ` +
+        `g.tick text`
+      );
+    }
+  }
+
+  /**
    * Associated axis element.
    */
   public get axis():
@@ -56,60 +71,24 @@ export class TickLabelElement extends AbstractChartElement {
   /**
    * @override
    */
-  public connectedCallback(): void {
-    super.connectedCallback();
-  }
-
-  /**
-   * @override
-   */
-  public disconnectedCallback(): void {
-    super.disconnectedCallback();
-  }
-
-  /**
-   * @override
-   */
   public render(): lit.TemplateResult<1> {
-    return lit.html`<slot></slot>`;
+    return lit.html`
+      <slot></slot>
+    `;
   }
 
   /**
-   * @override
+   * @implements
    */
-  protected firstUpdated(
-    changedProperties: Map<PropertyKey, unknown>,
-  ): void {
-    super.firstUpdated(changedProperties);
-    this.updateSvgStyles();
+  protected renderGeometry(): void {
+    //
   }
 
   /**
-   * @override
+   * @implements
    */
-  protected updated(changed: Map<string, unknown>): void {
-    super.updated(changed);
-    this.updateSvgStyles();
-  }
-
-  /**
-   * @override
-   */
-  protected trackedStylesChanged(): void {
-    this.updateSvgStyles();
-  }
-
-  /**
-   * @override
-   */
-  protected updateSvgStyles(): void {
-    if (this.axis) {
-      super.updateSvgStyles(
-        `:host > svg ` +
-          `g.${this.axis.direction}-axis ` +
-          `g.tick text`,
-      );
-    }
+  protected updateGeometry(): void {
+    //
   }
 }
 
