@@ -15,19 +15,18 @@ export class VerticalAxisElement extends AbstractAxisElement {
     :host {
       display: block;
       position: absolute;
-      box-sizing: border-box;
-      width: 0;
       height: 100%;
-      border: 1px solid black;
+      border: none;
+      width: var(--hdml-line-width);
     }
     :host([position=left]) {
-      left: 0;
+      left: calc(0% - var(--hdml-line-width)/2);
     }
     :host([position=center]) {
-      left: 50%;
+      left: calc(50% - var(--hdml-line-width)/2);
     }
     :host([position=right]) {
-      right: 0;
+      left: calc(100% - var(--hdml-line-width)/2);
     }
   `;
 
@@ -35,6 +34,16 @@ export class VerticalAxisElement extends AbstractAxisElement {
    * Reactive attributes.
    */
   public static properties = {
+    /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+
     /**
      * The `direction` property definition.
      */

@@ -106,6 +106,7 @@ abstract class AbstractScaleElement extends AbstractChartElement {
         -${this.tracked.paddingBottom}px
         -${this.tracked.paddingLeft}px;
     }`);
+    super.updateStyles();
   }
 
   /**

@@ -15,20 +15,19 @@ export class HorizontalAxisElement extends AbstractAxisElement {
     :host {
       display: block;
       position: absolute;
-      box-sizing: border-box;
       width: 100%;
-      height: 0;
-      border: 1px solid black;
+      border: none;
       cursor: pointer;
+      height: var(--hdml-line-width);
     }
     :host([position=top]) {
-      top: 0;
+      top: calc(0% - var(--hdml-line-width)/2);
     }
     :host([position=center]) {
-      top: 50%;
+      top: calc(50% - var(--hdml-line-width)/2);
     }
     :host([position=bottom]) {
-      bottom: 0;
+      top: calc(100% - var(--hdml-line-width)/2);
     }
   `;
 
@@ -36,6 +35,16 @@ export class HorizontalAxisElement extends AbstractAxisElement {
    * Reactive attributes.
    */
   public static properties = {
+    /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+
     /**
      * The `direction` property definition.
      */

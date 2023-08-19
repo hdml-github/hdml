@@ -142,6 +142,10 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
         this.scaleUpdatedListener,
       );
     }
+    if (this.selection) {
+      this.renderGeometry();
+      this.requestUpdate("_force", true);
+    }
   }
 
   /**
@@ -155,6 +159,7 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
       );
     }
     this.detachListener();
+    this.selection?.remove();
     super.disconnectedCallback();
   }
 
@@ -209,6 +214,16 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
       this._selection = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
+    } else if (this._selection && this.view?.svg) {
+      this.view?.svg?.insert(() => {
+        if (this.selection) {
+          return this.selection.node();
+        } else {
+          return null;
+        }
+      });
+    }
+    if (this.selection) {
       this.updateSvgPosition();
       this.updateSvgAxis();
       this.attachListener();
@@ -266,35 +281,17 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
       let x = 0;
       let y = 0;
       if (this.type === AxisType.Horizontal) {
-        switch (this.position) {
-          case "top":
-            x = 0;
-            y = this.scale.plane.tracked.paddingTop;
-            break;
-          case "center":
-          case "bottom":
-            x = 0;
-            y =
-              this.scale.plane.tracked.paddingTop +
-              this.tracked.top +
-              this.tracked.height;
-            break;
-        }
+        x = 0;
+        y =
+          this.scale.plane.tracked.paddingTop +
+          this.tracked.top +
+          this.tracked.lineWidth / 2;
       } else if (this.type === AxisType.Vertical) {
-        switch (this.position) {
-          case "right":
-          case "center":
-            x =
-              this.scale.plane.tracked.paddingLeft +
-              this.tracked.left +
-              this.tracked.width;
-            y = 0;
-            break;
-          case "left":
-            x = this.scale.plane.tracked.paddingLeft;
-            y = 0;
-            break;
-        }
+        x =
+          this.scale.plane.tracked.paddingLeft +
+          this.tracked.left +
+          this.tracked.lineWidth / 2;
+        y = 0;
       }
       this.selection.attr("transform", `translate(${x}, ${y})`);
     }

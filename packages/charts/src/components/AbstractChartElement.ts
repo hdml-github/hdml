@@ -26,9 +26,9 @@ export abstract class AbstractChartElement extends UnifiedElement {
     paddingRight: 0,
     paddingBottom: 0,
     paddingLeft: 0,
-    borderColor: "rgba(0, 0, 0, 0)",
-    borderStyle: "none",
-    borderWidth: 0,
+    lineColor: "rgba(0, 0, 0, 0)",
+    lineStyle: "solid",
+    lineWidth: 0,
     cursor: "auto",
     fontFamily: "Times New Roman",
     fontSize: 0,
@@ -110,14 +110,23 @@ export abstract class AbstractChartElement extends UnifiedElement {
       get paddingLeft(): number {
         return parseFloat(self.styles.paddingLeft);
       },
-      get borderColor(): string {
-        return self.styles.borderColor;
+      get lineColor(): string {
+        return (
+          self.styles.getPropertyValue("--hdml-line-color") ||
+          "rgba(0, 0, 0, 0)"
+        );
       },
-      get borderStyle(): string {
-        return self.styles.borderStyle;
+      get lineStyle(): string {
+        return (
+          self.styles.getPropertyValue("--hdml-line-style") || "solid"
+        );
       },
-      get borderWidth(): number {
-        return parseFloat(self.styles.borderWidth);
+      get lineWidth(): number {
+        return (
+          parseFloat(
+            self.styles.getPropertyValue("--hdml-line-width"),
+          ) || 0
+        );
       },
       get cursor(): string {
         return self.styles.cursor;

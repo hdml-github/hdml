@@ -65,6 +65,16 @@ export class AxisTickElement extends AbstractChartElement {
    */
   public static properties = {
     /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+
+    /**
      * The `count` property definition.
      */
     count: {
@@ -259,6 +269,7 @@ export class AxisTickElement extends AbstractChartElement {
     changedProperties: Map<string, unknown>,
   ): boolean {
     if (
+      changedProperties.has("_force") ||
       changedProperties.has("count") ||
       changedProperties.has("values")
     ) {
@@ -356,7 +367,7 @@ export class AxisTickElement extends AbstractChartElement {
    * Associated axis `styles-changed` event listener.
    */
   private axisUpdatedListener = () => {
-    this.requestUpdate();
+    this.requestUpdate("_force", true);
   };
 }
 

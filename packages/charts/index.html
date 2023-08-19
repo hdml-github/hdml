@@ -14,12 +14,12 @@
       }
       hdml-view {
         width: 80%;
-        height: 250px;
+        height: 260px;
       }
       cartesian-plane {
         width: 50%;
         height: 100%;
-        padding: 10px 10px 25px 70px;
+        padding: 25px 75px 25px 75px;
       }
       polar-plane {
         width: 50%;
@@ -44,22 +44,30 @@
       .blue horizontal-axis,
       .blue vertical-axis,
       .blue axis-tick {
-        border: 2px rgb(126, 188, 246) dashed;
+        --hdml-line-width: 4px;
+        --hdml-line-style: dashed;
+        --hdml-line-color: rgb(126, 188, 246);
       }
       .blue horizontal-axis.hover,
       .blue vertical-axis.hover,
       .blue axis-tick.hover {
-        border: 2px rgb(28, 140, 244) dashed;
+        --hdml-line-width: 4px;
+        --hdml-line-style: dashed;
+        --hdml-line-color: rgb(28, 140, 244);
       }
       .blue horizontal-axis.focus,
       .blue vertical-axis.focus,
       .blue axis-tick.focus {
-        border: 2px rgb(245, 121, 121) dashed;
+        --hdml-line-width: 4px;
+        --hdml-line-style: dashed;
+        --hdml-line-color: rgb(245, 121, 121);
       }
       .blue horizontal-axis.active,
       .blue vertical-axis.active,
       .blue axis-tick.active {
-        border: 2px rgb(244, 28, 28) dashed;
+        --hdml-line-width: 4px;
+        --hdml-line-style: dashed;
+        --hdml-line-color: rgb(244, 28, 28);
       }
       .blue tick-label {
         color:rgb(126, 188, 246);
@@ -134,29 +142,29 @@
             <ordinal-scale
               bandwidth="0"
               source="?hdml-frame=frame&hdml-field=table"
-              values='["table_1", "table_2", "table_3", "table_4"]'
+              values='["t1", "t2", "t3"]'
               rest='null'>
 
               <horizontal-axis
                 direction="x"
                 position="bottom">
                 <!-- <axis-title>X axis</axis-title> -->
-                <axis-tick
+                <!-- <axis-tick
                   values="[0, 25, 50, 75, 100]">
                   <axis-grid></axis-grid>
                   <tick-label></tick-label>
-                </axis-tick>
+                </axis-tick> -->
               </horizontal-axis>
 
               <vertical-axis
                 direction="y"
                 position="left">
                 <!-- <axis-title>Y axis</axis-title> -->
-                <axis-tick
-                  count="4">
+                <!-- <axis-tick
+                  count="3">
                   <axis-grid></axis-grid>
                   <tick-label></tick-label>
-                </axis-tick>
+                </axis-tick> -->
               </vertical-axis>
 
             </ordinal-scale>

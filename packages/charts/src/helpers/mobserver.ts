@@ -30,16 +30,17 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
   let dispatch = false;
   let delayed = false;
   for (const rec of recs) {
-    dispatch =
-      dispatch ||
-      (rec.type === "attributes" &&
-        (rec.attributeName === "class" ||
-          rec.attributeName === "style"));
-
-    delayed =
-      rec.type === "attributes" && rec.attributeName === "class";
-
-    if (dispatch) break;
+    if (rec.type === "attributes") {
+      if (rec.attributeName === "style") {
+        dispatch = true;
+        break;
+      }
+      if (rec.attributeName === "class") {
+        dispatch = true;
+        delayed = true;
+        break;
+      }
+    }
 
     if (rec.type === "childList" && rec.addedNodes.length) {
       for (const node of rec.addedNodes) {
@@ -62,7 +63,11 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
     }
   }
 
-  dispatch && delayed ? dispatchDelayed() : dispatchImmediate();
+  if (dispatch && delayed) {
+    dispatchDelayed();
+  } else {
+    dispatchImmediate();
+  }
 });
 
 mobserver.observe(document, {

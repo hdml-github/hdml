@@ -15,9 +15,9 @@ export type TrackedStyles = {
   paddingRight: number;
   paddingBottom: number;
   paddingLeft: number;
-  borderColor: string;
-  borderStyle: string;
-  borderWidth: number;
+  lineColor: string;
+  lineStyle: string;
+  lineWidth: number;
   cursor: string;
   fontFamily: string;
   fontSize: number;
@@ -82,43 +82,43 @@ function getSvgSelectorStyles(
 }
 
 function getSvgStrokeStyle(tracked: TrackedStyles): string {
-  return `stroke: ${tracked.borderColor};`;
+  return `stroke: ${tracked.lineColor};`;
 }
 
 function getSvgStrokeWidthStyle(tracked: TrackedStyles): string {
   if (
-    tracked.borderStyle === "solid" ||
-    tracked.borderStyle === "dashed" ||
-    tracked.borderStyle === "dotted"
+    tracked.lineStyle === "solid" ||
+    tracked.lineStyle === "dashed" ||
+    tracked.lineStyle === "dotted"
   ) {
-    return `stroke-width: ${tracked.borderWidth};`;
+    return `stroke-width: ${tracked.lineWidth};`;
   } else {
     return "stroke-width: 0;";
   }
 }
 
 function getSvgStrokeDasharrayStyle(tracked: TrackedStyles): string {
-  if (tracked.borderStyle === "solid") {
+  if (tracked.lineStyle === "solid") {
     return `stroke-dasharray: none;`;
-  } else if (tracked.borderStyle === "dashed") {
+  } else if (tracked.lineStyle === "dashed") {
     return (
       `stroke-dasharray: ` +
-      `${2 * tracked.borderWidth + 1},` +
-      `${tracked.borderWidth + 1};`
+      `${2 * tracked.lineWidth + 1},` +
+      `${tracked.lineWidth + 1};`
     );
-  } else if (tracked.borderStyle === "dotted") {
-    return `stroke-dasharray: 0, ${2 * tracked.borderWidth};`;
+  } else if (tracked.lineStyle === "dotted") {
+    return `stroke-dasharray: 0, ${2 * tracked.lineWidth};`;
   } else {
     return `stroke-dasharray: none;`;
   }
 }
 
 function getSvgStrokeLinecapStyle(tracked: TrackedStyles): string {
-  if (tracked.borderStyle === "solid") {
+  if (tracked.lineStyle === "solid") {
     return `stroke-linecap: inherit;`;
-  } else if (tracked.borderStyle === "dashed") {
+  } else if (tracked.lineStyle === "dashed") {
     return `stroke-linecap: inherit;`;
-  } else if (tracked.borderStyle === "dotted") {
+  } else if (tracked.lineStyle === "dotted") {
     return `stroke-linecap: round;`;
   } else {
     return `stroke-linecap: inherit;`;
