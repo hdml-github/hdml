@@ -144,7 +144,6 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
     }
     if (this.selection) {
       this.renderGeometry();
-      this.requestUpdate("_force", true);
     }
   }
 
@@ -214,6 +213,9 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
       this._selection = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
+      this.updateSvgPosition();
+      this.updateSvgAxis();
+      this.attachListener();
     } else if (this._selection && this.view?.svg) {
       this.view?.svg?.insert(() => {
         if (this.selection) {
@@ -222,10 +224,6 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
           return null;
         }
       });
-    }
-    if (this.selection) {
-      this.updateSvgPosition();
-      this.updateSvgAxis();
       this.attachListener();
     }
   }
@@ -273,6 +271,7 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
    */
   private updateSvgPosition(): void {
     if (
+      this.isConnected &&
       this.selection &&
       this.scale &&
       this.scale.scale &&
@@ -301,7 +300,12 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
    * Updates `svg` axis elements.
    */
   private updateSvgAxis(): void {
-    if (this.selection && this.scale && this.scale.scale) {
+    if (
+      this.isConnected &&
+      this.selection &&
+      this.scale &&
+      this.scale.scale
+    ) {
       let axisFn;
       if (this.type === AxisType.Horizontal) {
         switch (this.position) {

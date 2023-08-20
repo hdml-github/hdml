@@ -28,6 +28,16 @@ export class OrdinalScaleElement extends AbstractScaleElement {
    */
   public static properties = {
     /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+
+    /**
      * The `bandwidth` property definition.
      */
     bandwidth: {

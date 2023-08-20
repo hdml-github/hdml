@@ -165,6 +165,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
       "styles-changed",
       this.stylesChangedListener,
     );
+    this.requestUpdate("_force", true);
   }
 
   /**

@@ -37,6 +37,21 @@ export class PolarPlaneElement extends AbstractPlaneElement {
   `;
 
   /**
+   * Reactive attributes.
+   */
+  public static properties = {
+    /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+  };
+
+  /**
    * Renders compomponent `DOM`.
    */
   public render(): lit.TemplateResult<1> {

@@ -28,6 +28,16 @@ export class LinearScaleElement extends AbstractScaleElement {
    */
   public static properties = {
     /**
+     * Private property to force updates.
+     */
+    _force: {
+      type: Boolean,
+      attribute: false,
+      reflect: false,
+      state: false,
+    },
+
+    /**
      * The `min` property definition.
      */
     min: {
