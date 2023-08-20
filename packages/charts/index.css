@@ -1,0 +1,155 @@
+body {
+  margin: 0;
+}
+
+/* COMMON --------------------------------------------------- */
+
+/* HDML VIEW */
+hdml-view {
+  width: 80%;
+  height: 260px;
+}
+
+/* HDML PLANE */
+cartesian-plane {
+  width: 50%;
+  height: 100%;
+  padding: 25px 75px 25px 75px;
+}
+polar-plane {
+  width: 50%;
+  height: 100%;
+  left: 50%;
+}
+
+/* HDML SCALE */
+ordinal-scale {
+  padding: 15px 0;
+}
+linear-scale {
+  padding: 0 15px;
+}
+
+/* HDML AXIS */
+horizontal-axis,
+vertical-axis {
+  --hdml-line-width: 1px;
+  --hdml-line-style: solid;
+}
+
+/* HDML AXIS TICK */
+axis-tick {
+  cursor: pointer;
+  --hdml-line-width: 10px;
+  --hdml-line-style: solid;
+}
+horizontal-axis axis-tick {
+  height: 10px;
+}
+vertical-axis axis-tick {
+  width: 10px;
+}
+
+/* HDML AXIS TICK LABEL */
+tick-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* BLUE THEME ----------------------------------------------- */
+
+/* HDML AXIS */
+.blue horizontal-axis,
+.blue vertical-axis {
+  --hdml-line-color: rgb(126, 188, 246);
+}
+.blue horizontal-axis.hover,
+.blue vertical-axis.hover {
+  --hdml-line-color: rgb(28, 140, 244);
+}
+.blue horizontal-axis.focus,
+.blue vertical-axis.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.blue horizontal-axis.active,
+.blue vertical-axis.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK */
+.blue axis-tick {
+  --hdml-line-color: rgb(126, 188, 246);
+}
+.blue axis-tick.hover {
+  --hdml-line-color: rgb(28, 140, 244);
+}
+.blue axis-tick.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.blue axis-tick.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK LABEL */
+.blue tick-label {
+  color:rgb(126, 188, 246);
+}
+.blue tick-label.hover {
+  color:rgb(28, 140, 244);
+}
+.blue tick-label.focus {
+  color:rgb(245, 121, 121);
+}
+.blue tick-label.active {
+  color:rgb(244, 28, 28);
+}
+
+/* GREEN THEME ---------------------------------------------- */
+
+/* HDML AXIS */
+.green horizontal-axis,
+.green vertical-axis {
+  --hdml-line-color: rgb(74, 225, 109);
+}
+.green horizontal-axis.hover,
+.green vertical-axis.hover {
+  --hdml-line-color: rgb(30, 185, 66);
+}
+.green horizontal-axis.focus,
+.green vertical-axis.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.green horizontal-axis.active,
+.green vertical-axis.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK */
+.green axis-tick {
+  --hdml-line-color: rgb(74, 225, 109);
+}
+.green axis-tick.hover {
+  --hdml-line-color: rgb(30, 185, 66);
+}
+.green axis-tick.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.green axis-tick.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK LABEL */
+.green tick-label {
+  color:rgb(74, 225, 109);
+}
+.green tick-label.hover {
+  color:rgb(30, 185, 66);
+}
+.green tick-label.focus {
+  color:rgb(245, 121, 121);
+}
+.green tick-label.active {
+  color:rgb(244, 28, 28);
+}

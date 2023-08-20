@@ -177,7 +177,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
       "styles-changed",
       this.stylesChangedListener,
     );
-    // TODO: what should we do with this?
     this._view?.removeStylesheet(this._ssheet);
     this._view = null;
   }

@@ -19,44 +19,15 @@ export class AxisTickElement extends AbstractChartElement {
     :host {
       display: block;
       position: absolute;
-      box-sizing: border-box;
-      border: 1px solid black;
-    }
-    :host > slot {
-      display: flex;
-      align-items: center;
+      border: none;
     }
     :host-context(horizontal-axis) {
-      width: 100%;
-      height: 5px;
+      width: 100% !important;
       left: 0;
-      top: 0;
     }
     :host-context(vertical-axis) {
-      width: 5px;
-      height: 100%;
-      right: 0;
+      height: 100% !important;
       top: 0;
-    }
-    :host-context(horizontal-axis[position=top]) {
-      bottom: 0;
-    }
-    :host-context(horizontal-axis[position=center]),
-    :host-context(horizontal-axis[position=bottom]) {
-      top: 0;
-    }
-    :host-context(vertical-axis[position=left]),
-    :host-context(vertical-axis[position=center]) {
-      right: 0;
-    }
-    :host-context(vertical-axis[position=right]) {
-      left: 0;
-    }
-    :host-context(horizontal-axis) > slot {
-      flex-direction: column;
-    }
-    :host-context(vertical-axis) > slot {
-      flex-direction: row;
     }
   `;
 
@@ -145,6 +116,8 @@ export class AxisTickElement extends AbstractChartElement {
 
   private _count: null | number = null;
   private _values: null | number[] | string[] = null;
+  private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
+  private _lines: SVGLineElement[] = [];
 
   /**
    * @implements
@@ -173,6 +146,8 @@ export class AxisTickElement extends AbstractChartElement {
     const old = this._count;
     this._count = val;
     this.requestUpdate("count", old);
+    this.detachListeners();
+    this._lines = [];
   }
 
   /**
@@ -194,6 +169,8 @@ export class AxisTickElement extends AbstractChartElement {
     const old = this._values;
     this._values = val;
     this.requestUpdate("values", old);
+    this.detachListeners();
+    this._lines = [];
   }
 
   /**
@@ -252,6 +229,8 @@ export class AxisTickElement extends AbstractChartElement {
         );
       }
     }
+    this.detachListeners();
+    this._lines = [];
     super.disconnectedCallback();
   }
 
@@ -259,7 +238,9 @@ export class AxisTickElement extends AbstractChartElement {
    * @override
    */
   public render(): lit.TemplateResult<1> {
-    return lit.html`<slot></slot>`;
+    return lit.html`
+      <slot></slot>
+    `;
   }
 
   /**
@@ -300,17 +281,49 @@ export class AxisTickElement extends AbstractChartElement {
   }
 
   /**
+   * @override
+   */
+  protected updateStyles(): void {
+    this._stylesheet.insertRule(`
+      :host-context(horizontal-axis[position=top]) {
+        top: -${
+          this.tracked.height -
+          (this.axis?.tracked.lineWidth || 0) / 2
+        }px;
+      }
+    `);
+    this._stylesheet.insertRule(`
+     :host-context(horizontal-axis[position=center]),
+     :host-context(horizontal-axis[position=bottom]) {
+        top: ${(this.axis?.tracked.lineWidth || 0) / 2}px;
+      }
+    `);
+    this._stylesheet.insertRule(`
+      :host-context(vertical-axis[position=left]),
+      :host-context(vertical-axis[position=center]) {
+        right: ${(this.axis?.tracked.lineWidth || 0) / 2}px;
+      }
+    `);
+    this._stylesheet.insertRule(`
+      :host-context(vertical-axis[position=right]) {
+        left: ${(this.axis?.tracked.lineWidth || 0) / 2}px;
+      }
+    `);
+    super.updateStyles();
+  }
+
+  /**
    * @implements
    */
   protected renderGeometry(): void {
-    //
+    this.resetStylesheets([this._stylesheet]);
   }
 
   /**
    * @override
    */
   protected updateGeometry(): void {
-    if (this.axis && this.axis.selection) {
+    if (this.isConnected && this.axis && this.axis.selection) {
       let size = 0;
       let axisFn;
       if (this.axis.type === AxisType.Horizontal) {
@@ -360,6 +373,19 @@ export class AxisTickElement extends AbstractChartElement {
             .tickSizeOuter(0),
         );
       }
+      if (this._lines.length === 0) {
+        this._lines = this.axis.selection
+          .selectChildren("g.tick")
+          .nodes()
+          .map((el) => {
+            const line = <SVGLineElement>(
+              (<SVGGElement>el).querySelector("line")
+            );
+            line.setAttribute("tabindex", "-1");
+            return line;
+          });
+        this.attachListeners();
+      }
     }
   }
 
@@ -368,6 +394,84 @@ export class AxisTickElement extends AbstractChartElement {
    */
   private axisUpdatedListener = () => {
     this.requestUpdate("_force", true);
+  };
+
+  /**
+   * Attaches event listeners to the associated `svg` elements.
+   */
+  private attachListeners(): void {
+    if (this._lines.length > 0) {
+      this._lines.forEach((element) => {
+        element.addEventListener("mouseenter", this.eventListener);
+        element.addEventListener("mouseleave", this.eventListener);
+        element.addEventListener("mousemove", this.eventListener);
+        element.addEventListener("mouseover", this.eventListener);
+        element.addEventListener("mouseout", this.eventListener);
+        element.addEventListener("mousedown", this.eventListener);
+        element.addEventListener("mouseup", this.eventListener);
+        element.addEventListener("click", this.eventListener);
+        element.addEventListener("focus", this.eventListener);
+        element.addEventListener("blur", this.eventListener);
+      });
+    }
+  }
+
+  /**
+   * Detaches event listeners to the associated `svg` elements.
+   */
+  private detachListeners(): void {
+    if (this._lines.length > 0) {
+      this._lines.forEach((element) => {
+        element.removeEventListener("mouseenter", this.eventListener);
+        element.removeEventListener("mouseleave", this.eventListener);
+        element.removeEventListener("mousemove", this.eventListener);
+        element.removeEventListener("mouseover", this.eventListener);
+        element.removeEventListener("mouseout", this.eventListener);
+        element.removeEventListener("mousedown", this.eventListener);
+        element.removeEventListener("mouseup", this.eventListener);
+        element.removeEventListener("click", this.eventListener);
+        element.removeEventListener("focus", this.eventListener);
+        element.removeEventListener("blur", this.eventListener);
+      });
+    }
+  }
+
+  /**
+   * `svg` element event listener.
+   */
+  private eventListener = (evt: Event) => {
+    switch (evt.type) {
+      case "mouseenter":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mouseleave":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mousemove":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mouseover":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mouseout":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mousedown":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "mouseup":
+        this.dispatchEvent(new MouseEvent(evt.type));
+        break;
+      case "click":
+        this.dispatchEvent(new PointerEvent(evt.type));
+        break;
+      case "focus":
+        this.dispatchEvent(new FocusEvent(evt.type));
+        break;
+      case "blur":
+        this.dispatchEvent(new FocusEvent(evt.type));
+        break;
+    }
   };
 }
 

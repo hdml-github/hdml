@@ -41,6 +41,9 @@ export class HdmlViewElement extends AbstractChartElement {
     text {
       color: rgba(0, 0, 0, 0);
       cursor: pointer;
+      stroke-width: 0 !important;
+      stroke-dasharray: none !important;
+      stroke: rgba(0, 0, 0, 0) !important;
     }
     text::selection {
       background-color: rgba(0, 0, 0, 0);

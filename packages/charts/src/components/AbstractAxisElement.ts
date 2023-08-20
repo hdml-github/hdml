@@ -178,6 +178,7 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
     changedProperties: Map<string, unknown>,
   ): boolean {
     if (
+      changedProperties.has("_force") ||
       changedProperties.has("direction") ||
       changedProperties.has("position")
     ) {
