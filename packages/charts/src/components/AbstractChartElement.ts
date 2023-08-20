@@ -186,6 +186,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * @override
    */
   public shouldUpdate(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changedProperties: Map<string, unknown>,
   ): boolean {
     const props = <(keyof TrackedStyles)[]>Object.keys(this._stored);
@@ -200,6 +201,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * @override
    */
   protected firstUpdated(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
     this.renderGeometry();
@@ -208,6 +210,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
   /**
    * @override
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected updated(changed: Map<string, unknown>): void {
     this.updateStyles();
     this.updateGeometry();
