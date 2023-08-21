@@ -5,25 +5,21 @@
  */
 
 import { lit } from "@hdml/elements";
-import {
-  type Selection,
-  axisBottom,
-  axisTop,
-  axisLeft,
-  axisRight,
-} from "d3";
+import { type Selection } from "d3";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { AbstractScaleElement } from "./AbstractScaleElement";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 
 export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
+
 export type GSelection = Selection<
   SVGGElement,
   unknown,
   null,
   undefined
 >;
+
 export enum AxisType {
   Horizontal,
   Vertical,
@@ -214,6 +210,12 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
       this._selection = this.view.svg
         .append("g")
         .attr("class", `${this.direction}-axis`);
+
+      this._selection
+        .append("path")
+        .attr("class", "domain")
+        .attr("tabindex", "-1");
+
       this.updateSvgPosition();
       this.updateSvgAxis();
       this.attachListener();
@@ -300,44 +302,25 @@ export abstract class AbstractAxisElement extends AbstractChartElement {
   /**
    * Updates `svg` axis elements.
    */
-  private updateSvgAxis(): void {
+  private updateSvgAxis() {
     if (
       this.isConnected &&
       this.selection &&
       this.scale &&
       this.scale.scale
     ) {
-      let axisFn;
-      if (this.type === AxisType.Horizontal) {
-        switch (this.position) {
-          case "top":
-            axisFn = axisTop;
-            break;
-          case "center":
-          case "bottom":
-            axisFn = axisBottom;
-            break;
-        }
-      } else if (this.type === AxisType.Vertical) {
-        switch (this.position) {
-          case "right":
-            axisFn = axisRight;
-            break;
-          case "center":
-          case "left":
-            axisFn = axisLeft;
-            break;
-        }
-      }
-      this.selection
-        .call(
-          // eslint-disable-next-line max-len
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          axisFn(this.scale.scale).ticks(0).tickSize(0),
-        )
-        .selectChild("path.domain")
-        .attr("tabindex", "-1");
+      const offset =
+        typeof window !== "undefined" && window.devicePixelRatio > 1
+          ? 0
+          : 0.5;
+      const range = this.scale.scale.range();
+      const range0 = +range[0] + offset;
+      const range1 = +range[range.length - 1] + offset;
+      const d =
+        this.type === AxisType.Vertical
+          ? `M${offset},${range0}V${range1}`
+          : `M${range0},${offset}H${range1}`;
+      this.selection.select("path.domain").attr("d", d);
     }
   }
 

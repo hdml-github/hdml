@@ -33,7 +33,7 @@ linear-scale {
 /* HDML AXIS */
 horizontal-axis,
 vertical-axis {
-  --hdml-line-width: 1px;
+  --hdml-line-width: 2px;
   --hdml-line-style: solid;
 }
 

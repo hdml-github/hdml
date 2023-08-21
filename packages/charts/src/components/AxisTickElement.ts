@@ -5,12 +5,30 @@
  */
 
 import { lit } from "@hdml/elements";
-import { axisBottom, axisTop, axisLeft, axisRight } from "d3";
+import {
+  axisBottom,
+  axisTop,
+  axisLeft,
+  axisRight,
+  ValueFn,
+  BaseType,
+  Selection,
+  ScaleLinear,
+  ScaleBand,
+} from "d3";
+import { LinearScaleElement } from "./LinearScaleElement";
+import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { HorizontalAxisElement } from "./HorizontalAxisElement";
 import { VerticalAxisElement } from "./VerticalAxisElement";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { AxisType } from "./AbstractAxisElement";
 
+export type TicksSelection = Selection<
+  SVGGElement,
+  string | number,
+  SVGGElement,
+  unknown
+>;
 export class AxisTickElement extends AbstractChartElement {
   /**
    * Component styles.
@@ -118,6 +136,7 @@ export class AxisTickElement extends AbstractChartElement {
   private _values: null | number[] | string[] = null;
   private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
   private _lines: SVGLineElement[] = [];
+  private _selection: null | TicksSelection = null;
 
   /**
    * @implements
@@ -146,8 +165,6 @@ export class AxisTickElement extends AbstractChartElement {
     const old = this._count;
     this._count = val;
     this.requestUpdate("count", old);
-    this.detachListeners();
-    this._lines = [];
   }
 
   /**
@@ -169,8 +186,6 @@ export class AxisTickElement extends AbstractChartElement {
     const old = this._values;
     this._values = val;
     this.requestUpdate("values", old);
-    this.detachListeners();
-    this._lines = [];
   }
 
   /**
@@ -178,6 +193,13 @@ export class AxisTickElement extends AbstractChartElement {
    */
   public get values(): null | number[] | string[] {
     return this._values;
+  }
+
+  /**
+   * Ticks `svg` elements selection.
+   */
+  public get selection(): null | TicksSelection {
+    return this._selection;
   }
 
   /**
@@ -230,7 +252,6 @@ export class AxisTickElement extends AbstractChartElement {
       }
     }
     this.detachListeners();
-    this._lines = [];
     super.disconnectedCallback();
   }
 
@@ -323,6 +344,88 @@ export class AxisTickElement extends AbstractChartElement {
    * @override
    */
   protected updateGeometry(): void {
+    if (
+      this.isConnected &&
+      this.axis &&
+      this.axis.selection &&
+      this.axis.scale &&
+      this.axis.scale.scale
+    ) {
+      const axis = this.axis;
+      const selection = this.axis.selection;
+      const scale = this.axis.scale.scale;
+      const offset =
+        typeof window !== "undefined" && window.devicePixelRatio > 1
+          ? 0
+          : 0.5;
+
+      let values: number[] | string[] = [];
+      if (axis.scale instanceof LinearScaleElement) {
+        if (this.values) {
+          values = this.values;
+        } else if (this.count) {
+          values = (<ScaleLinear<number, number, never>>scale).ticks(
+            this.count,
+          );
+        } else {
+          values = (<ScaleLinear<number, number, never>>scale).ticks(
+            5,
+          );
+        }
+      } else if (axis.scale instanceof OrdinalScaleElement) {
+        if (this.count) {
+          values = scale.domain().slice(0, this.count);
+        } else {
+          values = scale.domain();
+        }
+      }
+      const _selection = selection
+        .selectAll(".tick")
+        .data<number | string>(
+          values,
+          <ValueFn<SVGGElement | BaseType, unknown, KeyType>>(
+            (<unknown>scale)
+          ),
+        )
+        .order()
+        .enter()
+        .append("g")
+        .attr("class", "tick")
+        .attr("transform", (d) => {
+          let delta: number | undefined;
+          if (
+            axis.scale instanceof OrdinalScaleElement &&
+            (<ScaleBand<string>>scale).bandwidth
+          ) {
+            const offs =
+              Math.max(
+                0,
+                (<ScaleBand<string>>scale).bandwidth() - offset * 2,
+              ) / 2;
+
+            // TODO: For the Point Scale and Band Scale this branch
+            // must be enabled.
+            // if (scale.round()) offs = Math.round(offs);
+            delta = scale(<string & { valueOf(): number }>d) || 0;
+            delta = delta + offs;
+          } else {
+            delta = scale(<string & { valueOf(): number }>d) || 0;
+          }
+          if (axis.type === AxisType.Horizontal) {
+            return `translate(${delta},0)`;
+          } else {
+            return `translate(0,${delta})`;
+          }
+        })
+        .append("line")
+        .attr(axis.type === AxisType.Horizontal ? "x2" : "y2", 2);
+    }
+  }
+
+  /**
+   * @override
+   */
+  protected updateGeometry_(): void {
     if (this.isConnected && this.axis && this.axis.selection) {
       let size = 0;
       let axisFn;
