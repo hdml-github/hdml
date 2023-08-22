@@ -6,7 +6,10 @@
 
 import { lit } from "@hdml/elements";
 import { type ScaleBand, scaleBand } from "d3";
-import { AbstractScaleElement } from "./AbstractScaleElement";
+import {
+  AbstractScaleElement,
+  Dimension,
+} from "./AbstractScaleElement";
 
 export class OrdinalScaleElement extends AbstractScaleElement {
   /**
@@ -282,13 +285,13 @@ export class OrdinalScaleElement extends AbstractScaleElement {
       const scale = scaleBand(domain, this.range);
       scale.paddingInner(1 - this.bandwidth);
 
-      if (this.direction === "x") {
+      if (this.dimension === Dimension.X) {
         fp = this.tracked.paddingLeft + this.tracked.paddingRight;
         op = fp / (2 * (scale.step() - fp / domain.length));
         al = fp ? this.tracked.paddingLeft / fp : 0.5;
       }
 
-      if (this.direction === "y") {
+      if (this.dimension === Dimension.Y) {
         fp = this.tracked.paddingTop + this.tracked.paddingBottom;
         op = fp / (2 * (scale.step() - fp / domain.length));
         al = fp ? this.tracked.paddingTop / fp : 0.5;

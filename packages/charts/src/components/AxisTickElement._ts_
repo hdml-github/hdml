@@ -21,7 +21,7 @@ import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { HorizontalAxisElement } from "./HorizontalAxisElement";
 import { VerticalAxisElement } from "./VerticalAxisElement";
 import { AbstractChartElement } from "./AbstractChartElement";
-import { AxisType } from "./AbstractAxisElement";
+import { DirectionType } from "./AbstractDirection";
 
 export type TicksSelection = Selection<
   SVGGElement,
@@ -145,11 +145,7 @@ export class AxisTickElement extends AbstractChartElement {
     if (!this.axis) {
       return null;
     } else {
-      return (
-        `:host > svg ` +
-        `g.${this.axis.direction}-axis ` +
-        `g.tick line`
-      );
+      return `:host > svg g.${this.axis.dimension}-axis g.tick`;
     }
   }
 
@@ -379,7 +375,7 @@ export class AxisTickElement extends AbstractChartElement {
           values = scale.domain();
         }
       }
-      const _selection = selection
+      selection
         .selectAll(".tick")
         .data<number | string>(
           values,
@@ -417,8 +413,16 @@ export class AxisTickElement extends AbstractChartElement {
             return `translate(0,${delta})`;
           }
         })
-        .append("line")
-        .attr(axis.type === AxisType.Horizontal ? "x2" : "y2", 2);
+        .append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 10)
+        .attr("height", 10);
+
+      // .append("circle")
+      // .attr("cx", 0)
+      // .attr("cy", 5)
+      // .attr("r", 5);
     }
   }
 

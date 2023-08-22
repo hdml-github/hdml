@@ -33,14 +33,14 @@ linear-scale {
 /* HDML AXIS */
 horizontal-axis,
 vertical-axis {
-  --hdml-line-width: 2px;
+  --hdml-line-width: 8px;
   --hdml-line-style: solid;
 }
 
 /* HDML AXIS TICK */
 axis-tick {
   cursor: pointer;
-  --hdml-line-width: 10px;
+  --hdml-line-width: 0px;
   --hdml-line-style: solid;
 }
 horizontal-axis axis-tick {

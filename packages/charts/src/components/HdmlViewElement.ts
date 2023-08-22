@@ -83,7 +83,7 @@ export class HdmlViewElement extends AbstractChartElement {
   public render(): lit.TemplateResult<1> {
     return lit.html`
       <slot></slot>
-      <svg></svg>
+      <svg><g><text>Text</text></g></svg>
     `;
   }
 

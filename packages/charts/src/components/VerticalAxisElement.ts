@@ -5,7 +5,9 @@
  */
 
 import { lit } from "@hdml/elements";
-import { AxisType, AbstractAxisElement } from "./AbstractAxisElement";
+import { Dimension } from "./AbstractScaleElement";
+import { DirectionType, VerticalPosition } from "./AbstractDirection";
+import { AbstractAxisElement } from "./AbstractAxisElement";
 
 export class VerticalAxisElement extends AbstractAxisElement {
   /**
@@ -45,9 +47,9 @@ export class VerticalAxisElement extends AbstractAxisElement {
     },
 
     /**
-     * The `direction` property definition.
+     * The `dimension` property definition.
      */
-    direction: {
+    dimension: {
       type: String,
       attribute: true,
       reflect: true,
@@ -110,41 +112,41 @@ export class VerticalAxisElement extends AbstractAxisElement {
     },
   };
 
-  private _direction: "y" | "z" | "i" | "j" = "y";
-  private _position: "left" | "center" | "right" = "left";
+  private _dimension: Dimension = Dimension.Y;
+  private _position: VerticalPosition = VerticalPosition.Left;
 
   /**
    * @override
    */
-  public get type(): AxisType {
-    return AxisType.Vertical;
+  public get type(): DirectionType {
+    return DirectionType.Vertical;
   }
 
   /**
    * @override
    */
-  public set direction(val: "y" | "z" | "i" | "j") {
-    const attr = this.getAttribute("direction");
+  public set dimension(val: Dimension) {
+    const attr = this.getAttribute("dimension");
     const sval = val;
     if (attr !== sval) {
-      this.setAttribute("direction", sval);
+      this.setAttribute("dimension", sval);
     }
-    const old = this._direction;
-    this._direction = val;
-    this.requestUpdate("direction", old);
+    const old = this._dimension;
+    this._dimension = val;
+    this.requestUpdate("dimension", old);
   }
 
   /**
    * @override
    */
-  public get direction(): "y" | "z" | "i" | "j" {
-    return this._direction;
+  public get dimension(): Dimension {
+    return this._dimension;
   }
 
   /**
    * @override
    */
-  public set position(val: "left" | "center" | "right") {
+  public set position(val: VerticalPosition) {
     const attr = this.getAttribute("position");
     const sval = val;
     if (attr !== sval) {
@@ -158,7 +160,7 @@ export class VerticalAxisElement extends AbstractAxisElement {
   /**
    * @override
    */
-  public get position(): "left" | "center" | "right" {
+  public get position(): VerticalPosition {
     return this._position;
   }
 }

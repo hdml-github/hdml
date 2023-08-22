@@ -153,6 +153,9 @@ export class TickLabelElement extends AbstractChartElement {
    */
   protected renderGeometry(): void {
     this.resetStylesheets([this._stylesheet]);
+    /* <text transform="rotate(-90)"
+    text-anchor="middle" x="0" y="0"
+    dominant-baseline="middle">Text</text> */
   }
 
   /**

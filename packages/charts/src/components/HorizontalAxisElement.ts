@@ -5,7 +5,12 @@
  */
 
 import { lit } from "@hdml/elements";
-import { AxisType, AbstractAxisElement } from "./AbstractAxisElement";
+import { Dimension } from "./AbstractScaleElement";
+import {
+  DirectionType,
+  HorizontalPosition,
+} from "./AbstractDirection";
+import { AbstractAxisElement } from "./AbstractAxisElement";
 
 export class HorizontalAxisElement extends AbstractAxisElement {
   /**
@@ -45,9 +50,9 @@ export class HorizontalAxisElement extends AbstractAxisElement {
     },
 
     /**
-     * The `direction` property definition.
+     * The `dimension` property definition.
      */
-    direction: {
+    dimension: {
       type: String,
       attribute: true,
       reflect: true,
@@ -110,41 +115,41 @@ export class HorizontalAxisElement extends AbstractAxisElement {
     },
   };
 
-  private _direction: "x" | "z" | "i" | "j" = "x";
-  private _position: "bottom" | "center" | "top" = "bottom";
+  private _dimension: Dimension = Dimension.X;
+  private _position: HorizontalPosition = HorizontalPosition.Bottom;
 
   /**
    * @override
    */
-  public get type(): AxisType {
-    return AxisType.Horizontal;
+  public get type(): DirectionType {
+    return DirectionType.Horizontal;
   }
 
   /**
    * @override
    */
-  public set direction(val: "x" | "z" | "i" | "j") {
-    const attr = this.getAttribute("direction");
+  public set dimension(val: Dimension) {
+    const attr = this.getAttribute("dimension");
     const sval = val;
     if (attr !== sval) {
-      this.setAttribute("direction", sval);
+      this.setAttribute("dimension", sval);
     }
-    const old = this._direction;
-    this._direction = val;
-    this.requestUpdate("direction", old);
+    const old = this._dimension;
+    this._dimension = val;
+    this.requestUpdate("dimension", old);
   }
 
   /**
    * @override
    */
-  public get direction(): "x" | "z" | "i" | "j" {
-    return this._direction;
+  public get dimension(): Dimension {
+    return this._dimension;
   }
 
   /**
    * @override
    */
-  public set position(val: "bottom" | "center" | "top") {
+  public set position(val: HorizontalPosition) {
     const attr = this.getAttribute("position");
     const sval = val;
     if (attr !== sval) {
@@ -158,7 +163,7 @@ export class HorizontalAxisElement extends AbstractAxisElement {
   /**
    * @override
    */
-  public get position(): "bottom" | "center" | "top" {
+  public get position(): HorizontalPosition {
     return this._position;
   }
 }

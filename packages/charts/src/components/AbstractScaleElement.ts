@@ -8,6 +8,17 @@ import { lit } from "@hdml/elements";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { AbstractPlaneElement } from "./AbstractPlaneElement";
 
+/**
+ * Cartesian plane dimension enum.
+ */
+export enum Dimension {
+  X = "x",
+  Y = "y",
+  Z = "z",
+  I = "i",
+  J = "j",
+}
+
 abstract class AbstractScaleElement extends AbstractChartElement {
   private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
 
@@ -37,24 +48,24 @@ abstract class AbstractScaleElement extends AbstractChartElement {
   }
 
   /**
-   * Scale direction.
+   * Scale dimension.
    */
-  public get direction(): null | "x" | "y" | "z" | "i" | "j" {
+  public get dimension(): null | Dimension {
     let cnt = 1;
     let parent: null | HTMLElement | AbstractPlaneElement =
       this.parentElement;
     while (parent && cnt <= 5) {
       if (parent instanceof AbstractPlaneElement) {
         if (cnt === 1) {
-          return "x";
+          return Dimension.X;
         } else if (cnt === 2) {
-          return "y";
+          return Dimension.Y;
         } else if (cnt === 3) {
-          return "z";
+          return Dimension.Z;
         } else if (cnt === 4) {
-          return "i";
+          return Dimension.I;
         } else {
-          return "j";
+          return Dimension.J;
         }
       } else {
         cnt++;
@@ -69,14 +80,14 @@ abstract class AbstractScaleElement extends AbstractChartElement {
    */
   public get range(): [number, number] {
     const res: [number, number] = [0, 1];
-    if (this.direction === "x") {
+    if (this.dimension === Dimension.X) {
       res[0] =
         (this.plane?.tracked.left || 0) +
         (this.plane?.tracked.paddingLeft || 0) +
         this.tracked.left;
       res[1] = res[0] + this.tracked.width;
     }
-    if (this.direction === "y") {
+    if (this.dimension === Dimension.Y) {
       res[1] =
         (this.plane?.tracked.top || 0) +
         (this.plane?.tracked.paddingTop || 0) +
