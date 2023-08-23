@@ -10,12 +10,13 @@ import {
   DirectionType,
   HorizontalPosition,
 } from "./AbstractDirection";
-import { AbstractAxisElement } from "./AbstractAxisElement";
+import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**
- * Horizontal axis element.
+ * Horizontal axis tick element.
  */
-export class HorizontalAxisElement extends AbstractAxisElement {
+// eslint-disable-next-line max-len
+export class HorizontalAxisTickElement extends AbstractAxisTickElement {
   /**
    * Component styles.
    */
@@ -25,16 +26,15 @@ export class HorizontalAxisElement extends AbstractAxisElement {
       position: absolute;
       width: 100%;
       border: none;
-      height: var(--hdml-line-width);
     }
     :host([position=top]) {
-      top: calc(0% - var(--hdml-line-width)/2);
+      top: 0%;
     }
     :host([position=center]) {
-      top: calc(50% - var(--hdml-line-width)/2);
+      top: 50%;
     }
     :host([position=bottom]) {
-      top: calc(100% - var(--hdml-line-width)/2);
+      top: 100%;
     }
   `;
 
@@ -116,10 +116,80 @@ export class HorizontalAxisElement extends AbstractAxisElement {
         },
       },
     },
+
+    /**
+     * The `count` property definition.
+     */
+    count: {
+      type: Number,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (value: string): null | number => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (typeof val !== "number" || isNaN(val)) {
+                return null;
+              } else {
+                return val;
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: number): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
+
+    /**
+     * The `values` property definition.
+     */
+    values: {
+      type: Array,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): null | number[] | string[] => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (!Array.isArray(val)) {
+                return null;
+              } else {
+                return val as number[] | string[];
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: null | number[] | string[]): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
   };
 
   private _dimension: Dimension = Dimension.X;
   private _position: HorizontalPosition = HorizontalPosition.Bottom;
+  private _count: null | number = null;
+  private _values: null | number[] | string[] = null;
 
   /**
    * @override
@@ -169,6 +239,51 @@ export class HorizontalAxisElement extends AbstractAxisElement {
   public get position(): HorizontalPosition {
     return this._position;
   }
+
+  /**
+   * The `count` setter.
+   */
+  public set count(val: null | number) {
+    const attr = this.getAttribute("count");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("count", sval);
+    }
+    const old = this._count;
+    this._count = val;
+    this.requestUpdate("count", old);
+  }
+
+  /**
+   * The `count` getter.
+   */
+  public get count(): null | number {
+    return this._count;
+  }
+
+  /**
+   * The `values` setter.
+   */
+  public set values(val: null | number[] | string[]) {
+    const attr = this.getAttribute("values");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("values", sval);
+    }
+    const old = this._values;
+    this._values = val;
+    this.requestUpdate("values", old);
+  }
+
+  /**
+   * The `values` getter.
+   */
+  public get values(): null | number[] | string[] {
+    return this._values;
+  }
 }
 
-customElements.define("horizontal-axis", HorizontalAxisElement);
+customElements.define(
+  "horizontal-axis-tick",
+  HorizontalAxisTickElement,
+);

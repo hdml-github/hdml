@@ -7,12 +7,12 @@
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
 import { DirectionType, VerticalPosition } from "./AbstractDirection";
-import { AbstractAxisElement } from "./AbstractAxisElement";
+import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**
  * Vertical axis element.
  */
-export class VerticalAxisElement extends AbstractAxisElement {
+export class VerticalAxisTickElement extends AbstractAxisTickElement {
   /**
    * Component styles.
    */
@@ -22,16 +22,15 @@ export class VerticalAxisElement extends AbstractAxisElement {
       position: absolute;
       height: 100%;
       border: none;
-      width: var(--hdml-line-width);
     }
     :host([position=left]) {
-      left: calc(0% - var(--hdml-line-width)/2);
+      left: 0%;
     }
     :host([position=center]) {
-      left: calc(50% - var(--hdml-line-width)/2);
+      left: 50%;
     }
     :host([position=right]) {
-      left: calc(100% - var(--hdml-line-width)/2);
+      left: 100%;
     }
   `;
 
@@ -113,10 +112,80 @@ export class VerticalAxisElement extends AbstractAxisElement {
         },
       },
     },
+
+    /**
+     * The `count` property definition.
+     */
+    count: {
+      type: Number,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (value: string): null | number => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (typeof val !== "number" || isNaN(val)) {
+                return null;
+              } else {
+                return val;
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: number): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
+
+    /**
+     * The `values` property definition.
+     */
+    values: {
+      type: Array,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): null | number[] | string[] => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (!Array.isArray(val)) {
+                return null;
+              } else {
+                return val as number[] | string[];
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: null | number[] | string[]): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
   };
 
   private _dimension: Dimension = Dimension.Y;
   private _position: VerticalPosition = VerticalPosition.Left;
+  private _count: null | number = null;
+  private _values: null | number[] | string[] = null;
 
   /**
    * @override
@@ -166,6 +235,48 @@ export class VerticalAxisElement extends AbstractAxisElement {
   public get position(): VerticalPosition {
     return this._position;
   }
+
+  /**
+   * The `count` setter.
+   */
+  public set count(val: null | number) {
+    const attr = this.getAttribute("count");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("count", sval);
+    }
+    const old = this._count;
+    this._count = val;
+    this.requestUpdate("count", old);
+  }
+
+  /**
+   * The `count` getter.
+   */
+  public get count(): null | number {
+    return this._count;
+  }
+
+  /**
+   * The `values` setter.
+   */
+  public set values(val: null | number[] | string[]) {
+    const attr = this.getAttribute("values");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("values", sval);
+    }
+    const old = this._values;
+    this._values = val;
+    this.requestUpdate("values", old);
+  }
+
+  /**
+   * The `values` getter.
+   */
+  public get values(): null | number[] | string[] {
+    return this._values;
+  }
 }
 
-customElements.define("vertical-axis", VerticalAxisElement);
+customElements.define("vertical-axis-tick", VerticalAxisTickElement);

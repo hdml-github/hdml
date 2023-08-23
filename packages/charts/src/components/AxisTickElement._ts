@@ -375,6 +375,7 @@ export class AxisTickElement extends AbstractChartElement {
           values = scale.domain();
         }
       }
+
       selection
         .selectAll(".tick")
         .data<number | string>(

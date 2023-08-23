@@ -6,10 +6,7 @@
 
 import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
-import {
-  TrackedStyles,
-  resetStylesheet,
-} from "../helpers/resetStylesheet";
+import { TrackedStyles, updateStyles } from "../helpers/updateStyles";
 
 export abstract class AbstractChartElement extends UnifiedElement {
   private _view: null | HdmlViewElement = null;
@@ -242,7 +239,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
     });
     if (this.view && this.geometrySelector) {
       this.view?.addStylesheet(this._ssheet);
-      resetStylesheet(this, this._ssheet, this.geometrySelector);
+      updateStyles(this, this._ssheet, this.geometrySelector);
     }
   }
 

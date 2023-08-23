@@ -14,9 +14,10 @@ import "./components/OrdinalScaleElement";
 import "./components/LinearScaleElement";
 import "./components/ChromaticScaleElement";
 import "./components/HorizontalAxisElement";
+import "./components/HorizontalAxisTickElement";
 import "./components/VerticalAxisElement";
-import "./components/AxisGridElement";
-// import "./components/AxisTickElement";
+import "./components/VerticalAxisTickElement";
+// import "./components/AxisGridElement";
 // import "./components/TickLabelElement";
 // import "./components/AxisTitleElement";
 
@@ -28,9 +29,10 @@ import "./components/AxisGridElement";
   await customElements.whenDefined("linear-scale");
   await customElements.whenDefined("chromatic-scale");
   await customElements.whenDefined("horizontal-axis");
+  await customElements.whenDefined("horizontal-axis-tick");
   await customElements.whenDefined("vertical-axis");
-  await customElements.whenDefined("axis-grid");
-  // await customElements.whenDefined("axis-tick");
+  await customElements.whenDefined("vertical-axis-tick");
+  // await customElements.whenDefined("axis-grid");
   // await customElements.whenDefined("tick-label");
   // await customElements.whenDefined("axis-title");
 })().catch((reason) => {

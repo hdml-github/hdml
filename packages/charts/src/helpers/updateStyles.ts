@@ -27,9 +27,9 @@ export type TrackedStyles = {
 };
 
 /**
- * Reset stylesheet rules based on the components styles.
+ * Updates stylesheet rules based on the components styles.
  */
-export function resetStylesheet(
+export function updateStyles(
   component: Element & { tracked: TrackedStyles },
   stylesheet: CSSStyleSheet,
   selector: string,

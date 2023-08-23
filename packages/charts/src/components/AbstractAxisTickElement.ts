@@ -14,19 +14,20 @@ import {
 
 export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
 
-export type SelectedPath = Selection<
-  SVGPathElement,
-  unknown,
-  null,
-  undefined
+export type SelectedTicksGroupTicks = Selection<
+  SVGGElement,
+  string | number,
+  SVGGElement,
+  unknown
 >;
 
 /**
- * The abstract class, which encapsules the logic that is required to
- * visualize axis.
+ * The abstract class with the logic that is required to visualize the
+ * ticks.
  */
-export abstract class AbstractAxisElement extends AbstractDirection {
-  private _selectedPath: null | SelectedPath = null;
+// eslint-disable-next-line max-len
+export abstract class AbstractAxisTickElement extends AbstractDirection {
+  private _selectedTicksGroup: null | SelectedTicksGroupTicks = null;
 
   /**
    * @implements
@@ -34,15 +35,25 @@ export abstract class AbstractAxisElement extends AbstractDirection {
   protected get geometrySelector(): null | string {
     return (
       `:host > svg g.${this.dimension}-direction#_${this.uid} ` +
-      `path.axis`
+      `g.tick`
     );
   }
 
   /**
-   * `D3` selection of the `<path>` element.
+   * The `count` property definition.
    */
-  public get selectedPath(): null | SelectedPath {
-    return this._selectedPath;
+  public abstract get count(): null | number;
+
+  /**
+   * The `values` property definition.
+   */
+  public abstract get values(): null | number[] | string[];
+
+  /**
+   * `D3` selection of the ticks `<g>` element.
+   */
+  public get selectedTicksGroup(): null | SelectedTicksGroupTicks {
+    return this._selectedTicksGroup;
   }
 
   /**
@@ -50,7 +61,7 @@ export abstract class AbstractAxisElement extends AbstractDirection {
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    if (this.selectedPath) {
+    if (this.selectedTicksGroup) {
       this.renderGeometry();
     }
   }
@@ -59,7 +70,7 @@ export abstract class AbstractAxisElement extends AbstractDirection {
    * @override
    */
   public disconnectedCallback(): void {
-    this.selectedPath?.remove();
+    this.selectedTicksGroup?.remove();
     super.disconnectedCallback();
   }
 
@@ -77,24 +88,20 @@ export abstract class AbstractAxisElement extends AbstractDirection {
    */
   protected renderGeometry(): void {
     super.renderGeometry();
-    if (this.view?.svg && this.selectedGroup && !this.selectedPath) {
-      this._selectedPath = this.selectedGroup
-        .append("path")
-        .attr("class", "axis")
-        .attr("tabindex", "-1")
-        .attr("d", this.getPathD());
-    } else if (
-      this.view?.svg &&
-      this.selectedGroup &&
-      this.selectedPath
-    ) {
-      this.selectedGroup.insert(() => {
-        if (this.selectedPath) {
-          return this.selectedPath.node();
-        } else {
-          return null;
-        }
-      });
+    if (this.selectedGroup) {
+      this._selectedTicksGroup = this.selectedGroup
+        .selectAll(".tick")
+        .data<number | string>(this.getData())
+        .order()
+        .enter()
+        .append("g")
+        .attr("class", "tick")
+        .attr("transform", this.getTransform.bind(this));
+      this._selectedTicksGroup
+        .append("polygon")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("points", "-5,5 5,5 5,-5 -5,-5");
     }
   }
 
@@ -103,30 +110,69 @@ export abstract class AbstractAxisElement extends AbstractDirection {
    */
   protected updateGeometry(): void {
     super.updateGeometry();
-    if (this.selectedPath) {
-      this.selectedPath.attr("d", this.getPathD());
+    if (this.selectedTicksGroup) {
+      this.selectedTicksGroup.attr(
+        "transform",
+        this.getTransform.bind(this),
+      );
     }
   }
 
-  /**
-   * Returns axis path `d` property value.
-   */
-  private getPathD(): string {
+  private getData(): number[] | string[] {
+    let values: number[] | string[] = [];
     if (this.isConnected && this.scale && this.scale.scale) {
-      const offset =
-        typeof window !== "undefined" && window.devicePixelRatio > 1
-          ? 0
-          : 0; // 0.5; TODO: why it was here?
-      const range = this.scale.scale.range();
-      const range0 = +range[0] + offset;
-      const range1 = +range[range.length - 1] + offset;
-      const d =
-        this.type === DirectionType.Vertical
-          ? `M${offset},${range0}V${range1}`
-          : `M${range0},${offset}H${range1}`;
-      return d;
+      if (this.scale instanceof LinearScaleElement) {
+        if (this.values) {
+          values = this.values;
+        } else if (this.count) {
+          values = this.scale.scale.ticks(this.count);
+        } else {
+          values = this.scale.scale.ticks(5);
+        }
+      } else if (this.scale instanceof OrdinalScaleElement) {
+        if (this.count) {
+          values = this.scale.scale.domain().slice(0, this.count);
+        } else {
+          values = this.scale.scale.domain();
+        }
+      }
     }
-    return "M0,0";
+    return values;
+  }
+
+  private getTransform(d: number | string): string {
+    if (this.isConnected && this.scale && this.scale.scale) {
+      let delta: number | undefined;
+      if (this.scale instanceof OrdinalScaleElement) {
+        const offs =
+          Math.max(
+            0,
+            this.scale.scale.bandwidth() - this.getOffset() * 2,
+          ) / 2;
+
+        // TODO: For the Point Scale and Band Scale this branch
+        // must be enabled.
+        // if (scale.round()) offs = Math.round(offs);
+
+        delta = this.scale.scale(<string>d) || 0;
+        delta = delta + offs;
+      } else {
+        delta = this.scale.scale(<number>d) || 0;
+      }
+      if (this.type === DirectionType.Horizontal) {
+        return `translate(${delta},0)`;
+      } else {
+        return `translate(0,${delta})`;
+      }
+    }
+    return "translate(0,0)";
+  }
+
+  private getOffset(): number {
+    return typeof window !== "undefined" &&
+      window.devicePixelRatio > 1
+      ? 0
+      : 0; // 0.5;
   }
 
   /**
