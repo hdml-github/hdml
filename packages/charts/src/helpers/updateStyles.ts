@@ -15,15 +15,19 @@ export type TrackedStyles = {
   paddingRight: number;
   paddingBottom: number;
   paddingLeft: number;
-  lineColor: string;
-  lineStyle: string;
-  lineWidth: number;
   cursor: string;
   fontFamily: string;
   fontSize: number;
   fontWeight: number;
   fontStyle: string;
   color: string;
+  lineColor: string;
+  lineStyle: string;
+  lineWidth: number;
+  fillColor: string;
+  tickStyle: "text" | "rect" | "ellipse";
+  tickWidth: number;
+  tickHeight: number;
 };
 
 /**
@@ -65,6 +69,7 @@ function getSvgSelectorStyles(
   state && component.classList.add(state);
   const val =
     `${selector}${state ? `:${state}` : ""} {\n` +
+    `\t${getSvgFillStyle(component.tracked)}\n` +
     `\t${getSvgStrokeStyle(component.tracked)}\n` +
     `\t${getSvgStrokeWidthStyle(component.tracked)}\n` +
     `\t${getSvgStrokeDasharrayStyle(component.tracked)}\n` +
@@ -79,6 +84,34 @@ function getSvgSelectorStyles(
     `}`;
   state && component.classList.remove(state);
   return val;
+}
+
+function getSvgCursorStyle(tracked: TrackedStyles): string {
+  return `cursor: ${tracked.cursor};`;
+}
+
+function getSvgOutlineStyle(tracked: TrackedStyles): string {
+  return "outline: none;";
+}
+
+function getSvgFontFamilyStyle(tracked: TrackedStyles): string {
+  return `font-family: ${tracked.fontFamily};`;
+}
+
+function getSvgFontSizeStyle(tracked: TrackedStyles): string {
+  return `font-size: ${tracked.fontSize}px;`;
+}
+
+function getSvgFontWeightStyle(tracked: TrackedStyles): string {
+  return `font-weight: ${tracked.fontWeight};`;
+}
+
+function getSvgFontStyleStyle(tracked: TrackedStyles): string {
+  return `font-style: ${tracked.fontStyle};`;
+}
+
+function getSvgFontColorStyle(tracked: TrackedStyles): string {
+  return `color: ${tracked.color};`;
 }
 
 function getSvgStrokeStyle(tracked: TrackedStyles): string {
@@ -125,30 +158,6 @@ function getSvgStrokeLinecapStyle(tracked: TrackedStyles): string {
   }
 }
 
-function getSvgCursorStyle(tracked: TrackedStyles): string {
-  return `cursor: ${tracked.cursor};`;
-}
-
-function getSvgOutlineStyle(tracked: TrackedStyles): string {
-  return "outline: none;";
-}
-
-function getSvgFontFamilyStyle(tracked: TrackedStyles): string {
-  return `font-family: ${tracked.fontFamily};`;
-}
-
-function getSvgFontSizeStyle(tracked: TrackedStyles): string {
-  return `font-size: ${tracked.fontSize}px;`;
-}
-
-function getSvgFontWeightStyle(tracked: TrackedStyles): string {
-  return `font-weight: ${tracked.fontWeight};`;
-}
-
-function getSvgFontStyleStyle(tracked: TrackedStyles): string {
-  return `font-style: ${tracked.fontStyle};`;
-}
-
-function getSvgFontColorStyle(tracked: TrackedStyles): string {
-  return `color: ${tracked.color};`;
+function getSvgFillStyle(tracked: TrackedStyles): string {
+  return `fill: ${tracked.fillColor};`;
 }

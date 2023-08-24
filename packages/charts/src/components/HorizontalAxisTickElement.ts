@@ -26,6 +26,7 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
       position: absolute;
       width: 100%;
       border: none;
+      cursor: pointer;
     }
     :host([position=top]) {
       top: 0%;

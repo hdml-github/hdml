@@ -163,11 +163,11 @@ export abstract class AbstractDirection extends AbstractChartElement {
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
-    const attrDirection = this.getAttribute("direction");
+    const attrDimension = this.getAttribute("dimension");
     const attrPosition = this.getAttribute("position");
     const svalDimension = this.dimension;
     const svalPosition = this.position;
-    if (attrDirection !== svalDimension) {
+    if (attrDimension !== svalDimension) {
       this.setAttribute("dimension", svalDimension);
     }
     if (attrPosition !== svalPosition) {
@@ -184,7 +184,7 @@ export abstract class AbstractDirection extends AbstractChartElement {
       this._selectedGroup = this.view.svg
         .append("g")
         .attr("id", `_${this.uid}`)
-        .attr("class", `${this.dimension}-direction`)
+        .attr("class", `${this.dimension}-dimension`)
         .attr("transform", this.getTranslation());
     } else if (this.view?.svg && this.selectedGroup) {
       this.view.svg.insert(() => {

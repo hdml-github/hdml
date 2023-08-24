@@ -35,17 +35,8 @@
               <horizontal-axis-tick
                 dimension="x"
                 position="bottom"
-                values="[50]"
-                tick="circle">
+                count="3">
               </horizontal-axis-tick>
-
-              <!-- <axis-title>X axis</axis-title> -->
-              <!-- <axis-tick
-                values="[0, 25, 50, 75, 100]"
-                count="10"> -->
-                <!-- <axis-grid></axis-grid>
-                <tick-label></tick-label> -->
-              <!-- </axis-tick> -->
 
               <vertical-axis
                 dimension="y"
@@ -54,96 +45,19 @@
 
               <vertical-axis-tick
                 dimension="y"
-                position="left">
+                position="left"
+                values='["t1", "t2", "t3"]'>
               </vertical-axis-tick>
 
-              <!-- <axis-title>Y axis</axis-title> -->
-              <!-- <axis-tick> -->
-                <!-- <axis-grid></axis-grid> -->
-                <!-- <tick-label></tick-label> -->
-              <!-- </axis-tick> -->
-
             </ordinal-scale>
+
           </linear-scale>
           
         </cartesian-plane>
 
-        <polar-plane>
-          <!-- <chromatic-scale></chromatic-scale> -->
-        </polar-plane>
+        <polar-plane></polar-plane>
       </hdml-view>
 
       <script src="/index.js"></script>
-
-
-      <!-- <polar-plane for="?hdml-frame=frame">
-        <ordinal-scale for="table" count="3">
-          <linear-scale for="avg, sum" min="0" max="20">
-
-            <x-axis>
-              <axis-title
-                anchor="start|center|end"
-                text="Tables Axis">
-              </axis-title>
-              <axis-grid
-                type="straight"
-                count="3"
-                filter="(value, index, length) => true;">
-              </axis-grid>
-              <axis-ticks
-                type="rectangle|ellipse"
-                filter="(value, index, length) => true;">
-              </axis-ticks>
-              <axis-labels
-                anchor="center"
-                filter="(value, index, length) => true;"
-                map="(value, index) => `${value}`;">
-              </axis-labels>
-            </x-axis>
-
-            <y-axis>
-              <scale-title
-                anchor="start|center|end"
-                text="Sum Axis">
-              </scale-title>
-              <scale-grid
-                type="circular"
-                count="10"
-                filter="(value, index, length) => true;">
-              </scale-grid>
-              <scale-ticks
-                type="rectangle|ellipse"
-                filter="(value, index, length) => true;">
-              </scale-ticks>
-              <scale-label
-                anchor="tick"
-                filter="(value, index, length) => true;"
-                map="(value, index) => `${value}`;">
-              </scale-label>
-            </y-axis>
-
-          </linear-scale>
-        </ordinal-scale>
-      </polar-plane> -->
-
-      <script>
-        // const m = document.querySelector("hdml-model");
-        // const f1 = document.querySelector("hdml-frame[name=frame]");
-        // const f2 = document.querySelector("hdml-frame[name=query]");
-
-        // m.addEventListener("hdml-data", (event) => {
-        //   console.log(event.detail.table.toString());
-        // });
-        // f1.addEventListener("hdml-data", (event) => {
-        //   console.log(event.detail.table.toString());
-        // });
-        // f2.addEventListener("hdml-data", (event) => {
-        //   console.log(event.detail.table.toString());
-        // });
-
-        // m.query();
-        // f1.query();
-        // f2.query();
-      </script>
     </body>
 </html>

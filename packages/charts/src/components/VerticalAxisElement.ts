@@ -22,6 +22,7 @@ export class VerticalAxisElement extends AbstractAxisElement {
       position: absolute;
       height: 100%;
       border: none;
+      cursor: pointer;
       width: var(--hdml-line-width);
     }
     :host([position=left]) {

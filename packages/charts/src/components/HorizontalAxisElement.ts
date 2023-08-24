@@ -25,6 +25,7 @@ export class HorizontalAxisElement extends AbstractAxisElement {
       position: absolute;
       width: 100%;
       border: none;
+      cursor: pointer;
       height: var(--hdml-line-width);
     }
     :host([position=top]) {

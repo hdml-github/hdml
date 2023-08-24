@@ -21,20 +21,29 @@ export type SelectedTicksGroupTicks = Selection<
   unknown
 >;
 
+export type SelectedTicksItemTicks = SelectedTicksEllipseTicks;
+
+export type SelectedTicksEllipseTicks = Selection<
+  SVGEllipseElement,
+  string | number,
+  SVGGElement,
+  unknown
+>;
+
 /**
  * The abstract class with the logic that is required to visualize the
  * ticks.
  */
-// eslint-disable-next-line max-len
-export abstract class AbstractAxisTickElement extends AbstractDirection {
+abstract class AbstractAxisTickElement extends AbstractDirection {
   private _selectedTicksGroup: null | SelectedTicksGroupTicks = null;
+  private _selectedTicksItem: null | SelectedTicksItemTicks = null;
 
   /**
    * @implements
    */
   protected get geometrySelector(): null | string {
     return (
-      `:host > svg g.${this.dimension}-direction#_${this.uid} ` +
+      `:host > svg g.${this.dimension}-dimension#_${this.uid} ` +
       `g.tick`
     );
   }
@@ -96,12 +105,9 @@ export abstract class AbstractAxisTickElement extends AbstractDirection {
         .enter()
         .append("g")
         .attr("class", "tick")
+        .attr("tabindex", "-1")
         .attr("transform", this.getTransform.bind(this));
-      this._selectedTicksGroup
-        .append("polygon")
-        .attr("x", 0)
-        .attr("y", 0)
-        .attr("points", "-5,5 5,5 5,-5 -5,-5");
+      this.updateTickStyle();
     }
   }
 
@@ -118,6 +124,9 @@ export abstract class AbstractAxisTickElement extends AbstractDirection {
     }
   }
 
+  /**
+   * Returns ticks data array.
+   */
   private getData(): number[] | string[] {
     let values: number[] | string[] = [];
     if (this.isConnected && this.scale && this.scale.scale) {
@@ -140,6 +149,9 @@ export abstract class AbstractAxisTickElement extends AbstractDirection {
     return values;
   }
 
+  /**
+   * Returns tick traslate propperty.
+   */
   private getTransform(d: number | string): string {
     if (this.isConnected && this.scale && this.scale.scale) {
       let delta: number | undefined;
@@ -168,11 +180,40 @@ export abstract class AbstractAxisTickElement extends AbstractDirection {
     return "translate(0,0)";
   }
 
+  /**
+   * Returns device related offset.
+   */
   private getOffset(): number {
     return typeof window !== "undefined" &&
       window.devicePixelRatio > 1
       ? 0
       : 0; // 0.5;
+  }
+
+  /**
+   * Updates tick style.
+   */
+  private updateTickStyle(): void {
+    if (this.selectedTicksGroup) {
+      if (this.tracked.tickStyle === "ellipse") {
+        const dx =
+          this.type === DirectionType.Vertical
+            ? this.tracked.lineWidth / 2
+            : 0;
+        const dy =
+          this.type === DirectionType.Horizontal
+            ? this.tracked.lineWidth / 2
+            : 0;
+        this._selectedTicksItem = this.selectedTicksGroup
+          .append("ellipse")
+          .attr("cx", 0 - dx)
+          .attr("cy", 0 - dy)
+          .attr("rx", this.tracked.tickWidth)
+          .attr("ry", this.tracked.tickHeight);
+      }
+    }
+
+    // .attr("points", "-5,5 5,5 5,-5 -5,-5");
   }
 
   /**
@@ -255,3 +296,4 @@ export abstract class AbstractAxisTickElement extends AbstractDirection {
     }
   };
 }
+export { AbstractAxisTickElement };

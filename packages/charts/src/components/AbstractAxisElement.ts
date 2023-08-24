@@ -33,7 +33,7 @@ export abstract class AbstractAxisElement extends AbstractDirection {
    */
   protected get geometrySelector(): null | string {
     return (
-      `:host > svg g.${this.dimension}-direction#_${this.uid} ` +
+      `:host > svg g.${this.dimension}-dimension#_${this.uid} ` +
       `path.axis`
     );
   }

@@ -23,15 +23,19 @@ export abstract class AbstractChartElement extends UnifiedElement {
     paddingRight: 0,
     paddingBottom: 0,
     paddingLeft: 0,
-    lineColor: "rgba(0, 0, 0, 0)",
-    lineStyle: "solid",
-    lineWidth: 0,
     cursor: "auto",
     fontFamily: "Times New Roman",
     fontSize: 0,
     fontWeight: 0,
     fontStyle: "normal",
     color: "rgba(0, 0, 0, 0)",
+    lineColor: "rgba(0, 0, 0, 0)",
+    lineStyle: "solid",
+    lineWidth: 0,
+    fillColor: "rgba(0, 0, 0, 0)",
+    tickStyle: "ellipse",
+    tickWidth: 5,
+    tickHeight: 5,
   };
 
   /**
@@ -107,6 +111,24 @@ export abstract class AbstractChartElement extends UnifiedElement {
       get paddingLeft(): number {
         return parseFloat(self.styles.paddingLeft);
       },
+      get cursor(): string {
+        return self.styles.cursor;
+      },
+      get fontFamily(): string {
+        return self.styles.fontFamily;
+      },
+      get fontSize(): number {
+        return parseFloat(self.styles.fontSize);
+      },
+      get fontWeight(): number {
+        return parseFloat(self.styles.fontWeight);
+      },
+      get fontStyle(): string {
+        return self.styles.fontStyle;
+      },
+      get color(): string {
+        return self.styles.color;
+      },
       get lineColor(): string {
         return (
           self.styles.getPropertyValue("--hdml-line-color") ||
@@ -125,23 +147,28 @@ export abstract class AbstractChartElement extends UnifiedElement {
           ) || 0
         );
       },
-      get cursor(): string {
-        return self.styles.cursor;
+      get fillColor(): string {
+        return (
+          self.styles.getPropertyValue("--hdml-fill-color") ||
+          "rgba(0, 0, 0, 0)"
+        );
       },
-      get fontFamily(): string {
-        return self.styles.fontFamily;
+      get tickStyle(): "text" | "rect" | "ellipse" {
+        return (
+          <"text" | "rect" | "ellipse">(
+            self.styles.getPropertyValue("--hdml-tick-style")
+          ) || "ellipse"
+        );
       },
-      get fontSize(): number {
-        return parseFloat(self.styles.fontSize);
+      get tickWidth(): number {
+        return parseFloat(
+          self.styles.getPropertyValue("--hdml-tick-width") || "0",
+        );
       },
-      get fontWeight(): number {
-        return parseFloat(self.styles.fontWeight);
-      },
-      get fontStyle(): string {
-        return self.styles.fontStyle;
-      },
-      get color(): string {
-        return self.styles.color;
+      get tickHeight(): number {
+        return parseFloat(
+          self.styles.getPropertyValue("--hdml-tick-height") || "0",
+        );
       },
     };
   }

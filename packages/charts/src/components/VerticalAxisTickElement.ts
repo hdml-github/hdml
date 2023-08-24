@@ -22,6 +22,7 @@ export class VerticalAxisTickElement extends AbstractAxisTickElement {
       position: absolute;
       height: 100%;
       border: none;
+      cursor: pointer;
     }
     :host([position=left]) {
       left: 0%;
