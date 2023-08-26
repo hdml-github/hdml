@@ -4,13 +4,18 @@
  * @license Apache-2.0
  */
 
-import { type Selection } from "d3";
+import {
+  type Selection,
+  type EnterElement,
+  select,
+  selectAll,
+} from "d3";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 import {
-  AbstractDirection,
+  AbstractDirectionElement,
   DirectionType,
-} from "./AbstractDirection";
+} from "./AbstractDirectionElement";
 
 export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
 
@@ -21,8 +26,6 @@ export type SelectedTicksGroupTicks = Selection<
   unknown
 >;
 
-export type SelectedTicksItemTicks = SelectedTicksEllipseTicks;
-
 export type SelectedTicksEllipseTicks = Selection<
   SVGEllipseElement,
   string | number,
@@ -30,13 +33,32 @@ export type SelectedTicksEllipseTicks = Selection<
   unknown
 >;
 
+export type SelectedTicksRectTicks = Selection<
+  SVGRectElement,
+  string | number,
+  SVGGElement,
+  unknown
+>;
+
+export type SelectedTicksTextTicks = Selection<
+  SVGTextElement,
+  string | number,
+  SVGGElement,
+  unknown
+>;
+
+export type SelectedTicksItemTicks =
+  | SelectedTicksEllipseTicks
+  | SelectedTicksRectTicks
+  | SelectedTicksTextTicks;
+
 /**
  * The abstract class with the logic that is required to visualize the
  * ticks.
  */
-abstract class AbstractAxisTickElement extends AbstractDirection {
-  private _selectedTicksGroup: null | SelectedTicksGroupTicks = null;
-  private _selectedTicksItem: null | SelectedTicksItemTicks = null;
+// eslint-disable-next-line max-len
+export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
+  private _style: null | "text" | "rect" | "ellipse" = null;
 
   /**
    * @implements
@@ -59,28 +81,32 @@ abstract class AbstractAxisTickElement extends AbstractDirection {
   public abstract get values(): null | number[] | string[];
 
   /**
-   * `D3` selection of the ticks `<g>` element.
-   */
-  public get selectedTicksGroup(): null | SelectedTicksGroupTicks {
-    return this._selectedTicksGroup;
-  }
-
-  /**
    * @override
    */
   public connectedCallback(): void {
     super.connectedCallback();
-    if (this.selectedTicksGroup) {
-      this.renderGeometry();
-    }
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
-    this.selectedTicksGroup?.remove();
     super.disconnectedCallback();
+  }
+
+  /**
+   * @override
+   */
+  public shouldUpdate(
+    changedProperties: Map<string, unknown>,
+  ): boolean {
+    if (
+      changedProperties.has("count") ||
+      changedProperties.has("values")
+    ) {
+      return true;
+    }
+    return super.shouldUpdate(changedProperties);
   }
 
   /**
@@ -95,32 +121,42 @@ abstract class AbstractAxisTickElement extends AbstractDirection {
   /**
    * @implements
    */
-  protected renderGeometry(): void {
-    super.renderGeometry();
+  protected updateGeometry(): void {
+    super.updateGeometry();
     if (this.selectedGroup) {
-      this._selectedTicksGroup = this.selectedGroup
+      this.selectedGroup
         .selectAll(".tick")
         .data<number | string>(this.getData())
         .order()
-        .enter()
-        .append("g")
-        .attr("class", "tick")
-        .attr("tabindex", "-1")
-        .attr("transform", this.getTransform.bind(this));
-      this.updateTickStyle();
-    }
-  }
-
-  /**
-   * @implements
-   */
-  protected updateGeometry(): void {
-    super.updateGeometry();
-    if (this.selectedTicksGroup) {
-      this.selectedTicksGroup.attr(
-        "transform",
-        this.getTransform.bind(this),
-      );
+        .join(
+          (enter) => {
+            return enter
+              .append("g")
+              .attr("class", "tick")
+              .attr("tabindex", "-1")
+              .attr("transform", this.getTransform.bind(this))
+              .on("click", console.log)
+              .call((selection) => {
+                this.updateTick(selection);
+              });
+          },
+          (update) => {
+            return update
+              .attr("transform", this.getTransform.bind(this))
+              .call((selection) => {
+                const s = selection as unknown as Selection<
+                  SVGGElement,
+                  string | number,
+                  SVGGElement,
+                  unknown
+                >;
+                this.updateTick(s);
+              });
+          },
+          (exit) => {
+            return exit.remove();
+          },
+        );
     }
   }
 
@@ -154,30 +190,25 @@ abstract class AbstractAxisTickElement extends AbstractDirection {
    */
   private getTransform(d: number | string): string {
     if (this.isConnected && this.scale && this.scale.scale) {
-      let delta: number | undefined;
+      let delta = 0;
       if (this.scale instanceof OrdinalScaleElement) {
         const offs =
           Math.max(
             0,
             this.scale.scale.bandwidth() - this.getOffset() * 2,
           ) / 2;
-
-        // TODO: For the Point Scale and Band Scale this branch
-        // must be enabled.
-        // if (scale.round()) offs = Math.round(offs);
-
         delta = this.scale.scale(<string>d) || 0;
         delta = delta + offs;
       } else {
         delta = this.scale.scale(<number>d) || 0;
       }
       if (this.type === DirectionType.Horizontal) {
-        return `translate(${delta},0)`;
+        return `translate(${delta}, 0)`;
       } else {
-        return `translate(0,${delta})`;
+        return `translate(0, ${delta})`;
       }
     }
-    return "translate(0,0)";
+    return "translate(0, 0)";
   }
 
   /**
@@ -193,27 +224,184 @@ abstract class AbstractAxisTickElement extends AbstractDirection {
   /**
    * Updates tick style.
    */
-  private updateTickStyle(): void {
-    if (this.selectedTicksGroup) {
-      if (this.tracked.tickStyle === "ellipse") {
-        const dx =
-          this.type === DirectionType.Vertical
-            ? this.tracked.lineWidth / 2
-            : 0;
-        const dy =
-          this.type === DirectionType.Horizontal
-            ? this.tracked.lineWidth / 2
-            : 0;
-        this._selectedTicksItem = this.selectedTicksGroup
-          .append("ellipse")
-          .attr("cx", 0 - dx)
-          .attr("cy", 0 - dy)
-          .attr("rx", this.tracked.tickWidth)
-          .attr("ry", this.tracked.tickHeight);
-      }
+  private updateTick(
+    selection: Selection<
+      SVGGElement,
+      string | number,
+      SVGGElement,
+      unknown
+    >,
+  ): void {
+    const replace = this._style !== this.tracked.tickStyle;
+    switch (this.tracked.tickStyle) {
+      default:
+      case "ellipse":
+        this.appendEllipse(selection, replace);
+        break;
+      case "rect":
+        this.appendRect(selection, replace);
+        break;
+      case "text":
+        this.appendText(selection, replace);
+        break;
     }
+    this._style = this.tracked.tickStyle;
+  }
 
-    // .attr("points", "-5,5 5,5 5,-5 -5,-5");
+  /**
+   * Append ellipse tick.
+   */
+  private appendEllipse(
+    selection: Selection<
+      SVGGElement,
+      string | number,
+      SVGGElement,
+      unknown
+    >,
+    replace: boolean,
+  ) {
+    const dx =
+      this.type === DirectionType.Vertical
+        ? this.tracked.lineWidth / 2
+        : 0;
+    const dy =
+      this.type === DirectionType.Horizontal
+        ? this.tracked.lineWidth / 2
+        : 0;
+    if (replace) {
+      if (this.selectedGroup) {
+        if (this._style === null) {
+          selection
+            .append("ellipse")
+            .attr("class", "elm")
+            .attr("cx", 0 - dx)
+            .attr("cy", 0 - dy)
+            .attr("rx", this.tracked.tickWidth / 2)
+            .attr("ry", this.tracked.tickHeight / 2);
+        } else {
+          this.selectedGroup.selectAll("g.tick .elm").remove();
+          this.selectedGroup
+            .selectAll("g.tick")
+            .append("ellipse")
+            .attr("class", "elm")
+            .attr("cx", 0 - dx)
+            .attr("cy", 0 - dy)
+            .attr("rx", this.tracked.tickWidth / 2)
+            .attr("ry", this.tracked.tickHeight / 2);
+        }
+      }
+    } else {
+      selection
+        .select("*")
+        .attr("cx", 0 - dx)
+        .attr("cy", 0 - dy)
+        .attr("rx", this.tracked.tickWidth / 2)
+        .attr("ry", this.tracked.tickHeight / 2);
+    }
+  }
+
+  /**
+   * Append rect tick.
+   */
+  private appendRect(
+    selection: Selection<
+      SVGGElement,
+      string | number,
+      SVGGElement,
+      unknown
+    >,
+    replace: boolean,
+  ) {
+    const dx =
+      this.type === DirectionType.Vertical
+        ? (this.tracked.lineWidth + this.tracked.tickWidth) / 2
+        : this.tracked.tickWidth / 2;
+    const dy =
+      this.type === DirectionType.Horizontal
+        ? (this.tracked.lineWidth + this.tracked.tickHeight) / 2
+        : this.tracked.tickHeight / 2;
+    if (replace) {
+      if (this.selectedGroup) {
+        if (this._style === null) {
+          selection
+            .append("rect")
+            .attr("class", "elm")
+            .attr("x", 0 - dx)
+            .attr("y", 0 - dy)
+            .attr("width", this.tracked.tickWidth)
+            .attr("height", this.tracked.tickHeight);
+        } else {
+          this.selectedGroup.selectAll("g.tick .elm").remove();
+          this.selectedGroup
+            .selectAll("g.tick")
+            .append("rect")
+            .attr("class", "elm")
+            .attr("x", 0 - dx)
+            .attr("y", 0 - dy)
+            .attr("width", this.tracked.tickWidth)
+            .attr("height", this.tracked.tickHeight);
+        }
+      }
+    } else {
+      selection
+        .select("rect")
+        .attr("class", "elm")
+        .attr("x", 0 - dx)
+        .attr("y", 0 - dy)
+        .attr("width", this.tracked.tickWidth)
+        .attr("height", this.tracked.tickHeight);
+    }
+  }
+
+  /**
+   * Append text tick.
+   */
+  private appendText(
+    selection: Selection<
+      SVGGElement,
+      string | number,
+      SVGGElement,
+      unknown
+    >,
+    replace: boolean,
+  ) {
+    const dx = 0;
+    const dy = 0;
+    if (replace) {
+      if (this.selectedGroup) {
+        if (this._style === null) {
+          selection
+            .append("text")
+            .attr("class", "elm")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("x", 0 - dx)
+            .attr("y", 0 - dy)
+            .text((v) => v);
+        } else {
+          this.selectedGroup.selectAll("g.tick .elm").remove();
+          this.selectedGroup
+            .selectAll(".tick")
+            .data<number | string>(this.getData())
+            .order()
+            .append("text")
+            .attr("class", "elm")
+            .attr("text-anchor", "middle")
+            .attr("dominant-baseline", "middle")
+            .attr("x", 0 - dx)
+            .attr("y", 0 - dy)
+            .text((v) => v);
+        }
+      }
+    } else {
+      selection
+        .select("text")
+        .attr("class", "elm")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("x", 0 - dx)
+        .attr("y", 0 - dy);
+    }
   }
 
   /**
@@ -296,4 +484,3 @@ abstract class AbstractAxisTickElement extends AbstractDirection {
     }
   };
 }
-export { AbstractAxisTickElement };

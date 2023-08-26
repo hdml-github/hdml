@@ -8,9 +8,9 @@ import { type Selection } from "d3";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 import {
-  AbstractDirection,
+  AbstractDirectionElement,
   DirectionType,
-} from "./AbstractDirection";
+} from "./AbstractDirectionElement";
 
 export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
 
@@ -25,7 +25,8 @@ export type SelectedPath = Selection<
  * The abstract class, which encapsules the logic that is required to
  * visualize axis.
  */
-export abstract class AbstractAxisElement extends AbstractDirection {
+// eslint-disable-next-line max-len
+export abstract class AbstractAxisElement extends AbstractDirectionElement {
   private _selectedPath: null | SelectedPath = null;
 
   /**

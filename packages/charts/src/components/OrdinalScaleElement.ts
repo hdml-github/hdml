@@ -284,19 +284,16 @@ export class OrdinalScaleElement extends AbstractScaleElement {
       let al = 0;
       const scale = scaleBand(domain, this.range);
       scale.paddingInner(1 - this.bandwidth);
-
       if (this.dimension === Dimension.X) {
         fp = this.tracked.paddingLeft + this.tracked.paddingRight;
         op = fp / (2 * (scale.step() - fp / domain.length));
         al = fp ? this.tracked.paddingLeft / fp : 0.5;
       }
-
       if (this.dimension === Dimension.Y) {
         fp = this.tracked.paddingTop + this.tracked.paddingBottom;
         op = fp / (2 * (scale.step() - fp / domain.length));
         al = fp ? this.tracked.paddingTop / fp : 0.5;
       }
-
       scale.paddingOuter(op);
       scale.align(al);
       this._scale = scale;

@@ -42,9 +42,9 @@ horizontal-axis-tick,
 vertical-axis-tick {
   --hdml-line-width: 2px;
   --hdml-line-style: solid;
-  --hdml-tick-style: ellipse;
-  --hdml-tick-width: 5px;
-  --hdml-tick-height: 5px;
+  --hdml-tick-style: text;
+  --hdml-tick-width: 10px;
+  --hdml-tick-height: 10px;
 }
 
 /* BLUE THEME ----------------------------------------------- */
@@ -70,10 +70,10 @@ vertical-axis-tick {
 /* HDML AXIS TICK */
 .blue horizontal-axis-tick,
 .blue vertical-axis-tick {
-  /* --hdml-line-color: rgb(126, 188, 246); */
-  --hdml-fill-color: rgb(255, 255, 255);
-  /* --hdml-fill-color: rgb(28, 140, 244); */
-  --hdml-line-color: rgb(126, 188, 246);
+  --hdml-line-color: rgb(244, 28, 28);
+  --hdml-fill-color: rgb(28, 140, 244);
+  /* --hdml-line-color: rgb(126, 188, 246);
+  --hdml-fill-color: rgb(255, 255, 255); */
 }
 .blue horizontal-axis-tick.hover,
 .blue vertical-axis-tick.hover {

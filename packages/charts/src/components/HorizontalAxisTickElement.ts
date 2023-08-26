@@ -9,7 +9,7 @@ import { Dimension } from "./AbstractScaleElement";
 import {
   DirectionType,
   HorizontalPosition,
-} from "./AbstractDirection";
+} from "./AbstractDirectionElement";
 import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**

@@ -6,7 +6,10 @@
 
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
-import { DirectionType, VerticalPosition } from "./AbstractDirection";
+import {
+  DirectionType,
+  VerticalPosition,
+} from "./AbstractDirectionElement";
 import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**

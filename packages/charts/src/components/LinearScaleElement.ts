@@ -202,21 +202,18 @@ export class LinearScaleElement extends AbstractScaleElement {
     let pv = 0;
     let lv = 0;
     let rv = 0;
-
     if (this.dimension === Dimension.X) {
       fp = this.tracked.paddingLeft + this.tracked.paddingRight;
       pv = (fp * (this.max - this.min)) / (this.tracked.width - fp);
       lv = fp ? (pv * this.tracked.paddingLeft) / fp : 0;
       rv = fp ? (pv * this.tracked.paddingRight) / fp : 0;
     }
-
     if (this.dimension === Dimension.Y) {
       fp = this.tracked.paddingTop + this.tracked.paddingBottom;
       pv = (fp * (this.max - this.min)) / (this.tracked.height - fp);
       lv = fp ? (pv * this.tracked.paddingTop) / fp : 0;
       rv = fp ? (pv * this.tracked.paddingBottom) / fp : 0;
     }
-
     const domain = [this.min - lv, this.max + rv];
     const scale = scaleLinear(domain, this.range);
     this._scale = scale;
