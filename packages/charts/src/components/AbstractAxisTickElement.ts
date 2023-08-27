@@ -4,54 +4,13 @@
  * @license Apache-2.0
  */
 
-import {
-  type Selection,
-  type EnterElement,
-  type BaseType,
-  select,
-  selectAll,
-} from "d3";
+import { type Selection, type EnterElement, type BaseType } from "d3";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 import {
   AbstractDirectionElement,
   DirectionType,
 } from "./AbstractDirectionElement";
-
-export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-
-export type SelectedTicksGroupTicks = Selection<
-  SVGGElement,
-  string | number,
-  SVGGElement,
-  unknown
->;
-
-export type SelectedTicksEllipseTicks = Selection<
-  SVGEllipseElement,
-  string | number,
-  SVGGElement,
-  unknown
->;
-
-export type SelectedTicksRectTicks = Selection<
-  SVGRectElement,
-  string | number,
-  SVGGElement,
-  unknown
->;
-
-export type SelectedTicksTextTicks = Selection<
-  SVGTextElement,
-  string | number,
-  SVGGElement,
-  unknown
->;
-
-export type SelectedTicksItemTicks =
-  | SelectedTicksEllipseTicks
-  | SelectedTicksRectTicks
-  | SelectedTicksTextTicks;
 
 /**
  * The abstract class with the logic that is required to visualize the
@@ -60,6 +19,7 @@ export type SelectedTicksItemTicks =
 // eslint-disable-next-line max-len
 export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   private _tickStyle: null | "text" | "rect" | "ellipse" = null;
+  private _events: Set<string> = new Set();
 
   /**
    * @implements
@@ -86,12 +46,28 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    if (this.selectedGroup) {
+      this.selectedGroup
+        .selectAll<BaseType, number | string>("g.tick")
+        .call((selection) => {
+          this._events.forEach((type) => {
+            selection.on(type, this.proxyEvent);
+          });
+        });
+    }
   }
 
   /**
    * @override
    */
   public disconnectedCallback(): void {
+    if (this.selectedGroup) {
+      this.selectedGroup.selectAll("g.tick").call((selection) => {
+        this._events.forEach((type) => {
+          selection.on(type, null);
+        });
+      });
+    }
     super.disconnectedCallback();
   }
 
@@ -108,15 +84,6 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       return true;
     }
     return super.shouldUpdate(changedProperties);
-  }
-
-  /**
-   * @override
-   */
-  protected firstUpdated(
-    changedProperties: Map<PropertyKey, unknown>,
-  ): void {
-    super.firstUpdated(changedProperties);
   }
 
   /**
@@ -146,7 +113,14 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
    */
   private removeTicks(): void {
     if (this.selectedGroup) {
-      this.selectedGroup.selectAll("g.tick").remove();
+      this.selectedGroup
+        .selectAll("g.tick")
+        .call((selection) => {
+          this._events.forEach((type) => {
+            selection.on(type, null);
+          });
+        })
+        .remove();
     }
   }
 
@@ -194,6 +168,9 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       .attr("tabindex", "-1")
       .attr("transform", this.getTransform.bind(this))
       .call((selection) => {
+        this._events.forEach((type) => {
+          selection.on(type, this.proxyEvent);
+        });
         this.appendTick(selection);
       });
   }
@@ -222,7 +199,13 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   private exitTicks(
     exit: Selection<BaseType, string | number, SVGGElement, unknown>,
   ): Selection<BaseType, string | number, SVGGElement, unknown> {
-    return exit.remove();
+    return exit
+      .call((selection) => {
+        this._events.forEach((type) => {
+          selection.on(type, null);
+        });
+      })
+      .remove();
   }
 
   /**
@@ -465,51 +448,61 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   }
 
   /**
-   * Attaches event listeners to the associated `svg` element.
+   * @override
    */
-  private attachListener(): void {
-    // if (this.selection) {
-    //   const element = <SVGGElement>(
-    //     this.selection.selectChild("path.domain").node()
-    //   );
-    //   element.addEventListener("mouseenter", this.eventListener);
-    //   element.addEventListener("mouseleave", this.eventListener);
-    //   element.addEventListener("mousemove", this.eventListener);
-    //   element.addEventListener("mouseover", this.eventListener);
-    //   element.addEventListener("mouseout", this.eventListener);
-    //   element.addEventListener("mousedown", this.eventListener);
-    //   element.addEventListener("mouseup", this.eventListener);
-    //   element.addEventListener("click", this.eventListener);
-    //   element.addEventListener("focus", this.eventListener);
-    //   element.addEventListener("blur", this.eventListener);
-    // }
+  public addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void;
+  public addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void {
+    if (!this._events.has(type)) {
+      this._tickStyle = null;
+      this._events.add(type);
+      this.requestUpdate("_force", true);
+    }
+    super.addEventListener(type, listener, options);
   }
 
   /**
-   * Detaches event listeners to the associated `svg` element.
+   * @override
    */
-  private detachListener(): void {
-    // if (this.selection) {
-    //   const el = <SVGGElement>(
-    //     this.selection.selectChild("path.domain").node()
-    //   );
-    //   el.removeEventListener("mouseenter", this.eventListener);
-    //   el.removeEventListener("mouseleave", this.eventListener);
-    //   el.removeEventListener("mousemove", this.eventListener);
-    //   el.removeEventListener("mouseover", this.eventListener);
-    //   el.removeEventListener("mouseout", this.eventListener);
-    //   el.removeEventListener("mousedown", this.eventListener);
-    //   el.removeEventListener("mouseup", this.eventListener);
-    //   el.removeEventListener("click", this.eventListener);
-    //   el.removeEventListener("focus", this.eventListener);
-    //   el.removeEventListener("blur", this.eventListener);
-    // }
+  public removeEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void;
+  public removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void {
+    if (this._events.has(type)) {
+      this._tickStyle = null;
+      this._events.delete(type);
+      this.requestUpdate("_force", true);
+    }
+    super.removeEventListener(type, listener, options);
   }
 
   /**
    * The associated `svg` element event listener.
    */
-  private eventListener = (evt: Event) => {
+  private proxyEvent = (evt: Event, dat: number | string) => {
+    type TickEvent = (MouseEvent | PointerEvent | FocusEvent) & {
+      point?: number | string;
+    };
+    let event: TickEvent;
     switch (evt.type) {
       case "mouseenter":
         this.dispatchEvent(new MouseEvent(evt.type));
@@ -533,7 +526,9 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
         this.dispatchEvent(new MouseEvent(evt.type));
         break;
       case "click":
-        this.dispatchEvent(new PointerEvent(evt.type));
+        event = new PointerEvent(evt.type);
+        event.point = dat;
+        this.dispatchEvent(event);
         break;
       case "focus":
         this.dispatchEvent(new FocusEvent(evt.type));
