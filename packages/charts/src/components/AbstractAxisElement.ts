@@ -5,21 +5,29 @@
  */
 
 import { type Selection } from "d3";
-import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
+import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import {
   AbstractDirectionElement,
   DirectionType,
 } from "./AbstractDirectionElement";
 
-export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-
-export type SelectedPath = Selection<
+/**
+ * Selected `path` element.
+ */
+type SelectedPath = Selection<
   SVGPathElement,
   unknown,
   null,
   undefined
 >;
+
+/**
+ * Axis event.
+ */
+type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
+  datum?: number | string;
+};
 
 /**
  * The abstract class, which encapsules the logic that is required to
@@ -28,6 +36,7 @@ export type SelectedPath = Selection<
 // eslint-disable-next-line max-len
 export abstract class AbstractAxisElement extends AbstractDirectionElement {
   private _selectedPath: null | SelectedPath = null;
+  private _events: Set<string> = new Set();
 
   /**
    * @implements
@@ -131,81 +140,93 @@ export abstract class AbstractAxisElement extends AbstractDirectionElement {
   }
 
   /**
-   * Attaches event listeners to the associated `svg` element.
+   * @override
    */
-  private attachListener(): void {
-    // if (this.selection) {
-    //   const element = <SVGGElement>(
-    //     this.selection.selectChild("path.domain").node()
-    //   );
-    //   element.addEventListener("mouseenter", this.eventListener);
-    //   element.addEventListener("mouseleave", this.eventListener);
-    //   element.addEventListener("mousemove", this.eventListener);
-    //   element.addEventListener("mouseover", this.eventListener);
-    //   element.addEventListener("mouseout", this.eventListener);
-    //   element.addEventListener("mousedown", this.eventListener);
-    //   element.addEventListener("mouseup", this.eventListener);
-    //   element.addEventListener("click", this.eventListener);
-    //   element.addEventListener("focus", this.eventListener);
-    //   element.addEventListener("blur", this.eventListener);
-    // }
+  public addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void;
+  public addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void {
+    if (!this._events.has(type)) {
+      this._events.add(type);
+      this.selectedPath?.on(type, this.proxyEvent.bind(this));
+    }
+    super.addEventListener(type, listener, options);
   }
 
   /**
-   * Detaches event listeners to the associated `svg` element.
+   * @override
    */
-  private detachListener(): void {
-    // if (this.selection) {
-    //   const el = <SVGGElement>(
-    //     this.selection.selectChild("path.domain").node()
-    //   );
-    //   el.removeEventListener("mouseenter", this.eventListener);
-    //   el.removeEventListener("mouseleave", this.eventListener);
-    //   el.removeEventListener("mousemove", this.eventListener);
-    //   el.removeEventListener("mouseover", this.eventListener);
-    //   el.removeEventListener("mouseout", this.eventListener);
-    //   el.removeEventListener("mousedown", this.eventListener);
-    //   el.removeEventListener("mouseup", this.eventListener);
-    //   el.removeEventListener("click", this.eventListener);
-    //   el.removeEventListener("focus", this.eventListener);
-    //   el.removeEventListener("blur", this.eventListener);
-    // }
+  public removeEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void;
+  public removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void {
+    if (this._events.has(type)) {
+      this._events.delete(type);
+      this.selectedPath?.on(type, null);
+    }
+    super.removeEventListener(type, listener, options);
   }
 
   /**
-   * The associated `svg` element event listener.
+   * Proxy the `event` of the `svg` element to the `hdml` element.
    */
-  private eventListener = (evt: Event) => {
-    switch (evt.type) {
+  private proxyEvent = (event: Event) => {
+    let evt: AxisEvent;
+    let datum: undefined | number;
+    if (event instanceof MouseEvent) {
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      const elemLeft = this.view?.getClientRects()[0].left || 0;
+      const elemTop = this.view?.getClientRects()[0].top || 0;
+      const x = mouseX - elemLeft;
+      const y = mouseY - elemTop;
+      if (this.scale instanceof LinearScaleElement) {
+        if (this.type === DirectionType.Horizontal) {
+          datum = this.scale.scale?.invert(x);
+        } else {
+          datum = this.scale.scale?.invert(y);
+        }
+      }
+    }
+    switch (event.type) {
       case "mouseenter":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseleave":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mousemove":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseover":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseout":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mousedown":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseup":
-        this.dispatchEvent(new MouseEvent(evt.type));
+        evt = new MouseEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
         break;
       case "click":
-        this.dispatchEvent(new PointerEvent(evt.type));
+        evt = new PointerEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
         break;
       case "focus":
-        this.dispatchEvent(new FocusEvent(evt.type));
-        break;
       case "blur":
-        this.dispatchEvent(new FocusEvent(evt.type));
+        evt = new FocusEvent(event.type);
+        this.dispatchEvent(evt);
         break;
     }
   };

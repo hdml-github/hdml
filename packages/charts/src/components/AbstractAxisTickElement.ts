@@ -13,6 +13,13 @@ import {
 } from "./AbstractDirectionElement";
 
 /**
+ * Tick event.
+ */
+type TickEvent = (MouseEvent | PointerEvent | FocusEvent) & {
+  datum?: number | string;
+};
+
+/**
  * The abstract class with the logic that is required to visualize the
  * ticks.
  */
@@ -51,7 +58,7 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
         .selectAll<BaseType, number | string>("g.tick")
         .call((selection) => {
           this._events.forEach((type) => {
-            selection.on(type, this.proxyEvent);
+            selection.on(type, this.proxyEvent.bind(this));
           });
         });
     }
@@ -169,7 +176,7 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       .attr("transform", this.getTransform.bind(this))
       .call((selection) => {
         this._events.forEach((type) => {
-          selection.on(type, this.proxyEvent);
+          selection.on(type, this.proxyEvent.bind(this));
         });
         this.appendTick(selection);
       });
@@ -496,45 +503,32 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   }
 
   /**
-   * The associated `svg` element event listener.
+   * Proxy the `event` of the `svg` element to the `hdml` element.
    */
-  private proxyEvent = (evt: Event, dat: number | string) => {
-    type TickEvent = (MouseEvent | PointerEvent | FocusEvent) & {
-      point?: number | string;
-    };
-    let event: TickEvent;
-    switch (evt.type) {
+  private proxyEvent = (event: Event, datum: number | string) => {
+    let evt: TickEvent;
+    switch (event.type) {
       case "mouseenter":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseleave":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mousemove":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseover":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseout":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mousedown":
-        this.dispatchEvent(new MouseEvent(evt.type));
-        break;
       case "mouseup":
-        this.dispatchEvent(new MouseEvent(evt.type));
+        evt = new MouseEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
         break;
       case "click":
-        event = new PointerEvent(evt.type);
-        event.point = dat;
-        this.dispatchEvent(event);
+        evt = new PointerEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
         break;
       case "focus":
-        this.dispatchEvent(new FocusEvent(evt.type));
-        break;
       case "blur":
-        this.dispatchEvent(new FocusEvent(evt.type));
+        evt = new FocusEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
         break;
     }
   };
