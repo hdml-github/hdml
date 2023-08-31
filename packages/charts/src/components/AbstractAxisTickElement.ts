@@ -147,7 +147,10 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
         }
       } else if (this.scale instanceof OrdinalScaleElement) {
         if (this.values) {
-          values = this.values;
+          const scale = this.scale.scale;
+          values = (<string[]>this.values).filter(
+            (el: string) => scale.domain().indexOf(el) >= 0,
+          );
         } else if (this.count) {
           values = this.scale.scale.domain().slice(0, this.count);
         } else {

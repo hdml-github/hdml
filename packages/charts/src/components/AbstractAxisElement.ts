@@ -190,21 +190,12 @@ export abstract class AbstractAxisElement extends AbstractDirectionElement {
    */
   private proxyEvent = (event: Event) => {
     let evt: AxisEvent;
-    let datum: undefined | number;
-    if (event instanceof MouseEvent) {
-      const mouseX = event.clientX;
-      const mouseY = event.clientY;
-      const elemLeft = this.view?.getClientRects()[0].left || 0;
-      const elemTop = this.view?.getClientRects()[0].top || 0;
-      const x = mouseX - elemLeft;
-      const y = mouseY - elemTop;
-      if (this.scale instanceof LinearScaleElement) {
-        if (this.type === DirectionType.Horizontal) {
-          datum = this.scale.scale?.invert(x);
-        } else {
-          datum = this.scale.scale?.invert(y);
-        }
-      }
+    let datum: undefined | number | string;
+    if (
+      event instanceof MouseEvent ||
+      event instanceof PointerEvent
+    ) {
+      datum = this.getDatum(event.clientX, event.clientY);
     }
     switch (event.type) {
       case "mouseenter":
@@ -230,4 +221,41 @@ export abstract class AbstractAxisElement extends AbstractDirectionElement {
         break;
     }
   };
+
+  /**
+   * Returns the datum associated with a point on an axis.
+   */
+  private getDatum(
+    mouseX: number,
+    mouseY: number,
+  ): undefined | string | number {
+    let datum: undefined | number | string;
+    const elemLeft = this.view?.getClientRects()[0].left || 0;
+    const elemTop = this.view?.getClientRects()[0].top || 0;
+    const x = mouseX - elemLeft;
+    const y = mouseY - elemTop;
+    if (this.scale instanceof LinearScaleElement) {
+      if (this.type === DirectionType.Horizontal) {
+        datum = this.scale.scale?.invert(x);
+      } else {
+        datum = this.scale.scale?.invert(y);
+      }
+    } else if (this.scale instanceof OrdinalScaleElement) {
+      const domain = this.scale.scale?.domain() || [];
+      const step = this.scale.scale?.step() || 0;
+      const range = this.scale.scale?.range() || [0, 0];
+      if (this.type === DirectionType.Horizontal) {
+        const index = Math.round(
+          (x - range[0] - this.scale.tracked.paddingLeft) / step,
+        );
+        datum = domain.slice(0).reverse()[index];
+      } else {
+        const index = Math.round(
+          (y - range[1] - this.scale.tracked.paddingTop) / step,
+        );
+        datum = domain.slice(0).reverse()[index];
+      }
+    }
+    return datum;
+  }
 }

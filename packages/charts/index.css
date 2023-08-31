@@ -24,7 +24,7 @@ polar-plane {
 
 /* HDML SCALE */
 ordinal-scale {
-  padding: 15px 0;
+  padding: 45px 0 45px 0;
 }
 linear-scale {
   padding: 0 15px;

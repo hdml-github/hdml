@@ -279,6 +279,7 @@ export class OrdinalScaleElement extends AbstractScaleElement {
       if (this.rest) {
         domain.push(this.rest);
       }
+      const div = domain.length - 1 || 1;
       let fp = 0;
       let op = 0;
       let al = 0;
@@ -286,12 +287,12 @@ export class OrdinalScaleElement extends AbstractScaleElement {
       scale.paddingInner(1 - this.bandwidth);
       if (this.dimension === Dimension.X) {
         fp = this.tracked.paddingLeft + this.tracked.paddingRight;
-        op = fp / (2 * (scale.step() - fp / domain.length));
+        op = fp / (2 * (scale.step() - fp / div));
         al = fp ? this.tracked.paddingLeft / fp : 0.5;
       }
       if (this.dimension === Dimension.Y) {
         fp = this.tracked.paddingTop + this.tracked.paddingBottom;
-        op = fp / (2 * (scale.step() - fp / domain.length));
+        op = fp / (2 * (scale.step() - fp / div));
         al = fp ? this.tracked.paddingTop / fp : 0.5;
       }
       scale.paddingOuter(op);
