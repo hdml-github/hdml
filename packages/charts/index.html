@@ -27,6 +27,7 @@
               values='["t1", "t2", "t3"]'
               rest='null'>
 
+              <!-- X-axis -->
               <horizontal-axis
                 dimension="x"
                 position="bottom">
@@ -38,6 +39,7 @@
                 count="3">
               </horizontal-axis-tick>
 
+              <!-- Y-axis -->
               <vertical-axis
                 dimension="y"
                 position="left">
@@ -48,6 +50,24 @@
                 position="left"
                 values='["t1", "t2", "t3"]'>
               </vertical-axis-tick>
+
+              <!-- Line -->
+              <linear-curve
+                type="closed"
+                x-series='[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]'
+                y-series='["t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t1", "t3"]'>
+              </linear-curve>
+
+              <!--
+                <natural-curve />
+                <linear-curve [type=normal|closed] />
+                <cubic-curve [monotonicity=x|y] />
+                <step-curve[change=before|middle|after] />
+                <bezier-curve [tangents=horizontal|vertical] />
+                <basis-curve [beta=0..1] [type=normal|closed|opened] />
+                <cardinal-curve [tension=0..1] [type=normal|closed|opened] />
+                <catmull-rom-curve [alpha=0..1] [type=normal|closed|opened] />
+              -->
 
             </ordinal-scale>
 
@@ -66,27 +86,36 @@
                 min="0"
                 max="100">
   
+                <!-- X-axis -->
                 <horizontal-axis
                   dimension="x"
-                  position="left">
+                  position="top">
                 </horizontal-axis>
-  
+
                 <horizontal-axis-tick
                   dimension="x"
-                  position="left"
+                  position="top"
                   values='["t1", "t2", "t3"]'>
                 </horizontal-axis-tick>
 
+                <!-- Y-axis -->
                 <vertical-axis
                   dimension="y"
-                  position="bottom">
+                  position="right">
                 </vertical-axis>
-  
+
                 <vertical-axis-tick
                   dimension="y"
-                  position="bottom"
+                  position="right"
                   count="3">
                 </vertical-axis-tick>
+
+                <!-- Line -->
+                <linear-curve
+                  type="closed"
+                  x-series='["t1", "t2", "t3"]'
+                  y-series='[0, 50, 100]'>
+                </linear-curve>
 
               </linear-scale>
 
