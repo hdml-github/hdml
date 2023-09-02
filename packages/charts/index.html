@@ -14,7 +14,7 @@
       <br><br><br>
       My chart:
       <hdml-view>
-        <cartesian-plane>
+        <cartesian-plane class="first">
 
           <linear-scale
             source="?hdml-frame=frame&hdml-field=table"
@@ -55,7 +55,44 @@
           
         </cartesian-plane>
 
-        <polar-plane></polar-plane>
+        <cartesian-plane class="second">
+
+          <ordinal-scale
+              bandwidth="0"
+              values='["t1", "t2", "t3"]'
+              rest='null'>
+
+              <linear-scale
+                min="0"
+                max="100">
+  
+                <horizontal-axis
+                  dimension="x"
+                  position="left">
+                </horizontal-axis>
+  
+                <horizontal-axis-tick
+                  dimension="x"
+                  position="left"
+                  values='["t1", "t2", "t3"]'>
+                </horizontal-axis-tick>
+
+                <vertical-axis
+                  dimension="y"
+                  position="bottom">
+                </vertical-axis>
+  
+                <vertical-axis-tick
+                  dimension="y"
+                  position="bottom"
+                  count="3">
+                </vertical-axis-tick>
+
+              </linear-scale>
+
+          </ordinal-scale>
+          
+        </cartesian-plane>
       </hdml-view>
 
       <script src="/index.js"></script>

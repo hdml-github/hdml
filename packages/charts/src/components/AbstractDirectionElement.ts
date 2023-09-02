@@ -224,11 +224,13 @@ export abstract class AbstractDirectionElement extends AbstractChartElement {
       if (this.type === DirectionType.Horizontal) {
         x = 0;
         y =
+          this.scale.plane.tracked.top +
           this.scale.plane.tracked.paddingTop +
           this.tracked.top +
           this.tracked.lineWidth / 2;
       } else if (this.type === DirectionType.Vertical) {
         x =
+          this.scale.plane.tracked.left +
           this.scale.plane.tracked.paddingLeft +
           this.tracked.left +
           this.tracked.lineWidth / 2;

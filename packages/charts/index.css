@@ -11,23 +11,30 @@ hdml-view {
 }
 
 /* HDML PLANE */
-cartesian-plane {
+cartesian-plane.first {
   width: 50%;
   height: 100%;
-  padding: 25px 75px 25px 75px;
+  padding: 25px 25px 25px 75px;
 }
-polar-plane {
+cartesian-plane.second {
   width: 50%;
   height: 100%;
   left: 50%;
+  padding: 25px 25px 25px 75px;
 }
 
 /* HDML SCALE */
-ordinal-scale {
-  padding: 45px 0 45px 0;
+cartesian-plane.first ordinal-scale {
+  padding: 45px 0;
 }
-linear-scale {
+cartesian-plane.first linear-scale {
   padding: 0 15px;
+}
+cartesian-plane.second ordinal-scale {
+  padding: 0 45px;
+}
+cartesian-plane.second linear-scale {
+  padding: 15px 0;
 }
 
 /* HDML AXIS */
@@ -70,8 +77,6 @@ vertical-axis-tick {
 /* HDML AXIS TICK */
 .blue horizontal-axis-tick,
 .blue vertical-axis-tick {
-  /* --hdml-line-color: rgb(244, 28, 28);
-  --hdml-fill-color: rgb(28, 140, 244); */
   --hdml-line-color: rgb(126, 188, 246);
   --hdml-fill-color: rgb(255, 255, 255);
 }
