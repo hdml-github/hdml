@@ -17,9 +17,8 @@ import "./components/HorizontalAxisElement";
 import "./components/HorizontalAxisTickElement";
 import "./components/VerticalAxisElement";
 import "./components/VerticalAxisTickElement";
-// import "./components/AxisGridElement";
-// import "./components/TickLabelElement";
-// import "./components/AxisTitleElement";
+import "./components/SeriesElement";
+import "./components/DataAreaElement";
 
 (async () => {
   await customElements.whenDefined("hdml-view");
@@ -32,9 +31,12 @@ import "./components/VerticalAxisTickElement";
   await customElements.whenDefined("horizontal-axis-tick");
   await customElements.whenDefined("vertical-axis");
   await customElements.whenDefined("vertical-axis-tick");
-  // await customElements.whenDefined("axis-grid");
-  // await customElements.whenDefined("tick-label");
-  // await customElements.whenDefined("axis-title");
+  await customElements.whenDefined("x-series");
+  await customElements.whenDefined("y-series");
+  await customElements.whenDefined("z-series");
+  await customElements.whenDefined("i-series");
+  await customElements.whenDefined("j-series");
+  await customElements.whenDefined("data-area");
 })().catch((reason) => {
   console.error(reason);
 });

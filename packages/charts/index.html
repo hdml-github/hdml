@@ -15,16 +15,12 @@
       My chart:
       <hdml-view>
         <cartesian-plane class="first">
-
           <linear-scale
-            source="?hdml-frame=frame&hdml-field=table"
             min="0"
             max="100">
-
             <ordinal-scale
               bandwidth="0"
-              source="?hdml-frame=frame&hdml-field=table"
-              values='["t1", "t2", "t3"]'
+              values='["t0", "t1", "t2", "t3"]'
               rest='null'>
 
               <!-- X-axis -->
@@ -32,11 +28,10 @@
                 dimension="x"
                 position="bottom">
               </horizontal-axis>
-
               <horizontal-axis-tick
                 dimension="x"
                 position="bottom"
-                count="3">
+                count="5">
               </horizontal-axis-tick>
 
               <!-- Y-axis -->
@@ -44,44 +39,51 @@
                 dimension="y"
                 position="left">
               </vertical-axis>
-
               <vertical-axis-tick
                 dimension="y"
                 position="left"
-                values='["t1", "t2", "t3"]'>
+                values='["t0", "t1", "t2", "t3"]'>
               </vertical-axis-tick>
 
-              <!-- Line -->
-              <linear-curve
-                type="closed"
-                x-series='[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]'
-                y-series='["t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t1", "t3"]'>
-              </linear-curve>
+              <!-- Dataset visualization -->
+              <x-series values="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]">
+                <y-series values='["t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t1", "t3"]'>
+                  <data-area type="linear"></data-area>
+                  <data-line type="linear"></data-line>
+                  <data-point type="ellipse"></data-point>
+                </y-series>
+                <y-series values='["t3", "t2", "t1", "t2", "t3", "t2", "t1", "t2", "t3", "t1"]'>
+                  <data-area type="linear"></data-area>
+                  <data-line type="linear"></data-line>
+                  <data-point type="ellipse"></data-point>
+                </y-series>
+                <y-series values='["t2", "t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t2"]'>
+                  <data-area type="linear"></data-area>
+                  <data-line type="linear"></data-line>
+                  <data-point type="ellipse"></data-point>
+                </y-series>
+              </x-series>
 
               <!--
-                <natural-curve />
-                <linear-curve [type=normal|closed] />
-                <cubic-curve [monotonicity=x|y] />
-                <step-curve[change=before|middle|after] />
-                <bezier-curve [tangents=horizontal|vertical] />
-                <basis-curve [beta=0..1] [type=normal|closed|opened] />
-                <cardinal-curve [tension=0..1] [type=normal|closed|opened] />
-                <catmull-rom-curve [alpha=0..1] [type=normal|closed|opened] />
+                <curve-natural />
+                <curve-linear [type=normal|closed] />
+                <curve-cubic [monotonicity=x|y] />
+                <curve-step[change=before|middle|after] />
+                <curve-bezier [tangents=horizontal|vertical] />
+                <curve-basis [beta=0..1] [type=normal|closed|opened] />
+                <curve-cardinal [tension=0..1] [type=normal|closed|opened] />
+                <curve-catmull-rom [alpha=0..1] [type=normal|closed|opened] />
               -->
 
             </ordinal-scale>
-
           </linear-scale>
-          
         </cartesian-plane>
 
         <cartesian-plane class="second">
-
           <ordinal-scale
               bandwidth="0"
               values='["t1", "t2", "t3"]'
               rest='null'>
-
               <linear-scale
                 min="0"
                 max="100">
@@ -91,7 +93,6 @@
                   dimension="x"
                   position="top">
                 </horizontal-axis>
-
                 <horizontal-axis-tick
                   dimension="x"
                   position="top"
@@ -103,24 +104,14 @@
                   dimension="y"
                   position="right">
                 </vertical-axis>
-
                 <vertical-axis-tick
                   dimension="y"
                   position="right"
                   count="3">
                 </vertical-axis-tick>
 
-                <!-- Line -->
-                <linear-curve
-                  type="closed"
-                  x-series='["t1", "t2", "t3"]'
-                  y-series='[0, 50, 100]'>
-                </linear-curve>
-
               </linear-scale>
-
           </ordinal-scale>
-          
         </cartesian-plane>
       </hdml-view>
 
