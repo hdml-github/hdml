@@ -27,6 +27,9 @@ type SelectedPath = Selection<
   null,
   undefined
 >;
+type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
+  datum?: [undefined | number | string, undefined | number | string];
+};
 
 /**
  *
@@ -204,6 +207,7 @@ class DataAreaElement extends AbstractChartElement {
   };
 
   private _selectedPath: null | SelectedPath = null;
+  private _events: Set<string> = new Set();
   private _type: AreaType = "natural";
   private _y0: null | number[] | string[] = null;
   private _y1: null | number[] | string[] = null;
@@ -381,6 +385,52 @@ class DataAreaElement extends AbstractChartElement {
   /**
    * @override
    */
+  public addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void;
+  public addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void {
+    if (!this._events.has(type)) {
+      this._events.add(type);
+      this._selectedPath?.on(type, this.proxyEvent.bind(this));
+    }
+    super.addEventListener(type, listener, options);
+  }
+
+  /**
+   * @override
+   */
+  public removeEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void;
+  public removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void {
+    if (this._events.has(type)) {
+      this._events.delete(type);
+      this._selectedPath?.on(type, null);
+    }
+    super.removeEventListener(type, listener, options);
+  }
+
+  /**
+   * @override
+   */
   protected firstUpdated(
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
@@ -476,6 +526,85 @@ class DataAreaElement extends AbstractChartElement {
       return getPathD(array) || "M0,0";
     }
     return "M0,0";
+  }
+
+  /**
+   * Proxy the `event` of the `svg` element to the `hdml` element.
+   */
+  private proxyEvent = (event: Event) => {
+    let evt: AxisEvent;
+    let datum:
+      | undefined
+      | [undefined | number | string, undefined | number | string];
+    if (
+      event instanceof MouseEvent ||
+      event instanceof PointerEvent
+    ) {
+      datum = this.getDatum(event.clientX, event.clientY);
+    }
+    switch (event.type) {
+      case "mouseenter":
+      case "mouseleave":
+      case "mousemove":
+      case "mouseover":
+      case "mouseout":
+      case "mousedown":
+      case "mouseup":
+        evt = new MouseEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
+        break;
+      case "click":
+        evt = new PointerEvent(event.type);
+        evt.datum = datum;
+        this.dispatchEvent(evt);
+        break;
+      case "focus":
+      case "blur":
+        evt = new FocusEvent(event.type);
+        this.dispatchEvent(evt);
+        break;
+    }
+  };
+
+  /**
+   * Returns the datum associated with a point on an axis.
+   */
+  private getDatum(
+    mouseX: number,
+    mouseY: number,
+  ): [undefined | number | string, undefined | number | string] {
+    const datum: [
+      undefined | number | string,
+      undefined | number | string,
+    ] = [undefined, undefined];
+    const elemLeft = this.view?.getClientRects()[0].left || 0;
+    const elemTop = this.view?.getClientRects()[0].top || 0;
+    const x = mouseX - elemLeft;
+    const y = mouseY - elemTop;
+    if (this.scaleX instanceof LinearScaleElement) {
+      datum[0] = this.scaleX.scale?.invert(x);
+    } else if (this.scaleX instanceof OrdinalScaleElement) {
+      const domain = this.scaleX.scale?.domain() || [];
+      const step = this.scaleX.scale?.step() || 0;
+      const range = this.scaleX.scale?.range() || [0, 0];
+      const index = Math.round(
+        (x - range[0] - this.scaleX.tracked.paddingLeft) / step,
+      );
+      datum[0] = domain.slice(0).reverse()[index];
+    }
+    if (this.scaleY instanceof LinearScaleElement) {
+      datum[1] = this.scaleY.scale?.invert(y);
+    } else if (this.scaleY instanceof OrdinalScaleElement) {
+      const domain = this.scaleY.scale?.domain() || [];
+      const step = this.scaleY.scale?.step() || 0;
+      const range = this.scaleY.scale?.range() || [0, 0];
+      const index = Math.round(
+        (y - range[1] - this.scaleY.tracked.paddingTop) / step,
+      );
+      datum[1] = domain.slice(0).reverse()[index];
+    }
+    return datum;
   }
 }
 customElements.define("data-area", DataAreaElement);
