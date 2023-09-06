@@ -4,16 +4,14 @@
  * @license Apache-2.0
  */
 
-import { area } from "d3";
+import { area, type Selection } from "d3";
 import { lit } from "@hdml/elements";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { Dimension } from "./AbstractScaleElement";
 import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
-import { SeriesElement } from "./SeriesElement";
 
-export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-
+type ScaleElement = OrdinalScaleElement | LinearScaleElement;
 type AreaType =
   | "natural"
   | "linear"
@@ -23,6 +21,12 @@ type AreaType =
   | "basis"
   | "cardinal"
   | "catmull-rom";
+type SelectedPath = Selection<
+  SVGPathElement,
+  unknown,
+  null,
+  undefined
+>;
 
 /**
  *
@@ -92,9 +96,118 @@ class DataAreaElement extends AbstractChartElement {
         },
       },
     },
+
+    /**
+     * The `x` property definition.
+     */
+    x: {
+      type: Array,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): null | number[] | string[] => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (!Array.isArray(val)) {
+                return null;
+              } else {
+                return val as number[] | string[];
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: null | number[] | string[]): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
+
+    /**
+     * The `y0` property definition.
+     */
+    y0: {
+      type: Array,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): null | number[] | string[] => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (!Array.isArray(val)) {
+                return null;
+              } else {
+                return val as number[] | string[];
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: null | number[] | string[]): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
+
+    /**
+     * The `y1` property definition.
+     */
+    y1: {
+      type: Array,
+      attribute: true,
+      reflect: true,
+      noAccessor: true,
+      state: false,
+      converter: {
+        fromAttribute: (
+          value: string,
+        ): null | number[] | string[] => {
+          if (!value) {
+            return null;
+          } else {
+            try {
+              const val = <unknown>JSON.parse(value);
+              if (!Array.isArray(val)) {
+                return null;
+              } else {
+                return val as number[] | string[];
+              }
+            } catch (err) {
+              console.error(err);
+              return null;
+            }
+          }
+        },
+        toAttribute: (value: null | number[] | string[]): string => {
+          return value === null ? "" : JSON.stringify(value);
+        },
+      },
+    },
   };
 
+  private _selectedPath: null | SelectedPath = null;
   private _type: AreaType = "natural";
+  private _y0: null | number[] | string[] = null;
+  private _y1: null | number[] | string[] = null;
+  private _x: null | number[] | string[] = null;
 
   /**
    * @implements
@@ -148,48 +261,6 @@ class DataAreaElement extends AbstractChartElement {
   }
 
   /**
-   * X series.
-   */
-  public get seriesX(): null | SeriesElement {
-    let cnt = 0;
-    let parent: null | HTMLElement | SeriesElement =
-      this.parentElement;
-    while (parent && cnt <= 5) {
-      if (
-        parent instanceof SeriesElement &&
-        parent.tagName.toLowerCase() === "x-series"
-      ) {
-        return parent;
-      } else {
-        cnt++;
-        parent = parent.parentElement;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Y series.
-   */
-  public get seriesY(): null | SeriesElement {
-    let cnt = 0;
-    let parent: null | HTMLElement | SeriesElement =
-      this.parentElement;
-    while (parent && cnt <= 5) {
-      if (
-        parent instanceof SeriesElement &&
-        parent.tagName.toLowerCase() === "y-series"
-      ) {
-        return parent;
-      } else {
-        cnt++;
-        parent = parent.parentElement;
-      }
-    }
-    return null;
-  }
-
-  /**
    * @override
    */
   public set type(val: AreaType) {
@@ -211,6 +282,85 @@ class DataAreaElement extends AbstractChartElement {
   }
 
   /**
+   * The `x` attribute.
+   */
+  public set x(val: null | number[] | string[]) {
+    const attr = this.getAttribute("x");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("x", sval);
+    }
+    const old = this._x;
+    this._x = val;
+    this.requestUpdate("x", old);
+  }
+
+  /**
+   * The `x` attribute.
+   */
+  public get x(): null | number[] | string[] {
+    return this._x;
+  }
+
+  /**
+   * The `y0` attribute.
+   */
+  public set y0(val: null | number[] | string[]) {
+    const attr = this.getAttribute("y0");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("y0", sval);
+    }
+    const old = this._y0;
+    this._y0 = val;
+    this.requestUpdate("y0", old);
+  }
+
+  /**
+   * The `y0` attribute.
+   */
+  public get y0(): null | number[] | string[] {
+    return this._y0;
+  }
+
+  /**
+   * The `y1` attribute.
+   */
+  public set y1(val: null | number[] | string[]) {
+    const attr = this.getAttribute("y1");
+    const sval = val === null ? "" : JSON.stringify(val);
+    if (attr !== sval) {
+      this.setAttribute("y1", sval);
+    }
+    const old = this._y1;
+    this._y1 = val;
+    this.requestUpdate("y1", old);
+  }
+
+  /**
+   * The `y1` attribute.
+   */
+  public get y1(): null | number[] | string[] {
+    return this._y1;
+  }
+
+  /**
+   * @override
+   */
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this.renderGeometry();
+  }
+
+  /**
+   * @override
+   */
+  public disconnectedCallback(): void {
+    this._selectedPath?.remove();
+    super.disconnectedCallback();
+  }
+
+  /**
    * @override
    */
   public shouldUpdate(
@@ -218,7 +368,10 @@ class DataAreaElement extends AbstractChartElement {
   ): boolean {
     if (
       changedProperties.has("_force") ||
-      changedProperties.has("type")
+      changedProperties.has("type") ||
+      changedProperties.has("y0") ||
+      changedProperties.has("y1") ||
+      changedProperties.has("x")
     ) {
       return true;
     }
@@ -236,6 +389,21 @@ class DataAreaElement extends AbstractChartElement {
     if (attrType !== svalType) {
       this.setAttribute("type", svalType);
     }
+    const attrX = this.getAttribute("x");
+    const svalX = JSON.stringify(this.x);
+    if (attrX !== svalX) {
+      this.setAttribute("x", svalX);
+    }
+    const attrY0 = this.getAttribute("y0");
+    const svalY0 = JSON.stringify(this.y0);
+    if (attrY0 !== svalY0) {
+      this.setAttribute("y0", svalY0);
+    }
+    const attrY1 = this.getAttribute("y1");
+    const svalY1 = JSON.stringify(this.y1);
+    if (attrY1 !== svalY1) {
+      this.setAttribute("y1", svalY1);
+    }
     super.firstUpdated(changedProperties);
   }
 
@@ -243,12 +411,20 @@ class DataAreaElement extends AbstractChartElement {
    * @implements
    */
   protected renderGeometry(): void {
-    if (this.view?.svg) {
-      this.view.svg
+    if (this.view?.svg && !this._selectedPath) {
+      this._selectedPath = this.view.svg
         .append("path")
         .attr("id", `_${this.uid}`)
         .attr("tabindex", "-1")
         .attr("d", this.getPathD());
+    } else if (this.view?.svg && this._selectedPath) {
+      this.view.svg.insert(() => {
+        if (this._selectedPath) {
+          return this._selectedPath.node();
+        } else {
+          return null;
+        }
+      });
     }
   }
 
@@ -256,42 +432,48 @@ class DataAreaElement extends AbstractChartElement {
    * @implements
    */
   protected updateGeometry(): void {
-    //
+    if (this._selectedPath) {
+      this._selectedPath.attr("d", this.getPathD());
+    }
   }
 
+  /**
+   * Returns area path `d` property value.
+   */
   private getPathD(): string {
     if (
       this.scaleX &&
       this.scaleX.scale &&
-      this.seriesX &&
-      this.seriesX.values &&
       this.scaleY &&
       this.scaleY.scale &&
-      this.seriesY &&
-      this.seriesY.values
+      this.x &&
+      this.y0 &&
+      this.y1
     ) {
-      const xLength = this.seriesX.values.length;
-      const yLength = this.seriesY.values.length;
-      const length = xLength <= yLength ? xLength : yLength;
-      const dataset: [number, number][] = [];
-      for (let i = 0; i <= length; i++) {
-        const xVal = <string & { valueOf(): number }>(
-          this.seriesX.values[i]
+      const scaleX = this.scaleX.scale;
+      const scaleY = this.scaleY.scale;
+      const x = this.x;
+      const y0 = this.y0;
+      const y1 = this.y1;
+      const length = Math.max(
+        this.x.length,
+        this.y0.length,
+        this.y1.length,
+      );
+      const array = new Array<[number, number]>(length);
+      const getPathD = area()
+        .x(
+          (_, i) => scaleX(<string & { valueOf(): number }>x[i]) || 0,
+        )
+        .y0(
+          (_, i) =>
+            scaleY(<string & { valueOf(): number }>y0[i]) || 0,
+        )
+        .y1(
+          (_, i) =>
+            scaleY(<string & { valueOf(): number }>y1[i]) || 0,
         );
-        const yVal = <string & { valueOf(): number }>(
-          this.seriesY.values[i]
-        );
-        const x = this.scaleX.scale(xVal) || 0;
-        const y = this.scaleX.scale(yVal) || 0;
-        dataset.push([x, y]);
-      }
-      const y0 =
-        this.scaleX.scale(<string & { valueOf(): number }>"t0") || 0;
-      const _area = area<[number, number]>()
-        .x((el) => el[0])
-        .y0(() => y0)
-        .y1((el) => el[1]);
-      return _area(dataset) || "M0,0";
+      return getPathD(array) || "M0,0";
     }
     return "M0,0";
   }

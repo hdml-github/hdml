@@ -54,6 +54,13 @@ vertical-axis-tick {
   --hdml-tick-height: 10px;
 }
 
+data-area {
+  --hdml-line-width: 2px;
+  --hdml-line-style: solid;
+  --hdml-line-color: rgb(28, 140, 244);
+  --hdml-fill-color: rgb(126, 188, 246);
+}
+
 /* BLUE THEME ----------------------------------------------- */
 
 /* HDML AXIS */

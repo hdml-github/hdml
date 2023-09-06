@@ -46,23 +46,22 @@
               </vertical-axis-tick>
 
               <!-- Dataset visualization -->
-              <x-series values="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]">
-                <y-series values='["t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t1", "t3"]'>
-                  <data-area type="linear"></data-area>
-                  <data-line type="linear"></data-line>
-                  <data-point type="ellipse"></data-point>
-                </y-series>
-                <y-series values='["t3", "t2", "t1", "t2", "t3", "t2", "t1", "t2", "t3", "t1"]'>
-                  <data-area type="linear"></data-area>
-                  <data-line type="linear"></data-line>
-                  <data-point type="ellipse"></data-point>
-                </y-series>
-                <y-series values='["t2", "t1", "t2", "t3", "t2", "t1", "t2", "t3", "t2", "t2"]'>
-                  <data-area type="linear"></data-area>
-                  <data-line type="linear"></data-line>
-                  <data-point type="ellipse"></data-point>
-                </y-series>
-              </x-series>
+              <data-area
+                type="linear"
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y0='["t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0"]'
+                y1='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-area>
+              <data-line
+                type="linear"
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-line>
+              <data-point
+                type="ellipse"
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-point>
 
               <!--
                 <curve-natural />
@@ -109,6 +108,14 @@
                   position="right"
                   count="3">
                 </vertical-axis-tick>
+
+                <!-- Dataset visualization -->
+                <data-area
+                  type="linear"
+                  x='["t1", "t2", "t3"]'
+                  y0="[25, 15, 30]"
+                  y1="[75, 54, 90]">
+                </data-area>
 
               </linear-scale>
           </ordinal-scale>
