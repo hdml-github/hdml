@@ -6,7 +6,6 @@
 
 import {
   area,
-  curveBasis,
   curveBumpX,
   curveBumpY,
   curveBundle,
