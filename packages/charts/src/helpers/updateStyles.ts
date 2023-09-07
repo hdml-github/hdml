@@ -28,6 +28,21 @@ export type TrackedStyles = {
   tickStyle: "text" | "rect" | "ellipse";
   tickWidth: number;
   tickHeight: number;
+  curveType:
+    | "natural"
+    | "linear"
+    | "cubic"
+    | "step"
+    | "bezier"
+    | "basis"
+    | "cardinal"
+    | "catmull-rom";
+  curveBasisBeta: number /* 0..1 */;
+  curveBezierTangents: "horizontal" | "vertical";
+  curveCardinalTension: number /* 0..1 */;
+  curveCatmullRomAlpha: number /* 0..1 */;
+  curveCubicMonotonicity: "x" | "y";
+  curveStepChange: "before" | "middle" | "after";
 };
 
 /**
@@ -75,7 +90,7 @@ function getSvgSelectorStyles(
     `\t${getSvgStrokeDasharrayStyle(component.tracked)}\n` +
     `\t${getSvgStrokeLinecapStyle(component.tracked)}\n` +
     `\t${getSvgCursorStyle(component.tracked)}\n` +
-    `\t${getSvgOutlineStyle(component.tracked)}\n` +
+    `\t${getSvgOutlineStyle()}\n` +
     `\t${getSvgFontFamilyStyle(component.tracked)}\n` +
     `\t${getSvgFontSizeStyle(component.tracked)}\n` +
     `\t${getSvgFontWeightStyle(component.tracked)}\n` +
@@ -90,7 +105,7 @@ function getSvgCursorStyle(tracked: TrackedStyles): string {
   return `cursor: ${tracked.cursor};`;
 }
 
-function getSvgOutlineStyle(tracked: TrackedStyles): string {
+function getSvgOutlineStyle(): string {
   return "outline: none;";
 }
 

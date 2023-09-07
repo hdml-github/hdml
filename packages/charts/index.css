@@ -55,10 +55,17 @@ vertical-axis-tick {
 }
 
 data-area {
-  --hdml-line-width: 2px;
+  /* --hdml-line-width: 2px; */
   --hdml-line-style: solid;
   --hdml-line-color: rgb(28, 140, 244);
   --hdml-fill-color: rgb(126, 188, 246);
+  --hdml-curve-type: natural; /* natural, linear, cubic, step, bezier, basis, cardinal, catmull-rom */
+  --hdml-curve-cubic-monotonicity: x; /* x, y */
+  --hdml-curve-step-change: before; /* before, middle, after */
+  --hdml-curve-bezier-tangents: horizontal; /* horizontal, vertical */
+  --hdml-curve-basis-beta: 1; /* 0..1 */
+  --hdml-curve-cardinal-tension: 0; /* 0..1 */
+  --hdml-curve-catmull-rom-alpha: 0; /* 0..1 */
 }
 
 /* BLUE THEME ----------------------------------------------- */

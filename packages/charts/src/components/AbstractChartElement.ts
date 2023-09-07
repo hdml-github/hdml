@@ -36,6 +36,13 @@ export abstract class AbstractChartElement extends UnifiedElement {
     tickStyle: "ellipse",
     tickWidth: 5,
     tickHeight: 5,
+    curveType: "linear",
+    curveBasisBeta: 0,
+    curveBezierTangents: "horizontal",
+    curveCardinalTension: 0,
+    curveCatmullRomAlpha: 0,
+    curveCubicMonotonicity: "x",
+    curveStepChange: "middle",
   };
 
   /**
@@ -168,6 +175,81 @@ export abstract class AbstractChartElement extends UnifiedElement {
       get tickHeight(): number {
         return parseFloat(
           self.styles.getPropertyValue("--hdml-tick-height") || "0",
+        );
+      },
+      get curveType():
+        | "natural"
+        | "linear"
+        | "cubic"
+        | "step"
+        | "bezier"
+        | "basis"
+        | "cardinal"
+        | "catmull-rom" {
+        return (
+          <
+            | "natural"
+            | "linear"
+            | "cubic"
+            | "step"
+            | "bezier"
+            | "basis"
+            | "cardinal"
+            | "catmull-rom"
+          >self.styles.getPropertyValue("--hdml-curve-type") ||
+          "linear"
+        );
+      },
+      get curveBasisBeta(): number {
+        const beta = parseFloat(
+          self.styles.getPropertyValue("--hdml-curve-basis-beta") ||
+            "0",
+        );
+        return beta >= 0 && beta <= 1 ? beta : beta < 0 ? 0 : 1;
+      },
+      get curveBezierTangents(): "horizontal" | "vertical" {
+        return (
+          <"horizontal" | "vertical">(
+            self.styles.getPropertyValue(
+              "--hdml-curve-bezier-tangents",
+            )
+          ) || "horizontal"
+        );
+      },
+      get curveCardinalTension(): number {
+        const tension = parseFloat(
+          self.styles.getPropertyValue(
+            "--hdml-curve-cardinal-tension",
+          ) || "0",
+        );
+        return tension >= 0 && tension <= 1
+          ? tension
+          : tension < 0
+          ? 0
+          : 1;
+      },
+      get curveCatmullRomAlpha(): number {
+        const alpha = parseFloat(
+          self.styles.getPropertyValue(
+            "--hdml-curve-catmull-rom-alpha",
+          ) || "0",
+        );
+        return alpha >= 0 && alpha <= 1 ? alpha : alpha < 0 ? 0 : 1;
+      },
+      get curveCubicMonotonicity(): "x" | "y" {
+        return (
+          <"x" | "y">(
+            self.styles.getPropertyValue(
+              "--hdml-curve-cubic-monotonicity",
+            )
+          ) || "x"
+        );
+      },
+      get curveStepChange(): "before" | "middle" | "after" {
+        return (
+          <"before" | "middle" | "after">(
+            self.styles.getPropertyValue("--hdml-curve-step-change")
+          ) || "middle"
         );
       },
     };

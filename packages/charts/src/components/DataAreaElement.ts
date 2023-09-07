@@ -4,7 +4,27 @@
  * @license Apache-2.0
  */
 
-import { area, type Selection } from "d3";
+import {
+  area,
+  curveBasis,
+  curveBumpX,
+  curveBumpY,
+  curveBundle,
+  curveCardinal,
+  curveCatmullRom,
+  curveLinear,
+  curveMonotoneX,
+  curveMonotoneY,
+  curveNatural,
+  curveStep,
+  curveStepAfter,
+  curveStepBefore,
+  type Selection,
+  type CurveFactory,
+  type CurveBundleFactory,
+  type CurveCardinalFactory,
+  type CurveCatmullRomFactory,
+} from "d3";
 import { lit } from "@hdml/elements";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { Dimension } from "./AbstractScaleElement";
@@ -512,6 +532,7 @@ class DataAreaElement extends AbstractChartElement {
       );
       const array = new Array<[number, number]>(length);
       const getPathD = area()
+        .curve(<CurveFactory>this.getCurve())
         .x(
           (_, i) => scaleX(<string & { valueOf(): number }>x[i]) || 0,
         )
@@ -526,6 +547,52 @@ class DataAreaElement extends AbstractChartElement {
       return getPathD(array) || "M0,0";
     }
     return "M0,0";
+  }
+
+  /**
+   * Returns curve factory.
+   */
+  private getCurve():
+    | CurveFactory
+    | CurveBundleFactory
+    | CurveCardinalFactory
+    | CurveCatmullRomFactory {
+    switch (this.tracked.curveType) {
+      case "natural":
+        return curveNatural;
+      case "linear":
+        return curveLinear;
+      case "cubic":
+        if (this.tracked.curveCubicMonotonicity === "y") {
+          return curveMonotoneY;
+        } else {
+          return curveMonotoneX;
+        }
+      case "step":
+        if (this.tracked.curveStepChange === "before") {
+          return curveStepBefore;
+        } else if (this.tracked.curveStepChange === "after") {
+          return curveStepAfter;
+        } else {
+          return curveStep;
+        }
+      case "bezier":
+        if (this.tracked.curveBezierTangents === "vertical") {
+          return curveBumpY;
+        } else {
+          return curveBumpX;
+        }
+      case "basis":
+        return curveBundle.beta(this.tracked.curveBasisBeta);
+      case "cardinal":
+        return curveCardinal.tension(
+          this.tracked.curveCardinalTension,
+        );
+      case "catmull-rom":
+        return curveCatmullRom.alpha(
+          this.tracked.curveCatmullRomAlpha,
+        );
+    }
   }
 
   /**
