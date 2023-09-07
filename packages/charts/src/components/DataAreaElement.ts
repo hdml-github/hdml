@@ -51,7 +51,7 @@ type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
 };
 
 /**
- *
+ * Data area element.
  */
 class DataAreaElement extends AbstractChartElement {
   /**
