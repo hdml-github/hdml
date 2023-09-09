@@ -61,3 +61,15 @@ dataArea.addEventListener("mouseup", eventListener);
 dataArea.addEventListener("click", eventListener);
 dataArea.addEventListener("focus", eventListener);
 dataArea.addEventListener("blur", eventListener);
+
+const dataLine = window.document.querySelector("data-line");
+dataLine.addEventListener("mouseenter", eventListener);
+dataLine.addEventListener("mouseleave", eventListener);
+dataLine.addEventListener("mousemove", eventListener);
+dataLine.addEventListener("mouseover", eventListener);
+dataLine.addEventListener("mouseout", eventListener);
+dataLine.addEventListener("mousedown", eventListener);
+dataLine.addEventListener("mouseup", eventListener);
+dataLine.addEventListener("click", eventListener);
+dataLine.addEventListener("focus", eventListener);
+dataLine.addEventListener("blur", eventListener);

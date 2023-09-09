@@ -17,6 +17,8 @@ import "./components/HorizontalAxisTickElement";
 import "./components/VerticalAxisElement";
 import "./components/VerticalAxisTickElement";
 import "./components/DataAreaElement";
+import "./components/DataLineElement";
+import "./components/DataPointElement";
 
 (async () => {
   await customElements.whenDefined("hdml-view");
@@ -30,6 +32,8 @@ import "./components/DataAreaElement";
   await customElements.whenDefined("vertical-axis");
   await customElements.whenDefined("vertical-axis-tick");
   await customElements.whenDefined("data-area");
+  await customElements.whenDefined("data-line");
+  await customElements.whenDefined("data-point");
 })().catch((reason) => {
   console.error(reason);
 });

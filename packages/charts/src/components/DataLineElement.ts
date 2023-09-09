@@ -5,7 +5,7 @@
  */
 
 import {
-  area,
+  line,
   curveBumpX,
   curveBumpY,
   curveBundle,
@@ -42,9 +42,9 @@ type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
 };
 
 /**
- * Data area element.
+ * Data line element.
  */
-class DataAreaElement extends AbstractChartElement {
+class DataLineElement extends AbstractChartElement {
   /**
    * Component styles.
    */
@@ -110,44 +110,9 @@ class DataAreaElement extends AbstractChartElement {
     },
 
     /**
-     * The `y0` property definition.
+     * The `y` property definition.
      */
-    y0: {
-      type: Array,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): null | number[] | string[] => {
-          if (!value) {
-            return null;
-          } else {
-            try {
-              const val = <unknown>JSON.parse(value);
-              if (!Array.isArray(val)) {
-                return null;
-              } else {
-                return val as number[] | string[];
-              }
-            } catch (err) {
-              console.error(err);
-              return null;
-            }
-          }
-        },
-        toAttribute: (value: null | number[] | string[]): string => {
-          return value === null ? "" : JSON.stringify(value);
-        },
-      },
-    },
-
-    /**
-     * The `y1` property definition.
-     */
-    y1: {
+    y: {
       type: Array,
       attribute: true,
       reflect: true,
@@ -182,8 +147,7 @@ class DataAreaElement extends AbstractChartElement {
 
   private _selectedPath: null | SelectedPath = null;
   private _events: Set<string> = new Set();
-  private _y0: null | number[] | string[] = null;
-  private _y1: null | number[] | string[] = null;
+  private _y: null | number[] | string[] = null;
   private _x: null | number[] | string[] = null;
 
   /**
@@ -259,45 +223,24 @@ class DataAreaElement extends AbstractChartElement {
   }
 
   /**
-   * The `y0` attribute.
+   * The `y` attribute.
    */
-  public set y0(val: null | number[] | string[]) {
-    const attr = this.getAttribute("y0");
+  public set y(val: null | number[] | string[]) {
+    const attr = this.getAttribute("y");
     const sval = val === null ? "" : JSON.stringify(val);
     if (attr !== sval) {
-      this.setAttribute("y0", sval);
+      this.setAttribute("y", sval);
     }
-    const old = this._y0;
-    this._y0 = val;
-    this.requestUpdate("y0", old);
+    const old = this._y;
+    this._y = val;
+    this.requestUpdate("y", old);
   }
 
   /**
-   * The `y0` attribute.
+   * The `y` attribute.
    */
-  public get y0(): null | number[] | string[] {
-    return this._y0;
-  }
-
-  /**
-   * The `y1` attribute.
-   */
-  public set y1(val: null | number[] | string[]) {
-    const attr = this.getAttribute("y1");
-    const sval = val === null ? "" : JSON.stringify(val);
-    if (attr !== sval) {
-      this.setAttribute("y1", sval);
-    }
-    const old = this._y1;
-    this._y1 = val;
-    this.requestUpdate("y1", old);
-  }
-
-  /**
-   * The `y1` attribute.
-   */
-  public get y1(): null | number[] | string[] {
-    return this._y1;
+  public get y(): null | number[] | string[] {
+    return this._y;
   }
 
   /**
@@ -324,8 +267,7 @@ class DataAreaElement extends AbstractChartElement {
   ): boolean {
     if (
       changedProperties.has("_force") ||
-      changedProperties.has("y0") ||
-      changedProperties.has("y1") ||
+      changedProperties.has("y") ||
       changedProperties.has("x")
     ) {
       return true;
@@ -390,15 +332,10 @@ class DataAreaElement extends AbstractChartElement {
     if (attrX !== svalX) {
       this.setAttribute("x", svalX);
     }
-    const attrY0 = this.getAttribute("y0");
-    const svalY0 = JSON.stringify(this.y0);
-    if (attrY0 !== svalY0) {
-      this.setAttribute("y0", svalY0);
-    }
-    const attrY1 = this.getAttribute("y1");
-    const svalY1 = JSON.stringify(this.y1);
-    if (attrY1 !== svalY1) {
-      this.setAttribute("y1", svalY1);
+    const attrY = this.getAttribute("y");
+    const svalY = JSON.stringify(this.y);
+    if (attrY !== svalY) {
+      this.setAttribute("y", svalY);
     }
     super.firstUpdated(changedProperties);
   }
@@ -443,32 +380,21 @@ class DataAreaElement extends AbstractChartElement {
       this.scaleY &&
       this.scaleY.scale &&
       this.x &&
-      this.y0 &&
-      this.y1
+      this.y
     ) {
       const scaleX = this.scaleX.scale;
       const scaleY = this.scaleY.scale;
       const x = this.x;
-      const y0 = this.y0;
-      const y1 = this.y1;
-      const length = Math.max(
-        this.x.length,
-        this.y0.length,
-        this.y1.length,
-      );
+      const y = this.y;
+      const length = Math.max(this.x.length, this.y.length);
       const array = new Array<[number, number]>(length);
-      const getPathD = area()
+      const getPathD = line()
         .curve(<CurveFactory>this.getCurve())
         .x(
           (_, i) => scaleX(<string & { valueOf(): number }>x[i]) || 0,
         )
-        .y0(
-          (_, i) =>
-            scaleY(<string & { valueOf(): number }>y0[i]) || 0,
-        )
-        .y1(
-          (_, i) =>
-            scaleY(<string & { valueOf(): number }>y1[i]) || 0,
+        .y(
+          (_, i) => scaleY(<string & { valueOf(): number }>y[i]) || 0,
         );
       return getPathD(array) || "M0,0";
     }
@@ -600,4 +526,4 @@ class DataAreaElement extends AbstractChartElement {
     return datum;
   }
 }
-customElements.define("data-area", DataAreaElement);
+customElements.define("data-line", DataLineElement);

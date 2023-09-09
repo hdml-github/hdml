@@ -283,7 +283,6 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
     return this._values;
   }
 }
-
 customElements.define(
   "horizontal-axis-tick",
   HorizontalAxisTickElement,

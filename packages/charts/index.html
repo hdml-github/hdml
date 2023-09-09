@@ -12,7 +12,7 @@
   </head>
     <body class="blue">
       <br><br><br>
-      My chart:
+      My charts:
       <hdml-view>
         <cartesian-plane class="first">
           <linear-scale
@@ -31,7 +31,7 @@
               <horizontal-axis-tick
                 dimension="x"
                 position="bottom"
-                count="5">
+                count="11">
               </horizontal-axis-tick>
 
               <!-- Y-axis -->
@@ -97,11 +97,18 @@
 
                 <!-- Dataset visualization -->
                 <data-area
-                  type="linear"
                   x='["t1", "t2", "t3"]'
                   y0="[25, 15, 30]"
                   y1="[75, 54, 90]">
                 </data-area>
+                <data-line
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-line>
+                <data-point
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-point>
 
               </linear-scale>
           </ordinal-scale>

@@ -4,26 +4,7 @@
  * @license Apache-2.0
  */
 
-import {
-  area,
-  curveBumpX,
-  curveBumpY,
-  curveBundle,
-  curveCardinal,
-  curveCatmullRom,
-  curveLinear,
-  curveMonotoneX,
-  curveMonotoneY,
-  curveNatural,
-  curveStep,
-  curveStepAfter,
-  curveStepBefore,
-  type Selection,
-  type CurveFactory,
-  type CurveBundleFactory,
-  type CurveCardinalFactory,
-  type CurveCatmullRomFactory,
-} from "d3";
+import { type Selection, type EnterElement, type BaseType } from "d3";
 import { lit } from "@hdml/elements";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { Dimension } from "./AbstractScaleElement";
@@ -31,8 +12,8 @@ import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 
 type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-type SelectedPath = Selection<
-  SVGPathElement,
+export type SelectedGroup = Selection<
+  SVGGElement,
   unknown,
   null,
   undefined
@@ -42,9 +23,9 @@ type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
 };
 
 /**
- * Data area element.
+ * Data line element.
  */
-class DataAreaElement extends AbstractChartElement {
+class DataPointElement extends AbstractChartElement {
   /**
    * Component styles.
    */
@@ -110,44 +91,9 @@ class DataAreaElement extends AbstractChartElement {
     },
 
     /**
-     * The `y0` property definition.
+     * The `y` property definition.
      */
-    y0: {
-      type: Array,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): null | number[] | string[] => {
-          if (!value) {
-            return null;
-          } else {
-            try {
-              const val = <unknown>JSON.parse(value);
-              if (!Array.isArray(val)) {
-                return null;
-              } else {
-                return val as number[] | string[];
-              }
-            } catch (err) {
-              console.error(err);
-              return null;
-            }
-          }
-        },
-        toAttribute: (value: null | number[] | string[]): string => {
-          return value === null ? "" : JSON.stringify(value);
-        },
-      },
-    },
-
-    /**
-     * The `y1` property definition.
-     */
-    y1: {
+    y: {
       type: Array,
       attribute: true,
       reflect: true,
@@ -180,17 +126,17 @@ class DataAreaElement extends AbstractChartElement {
     },
   };
 
-  private _selectedPath: null | SelectedPath = null;
+  private _group: null | SelectedGroup = null;
+  private _style: null | "text" | "rect" | "ellipse" = null;
   private _events: Set<string> = new Set();
-  private _y0: null | number[] | string[] = null;
-  private _y1: null | number[] | string[] = null;
+  private _y: null | number[] | string[] = null;
   private _x: null | number[] | string[] = null;
 
   /**
    * @implements
    */
   protected get geometrySelector(): null | string {
-    return `:host > svg path#_${this.uid}`;
+    return `:host > svg g#_${this.uid} g.point`;
   }
 
   /**
@@ -259,45 +205,24 @@ class DataAreaElement extends AbstractChartElement {
   }
 
   /**
-   * The `y0` attribute.
+   * The `y` attribute.
    */
-  public set y0(val: null | number[] | string[]) {
-    const attr = this.getAttribute("y0");
+  public set y(val: null | number[] | string[]) {
+    const attr = this.getAttribute("y");
     const sval = val === null ? "" : JSON.stringify(val);
     if (attr !== sval) {
-      this.setAttribute("y0", sval);
+      this.setAttribute("y", sval);
     }
-    const old = this._y0;
-    this._y0 = val;
-    this.requestUpdate("y0", old);
+    const old = this._y;
+    this._y = val;
+    this.requestUpdate("y", old);
   }
 
   /**
-   * The `y0` attribute.
+   * The `y` attribute.
    */
-  public get y0(): null | number[] | string[] {
-    return this._y0;
-  }
-
-  /**
-   * The `y1` attribute.
-   */
-  public set y1(val: null | number[] | string[]) {
-    const attr = this.getAttribute("y1");
-    const sval = val === null ? "" : JSON.stringify(val);
-    if (attr !== sval) {
-      this.setAttribute("y1", sval);
-    }
-    const old = this._y1;
-    this._y1 = val;
-    this.requestUpdate("y1", old);
-  }
-
-  /**
-   * The `y1` attribute.
-   */
-  public get y1(): null | number[] | string[] {
-    return this._y1;
+  public get y(): null | number[] | string[] {
+    return this._y;
   }
 
   /**
@@ -312,7 +237,7 @@ class DataAreaElement extends AbstractChartElement {
    * @override
    */
   public disconnectedCallback(): void {
-    this._selectedPath?.remove();
+    this._group?.remove();
     super.disconnectedCallback();
   }
 
@@ -324,8 +249,7 @@ class DataAreaElement extends AbstractChartElement {
   ): boolean {
     if (
       changedProperties.has("_force") ||
-      changedProperties.has("y0") ||
-      changedProperties.has("y1") ||
+      changedProperties.has("y") ||
       changedProperties.has("x")
     ) {
       return true;
@@ -351,7 +275,7 @@ class DataAreaElement extends AbstractChartElement {
   ): void {
     if (!this._events.has(type)) {
       this._events.add(type);
-      this._selectedPath?.on(type, this.proxyEvent.bind(this));
+      //
     }
     super.addEventListener(type, listener, options);
   }
@@ -374,7 +298,7 @@ class DataAreaElement extends AbstractChartElement {
   ): void {
     if (this._events.has(type)) {
       this._events.delete(type);
-      this._selectedPath?.on(type, null);
+      //
     }
     super.removeEventListener(type, listener, options);
   }
@@ -390,15 +314,10 @@ class DataAreaElement extends AbstractChartElement {
     if (attrX !== svalX) {
       this.setAttribute("x", svalX);
     }
-    const attrY0 = this.getAttribute("y0");
-    const svalY0 = JSON.stringify(this.y0);
-    if (attrY0 !== svalY0) {
-      this.setAttribute("y0", svalY0);
-    }
-    const attrY1 = this.getAttribute("y1");
-    const svalY1 = JSON.stringify(this.y1);
-    if (attrY1 !== svalY1) {
-      this.setAttribute("y1", svalY1);
+    const attrY = this.getAttribute("y");
+    const svalY = JSON.stringify(this.y);
+    if (attrY !== svalY) {
+      this.setAttribute("y", svalY);
     }
     super.firstUpdated(changedProperties);
   }
@@ -407,16 +326,49 @@ class DataAreaElement extends AbstractChartElement {
    * @implements
    */
   protected renderGeometry(): void {
-    if (this.view?.svg && !this._selectedPath) {
-      this._selectedPath = this.view.svg
-        .append("path")
-        .attr("id", `_${this.uid}`)
-        .attr("tabindex", "-1")
-        .attr("d", this.getPathD());
-    } else if (this.view?.svg && this._selectedPath) {
+    this.renderGroup();
+  }
+
+  /**
+   * @implements
+   */
+  protected updateGeometry(): void {
+    if (this._group && this.x && this.y) {
+      if (this._style !== this.tracked.tickStyle) {
+        this.removePoints();
+      }
+      const x = this.x;
+      const y = this.y;
+      const length = Math.max(x.length, y.length);
+      const data: (string | number)[][] = [];
+      for (let i = 0; i < length; i++) {
+        data.push([x[i], y[i]]);
+      }
+      this._group
+        .selectAll(".point")
+        .data<(string | number)[]>(data)
+        .order()
+        .join(
+          this.enterPoints.bind(this),
+          this.updatePoints.bind(this),
+          this.exitPoints.bind(this),
+        );
+      this._style = this.tracked.tickStyle;
+    }
+  }
+
+  /**
+   * Renders data point `svg` group.
+   */
+  private renderGroup(): void {
+    if (this.view?.svg && !this._group) {
+      this._group = this.view.svg
+        .append("g")
+        .attr("id", `_${this.uid}`);
+    } else if (this.view?.svg) {
       this.view.svg.insert(() => {
-        if (this._selectedPath) {
-          return this._selectedPath.node();
+        if (this._group) {
+          return this._group.node();
         } else {
           return null;
         }
@@ -425,100 +377,305 @@ class DataAreaElement extends AbstractChartElement {
   }
 
   /**
-   * @implements
+   * Removes data points from the view if exists.
    */
-  protected updateGeometry(): void {
-    if (this._selectedPath) {
-      this._selectedPath.attr("d", this.getPathD());
+  private removePoints(): void {
+    if (this._group) {
+      this._group
+        .selectAll("g.point")
+        .call((selection) => {
+          this._events.forEach((type) => {
+            selection.on(type, null);
+          });
+        })
+        .remove();
     }
   }
 
   /**
-   * Returns area path `d` property value.
+   * Renders new data points.
    */
-  private getPathD(): string {
+  private enterPoints(
+    enter: Selection<
+      EnterElement,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ): Selection<
+    SVGGElement,
+    (string | number)[],
+    SVGGElement,
+    unknown
+  > {
+    return enter
+      .append("g")
+      .attr("class", "point")
+      .attr("tabindex", "-1")
+      .attr("transform", this.getPointTranslation.bind(this))
+      .call((selection) => {
+        this._events.forEach((type) => {
+          selection.on(type, this.proxyEvent.bind(this));
+        });
+        this.appendPoint(selection);
+      });
+  }
+
+  /**
+   * Updates existing data points.
+   */
+  private updatePoints(
+    update: Selection<
+      BaseType,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ): Selection<BaseType, (string | number)[], SVGGElement, unknown> {
+    return update
+      .attr("transform", this.getPointTranslation.bind(this))
+      .call((selection) => {
+        this.updatePoint(selection);
+      });
+  }
+
+  /**
+   * Removes data points that are related with the removed data.
+   */
+  private exitPoints(
+    exit: Selection<BaseType, string | number, SVGGElement, unknown>,
+  ): Selection<BaseType, string | number, SVGGElement, unknown> {
+    return exit
+      .call((selection) => {
+        this._events.forEach((type) => {
+          selection.on(type, null);
+        });
+      })
+      .remove();
+  }
+
+  /**
+   * Returns data point group traslate propperty.
+   */
+  private getPointTranslation(d: (number | string)[]): string {
+    let deltaX = 0;
+    let deltaY = 0;
     if (
-      this.scaleX &&
-      this.scaleX.scale &&
-      this.scaleY &&
-      this.scaleY.scale &&
-      this.x &&
-      this.y0 &&
-      this.y1
+      this.isConnected &&
+      this.scaleX?.scale &&
+      this.scaleY?.scale
     ) {
-      const scaleX = this.scaleX.scale;
-      const scaleY = this.scaleY.scale;
-      const x = this.x;
-      const y0 = this.y0;
-      const y1 = this.y1;
-      const length = Math.max(
-        this.x.length,
-        this.y0.length,
-        this.y1.length,
-      );
-      const array = new Array<[number, number]>(length);
-      const getPathD = area()
-        .curve(<CurveFactory>this.getCurve())
-        .x(
-          (_, i) => scaleX(<string & { valueOf(): number }>x[i]) || 0,
-        )
-        .y0(
-          (_, i) =>
-            scaleY(<string & { valueOf(): number }>y0[i]) || 0,
-        )
-        .y1(
-          (_, i) =>
-            scaleY(<string & { valueOf(): number }>y1[i]) || 0,
-        );
-      return getPathD(array) || "M0,0";
+      if (this.scaleX instanceof OrdinalScaleElement) {
+        const offs =
+          Math.max(
+            0,
+            this.scaleX.scale.bandwidth() - this.getOffset() * 2,
+          ) / 2;
+        deltaX = this.scaleX.scale(<string>d[0]) || 0;
+        deltaX = deltaX + offs;
+      } else {
+        deltaX = this.scaleX.scale(<number>d[0]) || 0;
+      }
+      if (this.scaleY instanceof OrdinalScaleElement) {
+        const offs =
+          Math.max(
+            0,
+            this.scaleY.scale.bandwidth() - this.getOffset() * 2,
+          ) / 2;
+        deltaY = this.scaleY.scale(<string>d[1]) || 0;
+        deltaY = deltaY + offs;
+      } else {
+        deltaY = this.scaleY.scale(<number>d[1]) || 0;
+      }
     }
-    return "M0,0";
+    return `translate(${deltaX}, ${deltaY})`;
   }
 
   /**
-   * Returns curve factory.
+   * Returns device related offset.
    */
-  private getCurve():
-    | CurveFactory
-    | CurveBundleFactory
-    | CurveCardinalFactory
-    | CurveCatmullRomFactory {
-    switch (this.tracked.curveType) {
-      case "natural":
-        return curveNatural;
-      case "linear":
-        return curveLinear;
-      case "cubic":
-        if (this.tracked.curveCubicMonotonicity === "y") {
-          return curveMonotoneY;
-        } else {
-          return curveMonotoneX;
-        }
-      case "step":
-        if (this.tracked.curveStepChange === "before") {
-          return curveStepBefore;
-        } else if (this.tracked.curveStepChange === "after") {
-          return curveStepAfter;
-        } else {
-          return curveStep;
-        }
-      case "bezier":
-        if (this.tracked.curveBezierTangents === "vertical") {
-          return curveBumpY;
-        } else {
-          return curveBumpX;
-        }
-      case "basis":
-        return curveBundle.beta(this.tracked.curveBasisBeta);
-      case "cardinal":
-        return curveCardinal.tension(
-          this.tracked.curveCardinalTension,
-        );
-      case "catmull-rom":
-        return curveCatmullRom.alpha(
-          this.tracked.curveCatmullRomAlpha,
-        );
+  private getOffset(): number {
+    return typeof window !== "undefined" &&
+      window.devicePixelRatio > 1
+      ? 0
+      : 0; // 0.5;
+  }
+
+  /**
+   * Append tick style.
+   */
+  private appendPoint(
+    selection: Selection<
+      SVGGElement,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ): void {
+    switch (this.tracked.tickStyle) {
+      default:
+      case "ellipse":
+        this.appendEllipse(selection);
+        break;
+      case "rect":
+        this.appendRect(selection);
+        break;
+      case "text":
+        this.appendText(selection);
+        break;
     }
+  }
+
+  /**
+   * Update tick style.
+   */
+  private updatePoint(
+    selection: Selection<
+      BaseType,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ): void {
+    switch (this.tracked.tickStyle) {
+      default:
+      case "ellipse":
+        this.updateEllipse(selection);
+        break;
+      case "rect":
+        this.updateRect(selection);
+        break;
+      case "text":
+        this.updateText(selection);
+        break;
+    }
+  }
+
+  /**
+   * Append ellipse tick.
+   */
+  private appendEllipse(
+    selection: Selection<
+      SVGGElement,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ) {
+    const dx = 0;
+    const dy = 0;
+    selection
+      .append("ellipse")
+      .attr("cx", 0 - dx)
+      .attr("cy", 0 - dy)
+      .attr("rx", this.tracked.tickWidth / 2)
+      .attr("ry", this.tracked.tickHeight / 2);
+  }
+
+  /**
+   * Update ellipse tick.
+   */
+  private updateEllipse(
+    selection: Selection<
+      BaseType,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ): void {
+    const dx = 0;
+    const dy = 0;
+    selection
+      .select("ellipse")
+      .attr("cx", 0 - dx)
+      .attr("cy", 0 - dy)
+      .attr("rx", this.tracked.tickWidth / 2)
+      .attr("ry", this.tracked.tickHeight / 2);
+  }
+
+  /**
+   * Append rect tick.
+   */
+  private appendRect(
+    selection: Selection<
+      SVGGElement,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ) {
+    selection
+      .append("rect")
+      .attr("x", 0 - this.tracked.tickWidth / 2)
+      .attr("y", 0 - this.tracked.tickHeight / 2)
+      .attr("width", this.tracked.tickWidth)
+      .attr("height", this.tracked.tickHeight);
+  }
+
+  /**
+   * Append rect tick.
+   */
+  private updateRect(
+    selection: Selection<
+      BaseType,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ) {
+    const dx = 0;
+    const dy = 0;
+    selection
+      .select("rect")
+      .attr("x", 0 - dx)
+      .attr("y", 0 - dy)
+      .attr("width", this.tracked.tickWidth)
+      .attr("height", this.tracked.tickHeight);
+  }
+
+  /**
+   * Append text tick.
+   */
+  private appendText(
+    selection: Selection<
+      SVGGElement,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ) {
+    const dx = 0;
+    const dy = 0;
+    selection
+      .append("text")
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .attr("x", 0 - dx)
+      .attr("y", 0 - dy)
+      .text((v) => `${v[0]}, ${v[1]}`);
+  }
+
+  /**
+   * Append text tick.
+   */
+  private updateText(
+    selection: Selection<
+      BaseType,
+      (string | number)[],
+      SVGGElement,
+      unknown
+    >,
+  ) {
+    const dx = 0;
+    const dy = 0;
+    selection
+      .select("text")
+      .attr("class", "elm")
+      .attr("text-anchor", "middle")
+      .attr("dominant-baseline", "middle")
+      .attr("x", 0 - dx)
+      .attr("y", 0 - dy)
+      .text((v) => `${v[0]}; ${v[1]}`);
   }
 
   /**
@@ -600,4 +757,4 @@ class DataAreaElement extends AbstractChartElement {
     return datum;
   }
 }
-customElements.define("data-area", DataAreaElement);
+customElements.define("data-point", DataPointElement);

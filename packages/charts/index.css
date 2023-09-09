@@ -54,18 +54,38 @@ vertical-axis-tick {
   --hdml-tick-height: 10px;
 }
 
-data-area {
-  /* --hdml-line-width: 2px; */
+data-line {
+  --hdml-line-width: 5px;
   --hdml-line-style: solid;
   --hdml-line-color: rgb(28, 140, 244);
+  --hdml-curve-type: natural;
+  --hdml-curve-cubic-monotonicity: x;
+  --hdml-curve-step-change: before;
+  --hdml-curve-bezier-tangents: horizontal;
+  --hdml-curve-basis-beta: 1;
+  --hdml-curve-cardinal-tension: 0;
+  --hdml-curve-catmull-rom-alpha: 0;
+}
+
+data-area {
   --hdml-fill-color: rgb(126, 188, 246);
-  --hdml-curve-type: natural; /* natural, linear, cubic, step, bezier, basis, cardinal, catmull-rom */
-  --hdml-curve-cubic-monotonicity: x; /* x, y */
-  --hdml-curve-step-change: before; /* before, middle, after */
-  --hdml-curve-bezier-tangents: horizontal; /* horizontal, vertical */
-  --hdml-curve-basis-beta: 1; /* 0..1 */
-  --hdml-curve-cardinal-tension: 0; /* 0..1 */
-  --hdml-curve-catmull-rom-alpha: 0; /* 0..1 */
+  --hdml-curve-type: natural;
+  --hdml-curve-cubic-monotonicity: x;
+  --hdml-curve-step-change: before;
+  --hdml-curve-bezier-tangents: horizontal;
+  --hdml-curve-basis-beta: 1;
+  --hdml-curve-cardinal-tension: 0;
+  --hdml-curve-catmull-rom-alpha: 0;
+}
+
+data-point {
+  --hdml-line-width: 2px;
+  --hdml-line-style: solid;
+  --hdml-line-color: rgb(28, 140, 244);
+  --hdml-fill-color: rgb(255, 255, 255);
+  --hdml-tick-style: ellipse;
+  --hdml-tick-width: 10px;
+  --hdml-tick-height: 10px;
 }
 
 /* BLUE THEME ----------------------------------------------- */
