@@ -1,0 +1,144 @@
+:root {
+  --theme-line-color: #000;
+  --theme-line-width: 1px;
+  --theme-tick-width: 10px;
+  --theme-tick-height: 10px;
+  --theme-tick-fill: #fff;
+  --theme-area-line: #aaa;
+  --theme-area-fill: #eee;
+  --theme-label-color: #000;
+}
+
+body.blue {
+  --theme-line-color: #1180da;
+  --theme-label-color: #1180da;
+  --theme-area-line: #5daae9;
+  --theme-area-fill: #a1cef3;
+  --theme-tick-fill: #fff;
+}
+
+body.green {
+  --theme-line-color: #079459;
+  --theme-label-color: #079459;
+  --theme-area-line: #3aba84;
+  --theme-area-fill: #7ee6ba;
+  --theme-tick-fill: #fff;
+}
+
+body.bold {
+  --theme-line-width: 2px;
+}
+
+
+body {
+  color: var(--theme-label-color);
+}
+table {
+  width: 100%;
+}
+table, thead, td {
+  border: var(--theme-line-width) solid;
+  border-collapse: collapse;
+}
+thead {
+  font-weight: bold;
+  background-color: var(--theme-area-fill);
+}
+
+/* HDML VIEW */
+hdml-view.all-together,
+hdml-view.all-together-independent {
+  width: 100%;
+  height: calc(100% - 80px);
+}
+
+/* HDML PLANE */
+hdml-view.all-together cartesian-plane {
+  padding: 15px 25px;
+}
+hdml-view.all-together-independent cartesian-plane {
+  padding: 8px 15px 30px 35px;
+}
+
+/* HDML SCALE */
+hdml-view.all-together ordinal-scale {
+  padding: 0 0 0 40px;
+}
+hdml-view.all-together linear-scale {
+  padding: 15px 0;
+}
+
+/* HDML AXIS */
+hdml-view.all-together horizontal-axis,
+hdml-view.all-together vertical-axis,
+hdml-view.all-together-independent horizontal-axis,
+hdml-view.all-together-independent vertical-axis {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-style: solid;
+  --hdml-line-color: var(--theme-line-color);
+}
+
+/* HDML AXIS TICK */
+hdml-view.all-together horizontal-axis-tick,
+hdml-view.all-together vertical-axis-tick,
+hdml-view.all-together-independent horizontal-axis-tick,
+hdml-view.all-together-independent vertical-axis-tick {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-style: solid;
+  --hdml-tick-style: ellipse;
+  --hdml-line-color: var(--theme-line-color);
+  --hdml-tick-width: var(--theme-tick-width);
+  --hdml-tick-height: var(--theme-tick-height);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+
+/* HDML AXIS TICK LABELS */
+hdml-view.all-together horizontal-axis-tick.labels,
+hdml-view.all-together vertical-axis-tick.labels,
+hdml-view.all-together-independent horizontal-axis-tick.labels,
+hdml-view.all-together-independent vertical-axis-tick.labels {
+  --hdml-tick-style: text;
+  --hdml-fill-color: var(--theme-label-color);
+}
+hdml-view.all-together horizontal-axis-tick.labels {
+  top: calc(50% + 20px);
+}
+hdml-view.all-together vertical-axis-tick.labels {
+  left: 25px;
+}
+hdml-view.all-together-independent horizontal-axis-tick.labels {
+  top: calc(100% + 20px);
+}
+hdml-view.all-together-independent vertical-axis-tick.labels {
+  left: -25px;
+}
+
+/* HDML LINES */
+data-line {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-style: solid;
+  --hdml-line-color: var(--theme-line-color);
+  --hdml-curve-type: cardinal;
+  --hdml-curve-cardinal-tension: 0;
+}
+
+/* HDML AREAS */
+data-area {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-style: solid;
+  --hdml-line-color: var(--theme-area-line);
+  --hdml-curve-type: cardinal;
+  --hdml-curve-cardinal-tension: 0;
+  --hdml-fill-color: var(--theme-area-fill);
+}
+
+/* HDML POINTS */
+data-point {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-style: solid;
+  --hdml-tick-style: ellipse;
+  --hdml-line-color: var(--theme-line-color);
+  --hdml-tick-width: var(--theme-tick-width);
+  --hdml-tick-height: var(--theme-tick-height);
+  --hdml-fill-color: rgb(255, 255, 255);
+}

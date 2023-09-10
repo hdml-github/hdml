@@ -4,14 +4,9 @@
  * @license Apache-2.0
  */
 
-import { debounce } from "throttle-debounce";
 import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
-import {
-  TrackedStyles,
-  updateStyles,
-  updateStylesAsync,
-} from "../helpers/updateStyles";
+import { TrackedStyles, updateStyles } from "../helpers/updateStyles";
 
 export abstract class AbstractChartElement extends UnifiedElement {
   private _view: null | HdmlViewElement = null;
