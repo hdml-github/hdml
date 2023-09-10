@@ -4,9 +4,14 @@
  * @license Apache-2.0
  */
 
+import { debounce } from "throttle-debounce";
 import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
-import { TrackedStyles, updateStyles } from "../helpers/updateStyles";
+import {
+  TrackedStyles,
+  updateStyles,
+  updateStylesAsync,
+} from "../helpers/updateStyles";
 
 export abstract class AbstractChartElement extends UnifiedElement {
   private _view: null | HdmlViewElement = null;
@@ -44,6 +49,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
     curveCubicMonotonicity: "x",
     curveStepChange: "middle",
   };
+  private _cache: null | TrackedStyles = null;
 
   /**
    * Component geometry selector.
@@ -85,174 +91,128 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * Tracked component styles.
    */
   public get tracked(): TrackedStyles {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
-    return {
-      get width(): number {
-        return parseFloat(self.styles.width);
-      },
-      get height(): number {
-        return parseFloat(self.styles.height);
-      },
-      get top(): number {
-        return parseFloat(self.styles.top);
-      },
-      get right(): number {
-        return parseFloat(self.styles.right);
-      },
-      get bottom(): number {
-        return parseFloat(self.styles.bottom);
-      },
-      get left(): number {
-        return parseFloat(self.styles.left);
-      },
-      get paddingTop(): number {
-        return parseFloat(self.styles.paddingTop);
-      },
-      get paddingRight(): number {
-        return parseFloat(self.styles.paddingRight);
-      },
-      get paddingBottom(): number {
-        return parseFloat(self.styles.paddingBottom);
-      },
-      get paddingLeft(): number {
-        return parseFloat(self.styles.paddingLeft);
-      },
-      get cursor(): string {
-        return self.styles.cursor;
-      },
-      get fontFamily(): string {
-        return self.styles.fontFamily;
-      },
-      get fontSize(): number {
-        return parseFloat(self.styles.fontSize);
-      },
-      get fontWeight(): number {
-        return parseFloat(self.styles.fontWeight);
-      },
-      get fontStyle(): string {
-        return self.styles.fontStyle;
-      },
-      get color(): string {
-        return self.styles.color;
-      },
-      get lineColor(): string {
-        return (
-          self.styles.getPropertyValue("--hdml-line-color") ||
-          "rgba(0, 0, 0, 0)"
-        );
-      },
-      get lineStyle(): string {
-        return (
-          self.styles.getPropertyValue("--hdml-line-style") || "solid"
-        );
-      },
-      get lineWidth(): number {
-        return (
-          parseFloat(
-            self.styles.getPropertyValue("--hdml-line-width"),
-          ) || 0
-        );
-      },
-      get fillColor(): string {
-        return (
-          self.styles.getPropertyValue("--hdml-fill-color") ||
-          "rgba(0, 0, 0, 0)"
-        );
-      },
-      get tickStyle(): "text" | "rect" | "ellipse" {
-        return (
-          <"text" | "rect" | "ellipse">(
-            self.styles.getPropertyValue("--hdml-tick-style")
-          ) || "ellipse"
-        );
-      },
-      get tickWidth(): number {
-        return parseFloat(
-          self.styles.getPropertyValue("--hdml-tick-width") || "0",
-        );
-      },
-      get tickHeight(): number {
-        return parseFloat(
-          self.styles.getPropertyValue("--hdml-tick-height") || "0",
-        );
-      },
-      get curveType():
-        | "natural"
-        | "linear"
-        | "cubic"
-        | "step"
-        | "bezier"
-        | "basis"
-        | "cardinal"
-        | "catmull-rom" {
-        return (
-          <
-            | "natural"
-            | "linear"
-            | "cubic"
-            | "step"
-            | "bezier"
-            | "basis"
-            | "cardinal"
-            | "catmull-rom"
-          >self.styles.getPropertyValue("--hdml-curve-type") ||
-          "linear"
-        );
-      },
-      get curveBasisBeta(): number {
-        const beta = parseFloat(
-          self.styles.getPropertyValue("--hdml-curve-basis-beta") ||
-            "0",
-        );
-        return beta >= 0 && beta <= 1 ? beta : beta < 0 ? 0 : 1;
-      },
-      get curveBezierTangents(): "horizontal" | "vertical" {
-        return (
-          <"horizontal" | "vertical">(
-            self.styles.getPropertyValue(
-              "--hdml-curve-bezier-tangents",
-            )
-          ) || "horizontal"
-        );
-      },
-      get curveCardinalTension(): number {
-        const tension = parseFloat(
-          self.styles.getPropertyValue(
-            "--hdml-curve-cardinal-tension",
-          ) || "0",
-        );
-        return tension >= 0 && tension <= 1
-          ? tension
-          : tension < 0
-          ? 0
-          : 1;
-      },
-      get curveCatmullRomAlpha(): number {
-        const alpha = parseFloat(
-          self.styles.getPropertyValue(
-            "--hdml-curve-catmull-rom-alpha",
-          ) || "0",
-        );
-        return alpha >= 0 && alpha <= 1 ? alpha : alpha < 0 ? 0 : 1;
-      },
-      get curveCubicMonotonicity(): "x" | "y" {
-        return (
-          <"x" | "y">(
-            self.styles.getPropertyValue(
-              "--hdml-curve-cubic-monotonicity",
-            )
-          ) || "x"
-        );
-      },
-      get curveStepChange(): "before" | "middle" | "after" {
-        return (
-          <"before" | "middle" | "after">(
-            self.styles.getPropertyValue("--hdml-curve-step-change")
-          ) || "middle"
-        );
-      },
-    };
+    if (!this._cache) {
+      const width = parseFloat(this.styles.width);
+      const height = parseFloat(this.styles.height);
+      const top = parseFloat(this.styles.top);
+      const right = parseFloat(this.styles.right);
+      const bottom = parseFloat(this.styles.bottom);
+      const left = parseFloat(this.styles.left);
+      const paddingTop = parseFloat(this.styles.paddingTop);
+      const paddingRight = parseFloat(this.styles.paddingRight);
+      const paddingBottom = parseFloat(this.styles.paddingBottom);
+      const paddingLeft = parseFloat(this.styles.paddingLeft);
+      const cursor = this.styles.cursor;
+      const fontFamily = this.styles.fontFamily;
+      const fontSize = parseFloat(this.styles.fontSize);
+      const fontWeight = parseFloat(this.styles.fontWeight);
+      const fontStyle = this.styles.fontStyle;
+      const color = this.styles.color;
+      const lineColor =
+        this.styles.getPropertyValue("--hdml-line-color") ||
+        "rgba(0, 0, 0, 0)";
+      const lineStyle =
+        this.styles.getPropertyValue("--hdml-line-style") || "solid";
+      const lineWidth =
+        parseFloat(
+          this.styles.getPropertyValue("--hdml-line-width"),
+        ) || 0;
+      const fillColor =
+        this.styles.getPropertyValue("--hdml-fill-color") ||
+        "rgba(0, 0, 0, 0)";
+      const tickStyle =
+        <"text" | "rect" | "ellipse">(
+          this.styles.getPropertyValue("--hdml-tick-style")
+        ) || "ellipse";
+      const tickWidth = parseFloat(
+        this.styles.getPropertyValue("--hdml-tick-width") || "0",
+      );
+      const tickHeight = parseFloat(
+        this.styles.getPropertyValue("--hdml-tick-height") || "0",
+      );
+      const curveType =
+        <
+          | "natural"
+          | "linear"
+          | "cubic"
+          | "step"
+          | "bezier"
+          | "basis"
+          | "cardinal"
+          | "catmull-rom"
+        >this.styles.getPropertyValue("--hdml-curve-type") ||
+        "linear";
+      const beta = parseFloat(
+        this.styles.getPropertyValue("--hdml-curve-basis-beta") ||
+          "0",
+      );
+      const curveBasisBeta =
+        beta >= 0 && beta <= 1 ? beta : beta < 0 ? 0 : 1;
+      const curveBezierTangents =
+        <"horizontal" | "vertical">(
+          this.styles.getPropertyValue("--hdml-curve-bezier-tangents")
+        ) || "horizontal";
+      const tension = parseFloat(
+        this.styles.getPropertyValue(
+          "--hdml-curve-cardinal-tension",
+        ) || "0",
+      );
+      const curveCardinalTension =
+        tension >= 0 && tension <= 1 ? tension : tension < 0 ? 0 : 1;
+
+      const alpha = parseFloat(
+        this.styles.getPropertyValue(
+          "--hdml-curve-catmull-rom-alpha",
+        ) || "0",
+      );
+      const curveCatmullRomAlpha =
+        alpha >= 0 && alpha <= 1 ? alpha : alpha < 0 ? 0 : 1;
+
+      const curveCubicMonotonicity =
+        <"x" | "y">(
+          this.styles.getPropertyValue(
+            "--hdml-curve-cubic-monotonicity",
+          )
+        ) || "x";
+      const curveStepChange =
+        <"before" | "middle" | "after">(
+          this.styles.getPropertyValue("--hdml-curve-step-change")
+        ) || "middle";
+
+      this._cache = {
+        width,
+        height,
+        top,
+        right,
+        bottom,
+        left,
+        paddingTop,
+        paddingRight,
+        paddingBottom,
+        paddingLeft,
+        cursor,
+        fontFamily,
+        fontSize,
+        fontWeight,
+        fontStyle,
+        color,
+        lineColor,
+        lineStyle,
+        lineWidth,
+        fillColor,
+        tickStyle,
+        tickWidth,
+        tickHeight,
+        curveType,
+        curveBasisBeta,
+        curveBezierTangents,
+        curveCardinalTension,
+        curveCatmullRomAlpha,
+        curveCubicMonotonicity,
+        curveStepChange,
+      };
+    }
+    return this._cache;
   }
 
   /**
@@ -368,7 +328,10 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * property key.
    */
   private stylesChangedListener = () => {
-    this.requestUpdate();
+    this._cache = null;
+    setTimeout(() => {
+      this.requestUpdate();
+    });
   };
 
   /**

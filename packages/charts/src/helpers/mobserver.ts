@@ -66,7 +66,7 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
   if (dispatch && delayed) {
     dispatchDelayed();
   } else {
-    dispatchImmediate();
+    dispatchDelayed();
   }
 });
 

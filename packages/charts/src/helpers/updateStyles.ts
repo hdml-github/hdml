@@ -65,6 +65,31 @@ export function updateStyles(
   });
 }
 
+/**
+ * Updates stylesheet rules based on the components styles.
+ */
+export function updateStylesAsync(
+  component: Element & { tracked: TrackedStyles },
+  stylesheet: CSSStyleSheet,
+  selector: string,
+): void {
+  getSvgStylesAsync(component, selector)
+    .then((styles) => {
+      for (let i = stylesheet.cssRules.length - 1; i >= 0; i--) {
+        stylesheet.deleteRule(i);
+      }
+      styles.forEach((rule: string) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        stylesheet.insertRule(rule);
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
 function getSvgStyles(
   component: Element & { tracked: TrackedStyles },
   selector: string,
@@ -74,6 +99,21 @@ function getSvgStyles(
   const foc = getSvgSelectorStyles(component, selector, "focus");
   const act = getSvgSelectorStyles(component, selector, "active");
   return [act, foc, hov, def];
+}
+
+async function getSvgStylesAsync(
+  component: Element & { tracked: TrackedStyles },
+  selector: string,
+): Promise<string[]> {
+  return await new Promise<string[]>((resolve) => {
+    setTimeout(() => {
+      const def = getSvgSelectorStyles(component, selector);
+      const hov = getSvgSelectorStyles(component, selector, "hover");
+      const foc = getSvgSelectorStyles(component, selector, "focus");
+      const act = getSvgSelectorStyles(component, selector, "active");
+      resolve([act, foc, hov, def]);
+    });
+  });
 }
 
 function getSvgSelectorStyles(
