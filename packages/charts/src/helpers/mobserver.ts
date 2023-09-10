@@ -6,16 +6,6 @@
 
 import { debounce } from "throttle-debounce";
 
-const dispatchImmediate = () => {
-  window.dispatchEvent(
-    new CustomEvent("styles-changed", {
-      cancelable: false,
-      composed: false,
-      bubbles: false,
-    }),
-  );
-};
-
 const dispatchDelayed = debounce(50, () => {
   window.dispatchEvent(
     new CustomEvent("styles-changed", {
@@ -28,7 +18,6 @@ const dispatchDelayed = debounce(50, () => {
 
 const mobserver = new MutationObserver((recs: MutationRecord[]) => {
   let dispatch = false;
-  let delayed = false;
   for (const rec of recs) {
     if (rec.type === "attributes") {
       if (rec.attributeName === "style") {
@@ -37,7 +26,6 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
       }
       if (rec.attributeName === "class") {
         dispatch = true;
-        delayed = true;
         break;
       }
     }
@@ -62,12 +50,7 @@ const mobserver = new MutationObserver((recs: MutationRecord[]) => {
       if (dispatch) break;
     }
   }
-
-  if (dispatch && delayed) {
-    dispatchDelayed();
-  } else {
-    dispatchDelayed();
-  }
+  dispatchDelayed();
 });
 
 mobserver.observe(document, {

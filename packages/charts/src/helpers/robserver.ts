@@ -4,7 +4,9 @@
  * @license Apache-2.0
  */
 
-export const robserver = new ResizeObserver(() => {
+import { debounce } from "throttle-debounce";
+
+const dispatchDelayed = debounce(50, () => {
   window.dispatchEvent(
     new CustomEvent("styles-changed", {
       cancelable: false,
@@ -12,6 +14,10 @@ export const robserver = new ResizeObserver(() => {
       bubbles: false,
     }),
   );
+});
+
+export const robserver = new ResizeObserver(() => {
+  dispatchDelayed();
 });
 
 function cb(): void {
