@@ -51,36 +51,6 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   /**
    * @override
    */
-  public connectedCallback(): void {
-    super.connectedCallback();
-    if (this.selectedGroup) {
-      this.selectedGroup
-        .selectAll<BaseType, number | string>("g.tick")
-        .call((selection) => {
-          this._events.forEach((type) => {
-            selection.on(type, this.proxyEvent.bind(this));
-          });
-        });
-    }
-  }
-
-  /**
-   * @override
-   */
-  public disconnectedCallback(): void {
-    if (this.selectedGroup) {
-      this.selectedGroup.selectAll("g.tick").call((selection) => {
-        this._events.forEach((type) => {
-          selection.on(type, null);
-        });
-      });
-    }
-    super.disconnectedCallback();
-  }
-
-  /**
-   * @override
-   */
   public shouldUpdate(
     changedProperties: Map<string, unknown>,
   ): boolean {

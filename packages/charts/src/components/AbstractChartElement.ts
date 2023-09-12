@@ -12,6 +12,7 @@ export abstract class AbstractChartElement extends UnifiedElement {
   private _view: null | HdmlViewElement = null;
   private _ssheet = new CSSStyleSheet();
   private _styles = window.getComputedStyle(this);
+  private _cache: null | TrackedStyles = null;
   private _stored: TrackedStyles = {
     width: 0,
     height: 0,
@@ -44,7 +45,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
     curveCubicMonotonicity: "x",
     curveStepChange: "middle",
   };
-  private _cache: null | TrackedStyles = null;
 
   /**
    * Component geometry selector.
@@ -264,7 +264,9 @@ export abstract class AbstractChartElement extends UnifiedElement {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
-    this.renderGeometry();
+    setTimeout(() => {
+      this.renderGeometry();
+    });
   }
 
   /**
@@ -272,15 +274,17 @@ export abstract class AbstractChartElement extends UnifiedElement {
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected updated(changed: Map<string, unknown>): void {
-    this.updateStyles();
-    this.updateGeometry();
-    this.dispatchEvent(
-      new CustomEvent("updated", {
-        cancelable: false,
-        composed: false,
-        bubbles: false,
-      }),
-    );
+    setTimeout(() => {
+      this.updateStyles();
+      this.updateGeometry();
+      this.dispatchEvent(
+        new CustomEvent("updated", {
+          cancelable: false,
+          composed: false,
+          bubbles: false,
+        }),
+      );
+    });
   }
 
   /**
@@ -323,10 +327,12 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * property key.
    */
   private stylesChangedListener = () => {
+    // setTimeout(() => {
+    //   this._cache = null;
+    //   this.requestUpdate();
+    // });
     this._cache = null;
-    setTimeout(() => {
-      this.requestUpdate();
-    });
+    this.requestUpdate();
   };
 
   /**

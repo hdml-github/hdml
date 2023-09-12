@@ -88,6 +88,16 @@ export class HdmlViewElement extends AbstractChartElement {
   }
 
   /**
+   * @override
+   */
+  protected firstUpdated(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    changedProperties: Map<PropertyKey, unknown>,
+  ): void {
+    this.renderGeometry();
+  }
+
+  /**
    * @implements
    */
   protected renderGeometry(): void {
