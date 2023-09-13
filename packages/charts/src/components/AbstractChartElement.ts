@@ -327,10 +327,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
    * property key.
    */
   private stylesChangedListener = () => {
-    // setTimeout(() => {
-    //   this._cache = null;
-    //   this.requestUpdate();
-    // });
     this._cache = null;
     this.requestUpdate();
   };

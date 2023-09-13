@@ -65,7 +65,10 @@ hdml-view.all-together ordinal-scale {
   padding: 0 0 0 40px;
 }
 hdml-view.all-together linear-scale {
-  padding: 15px 0;
+  --hdml-padding: 15px 0;
+  --hdml-padding-hover: 25px 0;
+  --hdml-padding-active: 25px 0;
+  --hdml-padding-focus: 25px 0;
 }
 
 /* HDML AXIS */

@@ -23,6 +23,7 @@ export class LinearScaleElement extends AbstractScaleElement {
       box-sizing: border-box;
       width: 100%;
       height: 100%;
+      padding: var(--hdml-padding, 0);
     }
   `;
 

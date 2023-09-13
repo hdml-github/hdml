@@ -18,13 +18,6 @@ const dispatchDelayed = debounce(50, () => {
 
 export const robserver = new ResizeObserver(() => {
   dispatchDelayed();
-  // window.dispatchEvent(
-  //   new CustomEvent("styles-changed", {
-  //     cancelable: false,
-  //     composed: false,
-  //     bubbles: false,
-  //   }),
-  // );
 });
 
 function cb(): void {
