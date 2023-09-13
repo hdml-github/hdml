@@ -13,13 +13,14 @@ export class PolarPlaneElement extends AbstractPlaneElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      box-sizing: border-box;
       width: 100%;
       height: 100%;
       padding: 0;
-      background: rgba(0, 0, 0, 0);
+      margin: 0 !important;
+      display: block !important;
+      position: absolute !important;
+      box-sizing: border-box !important;
+      background: rgba(0, 0, 0, 0) !important;
     }
     :host > div {
       display: block;

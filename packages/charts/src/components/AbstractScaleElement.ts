@@ -5,6 +5,7 @@
  */
 
 import { lit } from "@hdml/elements";
+import { CompletedCSSStyleSheet } from "../helpers/updateStyles";
 import { AbstractChartElement } from "./AbstractChartElement";
 import { AbstractPlaneElement } from "./AbstractPlaneElement";
 
@@ -20,7 +21,9 @@ export enum Dimension {
 }
 
 abstract class AbstractScaleElement extends AbstractChartElement {
-  private _stylesheet: CSSStyleSheet = new CSSStyleSheet();
+  private _stylesheet: CompletedCSSStyleSheet = <
+    CompletedCSSStyleSheet
+  >new CSSStyleSheet();
 
   /**
    * @implements
@@ -110,7 +113,7 @@ abstract class AbstractScaleElement extends AbstractChartElement {
    * @override
    */
   protected updateStyles(): void {
-    this._stylesheet.insertRule(`:host > slot {
+    this._stylesheet.replaceSync(`:host > slot {
       margin:
         -${this.tracked.paddingTop}px
         -${this.tracked.paddingRight}px
@@ -139,5 +142,4 @@ abstract class AbstractScaleElement extends AbstractChartElement {
    */
   protected abstract updateScale(): void;
 }
-
 export { AbstractScaleElement };

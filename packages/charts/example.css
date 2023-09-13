@@ -57,13 +57,16 @@ hdml-view.all-together cartesian-plane {
   padding: 15px 25px;
 }
 hdml-view.all-together-independent cartesian-plane {
-  padding: 8px 15px 30px 35px;
+  padding: 8px 25px 30px 35px;
 }
 
 /* HDML SCALE */
 hdml-view.all-together ordinal-scale {
   padding: 0 0 0 40px;
 }
+/* hdml-view.all-together-independent ordinal-scale {
+  padding: 0 0 0 15px;
+} */
 hdml-view.all-together linear-scale {
   --hdml-padding: 15px 0;
   --hdml-padding-hover: 25px 0;

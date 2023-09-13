@@ -6,19 +6,21 @@
 
 import { lit, UnifiedElement } from "@hdml/elements";
 import { HdmlViewElement } from "./HdmlViewElement";
-import { TrackedStyles, updateStyles } from "../helpers/updateStyles";
+import {
+  CompletedCSSStyleSheet,
+  TrackedStyles,
+  updateStyles,
+} from "../helpers/updateStyles";
 
 export abstract class AbstractChartElement extends UnifiedElement {
   private _view: null | HdmlViewElement = null;
-  private _ssheet = new CSSStyleSheet();
+  private _ssheet = <CompletedCSSStyleSheet>new CSSStyleSheet();
   private _styles = window.getComputedStyle(this);
   private _cache: null | TrackedStyles = null;
   private _stored: TrackedStyles = {
     width: 0,
     height: 0,
     top: 0,
-    right: 0,
-    bottom: 0,
     left: 0,
     paddingTop: 0,
     paddingRight: 0,
@@ -90,8 +92,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
       const width = parseFloat(this.styles.width);
       const height = parseFloat(this.styles.height);
       const top = parseFloat(this.styles.top);
-      const right = parseFloat(this.styles.right);
-      const bottom = parseFloat(this.styles.bottom);
       const left = parseFloat(this.styles.left);
       const paddingTop = parseFloat(this.styles.paddingTop);
       const paddingRight = parseFloat(this.styles.paddingRight);
@@ -178,8 +178,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
         width,
         height,
         top,
-        right,
-        bottom,
         left,
         paddingTop,
         paddingRight,
@@ -322,9 +320,8 @@ export abstract class AbstractChartElement extends UnifiedElement {
   protected abstract updateGeometry(): void;
 
   /**
-   * The `window` `styles-changed` event listener. Runs the
-   * `requestUpdate` method passing the "styles-changed" string as a
-   * property key.
+   * Custom `window.body` `styles-changed` event listener. Runs the
+   * `requestUpdate` method.
    */
   private stylesChangedListener = () => {
     this._cache = null;

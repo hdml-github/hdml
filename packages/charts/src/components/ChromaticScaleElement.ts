@@ -12,13 +12,17 @@ export class ChromaticScaleElement extends AbstractScaleElement {
    * Component styles.
    */
   public static styles = lit.css`
+    :host {
+      margin: 0 !important;
+    }
     :host,
     :host > slot {
-      display: block;
-      position: absolute;
-      box-sizing: border-box;
       width: 100%;
       height: 100%;
+      padding: 0;
+      display: block !important;
+      position: absolute !important;
+      box-sizing: border-box !important;
     }
   `;
 

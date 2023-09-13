@@ -16,10 +16,11 @@ export class HdmlViewElement extends AbstractChartElement {
     :host {
       display: inline-block;
       position: relative;
-      box-sizing: border-box;
-      overflow: hidden;
       width: 100%;
       height: 100%;
+      padding: 0 !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
     }
     :host > slot {
       display: block;

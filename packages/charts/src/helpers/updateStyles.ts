@@ -4,12 +4,15 @@
  * @license Apache-2.0
  */
 
+export type CompletedCSSStyleSheet = CSSStyleSheet & {
+  insertRule(text: string): void;
+  replaceSync(text: string): void;
+};
+
 export type TrackedStyles = {
   width: number;
   height: number;
   top: number;
-  right: number;
-  bottom: number;
   left: number;
   paddingTop: number;
   paddingRight: number;
@@ -50,7 +53,7 @@ export type TrackedStyles = {
  */
 export function updateStyles(
   component: Element & { tracked: TrackedStyles },
-  stylesheet: CSSStyleSheet,
+  stylesheet: CompletedCSSStyleSheet,
   selector: string,
 ): void {
   const styles = getSvgStyles(component, selector);
@@ -58,9 +61,6 @@ export function updateStyles(
     stylesheet.deleteRule(i);
   }
   styles.forEach((rule: string) => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     stylesheet.insertRule(rule);
   });
 }
