@@ -33,8 +33,7 @@ type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
  * The abstract class, which encapsules the logic that is required to
  * visualize axis.
  */
-// eslint-disable-next-line max-len
-export abstract class AbstractAxisElement extends AbstractDirectionElement {
+abstract class AbstractAxisElement extends AbstractDirectionElement {
   private _selectedPath: null | SelectedPath = null;
   private _events: Set<string> = new Set();
 
@@ -259,3 +258,4 @@ export abstract class AbstractAxisElement extends AbstractDirectionElement {
     return datum;
   }
 }
+export { AbstractAxisElement };

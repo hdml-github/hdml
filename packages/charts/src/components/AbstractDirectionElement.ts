@@ -41,8 +41,7 @@ export enum VerticalPosition {
  * The abstract class, which encapsules the logic that is required to
  * visualize vertical or horizontal things on the Cartesian plane.
  */
-// eslint-disable-next-line max-len
-export abstract class AbstractDirectionElement extends AbstractChartElement {
+abstract class AbstractDirectionElement extends AbstractChartElement {
   private _selectedGroup: null | SelectedGroup = null;
 
   /**
@@ -240,3 +239,4 @@ export abstract class AbstractDirectionElement extends AbstractChartElement {
     return `translate(${x}, ${y})`;
   }
 }
+export { AbstractDirectionElement };

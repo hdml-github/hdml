@@ -21,12 +21,14 @@ export class VerticalAxisElement extends AbstractAxisElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      height: 100%;
-      border: none;
       cursor: pointer;
-      width: var(--hdml-line-width);
+      display: block !important;
+      position: absolute !important;
+      height: 100% !important;
+      width: var(--hdml-line-width) !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
     :host([position=left]) {
       left: calc(0% - var(--hdml-line-width)/2);
@@ -171,5 +173,4 @@ export class VerticalAxisElement extends AbstractAxisElement {
     return this._position;
   }
 }
-
 customElements.define("vertical-axis", VerticalAxisElement);

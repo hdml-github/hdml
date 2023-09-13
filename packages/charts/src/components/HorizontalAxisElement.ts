@@ -21,12 +21,14 @@ export class HorizontalAxisElement extends AbstractAxisElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      width: 100%;
-      border: none;
       cursor: pointer;
-      height: var(--hdml-line-width);
+      display: block !important;
+      position: absolute !important;
+      width: 100% !important;
+      height: var(--hdml-line-width, 1px) !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
     :host([position=top]) {
       top: calc(0% - var(--hdml-line-width)/2);
@@ -171,5 +173,4 @@ export class HorizontalAxisElement extends AbstractAxisElement {
     return this._position;
   }
 }
-
 customElements.define("horizontal-axis", HorizontalAxisElement);
