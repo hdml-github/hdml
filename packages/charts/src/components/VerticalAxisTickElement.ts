@@ -6,10 +6,7 @@
 
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
-import {
-  DirectionType,
-  VerticalPosition,
-} from "./AbstractDirectionElement";
+import { DirectionType } from "./AbstractDirectionElement";
 import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**
@@ -21,20 +18,15 @@ export class VerticalAxisTickElement extends AbstractAxisTickElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      height: 100%;
-      border: none;
-      cursor: pointer;
-    }
-    :host([position=left]) {
       left: 0%;
-    }
-    :host([position=center]) {
-      left: 50%;
-    }
-    :host([position=right]) {
-      left: 100%;
+      cursor: pointer;
+      display: block !important;
+      position: absolute !important;
+      width: 0 !important;
+      height: 100% !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
   `;
 
@@ -75,39 +67,6 @@ export class VerticalAxisTickElement extends AbstractAxisTickElement {
               return value;
             } else {
               return "y";
-            }
-          }
-        },
-        toAttribute: (value: string): string => {
-          return value;
-        },
-      },
-    },
-
-    /**
-     * The `position` property definition.
-     */
-    position: {
-      type: String,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): "left" | "center" | "right" => {
-          if (!value) {
-            return "left";
-          } else {
-            if (
-              value === "left" ||
-              value === "center" ||
-              value === "right"
-            ) {
-              return value;
-            } else {
-              return "left";
             }
           }
         },
@@ -187,7 +146,6 @@ export class VerticalAxisTickElement extends AbstractAxisTickElement {
   };
 
   private _dimension: Dimension = Dimension.Y;
-  private _position: VerticalPosition = VerticalPosition.Left;
   private _count: null | number = null;
   private _values: null | number[] | string[] = null;
 
@@ -217,27 +175,6 @@ export class VerticalAxisTickElement extends AbstractAxisTickElement {
    */
   public get dimension(): Dimension {
     return this._dimension;
-  }
-
-  /**
-   * @override
-   */
-  public set position(val: VerticalPosition) {
-    const attr = this.getAttribute("position");
-    const sval = val;
-    if (attr !== sval) {
-      this.setAttribute("position", sval);
-    }
-    const old = this._position;
-    this._position = val;
-    this.requestUpdate("position", old);
-  }
-
-  /**
-   * @override
-   */
-  public get position(): VerticalPosition {
-    return this._position;
   }
 
   /**

@@ -6,10 +6,7 @@
 
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
-import {
-  DirectionType,
-  HorizontalPosition,
-} from "./AbstractDirectionElement";
+import { DirectionType } from "./AbstractDirectionElement";
 import { AbstractAxisElement } from "./AbstractAxisElement";
 
 /**
@@ -21,23 +18,15 @@ export class HorizontalAxisElement extends AbstractAxisElement {
    */
   public static styles = lit.css`
     :host {
+      top: 100%;
       cursor: pointer;
       display: block !important;
       position: absolute !important;
       width: 100% !important;
-      height: var(--hdml-line-width, 1px) !important;
+      height: 0 !important;
       border: none !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-    :host([position=top]) {
-      top: calc(0% - var(--hdml-line-width)/2);
-    }
-    :host([position=center]) {
-      top: calc(50% - var(--hdml-line-width)/2);
-    }
-    :host([position=bottom]) {
-      top: calc(100% - var(--hdml-line-width)/2);
     }
   `;
 
@@ -86,43 +75,9 @@ export class HorizontalAxisElement extends AbstractAxisElement {
         },
       },
     },
-
-    /**
-     * The `position` property definition.
-     */
-    position: {
-      type: String,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): "bottom" | "center" | "top" => {
-          if (!value) {
-            return "bottom";
-          } else {
-            if (
-              value === "bottom" ||
-              value === "center" ||
-              value === "top"
-            ) {
-              return value;
-            } else {
-              return "bottom";
-            }
-          }
-        },
-        toAttribute: (value: string): string => {
-          return value;
-        },
-      },
-    },
   };
 
   private _dimension: Dimension = Dimension.X;
-  private _position: HorizontalPosition = HorizontalPosition.Bottom;
 
   /**
    * @override
@@ -150,27 +105,6 @@ export class HorizontalAxisElement extends AbstractAxisElement {
    */
   public get dimension(): Dimension {
     return this._dimension;
-  }
-
-  /**
-   * @override
-   */
-  public set position(val: HorizontalPosition) {
-    const attr = this.getAttribute("position");
-    const sval = val;
-    if (attr !== sval) {
-      this.setAttribute("position", sval);
-    }
-    const old = this._position;
-    this._position = val;
-    this.requestUpdate("position", old);
-  }
-
-  /**
-   * @override
-   */
-  public get position(): HorizontalPosition {
-    return this._position;
   }
 }
 customElements.define("horizontal-axis", HorizontalAxisElement);

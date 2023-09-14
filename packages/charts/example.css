@@ -1,6 +1,7 @@
 :root {
   --theme-line-color: #000;
-  --theme-line-width: 1px;
+  --theme-line-width: 2px;
+  --theme-line-width-bold: 3px;
   --theme-tick-width: 10px;
   --theme-tick-height: 10px;
   --theme-tick-fill: #fff;
@@ -26,7 +27,7 @@ body.green {
 }
 
 body.bold {
-  --theme-line-width: 2px;
+  --theme-line-width: 4px;
 }
 
 
@@ -43,6 +44,21 @@ table, thead, td {
 thead {
   font-weight: bold;
   background-color: var(--theme-area-fill);
+}
+
+div.container {
+  display: block;
+  position: absolute;
+  float: left;
+  width: 95%;
+  height: 300%;
+}
+
+div.block {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 12.5%;
 }
 
 /* HDML VIEW */
@@ -80,8 +96,18 @@ hdml-view.all-together vertical-axis,
 hdml-view.all-together-independent horizontal-axis,
 hdml-view.all-together-independent vertical-axis {
   --hdml-line-width: var(--theme-line-width);
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
+
   --hdml-line-style: solid;
   --hdml-line-color: var(--theme-line-color);
+}
+horizontal-axis.center {
+  top: 50%;
+}
+vertical-axis.center {
+  left: 50%;
 }
 
 /* HDML AXIS TICK */
@@ -90,12 +116,27 @@ hdml-view.all-together vertical-axis-tick,
 hdml-view.all-together-independent horizontal-axis-tick,
 hdml-view.all-together-independent vertical-axis-tick {
   --hdml-line-width: var(--theme-line-width);
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
+
   --hdml-line-style: solid;
-  --hdml-tick-style: ellipse;
+  
   --hdml-line-color: var(--theme-line-color);
+  
+  --hdml-tick-style: ellipse;
+  
   --hdml-tick-width: var(--theme-tick-width);
+  
   --hdml-tick-height: var(--theme-tick-height);
+  
   --hdml-fill-color: rgb(255, 255, 255);
+}
+horizontal-axis-tick.center {
+  top: 50%;
+}
+vertical-axis-tick.center {
+  left: 50%;
 }
 
 /* HDML AXIS TICK LABELS */
@@ -118,10 +159,20 @@ hdml-view.all-together-independent horizontal-axis-tick.labels {
 hdml-view.all-together-independent vertical-axis-tick.labels {
   left: -25px;
 }
+hdml-view.all-together-independent horizontal-axis-tick.labels.center {
+  top: calc(50% + 20px);
+}
+hdml-view.all-together-independent vertical-axis-tick.labels.center {
+  left: calc(50% - 25px);
+}
 
 /* HDML LINES */
 data-line {
   --hdml-line-width: var(--theme-line-width);
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
+
   --hdml-line-style: solid;
   --hdml-line-color: var(--theme-line-color);
   --hdml-curve-type: cardinal;
@@ -131,7 +182,11 @@ data-line {
 /* HDML AREAS */
 data-area {
   --hdml-line-width: var(--theme-line-width);
-  --hdml-line-style: solid;
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
+
+  --hdml-line-style: dashed;
   --hdml-line-color: var(--theme-area-line);
   --hdml-curve-type: cardinal;
   --hdml-curve-cardinal-tension: 0;
@@ -141,6 +196,10 @@ data-area {
 /* HDML POINTS */
 data-point {
   --hdml-line-width: var(--theme-line-width);
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
+
   --hdml-line-style: solid;
   --hdml-tick-style: ellipse;
   --hdml-line-color: var(--theme-line-color);

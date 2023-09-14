@@ -25,18 +25,6 @@ export enum DirectionType {
   Vertical,
 }
 
-export enum HorizontalPosition {
-  Top = "top",
-  Center = "center",
-  Bottom = "bottom",
-}
-
-export enum VerticalPosition {
-  Left = "left",
-  Center = "center",
-  Right = "right",
-}
-
 /**
  * The abstract class, which encapsules the logic that is required to
  * visualize vertical or horizontal things on the Cartesian plane.
@@ -58,20 +46,6 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
    * Direction `dimension`.
    */
   public abstract get dimension(): Dimension;
-
-  /**
-   * Direction `position`.
-   */
-  public abstract set position(
-    pos: HorizontalPosition | VerticalPosition,
-  );
-
-  /**
-   * Direction `position`.
-   */
-  public abstract get position():
-    | HorizontalPosition
-    | VerticalPosition;
 
   /**
    * Direction scale.
@@ -149,8 +123,7 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
   ): boolean {
     if (
       changedProperties.has("_force") ||
-      changedProperties.has("dimension") ||
-      changedProperties.has("position")
+      changedProperties.has("dimension")
     ) {
       return true;
     }
@@ -164,14 +137,9 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
     changedProperties: Map<PropertyKey, unknown>,
   ): void {
     const attrDimension = this.getAttribute("dimension");
-    const attrPosition = this.getAttribute("position");
     const svalDimension = this.dimension;
-    const svalPosition = this.position;
     if (attrDimension !== svalDimension) {
       this.setAttribute("dimension", svalDimension);
-    }
-    if (attrPosition !== svalPosition) {
-      this.setAttribute("position", svalPosition);
     }
     super.firstUpdated(changedProperties);
   }
@@ -225,14 +193,12 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
         y =
           this.scale.plane.tracked.top +
           this.scale.plane.tracked.paddingTop +
-          this.tracked.top +
-          this.tracked.lineWidth / 2;
+          this.tracked.top;
       } else if (this.type === DirectionType.Vertical) {
         x =
           this.scale.plane.tracked.left +
           this.scale.plane.tracked.paddingLeft +
-          this.tracked.left +
-          this.tracked.lineWidth / 2;
+          this.tracked.left;
         y = 0;
       }
     }

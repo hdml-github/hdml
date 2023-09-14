@@ -6,10 +6,7 @@
 
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
-import {
-  DirectionType,
-  VerticalPosition,
-} from "./AbstractDirectionElement";
+import { DirectionType } from "./AbstractDirectionElement";
 import { AbstractAxisElement } from "./AbstractAxisElement";
 
 /**
@@ -21,23 +18,15 @@ export class VerticalAxisElement extends AbstractAxisElement {
    */
   public static styles = lit.css`
     :host {
+      left: 0;
       cursor: pointer;
       display: block !important;
       position: absolute !important;
       height: 100% !important;
-      width: var(--hdml-line-width) !important;
+      width: 0 !important;
       border: none !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-    :host([position=left]) {
-      left: calc(0% - var(--hdml-line-width)/2);
-    }
-    :host([position=center]) {
-      left: calc(50% - var(--hdml-line-width)/2);
-    }
-    :host([position=right]) {
-      left: calc(100% - var(--hdml-line-width)/2);
     }
   `;
 
@@ -86,43 +75,9 @@ export class VerticalAxisElement extends AbstractAxisElement {
         },
       },
     },
-
-    /**
-     * The `position` property definition.
-     */
-    position: {
-      type: String,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): "left" | "center" | "right" => {
-          if (!value) {
-            return "left";
-          } else {
-            if (
-              value === "left" ||
-              value === "center" ||
-              value === "right"
-            ) {
-              return value;
-            } else {
-              return "left";
-            }
-          }
-        },
-        toAttribute: (value: string): string => {
-          return value;
-        },
-      },
-    },
   };
 
   private _dimension: Dimension = Dimension.Y;
-  private _position: VerticalPosition = VerticalPosition.Left;
 
   /**
    * @override
@@ -150,27 +105,6 @@ export class VerticalAxisElement extends AbstractAxisElement {
    */
   public get dimension(): Dimension {
     return this._dimension;
-  }
-
-  /**
-   * @override
-   */
-  public set position(val: VerticalPosition) {
-    const attr = this.getAttribute("position");
-    const sval = val;
-    if (attr !== sval) {
-      this.setAttribute("position", sval);
-    }
-    const old = this._position;
-    this._position = val;
-    this.requestUpdate("position", old);
-  }
-
-  /**
-   * @override
-   */
-  public get position(): VerticalPosition {
-    return this._position;
   }
 }
 customElements.define("vertical-axis", VerticalAxisElement);

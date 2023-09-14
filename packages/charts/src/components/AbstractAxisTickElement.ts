@@ -285,18 +285,10 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       unknown
     >,
   ) {
-    const dx =
-      this.type === DirectionType.Vertical
-        ? this.tracked.lineWidth / 2
-        : 0;
-    const dy =
-      this.type === DirectionType.Horizontal
-        ? this.tracked.lineWidth / 2
-        : 0;
     selection
       .append("ellipse")
-      .attr("cx", 0 - dx)
-      .attr("cy", 0 - dy)
+      .attr("cx", 0)
+      .attr("cy", 0)
       .attr("rx", this.tracked.tickWidth / 2)
       .attr("ry", this.tracked.tickHeight / 2);
   }
@@ -312,18 +304,10 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       unknown
     >,
   ): void {
-    const dx =
-      this.type === DirectionType.Vertical
-        ? this.tracked.lineWidth / 2
-        : 0;
-    const dy =
-      this.type === DirectionType.Horizontal
-        ? this.tracked.lineWidth / 2
-        : 0;
     selection
       .select("ellipse")
-      .attr("cx", 0 - dx)
-      .attr("cy", 0 - dy)
+      .attr("cx", 0)
+      .attr("cy", 0)
       .attr("rx", this.tracked.tickWidth / 2)
       .attr("ry", this.tracked.tickHeight / 2);
   }
@@ -339,18 +323,10 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       unknown
     >,
   ) {
-    const dx =
-      this.type === DirectionType.Vertical
-        ? (this.tracked.lineWidth + this.tracked.tickWidth) / 2
-        : this.tracked.tickWidth / 2;
-    const dy =
-      this.type === DirectionType.Horizontal
-        ? (this.tracked.lineWidth + this.tracked.tickHeight) / 2
-        : this.tracked.tickHeight / 2;
     selection
       .append("rect")
-      .attr("x", 0 - dx)
-      .attr("y", 0 - dy)
+      .attr("x", 0 - this.tracked.tickWidth / 2)
+      .attr("y", 0 - this.tracked.tickHeight / 2)
       .attr("width", this.tracked.tickWidth)
       .attr("height", this.tracked.tickHeight);
   }
@@ -366,18 +342,10 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
       unknown
     >,
   ) {
-    const dx =
-      this.type === DirectionType.Vertical
-        ? (this.tracked.lineWidth + this.tracked.tickWidth) / 2
-        : this.tracked.tickWidth / 2;
-    const dy =
-      this.type === DirectionType.Horizontal
-        ? (this.tracked.lineWidth + this.tracked.tickHeight) / 2
-        : this.tracked.tickHeight / 2;
     selection
       .select("rect")
-      .attr("x", 0 - dx)
-      .attr("y", 0 - dy)
+      .attr("x", 0 - this.tracked.tickWidth / 2)
+      .attr("y", 0 - this.tracked.tickHeight / 2)
       .attr("width", this.tracked.tickWidth)
       .attr("height", this.tracked.tickHeight);
   }

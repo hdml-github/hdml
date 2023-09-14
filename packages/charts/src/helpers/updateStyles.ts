@@ -24,9 +24,16 @@ export type TrackedStyles = {
   fontWeight: number;
   fontStyle: string;
   color: string;
+
+  // line width
+  lineWidth: number;
+  lineWidthActive: number;
+  lineWidthFocus: number;
+  lineWidthHover: number;
+
   lineColor: string;
   lineStyle: string;
-  lineWidth: number;
+
   fillColor: string;
   tickStyle: "text" | "rect" | "ellipse";
   tickWidth: number;
@@ -70,7 +77,10 @@ function getSvgStyles(
   selector: string,
 ): string[] {
   const def = getSvgSelectorStyles(component, selector);
-  return [def];
+  const act = getSvgSelectorStyles(component, selector, "active");
+  const foc = getSvgSelectorStyles(component, selector, "focus");
+  const hov = getSvgSelectorStyles(component, selector, "hover");
+  return [def, act, foc, hov];
 }
 
 function getSvgSelectorStyles(
@@ -78,24 +88,43 @@ function getSvgSelectorStyles(
   selector: string,
   state?: "hover" | "focus" | "active",
 ): string {
-  state && component.classList.add(state);
-  const val =
-    `${selector}${state ? `:${state}` : ""} {\n` +
-    `\t${getSvgFillStyle(component.tracked)}\n` +
-    `\t${getSvgStrokeStyle(component.tracked)}\n` +
-    `\t${getSvgStrokeWidthStyle(component.tracked)}\n` +
-    `\t${getSvgStrokeDasharrayStyle(component.tracked)}\n` +
-    `\t${getSvgStrokeLinecapStyle(component.tracked)}\n` +
-    `\t${getSvgCursorStyle(component.tracked)}\n` +
-    `\t${getSvgOutlineStyle()}\n` +
-    `\t${getSvgFontFamilyStyle(component.tracked)}\n` +
-    `\t${getSvgFontSizeStyle(component.tracked)}\n` +
-    `\t${getSvgFontWeightStyle(component.tracked)}\n` +
-    `\t${getSvgFontStyleStyle(component.tracked)}\n` +
-    `\t${getSvgFontColorStyle(component.tracked)}\n` +
-    `}`;
-  state && component.classList.remove(state);
-  return val;
+  switch (state) {
+    case undefined:
+      return (
+        `${selector} {\n` +
+        `\t${getSvgFillStyle(component.tracked)}\n` +
+        `\t${getSvgStrokeStyle(component.tracked)}\n` +
+        `\t${getSvgStrokeWidthStyle(component.tracked)}\n` +
+        `\t${getSvgStrokeDasharrayStyle(component.tracked)}\n` +
+        `\t${getSvgStrokeLinecapStyle(component.tracked)}\n` +
+        `\t${getSvgCursorStyle(component.tracked)}\n` +
+        `\t${getSvgOutlineStyle()}\n` +
+        `\t${getSvgFontFamilyStyle(component.tracked)}\n` +
+        `\t${getSvgFontSizeStyle(component.tracked)}\n` +
+        `\t${getSvgFontWeightStyle(component.tracked)}\n` +
+        `\t${getSvgFontStyleStyle(component.tracked)}\n` +
+        `\t${getSvgFontColorStyle(component.tracked)}\n` +
+        `}`
+      );
+    case "active":
+      return (
+        `${selector}:active {\n` +
+        `\t${getSvgStrokeWidthStyle(component.tracked, "active")}\n` +
+        `}`
+      );
+    case "focus":
+      return (
+        `${selector}:focus {\n` +
+        `\t${getSvgStrokeWidthStyle(component.tracked, "focus")}\n` +
+        `}`
+      );
+    case "hover":
+      return (
+        `${selector}:hover {\n` +
+        `\t${getSvgStrokeWidthStyle(component.tracked, "hover")}\n` +
+        `}`
+      );
+  }
 }
 
 function getSvgCursorStyle(tracked: TrackedStyles): string {
@@ -130,13 +159,25 @@ function getSvgStrokeStyle(tracked: TrackedStyles): string {
   return `stroke: ${tracked.lineColor};`;
 }
 
-function getSvgStrokeWidthStyle(tracked: TrackedStyles): string {
+function getSvgStrokeWidthStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
   if (
     tracked.lineStyle === "solid" ||
     tracked.lineStyle === "dashed" ||
     tracked.lineStyle === "dotted"
   ) {
-    return `stroke-width: ${tracked.lineWidth};`;
+    switch (state) {
+      case undefined:
+        return `stroke-width: ${tracked.lineWidth};`;
+      case "active":
+        return `stroke-width: ${tracked.lineWidthActive};`;
+      case "focus":
+        return `stroke-width: ${tracked.lineWidthFocus};`;
+      case "hover":
+        return `stroke-width: ${tracked.lineWidthHover};`;
+    }
   } else {
     return "stroke-width: 0;";
   }

@@ -32,9 +32,16 @@ export abstract class AbstractChartElement extends UnifiedElement {
     fontWeight: 0,
     fontStyle: "normal",
     color: "rgba(0, 0, 0, 0)",
+
+    // line width
+    lineWidth: 0,
+    lineWidthActive: 0,
+    lineWidthFocus: 0,
+    lineWidthHover: 0,
+
     lineColor: "rgba(0, 0, 0, 0)",
     lineStyle: "solid",
-    lineWidth: 0,
+
     fillColor: "rgba(0, 0, 0, 0)",
     tickStyle: "ellipse",
     tickWidth: 5,
@@ -103,15 +110,30 @@ export abstract class AbstractChartElement extends UnifiedElement {
       const fontWeight = parseFloat(this.styles.fontWeight);
       const fontStyle = this.styles.fontStyle;
       const color = this.styles.color;
+
+      // line width
+      const lineWidth =
+        parseFloat(
+          this.styles.getPropertyValue("--hdml-line-width"),
+        ) || 0;
+      const lineWidthActive =
+        parseFloat(
+          this.styles.getPropertyValue("--hdml-line-width_active"),
+        ) || lineWidth;
+      const lineWidthFocus =
+        parseFloat(
+          this.styles.getPropertyValue("--hdml-line-width_focus"),
+        ) || lineWidth;
+      const lineWidthHover =
+        parseFloat(
+          this.styles.getPropertyValue("--hdml-line-width_hover"),
+        ) || lineWidth;
+
       const lineColor =
         this.styles.getPropertyValue("--hdml-line-color") ||
         "rgba(0, 0, 0, 0)";
       const lineStyle =
         this.styles.getPropertyValue("--hdml-line-style") || "solid";
-      const lineWidth =
-        parseFloat(
-          this.styles.getPropertyValue("--hdml-line-width"),
-        ) || 0;
       const fillColor =
         this.styles.getPropertyValue("--hdml-fill-color") ||
         "rgba(0, 0, 0, 0)";
@@ -189,9 +211,15 @@ export abstract class AbstractChartElement extends UnifiedElement {
         fontWeight,
         fontStyle,
         color,
+
+        // line width
+        lineWidth,
+        lineWidthActive,
+        lineWidthFocus,
+        lineWidthHover,
+
         lineColor,
         lineStyle,
-        lineWidth,
         fillColor,
         tickStyle,
         tickWidth,

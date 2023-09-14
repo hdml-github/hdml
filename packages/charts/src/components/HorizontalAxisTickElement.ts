@@ -6,10 +6,7 @@
 
 import { lit } from "@hdml/elements";
 import { Dimension } from "./AbstractScaleElement";
-import {
-  DirectionType,
-  HorizontalPosition,
-} from "./AbstractDirectionElement";
+import { DirectionType } from "./AbstractDirectionElement";
 import { AbstractAxisTickElement } from "./AbstractAxisTickElement";
 
 /**
@@ -22,20 +19,15 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      width: 100%;
-      border: none;
-      cursor: pointer;
-    }
-    :host([position=top]) {
-      top: 0%;
-    }
-    :host([position=center]) {
-      top: 50%;
-    }
-    :host([position=bottom]) {
       top: 100%;
+      cursor: pointer;
+      display: block !important;
+      position: absolute !important;
+      width: 100% !important;
+      height: 0 !important;
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
   `;
 
@@ -76,39 +68,6 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
               return value;
             } else {
               return "x";
-            }
-          }
-        },
-        toAttribute: (value: string): string => {
-          return value;
-        },
-      },
-    },
-
-    /**
-     * The `position` property definition.
-     */
-    position: {
-      type: String,
-      attribute: true,
-      reflect: true,
-      noAccessor: true,
-      state: false,
-      converter: {
-        fromAttribute: (
-          value: string,
-        ): "bottom" | "center" | "top" => {
-          if (!value) {
-            return "bottom";
-          } else {
-            if (
-              value === "bottom" ||
-              value === "center" ||
-              value === "top"
-            ) {
-              return value;
-            } else {
-              return "bottom";
             }
           }
         },
@@ -188,7 +147,6 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
   };
 
   private _dimension: Dimension = Dimension.X;
-  private _position: HorizontalPosition = HorizontalPosition.Bottom;
   private _count: null | number = null;
   private _values: null | number[] | string[] = null;
 
@@ -218,27 +176,6 @@ export class HorizontalAxisTickElement extends AbstractAxisTickElement {
    */
   public get dimension(): Dimension {
     return this._dimension;
-  }
-
-  /**
-   * @override
-   */
-  public set position(val: HorizontalPosition) {
-    const attr = this.getAttribute("position");
-    const sval = val;
-    if (attr !== sval) {
-      this.setAttribute("position", sval);
-    }
-    const old = this._position;
-    this._position = val;
-    this.requestUpdate("position", old);
-  }
-
-  /**
-   * @override
-   */
-  public get position(): HorizontalPosition {
-    return this._position;
   }
 
   /**
