@@ -45,6 +45,12 @@ export type TrackedStyles = {
   lineStyleFocus: string;
   lineStyleHover: string;
 
+  // fill color (background)
+  fillColor: string;
+  fillColorActive: string;
+  fillColorFocus: string;
+  fillColorHover: string;
+
   // font style
   fontFamily: string;
   fontSize: number;
@@ -52,7 +58,6 @@ export type TrackedStyles = {
   fontStyle: string;
   color: string;
 
-  fillColor: string;
   tickStyle: "text" | "rect" | "ellipse";
   tickWidth: number;
   tickHeight: number;
@@ -133,6 +138,7 @@ function getSvgSelectorStyles(
           component.tracked,
           "active",
         )}\n` +
+        `\t${getSvgFillStyle(component.tracked, "active")}\n` +
         `}`
       );
     case "focus":
@@ -144,6 +150,7 @@ function getSvgSelectorStyles(
           component.tracked,
           "focus",
         )}\n` +
+        `\t${getSvgFillStyle(component.tracked, "focus")}\n` +
         `}`
       );
     case "hover":
@@ -155,6 +162,7 @@ function getSvgSelectorStyles(
           component.tracked,
           "hover",
         )}\n` +
+        `\t${getSvgFillStyle(component.tracked, "hover")}\n` +
         `}`
       );
   }
@@ -279,6 +287,18 @@ function getSvgStrokeLinecapStyle(tracked: TrackedStyles): string {
   }
 }
 
-function getSvgFillStyle(tracked: TrackedStyles): string {
-  return `fill: ${tracked.fillColor};`;
+function getSvgFillStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `fill: ${tracked.fillColor};`;
+    case "active":
+      return `fill: ${tracked.fillColorActive};`;
+    case "focus":
+      return `fill: ${tracked.fillColorFocus};`;
+    case "hover":
+      return `fill: ${tracked.fillColorHover};`;
+  }
 }

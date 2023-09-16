@@ -60,7 +60,12 @@ export abstract class AbstractChartElement extends UnifiedElement {
     lineStyleFocus: "solid",
     lineStyleHover: "solid",
 
+    // fill color (background)
     fillColor: "rgba(0, 0, 0, 0)",
+    fillColorActive: "rgba(0, 0, 0, 0)",
+    fillColorFocus: "rgba(0, 0, 0, 0)",
+    fillColorHover: "rgba(0, 0, 0, 0)",
+
     tickStyle: "ellipse",
     tickWidth: 5,
     tickHeight: 5,
@@ -176,6 +181,20 @@ export abstract class AbstractChartElement extends UnifiedElement {
         this.styles.getPropertyValue("--hdml-line-style_hover") ||
         "solid";
 
+      // fill color (background)
+      const fillColor =
+        this.styles.getPropertyValue("--hdml-fill-color") ||
+        "rgba(0, 0, 0, 0)";
+      const fillColorActive =
+        this.styles.getPropertyValue("--hdml-fill-color_active") ||
+        "rgba(0, 0, 0, 0)";
+      const fillColorFocus =
+        this.styles.getPropertyValue("--hdml-fill-color_focus") ||
+        "rgba(0, 0, 0, 0)";
+      const fillColorHover =
+        this.styles.getPropertyValue("--hdml-fill-color_hover") ||
+        "rgba(0, 0, 0, 0)";
+
       // font style
       const fontFamily = this.styles.fontFamily;
       const fontSize = parseFloat(this.styles.fontSize);
@@ -184,9 +203,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
       const color = this.styles.color;
 
       //
-      const fillColor =
-        this.styles.getPropertyValue("--hdml-fill-color") ||
-        "rgba(0, 0, 0, 0)";
       const tickStyle =
         <"text" | "rect" | "ellipse">(
           this.styles.getPropertyValue("--hdml-tick-style")
@@ -282,6 +298,12 @@ export abstract class AbstractChartElement extends UnifiedElement {
         lineStyleFocus,
         lineStyleHover,
 
+        // fill color (background)
+        fillColor,
+        fillColorActive,
+        fillColorFocus,
+        fillColorHover,
+
         // font style
         fontFamily,
         fontSize,
@@ -289,7 +311,6 @@ export abstract class AbstractChartElement extends UnifiedElement {
         fontStyle,
         color,
 
-        fillColor,
         tickStyle,
         tickWidth,
         tickHeight,

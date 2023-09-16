@@ -8,16 +8,19 @@
   --theme-area-line: #aaa;
   --theme-area-line-bold: #868686;
 
+  --theme-area-fill: #eee;
+  --theme-area-fill-bold: #aaa;
+
+  --theme-tick-fill: #fff;
+  --theme-tick-fill-bold: #eee;
+
+  --theme-tick-style: ellipse;
   --theme-tick-width: 10px;
   --theme-tick-height: 10px;
-  --theme-tick-fill: #fff;
-  --theme-area-fill: #eee;
-  --theme-label-color: #000;
 }
 
 body.blue {
   --theme-line-color: #1180da;
-  --theme-label-color: #1180da;
   --theme-area-line: #5daae9;
   --theme-area-fill: #a1cef3;
   --theme-tick-fill: #fff;
@@ -25,7 +28,6 @@ body.blue {
 
 body.green {
   --theme-line-color: #079459;
-  --theme-label-color: #079459;
   --theme-area-line: #3aba84;
   --theme-area-fill: #7ee6ba;
   --theme-tick-fill: #fff;
@@ -37,7 +39,7 @@ body.bold {
 
 
 body {
-  color: var(--theme-label-color);
+  color: var(--theme-line-color);
 }
 table {
   width: 100%;
@@ -142,13 +144,14 @@ hdml-view.all-together-independent vertical-axis-tick {
   --hdml-line-style_focus: solid;
   --hdml-line-style_hover: solid;
   
-  --hdml-tick-style: ellipse;
+  --hdml-fill-color: var(--theme-tick-fill);
+  --hdml-fill-color_active: var(--theme-tick-fill-bold);
+  --hdml-fill-color_focus: var(--theme-tick-fill-bold);
+  --hdml-fill-color_hover: var(--theme-tick-fill-bold);
   
+  --hdml-tick-style: var(--theme-tick-style);
   --hdml-tick-width: var(--theme-tick-width);
-  
   --hdml-tick-height: var(--theme-tick-height);
-  
-  --hdml-fill-color: rgb(255, 255, 255);
 }
 horizontal-axis-tick.center {
   top: 50%;
@@ -162,8 +165,12 @@ hdml-view.all-together horizontal-axis-tick.labels,
 hdml-view.all-together vertical-axis-tick.labels,
 hdml-view.all-together-independent horizontal-axis-tick.labels,
 hdml-view.all-together-independent vertical-axis-tick.labels {
+  --hdml-fill-color: var(--theme-line-color);
+  --hdml-fill-color_active: var(--theme-line-color-bold);
+  --hdml-fill-color_focus: var(--theme-line-color-bold);
+  --hdml-fill-color_hover: var(--theme-line-color-bold);
+
   --hdml-tick-style: text;
-  --hdml-fill-color: var(--theme-label-color);
 }
 hdml-view.all-together horizontal-axis-tick.labels {
   top: calc(50% + 20px);
@@ -222,9 +229,13 @@ data-area {
   --hdml-line-style_focus: solid;
   --hdml-line-style_hover: solid;
 
+  --hdml-fill-color: var(--theme-area-fill);
+  --hdml-fill-color_active: var(--theme-area-fill-bold);
+  --hdml-fill-color_focus: var(--theme-area-fill-bold);
+  --hdml-fill-color_hover: var(--theme-area-fill-bold);
+
   --hdml-curve-type: cardinal;
   --hdml-curve-cardinal-tension: 0;
-  --hdml-fill-color: var(--theme-area-fill);
 }
 
 /* HDML POINTS */
@@ -244,8 +255,12 @@ data-point {
   --hdml-line-style_focus: solid;
   --hdml-line-style_hover: solid;
 
-  --hdml-tick-style: ellipse;
+  --hdml-fill-color: var(--theme-tick-fill);
+  --hdml-fill-color_active: var(--theme-tick-fill-bold);
+  --hdml-fill-color_focus: var(--theme-tick-fill-bold);
+  --hdml-fill-color_hover: var(--theme-tick-fill-bold);
+
+  --hdml-tick-style: var(--theme-tick-style);
   --hdml-tick-width: var(--theme-tick-width);
   --hdml-tick-height: var(--theme-tick-height);
-  --hdml-fill-color: rgb(255, 255, 255);
 }
