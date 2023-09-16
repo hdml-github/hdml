@@ -10,20 +10,22 @@ export type CompletedCSSStyleSheet = CSSStyleSheet & {
 };
 
 export type TrackedStyles = {
+  // size
   width: number;
   height: number;
+
+  // position
   top: number;
   left: number;
+
+  // paddings
   paddingTop: number;
   paddingRight: number;
   paddingBottom: number;
   paddingLeft: number;
+
+  // cursor
   cursor: string;
-  fontFamily: string;
-  fontSize: number;
-  fontWeight: number;
-  fontStyle: string;
-  color: string;
 
   // line width
   lineWidth: number;
@@ -31,8 +33,24 @@ export type TrackedStyles = {
   lineWidthFocus: number;
   lineWidthHover: number;
 
+  // line color
   lineColor: string;
+  lineColorActive: string;
+  lineColorFocus: string;
+  lineColorHover: string;
+
+  // line style
   lineStyle: string;
+  lineStyleActive: string;
+  lineStyleFocus: string;
+  lineStyleHover: string;
+
+  // font style
+  fontFamily: string;
+  fontSize: number;
+  fontWeight: number;
+  fontStyle: string;
+  color: string;
 
   fillColor: string;
   tickStyle: "text" | "rect" | "ellipse";
@@ -110,18 +128,33 @@ function getSvgSelectorStyles(
       return (
         `${selector}:active {\n` +
         `\t${getSvgStrokeWidthStyle(component.tracked, "active")}\n` +
+        `\t${getSvgStrokeStyle(component.tracked, "active")}\n` +
+        `\t${getSvgStrokeDasharrayStyle(
+          component.tracked,
+          "active",
+        )}\n` +
         `}`
       );
     case "focus":
       return (
         `${selector}:focus {\n` +
         `\t${getSvgStrokeWidthStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgStrokeStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgStrokeDasharrayStyle(
+          component.tracked,
+          "focus",
+        )}\n` +
         `}`
       );
     case "hover":
       return (
         `${selector}:hover {\n` +
         `\t${getSvgStrokeWidthStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgStrokeStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgStrokeDasharrayStyle(
+          component.tracked,
+          "hover",
+        )}\n` +
         `}`
       );
   }
@@ -155,8 +188,20 @@ function getSvgFontColorStyle(tracked: TrackedStyles): string {
   return `color: ${tracked.color};`;
 }
 
-function getSvgStrokeStyle(tracked: TrackedStyles): string {
-  return `stroke: ${tracked.lineColor};`;
+function getSvgStrokeStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `stroke: ${tracked.lineColor};`;
+    case "active":
+      return `stroke: ${tracked.lineColorActive};`;
+    case "focus":
+      return `stroke: ${tracked.lineColorFocus};`;
+    case "hover":
+      return `stroke: ${tracked.lineColorHover};`;
+  }
 }
 
 function getSvgStrokeWidthStyle(
@@ -183,17 +228,40 @@ function getSvgStrokeWidthStyle(
   }
 }
 
-function getSvgStrokeDasharrayStyle(tracked: TrackedStyles): string {
-  if (tracked.lineStyle === "solid") {
+function getSvgStrokeDasharrayStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  let lineStyle: string;
+  let lineWidth: number;
+  switch (state) {
+    case undefined:
+      lineStyle = tracked.lineStyle;
+      lineWidth = tracked.lineWidth;
+      break;
+    case "active":
+      lineStyle = tracked.lineStyleActive;
+      lineWidth = tracked.lineWidthActive;
+      break;
+    case "focus":
+      lineStyle = tracked.lineStyleFocus;
+      lineWidth = tracked.lineWidthFocus;
+      break;
+    case "hover":
+      lineStyle = tracked.lineStyleHover;
+      lineWidth = tracked.lineWidthHover;
+      break;
+  }
+  if (lineStyle === "solid") {
     return `stroke-dasharray: none;`;
-  } else if (tracked.lineStyle === "dashed") {
+  } else if (lineStyle === "dashed") {
     return (
       `stroke-dasharray: ` +
-      `${2 * tracked.lineWidth + 1},` +
-      `${tracked.lineWidth + 1};`
+      `${2 * lineWidth + 1},` +
+      `${lineWidth + 1};`
     );
-  } else if (tracked.lineStyle === "dotted") {
-    return `stroke-dasharray: 0, ${2 * tracked.lineWidth};`;
+  } else if (lineStyle === "dotted") {
+    return `stroke-dasharray: 0, ${2 * lineWidth};`;
   } else {
     return `stroke-dasharray: none;`;
   }

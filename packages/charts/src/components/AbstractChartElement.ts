@@ -18,15 +18,24 @@ export abstract class AbstractChartElement extends UnifiedElement {
   private _styles = window.getComputedStyle(this);
   private _cache: null | TrackedStyles = null;
   private _stored: TrackedStyles = {
+    // size
     width: 0,
     height: 0,
+
+    // position
     top: 0,
     left: 0,
+
+    // padding
     paddingTop: 0,
     paddingRight: 0,
     paddingBottom: 0,
     paddingLeft: 0,
+
+    // cursor
     cursor: "auto",
+
+    // font style
     fontFamily: "Times New Roman",
     fontSize: 0,
     fontWeight: 0,
@@ -39,8 +48,17 @@ export abstract class AbstractChartElement extends UnifiedElement {
     lineWidthFocus: 0,
     lineWidthHover: 0,
 
+    // line color
     lineColor: "rgba(0, 0, 0, 0)",
+    lineColorActive: "rgba(0, 0, 0, 0)",
+    lineColorFocus: "rgba(0, 0, 0, 0)",
+    lineColorHover: "rgba(0, 0, 0, 0)",
+
+    // line style
     lineStyle: "solid",
+    lineStyleActive: "solid",
+    lineStyleFocus: "solid",
+    lineStyleHover: "solid",
 
     fillColor: "rgba(0, 0, 0, 0)",
     tickStyle: "ellipse",
@@ -96,20 +114,22 @@ export abstract class AbstractChartElement extends UnifiedElement {
    */
   public get tracked(): TrackedStyles {
     if (!this._cache) {
+      // size
       const width = parseFloat(this.styles.width);
       const height = parseFloat(this.styles.height);
+
+      // position
       const top = parseFloat(this.styles.top);
       const left = parseFloat(this.styles.left);
+
+      // padding
       const paddingTop = parseFloat(this.styles.paddingTop);
       const paddingRight = parseFloat(this.styles.paddingRight);
       const paddingBottom = parseFloat(this.styles.paddingBottom);
       const paddingLeft = parseFloat(this.styles.paddingLeft);
+
+      // cursor
       const cursor = this.styles.cursor;
-      const fontFamily = this.styles.fontFamily;
-      const fontSize = parseFloat(this.styles.fontSize);
-      const fontWeight = parseFloat(this.styles.fontWeight);
-      const fontStyle = this.styles.fontStyle;
-      const color = this.styles.color;
 
       // line width
       const lineWidth =
@@ -129,11 +149,41 @@ export abstract class AbstractChartElement extends UnifiedElement {
           this.styles.getPropertyValue("--hdml-line-width_hover"),
         ) || lineWidth;
 
+      // line color
       const lineColor =
         this.styles.getPropertyValue("--hdml-line-color") ||
         "rgba(0, 0, 0, 0)";
+      const lineColorActive =
+        this.styles.getPropertyValue("--hdml-line-color_active") ||
+        "rgba(0, 0, 0, 0)";
+      const lineColorFocus =
+        this.styles.getPropertyValue("--hdml-line-color_focus") ||
+        "rgba(0, 0, 0, 0)";
+      const lineColorHover =
+        this.styles.getPropertyValue("--hdml-line-color_hover") ||
+        "rgba(0, 0, 0, 0)";
+
+      // line style
       const lineStyle =
         this.styles.getPropertyValue("--hdml-line-style") || "solid";
+      const lineStyleActive =
+        this.styles.getPropertyValue("--hdml-line-style_active") ||
+        "solid";
+      const lineStyleFocus =
+        this.styles.getPropertyValue("--hdml-line-style_focus") ||
+        "solid";
+      const lineStyleHover =
+        this.styles.getPropertyValue("--hdml-line-style_hover") ||
+        "solid";
+
+      // font style
+      const fontFamily = this.styles.fontFamily;
+      const fontSize = parseFloat(this.styles.fontSize);
+      const fontWeight = parseFloat(this.styles.fontWeight);
+      const fontStyle = this.styles.fontStyle;
+      const color = this.styles.color;
+
+      //
       const fillColor =
         this.styles.getPropertyValue("--hdml-fill-color") ||
         "rgba(0, 0, 0, 0)";
@@ -197,20 +247,22 @@ export abstract class AbstractChartElement extends UnifiedElement {
         ) || "middle";
 
       this._cache = {
+        // size
         width,
         height,
+
+        // position
         top,
         left,
+
+        // padding
         paddingTop,
         paddingRight,
         paddingBottom,
         paddingLeft,
+
+        // cursor
         cursor,
-        fontFamily,
-        fontSize,
-        fontWeight,
-        fontStyle,
-        color,
 
         // line width
         lineWidth,
@@ -218,8 +270,25 @@ export abstract class AbstractChartElement extends UnifiedElement {
         lineWidthFocus,
         lineWidthHover,
 
+        // line color
         lineColor,
+        lineColorActive,
+        lineColorFocus,
+        lineColorHover,
+
+        // line style
         lineStyle,
+        lineStyleActive,
+        lineStyleFocus,
+        lineStyleHover,
+
+        // font style
+        fontFamily,
+        fontSize,
+        fontWeight,
+        fontStyle,
+        color,
+
         fillColor,
         tickStyle,
         tickWidth,

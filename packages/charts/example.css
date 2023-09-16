@@ -1,11 +1,16 @@
 :root {
-  --theme-line-color: #000;
   --theme-line-width: 2px;
   --theme-line-width-bold: 3px;
+
+  --theme-line-color: #585858;
+  --theme-line-color-bold: #000;
+
+  --theme-area-line: #aaa;
+  --theme-area-line-bold: #868686;
+
   --theme-tick-width: 10px;
   --theme-tick-height: 10px;
   --theme-tick-fill: #fff;
-  --theme-area-line: #aaa;
   --theme-area-fill: #eee;
   --theme-label-color: #000;
 }
@@ -100,8 +105,15 @@ hdml-view.all-together-independent vertical-axis {
   --hdml-line-width_focus: var(--theme-line-width-bold);
   --hdml-line-width_hover: var(--theme-line-width-bold);
 
-  --hdml-line-style: solid;
   --hdml-line-color: var(--theme-line-color);
+  --hdml-line-color_active: var(--theme-line-color-bold);
+  --hdml-line-color_focus: var(--theme-line-color-bold);
+  --hdml-line-color_hover: var(--theme-line-color-bold);
+
+  --hdml-line-style: solid;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
 }
 horizontal-axis.center {
   top: 50%;
@@ -119,10 +131,16 @@ hdml-view.all-together-independent vertical-axis-tick {
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
   --hdml-line-width_hover: var(--theme-line-width-bold);
-
-  --hdml-line-style: solid;
   
   --hdml-line-color: var(--theme-line-color);
+  --hdml-line-color_active: var(--theme-line-color-bold);
+  --hdml-line-color_focus: var(--theme-line-color-bold);
+  --hdml-line-color_hover: var(--theme-line-color-bold);
+
+  --hdml-line-style: solid;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
   
   --hdml-tick-style: ellipse;
   
@@ -173,8 +191,16 @@ data-line {
   --hdml-line-width_focus: var(--theme-line-width-bold);
   --hdml-line-width_hover: var(--theme-line-width-bold);
 
-  --hdml-line-style: solid;
   --hdml-line-color: var(--theme-line-color);
+  --hdml-line-color_active: var(--theme-line-color-bold);
+  --hdml-line-color_focus: var(--theme-line-color-bold);
+  --hdml-line-color_hover: var(--theme-line-color-bold);
+
+  --hdml-line-style: solid;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
+
   --hdml-curve-type: cardinal;
   --hdml-curve-cardinal-tension: 0;
 }
@@ -186,8 +212,16 @@ data-area {
   --hdml-line-width_focus: var(--theme-line-width-bold);
   --hdml-line-width_hover: var(--theme-line-width-bold);
 
-  --hdml-line-style: dashed;
   --hdml-line-color: var(--theme-area-line);
+  --hdml-line-color_active: var(--theme-area-line-bold);
+  --hdml-line-color_focus: var(--theme-area-line-bold);
+  --hdml-line-color_hover: var(--theme-area-line-bold);
+
+  --hdml-line-style: dashed;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
+
   --hdml-curve-type: cardinal;
   --hdml-curve-cardinal-tension: 0;
   --hdml-fill-color: var(--theme-area-fill);
@@ -200,9 +234,17 @@ data-point {
   --hdml-line-width_focus: var(--theme-line-width-bold);
   --hdml-line-width_hover: var(--theme-line-width-bold);
 
-  --hdml-line-style: solid;
-  --hdml-tick-style: ellipse;
   --hdml-line-color: var(--theme-line-color);
+  --hdml-line-color_active: var(--theme-line-color-bold);
+  --hdml-line-color_focus: var(--theme-line-color-bold);
+  --hdml-line-color_hover: var(--theme-line-color-bold);
+
+  --hdml-line-style: solid;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
+
+  --hdml-tick-style: ellipse;
   --hdml-tick-width: var(--theme-tick-width);
   --hdml-tick-height: var(--theme-tick-height);
   --hdml-fill-color: rgb(255, 255, 255);
