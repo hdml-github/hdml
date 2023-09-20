@@ -66,9 +66,12 @@ export abstract class AbstractChartElement extends UnifiedElement {
     fillColorFocus: "rgba(0, 0, 0, 0)",
     fillColorHover: "rgba(0, 0, 0, 0)",
 
+    // tick style
     tickStyle: "ellipse",
     tickWidth: 5,
     tickHeight: 5,
+
+    // curve style
     curveType: "linear",
     curveBasisBeta: 0,
     curveBezierTangents: "horizontal",

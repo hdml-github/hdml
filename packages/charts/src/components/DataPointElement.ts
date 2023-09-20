@@ -12,18 +12,13 @@ import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 
 type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-export type SelectedGroup = Selection<
-  SVGGElement,
-  unknown,
-  null,
-  undefined
->;
+type SelectedGroup = Selection<SVGGElement, unknown, null, undefined>;
 type AxisEvent = (MouseEvent | PointerEvent | FocusEvent) & {
   datum?: [undefined | number | string, undefined | number | string];
 };
 
 /**
- * Data line element.
+ * Data point element.
  */
 class DataPointElement extends AbstractChartElement {
   /**
@@ -31,13 +26,14 @@ class DataPointElement extends AbstractChartElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      background: rgba(0, 0, 0, 0);
+      cursor: pointer;
+      display: block !important;
+      position: absolute !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      height: 100% !important;
+      padding: 0 !important;
+      background: rgba(0, 0, 0, 0) !important;
     }
   `;
 
@@ -230,6 +226,18 @@ class DataPointElement extends AbstractChartElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    if (this.scaleX) {
+      this.scaleX.addEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
+    if (this.scaleY) {
+      this.scaleY.addEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
     this.renderGeometry();
   }
 
@@ -237,6 +245,18 @@ class DataPointElement extends AbstractChartElement {
    * @override
    */
   public disconnectedCallback(): void {
+    if (this.scaleX) {
+      this.scaleX.removeEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
+    if (this.scaleY) {
+      this.scaleY.removeEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
     this._group?.remove();
     super.disconnectedCallback();
   }
@@ -274,8 +294,9 @@ class DataPointElement extends AbstractChartElement {
     options?: boolean | AddEventListenerOptions | undefined,
   ): void {
     if (!this._events.has(type)) {
+      this._style = null;
       this._events.add(type);
-      //
+      this.requestUpdate("_force", true);
     }
     super.addEventListener(type, listener, options);
   }
@@ -297,8 +318,10 @@ class DataPointElement extends AbstractChartElement {
     options?: boolean | EventListenerOptions | undefined,
   ): void {
     if (this._events.has(type)) {
+      this.removePoints();
+      this._style = null;
       this._events.delete(type);
-      //
+      this.requestUpdate("_force", true);
     }
     super.removeEventListener(type, listener, options);
   }
@@ -334,6 +357,7 @@ class DataPointElement extends AbstractChartElement {
    */
   protected updateGeometry(): void {
     if (this._group && this.x && this.y) {
+      this._group.attr("transform", this.getTranslation());
       if (this._style !== this.tracked.tickStyle) {
         this.removePoints();
       }
@@ -364,7 +388,8 @@ class DataPointElement extends AbstractChartElement {
     if (this.view?.svg && !this._group) {
       this._group = this.view.svg
         .append("g")
-        .attr("id", `_${this.uid}`);
+        .attr("id", `_${this.uid}`)
+        .attr("transform", this.getTranslation());
     } else if (this.view?.svg) {
       this.view.svg.insert(() => {
         if (this._group) {
@@ -374,6 +399,15 @@ class DataPointElement extends AbstractChartElement {
         }
       });
     }
+  }
+
+  /**
+   * Returns direction group `transform` property value.
+   */
+  private getTranslation(): string {
+    const x = this.tracked.left;
+    const y = this.tracked.top;
+    return `translate(${x}, ${y})`;
   }
 
   /**
@@ -756,5 +790,12 @@ class DataPointElement extends AbstractChartElement {
     }
     return datum;
   }
+
+  /**
+   * Associated scale component `updated` event listeners.
+   */
+  private scaleUpdatedListener = () => {
+    this.requestUpdate("_force", true);
+  };
 }
 customElements.define("data-point", DataPointElement);

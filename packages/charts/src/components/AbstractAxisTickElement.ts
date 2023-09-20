@@ -64,6 +64,55 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   }
 
   /**
+   * @override
+   */
+  public addEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void;
+  public addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | AddEventListenerOptions | undefined,
+  ): void {
+    if (!this._events.has(type)) {
+      this._tickStyle = null;
+      this._events.add(type);
+      this.requestUpdate("_force", true);
+    }
+    super.addEventListener(type, listener, options);
+  }
+
+  /**
+   * @override
+   */
+  public removeEventListener<K extends keyof HTMLElementEventMap>(
+    type: K,
+    listener: (
+      this: HTMLElement,
+      ev: HTMLElementEventMap[K],
+    ) => unknown,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void;
+  public removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+    options?: boolean | EventListenerOptions | undefined,
+  ): void {
+    if (this._events.has(type)) {
+      this.removeTicks();
+      this._tickStyle = null;
+      this._events.delete(type);
+      this.requestUpdate("_force", true);
+    }
+    super.removeEventListener(type, listener, options);
+  }
+
+  /**
    * @implements
    */
   protected updateGeometry(): void {
@@ -99,36 +148,6 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
         })
         .remove();
     }
-  }
-
-  /**
-   * Returns ticks data array.
-   */
-  private getData(): number[] | string[] {
-    let values: number[] | string[] = [];
-    if (this.isConnected && this.scale && this.scale.scale) {
-      if (this.scale instanceof LinearScaleElement) {
-        if (this.values) {
-          values = this.values;
-        } else if (this.count) {
-          values = this.scale.scale.ticks(this.count);
-        } else {
-          values = this.scale.scale.ticks(5);
-        }
-      } else if (this.scale instanceof OrdinalScaleElement) {
-        if (this.values) {
-          const scale = this.scale.scale;
-          values = (<string[]>this.values).filter(
-            (el: string) => scale.domain().indexOf(el) >= 0,
-          );
-        } else if (this.count) {
-          values = this.scale.scale.domain().slice(0, this.count);
-        } else {
-          values = this.scale.scale.domain();
-        }
-      }
-    }
-    return values;
   }
 
   /**
@@ -396,51 +415,33 @@ export abstract class AbstractAxisTickElement extends AbstractDirectionElement {
   }
 
   /**
-   * @override
+   * Returns ticks data array.
    */
-  public addEventListener<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (
-      this: HTMLElement,
-      ev: HTMLElementEventMap[K],
-    ) => unknown,
-    options?: boolean | AddEventListenerOptions | undefined,
-  ): void;
-  public addEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions | undefined,
-  ): void {
-    if (!this._events.has(type)) {
-      this._tickStyle = null;
-      this._events.add(type);
-      this.requestUpdate("_force", true);
+  private getData(): number[] | string[] {
+    let values: number[] | string[] = [];
+    if (this.isConnected && this.scale && this.scale.scale) {
+      if (this.scale instanceof LinearScaleElement) {
+        if (this.values) {
+          values = this.values;
+        } else if (this.count) {
+          values = this.scale.scale.ticks(this.count);
+        } else {
+          values = this.scale.scale.ticks(5);
+        }
+      } else if (this.scale instanceof OrdinalScaleElement) {
+        if (this.values) {
+          const scale = this.scale.scale;
+          values = (<string[]>this.values).filter(
+            (el: string) => scale.domain().indexOf(el) >= 0,
+          );
+        } else if (this.count) {
+          values = this.scale.scale.domain().slice(0, this.count);
+        } else {
+          values = this.scale.scale.domain();
+        }
+      }
     }
-    super.addEventListener(type, listener, options);
-  }
-
-  /**
-   * @override
-   */
-  public removeEventListener<K extends keyof HTMLElementEventMap>(
-    type: K,
-    listener: (
-      this: HTMLElement,
-      ev: HTMLElementEventMap[K],
-    ) => unknown,
-    options?: boolean | EventListenerOptions | undefined,
-  ): void;
-  public removeEventListener(
-    type: string,
-    listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions | undefined,
-  ): void {
-    if (this._events.has(type)) {
-      this._tickStyle = null;
-      this._events.delete(type);
-      this.requestUpdate("_force", true);
-    }
-    super.removeEventListener(type, listener, options);
+    return values;
   }
 
   /**

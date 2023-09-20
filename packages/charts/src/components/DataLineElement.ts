@@ -50,13 +50,14 @@ class DataLineElement extends AbstractChartElement {
    */
   public static styles = lit.css`
     :host {
-      display: block;
-      position: absolute;
-      box-sizing: border-box;
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      background: rgba(0, 0, 0, 0);
+      cursor: pointer;
+      display: block !important;
+      position: absolute !important;
+      box-sizing: border-box !important;
+      width: 100% !important;
+      height: 100% !important;
+      padding: 0 !important;
+      background: rgba(0, 0, 0, 0) !important;
     }
   `;
 
@@ -248,6 +249,18 @@ class DataLineElement extends AbstractChartElement {
    */
   public connectedCallback(): void {
     super.connectedCallback();
+    if (this.scaleX) {
+      this.scaleX.addEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
+    if (this.scaleY) {
+      this.scaleY.addEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
     this.renderGeometry();
   }
 
@@ -255,6 +268,18 @@ class DataLineElement extends AbstractChartElement {
    * @override
    */
   public disconnectedCallback(): void {
+    if (this.scaleX) {
+      this.scaleX.removeEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
+    if (this.scaleY) {
+      this.scaleY.removeEventListener(
+        "updated",
+        this.scaleUpdatedListener,
+      );
+    }
     this._selectedPath?.remove();
     super.disconnectedCallback();
   }
@@ -525,5 +550,12 @@ class DataLineElement extends AbstractChartElement {
     }
     return datum;
   }
+
+  /**
+   * Associated scale component `updated` event listeners.
+   */
+  private scaleUpdatedListener = () => {
+    this.requestUpdate("_force", true);
+  };
 }
 customElements.define("data-line", DataLineElement);

@@ -175,13 +175,6 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
   }
 
   /**
-   * Associated scale component `updated` event listeners.
-   */
-  private scaleUpdatedListener = () => {
-    this.requestUpdate("_force", true);
-  };
-
-  /**
    * Returns direction group `transform` property value.
    */
   private getTranslation(): string {
@@ -204,5 +197,12 @@ abstract class AbstractDirectionElement extends AbstractChartElement {
     }
     return `translate(${x}, ${y})`;
   }
+
+  /**
+   * Associated scale component `updated` event listeners.
+   */
+  private scaleUpdatedListener = () => {
+    this.requestUpdate("_force", true);
+  };
 }
 export { AbstractDirectionElement };

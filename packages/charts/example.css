@@ -12,32 +12,31 @@
   --theme-area-fill-bold: #aaa;
 
   --theme-tick-fill: #fff;
-  --theme-tick-fill-bold: #eee;
+  --theme-tick-fill-bold: #aaa;
 
   --theme-tick-style: ellipse;
   --theme-tick-width: 10px;
   --theme-tick-height: 10px;
 }
 
+/* THEMES */
 body.blue {
   --theme-line-color: #1180da;
   --theme-area-line: #5daae9;
   --theme-area-fill: #a1cef3;
   --theme-tick-fill: #fff;
 }
-
 body.green {
   --theme-line-color: #079459;
   --theme-area-line: #3aba84;
   --theme-area-fill: #7ee6ba;
   --theme-tick-fill: #fff;
 }
-
 body.bold {
   --theme-line-width: 4px;
 }
 
-
+/* COMMON STYLES */
 body {
   color: var(--theme-line-color);
 }
@@ -52,7 +51,6 @@ thead {
   font-weight: bold;
   background-color: var(--theme-area-fill);
 }
-
 div.container {
   display: block;
   position: absolute;
@@ -60,7 +58,6 @@ div.container {
   width: 95%;
   height: 300%;
 }
-
 div.block {
   display: block;
   position: relative;
@@ -263,4 +260,14 @@ data-point {
   --hdml-tick-style: var(--theme-tick-style);
   --hdml-tick-width: var(--theme-tick-width);
   --hdml-tick-height: var(--theme-tick-height);
+}
+
+data-point.labels {
+  top: -20px;
+  --hdml-fill-color: var(--theme-line-color);
+  --hdml-fill-color_active: var(--theme-line-color-bold);
+  --hdml-fill-color_focus: var(--theme-line-color-bold);
+  --hdml-fill-color_hover: var(--theme-line-color-bold);
+
+  --hdml-tick-style: text;
 }
