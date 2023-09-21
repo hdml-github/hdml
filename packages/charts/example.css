@@ -17,6 +17,14 @@
   --theme-tick-style: ellipse;
   --theme-tick-width: 10px;
   --theme-tick-height: 10px;
+
+  --theme-font-family: inherit;
+  --theme-font-size: 16px;
+  --theme-font-size-bold: 18px;
+  --theme-font-weight: normal;
+  --theme-font-weight-bold: bold;
+  --theme-font-style: normal;
+  --theme-font-style-bold: italic;
 }
 
 /* THEMES */
@@ -84,9 +92,6 @@ hdml-view.all-together-independent cartesian-plane {
 hdml-view.all-together ordinal-scale {
   padding: 0 0 0 40px;
 }
-/* hdml-view.all-together-independent ordinal-scale {
-  padding: 0 0 0 15px;
-} */
 hdml-view.all-together linear-scale {
   --hdml-padding: 15px 0;
   --hdml-padding-hover: 25px 0;
@@ -126,6 +131,10 @@ hdml-view.all-together horizontal-axis-tick,
 hdml-view.all-together vertical-axis-tick,
 hdml-view.all-together-independent horizontal-axis-tick,
 hdml-view.all-together-independent vertical-axis-tick {
+  --hdml-tick-style: var(--theme-tick-style);
+  --hdml-tick-width: var(--theme-tick-width);
+  --hdml-tick-height: var(--theme-tick-height);
+
   --hdml-line-width: var(--theme-line-width);
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
@@ -145,10 +154,6 @@ hdml-view.all-together-independent vertical-axis-tick {
   --hdml-fill-color_active: var(--theme-tick-fill-bold);
   --hdml-fill-color_focus: var(--theme-tick-fill-bold);
   --hdml-fill-color_hover: var(--theme-tick-fill-bold);
-  
-  --hdml-tick-style: var(--theme-tick-style);
-  --hdml-tick-width: var(--theme-tick-width);
-  --hdml-tick-height: var(--theme-tick-height);
 }
 horizontal-axis-tick.center {
   top: 50%;
@@ -162,12 +167,32 @@ hdml-view.all-together horizontal-axis-tick.labels,
 hdml-view.all-together vertical-axis-tick.labels,
 hdml-view.all-together-independent horizontal-axis-tick.labels,
 hdml-view.all-together-independent vertical-axis-tick.labels {
+  --hdml-tick-style: text;
+
+  --hdml-font-family: var(--theme-font-family);
+  --hdml-font-family_active: var(--theme-font-family);
+  --hdml-font-family_focus: var(--theme-font-family);
+  --hdml-font-family_hover: var(--theme-font-family);
+
+  --hdml-font-size: var(--theme-font-size);
+  --hdml-font-size_active: var(--theme-font-size-bold);
+  --hdml-font-size_focus: var(--theme-font-size-bold);
+  --hdml-font-size_hover: var(--theme-font-size-bold);
+
+  --hdml-font-weight: var(--theme-font-weight);
+  --hdml-font-weight_active: var(--theme-font-weight-bold);
+  --hdml-font-weight_focus: var(--theme-font-weight-bold);
+  --hdml-font-weight_hover: var(--theme-font-weight-bold);
+
+  --hdml-font-style: var(--theme-font-style);
+  --hdml-font-style_active: var(--theme-font-style-bold);
+  --hdml-font-style_focus: var(--theme-font-style-bold);
+  --hdml-font-style_hover: var(--theme-font-style-bold);
+
   --hdml-fill-color: var(--theme-line-color);
   --hdml-fill-color_active: var(--theme-line-color-bold);
   --hdml-fill-color_focus: var(--theme-line-color-bold);
   --hdml-fill-color_hover: var(--theme-line-color-bold);
-
-  --hdml-tick-style: text;
 }
 hdml-view.all-together horizontal-axis-tick.labels {
   top: calc(50% + 20px);
@@ -190,6 +215,9 @@ hdml-view.all-together-independent vertical-axis-tick.labels.center {
 
 /* HDML LINES */
 data-line {
+  --hdml-curve-type: cardinal;
+  --hdml-curve-cardinal-tension: 0;
+
   --hdml-line-width: var(--theme-line-width);
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
@@ -204,13 +232,13 @@ data-line {
   --hdml-line-style_active: solid;
   --hdml-line-style_focus: solid;
   --hdml-line-style_hover: solid;
-
-  --hdml-curve-type: cardinal;
-  --hdml-curve-cardinal-tension: 0;
 }
 
 /* HDML AREAS */
 data-area {
+  --hdml-curve-type: cardinal;
+  --hdml-curve-cardinal-tension: 0;
+
   --hdml-line-width: var(--theme-line-width);
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
@@ -230,13 +258,14 @@ data-area {
   --hdml-fill-color_active: var(--theme-area-fill-bold);
   --hdml-fill-color_focus: var(--theme-area-fill-bold);
   --hdml-fill-color_hover: var(--theme-area-fill-bold);
-
-  --hdml-curve-type: cardinal;
-  --hdml-curve-cardinal-tension: 0;
 }
 
 /* HDML POINTS */
 data-point {
+  --hdml-tick-style: var(--theme-tick-style);
+  --hdml-tick-width: var(--theme-tick-width);
+  --hdml-tick-height: var(--theme-tick-height);
+
   --hdml-line-width: var(--theme-line-width);
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
@@ -256,18 +285,36 @@ data-point {
   --hdml-fill-color_active: var(--theme-tick-fill-bold);
   --hdml-fill-color_focus: var(--theme-tick-fill-bold);
   --hdml-fill-color_hover: var(--theme-tick-fill-bold);
-
-  --hdml-tick-style: var(--theme-tick-style);
-  --hdml-tick-width: var(--theme-tick-width);
-  --hdml-tick-height: var(--theme-tick-height);
 }
 
+/* HDML POINTS LABELS */
 data-point.labels {
   top: -20px;
+
+  --hdml-tick-style: text;
+
+  --hdml-font-family: var(--theme-font-family);
+  --hdml-font-family_active: var(--theme-font-family);
+  --hdml-font-family_focus: var(--theme-font-family);
+  --hdml-font-family_hover: var(--theme-font-family);
+
+  --hdml-font-size: var(--theme-font-size);
+  --hdml-font-size_active: var(--theme-font-size-bold);
+  --hdml-font-size_focus: var(--theme-font-size-bold);
+  --hdml-font-size_hover: var(--theme-font-size-bold);
+
+  --hdml-font-weight: var(--theme-font-weight);
+  --hdml-font-weight_active: var(--theme-font-weight-bold);
+  --hdml-font-weight_focus: var(--theme-font-weight-bold);
+  --hdml-font-weight_hover: var(--theme-font-weight-bold);
+
+  --hdml-font-style: var(--theme-font-style);
+  --hdml-font-style_active: var(--theme-font-style-bold);
+  --hdml-font-style_focus: var(--theme-font-style-bold);
+  --hdml-font-style_hover: var(--theme-font-style-bold);
+
   --hdml-fill-color: var(--theme-line-color);
   --hdml-fill-color_active: var(--theme-line-color-bold);
   --hdml-fill-color_focus: var(--theme-line-color-bold);
   --hdml-fill-color_hover: var(--theme-line-color-bold);
-
-  --hdml-tick-style: text;
 }

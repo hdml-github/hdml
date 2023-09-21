@@ -35,12 +35,29 @@ export abstract class AbstractChartElement extends UnifiedElement {
     // cursor
     cursor: "auto",
 
+    // font family
+    fontFamily: "inherit",
+    fontFamilyActive: "inherit",
+    fontFamilyFocus: "inherit",
+    fontFamilyHover: "inherit",
+
+    // font size
+    fontSize: "inherit",
+    fontSizeActive: "inherit",
+    fontSizeFocus: "inherit",
+    fontSizeHover: "inherit",
+
+    // font weight
+    fontWeight: "inherit",
+    fontWeightActive: "inherit",
+    fontWeightFocus: "inherit",
+    fontWeightHover: "inherit",
+
     // font style
-    fontFamily: "Times New Roman",
-    fontSize: 0,
-    fontWeight: 0,
-    fontStyle: "normal",
-    color: "rgba(0, 0, 0, 0)",
+    fontStyle: "inherit",
+    fontStyleActive: "inherit",
+    fontStyleFocus: "inherit",
+    fontStyleHover: "inherit",
 
     // line width
     lineWidth: 0,
@@ -198,14 +215,62 @@ export abstract class AbstractChartElement extends UnifiedElement {
         this.styles.getPropertyValue("--hdml-fill-color_hover") ||
         "rgba(0, 0, 0, 0)";
 
-      // font style
-      const fontFamily = this.styles.fontFamily;
-      const fontSize = parseFloat(this.styles.fontSize);
-      const fontWeight = parseFloat(this.styles.fontWeight);
-      const fontStyle = this.styles.fontStyle;
-      const color = this.styles.color;
+      // font family
+      const fontFamily =
+        this.styles.getPropertyValue("--hdml-font-family") ||
+        "inherit";
+      const fontFamilyActive =
+        this.styles.getPropertyValue("--hdml-font-family_active") ||
+        "inherit";
+      const fontFamilyFocus =
+        this.styles.getPropertyValue("--hdml-font-family_focus") ||
+        "inherit";
+      const fontFamilyHover =
+        this.styles.getPropertyValue("--hdml-font-family_hover") ||
+        "inherit";
 
-      //
+      // font size
+      const fontSize =
+        this.styles.getPropertyValue("--hdml-font-size") || "inherit";
+      const fontSizeActive =
+        this.styles.getPropertyValue("--hdml-font-size_active") ||
+        "inherit";
+      const fontSizeFocus =
+        this.styles.getPropertyValue("--hdml-font-size_focus") ||
+        "inherit";
+      const fontSizeHover =
+        this.styles.getPropertyValue("--hdml-font-size_hover") ||
+        "inherit";
+
+      // font size
+      const fontWeight =
+        this.styles.getPropertyValue("--hdml-font-weight") ||
+        "inherit";
+      const fontWeightActive =
+        this.styles.getPropertyValue("--hdml-font-weight_active") ||
+        "inherit";
+      const fontWeightFocus =
+        this.styles.getPropertyValue("--hdml-font-weight_focus") ||
+        "inherit";
+      const fontWeightHover =
+        this.styles.getPropertyValue("--hdml-font-weight_hover") ||
+        "inherit";
+
+      // font style
+      const fontStyle =
+        this.styles.getPropertyValue("--hdml-font-style") ||
+        "inherit";
+      const fontStyleActive =
+        this.styles.getPropertyValue("--hdml-font-style_active") ||
+        "inherit";
+      const fontStyleFocus =
+        this.styles.getPropertyValue("--hdml-font-style_focus") ||
+        "inherit";
+      const fontStyleHover =
+        this.styles.getPropertyValue("--hdml-font-style_hover") ||
+        "inherit";
+
+      // tick style
       const tickStyle =
         <"text" | "rect" | "ellipse">(
           this.styles.getPropertyValue("--hdml-tick-style")
@@ -307,12 +372,29 @@ export abstract class AbstractChartElement extends UnifiedElement {
         fillColorFocus,
         fillColorHover,
 
-        // font style
+        // font family
         fontFamily,
+        fontFamilyActive,
+        fontFamilyFocus,
+        fontFamilyHover,
+
+        // font size
         fontSize,
+        fontSizeActive,
+        fontSizeFocus,
+        fontSizeHover,
+
+        // font weight
         fontWeight,
+        fontWeightActive,
+        fontWeightFocus,
+        fontWeightHover,
+
+        // font style
         fontStyle,
-        color,
+        fontStyleActive,
+        fontStyleFocus,
+        fontStyleHover,
 
         tickStyle,
         tickWidth,

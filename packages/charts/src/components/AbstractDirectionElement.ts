@@ -12,14 +12,12 @@ import { OrdinalScaleElement } from "./OrdinalScaleElement";
 import { LinearScaleElement } from "./LinearScaleElement";
 
 export type ScaleElement = OrdinalScaleElement | LinearScaleElement;
-
 export type SelectedGroup = Selection<
   SVGGElement,
   unknown,
   null,
   undefined
 >;
-
 export enum DirectionType {
   Horizontal,
   Vertical,

@@ -51,12 +51,29 @@ export type TrackedStyles = {
   fillColorFocus: string;
   fillColorHover: string;
 
-  // font style
+  // font family
   fontFamily: string;
-  fontSize: number;
-  fontWeight: number;
+  fontFamilyActive: string;
+  fontFamilyFocus: string;
+  fontFamilyHover: string;
+
+  // font size
+  fontSize: string;
+  fontSizeActive: string;
+  fontSizeFocus: string;
+  fontSizeHover: string;
+
+  // font weight
+  fontWeight: string;
+  fontWeightActive: string;
+  fontWeightFocus: string;
+  fontWeightHover: string;
+
+  // font style
   fontStyle: string;
-  color: string;
+  fontStyleActive: string;
+  fontStyleFocus: string;
+  fontStyleHover: string;
 
   tickStyle: "text" | "rect" | "ellipse";
   tickWidth: number;
@@ -126,7 +143,6 @@ function getSvgSelectorStyles(
         `\t${getSvgFontSizeStyle(component.tracked)}\n` +
         `\t${getSvgFontWeightStyle(component.tracked)}\n` +
         `\t${getSvgFontStyleStyle(component.tracked)}\n` +
-        `\t${getSvgFontColorStyle(component.tracked)}\n` +
         `}`
       );
     case "active":
@@ -139,6 +155,10 @@ function getSvgSelectorStyles(
           "active",
         )}\n` +
         `\t${getSvgFillStyle(component.tracked, "active")}\n` +
+        `\t${getSvgFontFamilyStyle(component.tracked, "active")}\n` +
+        `\t${getSvgFontSizeStyle(component.tracked, "active")}\n` +
+        `\t${getSvgFontWeightStyle(component.tracked, "active")}\n` +
+        `\t${getSvgFontStyleStyle(component.tracked, "active")}\n` +
         `}`
       );
     case "focus":
@@ -151,6 +171,10 @@ function getSvgSelectorStyles(
           "focus",
         )}\n` +
         `\t${getSvgFillStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgFontFamilyStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgFontSizeStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgFontWeightStyle(component.tracked, "focus")}\n` +
+        `\t${getSvgFontStyleStyle(component.tracked, "focus")}\n` +
         `}`
       );
     case "hover":
@@ -163,6 +187,10 @@ function getSvgSelectorStyles(
           "hover",
         )}\n` +
         `\t${getSvgFillStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgFontFamilyStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgFontSizeStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgFontWeightStyle(component.tracked, "hover")}\n` +
+        `\t${getSvgFontStyleStyle(component.tracked, "hover")}\n` +
         `}`
       );
   }
@@ -176,24 +204,68 @@ function getSvgOutlineStyle(): string {
   return "outline: none;";
 }
 
-function getSvgFontFamilyStyle(tracked: TrackedStyles): string {
-  return `font-family: ${tracked.fontFamily};`;
+function getSvgFontFamilyStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `font-family: ${tracked.fontFamily};`;
+    case "active":
+      return `font-family: ${tracked.fontFamilyActive};`;
+    case "focus":
+      return `font-family: ${tracked.fontFamilyFocus};`;
+    case "hover":
+      return `font-family: ${tracked.fontFamilyHover};`;
+  }
 }
 
-function getSvgFontSizeStyle(tracked: TrackedStyles): string {
-  return `font-size: ${tracked.fontSize}px;`;
+function getSvgFontSizeStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `font-size: ${tracked.fontSize};`;
+    case "active":
+      return `font-size: ${tracked.fontSizeActive};`;
+    case "focus":
+      return `font-size: ${tracked.fontSizeFocus};`;
+    case "hover":
+      return `font-size: ${tracked.fontSizeHover};`;
+  }
 }
 
-function getSvgFontWeightStyle(tracked: TrackedStyles): string {
-  return `font-weight: ${tracked.fontWeight};`;
+function getSvgFontWeightStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `font-weight: ${tracked.fontWeight};`;
+    case "active":
+      return `font-weight: ${tracked.fontWeightActive};`;
+    case "focus":
+      return `font-weight: ${tracked.fontWeightFocus};`;
+    case "hover":
+      return `font-weight: ${tracked.fontWeightHover};`;
+  }
 }
 
-function getSvgFontStyleStyle(tracked: TrackedStyles): string {
-  return `font-style: ${tracked.fontStyle};`;
-}
-
-function getSvgFontColorStyle(tracked: TrackedStyles): string {
-  return `color: ${tracked.color};`;
+function getSvgFontStyleStyle(
+  tracked: TrackedStyles,
+  state?: "hover" | "focus" | "active",
+): string {
+  switch (state) {
+    case undefined:
+      return `font-style: ${tracked.fontStyle};`;
+    case "active":
+      return `font-style: ${tracked.fontStyleActive};`;
+    case "focus":
+      return `font-style: ${tracked.fontStyleFocus};`;
+    case "hover":
+      return `font-style: ${tracked.fontStyleHover};`;
+  }
 }
 
 function getSvgStrokeStyle(
