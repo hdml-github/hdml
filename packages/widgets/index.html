@@ -1,0 +1,281 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/widgets.min.js"></script>
+    <!-- <script type="module" src="/esm/index.js"></script> -->
+    <style>
+      body {
+        margin: 0;
+      }
+      hdml-model.basic-model {
+        height: 100vh;
+      }
+    </style>
+  </head>
+    <body>
+        <!-- <hdml-io
+          name="hdml.io"
+          host="http://localhost:8888"
+          tenant="common"
+          token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.cLGnPoJVR-6AFWz4vKEX_cHppAt2WVmVyVCfhKhOywlsolvg6D4NvGc5bBLRpJeUgPKXmNBvKiFNG8KBmFXVlDqanu77iXyBIbo1BrRwnTDc8C9F5NQBPHBzNS8Xi9DIq0oQ5ceN2Rcq0T-7Bh5W9T3s9cjNZugURkX43dA1ev5uGiXMZVo7Q8uTcw0hhFnEiQP5O8QeCSIqrHylvK97QRNOiOAiwbtA2-C7_8w8hVRBfQ8CTC3-c9zuFSigFn97cdn_L-0xjg2Ihe-q5tIsW6JojFxXIsoeZ5dXSWWxeVdcP5eo_0I0ihiv_2-JUwmQQ1FSAgSuRWtqytMiTm81x0J9jgVB8tLcak08fORn8vENIgYBS9gLmLM8CdM9GXLSNYhB7SFJG7LQiHe_UsyIAe3ALN65vIYEyqVeA4jGztYq5w-w09LtszKYRK4NAC5sQ6yFdfrMkqj0FgYbVolH0KmxDWKdHIBzpUQJ4ooXPHJpCUzicrWi0B2-cQkvnXd7.pIulXHlCoZ-9zBUi.GQ_KGaAGSzHOkxaZ86DUJ_7qZYGaNSWGlRT9N6vBOPoAHu4wBD7ZBbzwPiZZPODxbxiKY0tyJxb8h4lFJQRw05lDo8HrDuf4FPnNH3WLN2sihECbjN2augqEp6sfl-Qjb0KfVRdsIyLGQBwHZZZAqAG9vNhT.j9SvG3qiwuTetm55-zvBGw">
+        </hdml-io> -->
+
+        <hdml-model
+          class="basic-model"
+          name="model">
+
+          <hdml-table
+            name="tables"
+            type="table"
+            source="`tenant_postgres`.`information_schema`.`tables`"
+            onmouseover="console.log('!!!')">
+
+            <hdml-field
+              name="catalog"
+              origin="table_catalog">
+            </hdml-field>
+            <hdml-field
+              name="schema"
+              origin="table_schema">
+            </hdml-field>
+            <hdml-field
+              name="table"
+              origin="table_name">
+            </hdml-field>
+            <hdml-field
+              name="full"
+              clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)">
+            </hdml-field>
+            <hdml-field
+              name="hash"
+              clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"
+              type="binary">
+            </hdml-field>
+            <hdml-field
+              name="type"
+              origin="table_type">
+            </hdml-field>
+          </hdml-table>
+
+          <hdml-table
+            name="columns"
+            type="query"
+            source="select * from `tenant_postgres`.`information_schema`.`columns`">
+
+            <hdml-field
+              name="catalog"
+              origin="table_catalog">
+            </hdml-field>
+            <hdml-field
+              name="schema"
+              origin="table_schema">
+            </hdml-field>
+            <hdml-field
+              name="table"
+              origin="table_name">
+            </hdml-field>
+            <hdml-field
+              name="column"
+              origin="column_name">
+            </hdml-field>
+            <hdml-field
+              name="position"
+              origin="ordinal_position"
+              type="int-32">
+            </hdml-field>
+            <hdml-field
+              name="default"
+              origin="column_default">
+            </hdml-field>
+            <hdml-field
+              name="nullable"
+              origin="is_nullable">
+            </hdml-field>
+            <hdml-field
+              name="type"
+              origin="data_type">
+            </hdml-field>
+          </hdml-table>
+
+          <hdml-join
+            type="inner"
+            left="tables"
+            right="columns">
+            <hdml-connective
+              operator="and">
+              <hdml-filter
+                type="keys"
+                left="catalog"
+                right="catalog">
+              </hdml-filter>
+              <hdml-filter
+                type="keys"
+                left="schema"
+                right="schema">
+              </hdml-filter>
+              <hdml-filter
+                type="keys"
+                left="table"
+                right="table">
+              </hdml-filter>            
+              <hdml-connective
+                operator="or">
+                <hdml-filter
+                  type="expr"
+                  clause="`columns`.`table` = 'applicable_roles'">
+                </hdml-filter>
+                <hdml-filter
+                  type="expr"
+                  clause="`columns`.`table` = 'tables'">
+                </hdml-filter>
+                <hdml-connective
+                  operator="or">
+                  <hdml-filter
+                    type="expr"
+                    clause="1 = 1">
+                </hdml-connective>
+              </hdml-connective>
+            </hdml-connective>
+          </hdml-join>
+        </hdml-model>
+
+        <hdml-frame
+          name="frame"
+          source="/models/model.html?hdml-model=model"
+          offset="0"
+          limit="1000">
+          <hdml-field
+            name="catalog"
+            origin="columns_catalog">
+          </hdml-field>
+          <hdml-field
+            name="schema"
+            origin="columns_schema">
+          </hdml-field>
+          <hdml-field
+            name="table"
+            origin="columns_table">
+          </hdml-field>
+          <hdml-field
+            name="column"
+            origin="columns_column">
+          </hdml-field>
+          <hdml-field
+            name="count"
+            origin="columns_column"
+            agg="count">
+          </hdml-field>
+
+          <hdml-group-by>
+            <hdml-field
+              name="catalog">
+            </hdml-field>
+            <hdml-field
+              name="schema">
+            </hdml-field>
+            <hdml-field
+              name="table">
+            </hdml-field>
+            <hdml-field
+              name="column">
+            </hdml-field>
+          </hdml-group-by>
+        </hdml-frame>
+
+        <hdml-frame
+          name="query"
+          source="/frames/frame.html?hdml-frame=frame">
+          <div>
+            <div>
+              <hdml-field
+                name="catalog">
+              </hdml-field>
+              <hdml-field
+                name="schema">
+              </hdml-field>
+              <hdml-field
+                name="table">
+              </hdml-field>
+              <hdml-field
+                name="sum"
+                origin="count"
+                agg="sum">
+              </hdml-field>
+            </div>
+          </div>
+
+          <div>
+            <hdml-filter-by>
+              <hdml-connective
+                operator="and">
+                <hdml-filter
+                  type="expr"
+                  clause="`catalog` = 'tenant_postgres'">
+                </hdml-filter>
+                <hdml-filter
+                  type="expr"
+                  clause="`schema` = 'information_schema'">
+                </hdml-filter>
+              </hdml-connective>
+            </hdml-filter-by>
+          </div>
+
+          <div>
+            <hdml-group-by>
+              <div>
+                <hdml-field
+                  name="catalog">
+                </hdml-field>
+                <hdml-field
+                  name="schema">
+                </hdml-field>
+                <hdml-field
+                  name="table">
+                </hdml-field>
+              </div>
+            </hdml-group-by>
+          </div>
+
+          <div>
+            <hdml-sort-by>
+              <hdml-field
+                name="catalog">
+              </hdml-field>
+              <hdml-field
+                name="schema">
+              </hdml-field>
+              <hdml-field
+                name="table"
+                asc="true">
+              </hdml-field>
+            </hdml-sort-by>
+          </div>
+        </hdml-frame>
+
+      <script>
+        // const m = document.querySelector("hdml-model");
+        // const f1 = document.querySelector("hdml-frame[name=frame]");
+        // const f2 = document.querySelector("hdml-frame[name=query]");
+
+        // m.addEventListener("hdml-data", (event) => {
+        //   console.log(event.detail.table.toString());
+        // });
+        // f1.addEventListener("hdml-data", (event) => {
+        //   console.log(event.detail.table.toString());
+        // });
+        // f2.addEventListener("hdml-data", (event) => {
+        //   console.log(event.detail.table.toString());
+        // });
+
+        // m.query();
+        // f1.query();
+        // f2.query();
+      </script>
+    </body>
+</html>

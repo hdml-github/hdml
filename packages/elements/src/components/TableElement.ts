@@ -186,6 +186,13 @@ export class TableElement extends UnifiedElement {
   }
 
   /**
+   * An iterable iterator of the table's child fields.
+   */
+  public get fields(): IterableIterator<FieldElement> {
+    return this._fields.values();
+  }
+
+  /**
    * The `TableDef` object.
    */
   public get data(): TableDef {

@@ -57,7 +57,7 @@ export default {
     file: min,
     sourcemap: true,
     plugins: [
-      terser(),
+      // terser(),
     ],
   }],
 };

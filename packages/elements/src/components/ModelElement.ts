@@ -88,6 +88,20 @@ export class ModelElement extends UnifiedElement {
   }
 
   /**
+   * An iterable iterator of the model's child tables.
+   */
+  public get tables(): IterableIterator<TableElement> {
+    return this._tables.values();
+  }
+
+  /**
+   * An iterable iterator of the model's child joins.
+   */
+  public get joins(): IterableIterator<JoinElement> {
+    return this._joins.values();
+  }
+
+  /**
    * The `ModelDef` object.
    */
   public get data(): ModelDef {

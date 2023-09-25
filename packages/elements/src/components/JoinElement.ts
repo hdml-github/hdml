@@ -185,6 +185,13 @@ export class JoinElement extends UnifiedElement {
   }
 
   /**
+   * The assosiated `ConnectiveElement` element.
+   */
+  public get connective(): null | ConnectiveElement {
+    return this._connective;
+  }
+
+  /**
    * The `JoinDef` object.
    */
   public get data(): JoinDef {
