@@ -1,0 +1,25 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<html>
+  <head>
+    <script type="module" src="/bin/charts.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+
+      runTests(async () => {
+        describe("Mock test", () => {
+          it("must be passed", () => {
+            expect(1).to.equal(1);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

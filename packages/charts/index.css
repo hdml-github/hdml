@@ -1,0 +1,173 @@
+body {
+  margin: 0;
+}
+
+/* COMMON --------------------------------------------------- */
+
+/* HDML VIEW */
+hdml-view {
+  width: 80%;
+  height: 260px;
+}
+
+/* HDML PLANE */
+cartesian-plane.first {
+  width: 50%;
+  height: 100%;
+  padding: 25px 5px 25px 75px;
+}
+cartesian-plane.second {
+  width: 50%;
+  height: 100%;
+  left: 50%;
+  padding: 25px 75px 25px 5px;
+}
+
+/* HDML SCALE */
+cartesian-plane.first ordinal-scale {
+  padding: 45px 0;
+}
+cartesian-plane.first linear-scale {
+  padding: 0 15px;
+}
+cartesian-plane.second ordinal-scale {
+  padding: 0 45px;
+}
+cartesian-plane.second linear-scale {
+  padding: 15px 0;
+}
+
+/* HDML AXIS */
+horizontal-axis,
+vertical-axis {
+  --hdml-line-width: 2px;
+  --hdml-line-style: solid;
+}
+
+/* HDML AXIS TICK */
+horizontal-axis-tick,
+vertical-axis-tick {
+  --hdml-line-width: 2px;
+  --hdml-line-style: solid;
+  --hdml-tick-style: ellipse;
+  --hdml-tick-width: 10px;
+  --hdml-tick-height: 10px;
+}
+
+data-line {
+  --hdml-line-width: 5px;
+  --hdml-line-style: solid;
+  --hdml-line-color: rgb(28, 140, 244);
+  --hdml-curve-type: natural;
+  --hdml-curve-cubic-monotonicity: x;
+  --hdml-curve-step-change: before;
+  --hdml-curve-bezier-tangents: horizontal;
+  --hdml-curve-basis-beta: 1;
+  --hdml-curve-cardinal-tension: 0;
+  --hdml-curve-catmull-rom-alpha: 0;
+}
+
+data-area {
+  --hdml-fill-color: rgb(126, 188, 246);
+  --hdml-curve-type: natural;
+  --hdml-curve-cubic-monotonicity: x;
+  --hdml-curve-step-change: before;
+  --hdml-curve-bezier-tangents: horizontal;
+  --hdml-curve-basis-beta: 1;
+  --hdml-curve-cardinal-tension: 0;
+  --hdml-curve-catmull-rom-alpha: 0;
+}
+
+data-point {
+  --hdml-line-width: 2px;
+  --hdml-line-style: solid;
+  --hdml-line-color: rgb(28, 140, 244);
+  --hdml-fill-color: rgb(255, 255, 255);
+  --hdml-tick-style: ellipse;
+  --hdml-tick-width: 10px;
+  --hdml-tick-height: 10px;
+}
+
+/* BLUE THEME ----------------------------------------------- */
+
+/* HDML AXIS */
+.blue horizontal-axis,
+.blue vertical-axis {
+  --hdml-line-color: rgb(126, 188, 246);
+}
+.blue horizontal-axis.hover,
+.blue vertical-axis.hover {
+  --hdml-line-color: rgb(28, 140, 244);
+}
+.blue horizontal-axis.focus,
+.blue vertical-axis.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.blue horizontal-axis.active,
+.blue vertical-axis.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK */
+.blue horizontal-axis-tick,
+.blue vertical-axis-tick {
+  --hdml-line-color: rgb(126, 188, 246);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.blue horizontal-axis-tick.hover,
+.blue vertical-axis-tick.hover {
+  --hdml-line-color: rgb(28, 140, 244);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.blue horizontal-axis-tick.focus,
+.blue vertical-axis-tick.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.blue horizontal-axis-tick.active,
+.blue vertical-axis-tick.active {
+  --hdml-line-color: rgb(244, 28, 28);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+
+/* GREEN THEME ---------------------------------------------- */
+
+/* HDML AXIS */
+.green horizontal-axis,
+.green vertical-axis {
+  --hdml-line-color: rgb(74, 225, 109);
+}
+.green horizontal-axis.hover,
+.green vertical-axis.hover {
+  --hdml-line-color: rgb(30, 185, 66);
+}
+.green horizontal-axis.focus,
+.green vertical-axis.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+}
+.green horizontal-axis.active,
+.green vertical-axis.active {
+  --hdml-line-color: rgb(244, 28, 28);
+}
+
+/* HDML AXIS TICK */
+.green horizontal-axis-tick,
+.green vertical-axis-tick {
+  --hdml-line-color: rgb(74, 225, 109);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.green horizontal-axis-tick.hover,
+.green vertical-axis-tick.hover {
+  --hdml-line-color: rgb(30, 185, 66);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.green horizontal-axis-tick.focus,
+.green vertical-axis-tick.focus {
+  --hdml-line-color: rgb(245, 121, 121);
+  --hdml-fill-color: rgb(255, 255, 255);
+}
+.green horizontal-axis-tick.active,
+.green vertical-axis-tick.active {
+  --hdml-line-color: rgb(244, 28, 28);
+  --hdml-fill-color: rgb(255, 255, 255);
+}

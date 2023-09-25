@@ -1,0 +1,752 @@
+@startuml index
+  title Table of content
+
+  object Content {
+    +[[./init_workflow.svg Observers initialization workflow]]
+    
+    --View--
+    +[[./hdml_view_append.svg <hdml-view/> append workflow]]
+    +[[./hdml_view_styles_changed.svg <hdml-view/> styles-changed workflow]]
+    +[[./hdml_view_remove.svg <hdml-view/> remove workflow]]
+    
+    --Planes--
+    +[[./cartesian_plane_append.svg <cartesian-plane/> append workflow]]
+    +[[./cartesian_plane_styles_changed.svg <cartesian-plane/> styles-changed workflow]]
+    +[[./cartesian_plane_remove.svg <cartesian-plane/> remove workflow]]
+    ....
+    +[[./polar_plane_append.svg <polar-plane/> append workflow]]
+    +[[./polar_plane_styles_changed.svg <polar-plane/> styles-changed workflow]]
+    +[[./polar_plane_remove.svg <polar-plane/> remove workflow]]
+    
+    --Scales--
+    +[[./linear_scale_append.svg <linear-scale/> append workflow]]
+    +[[./linear_scale_styles_changed.svg <linear-scale/> styles-changed workflow]]
+    +[[./linear_scale_remove.svg <linear-scale/> remove workflow]]
+    ....
+    +[[./ordinal_scale_append.svg <ordinal-scale/> append workflow]]
+    +[[./ordinal_scale_styles_changed.svg <ordinal-scale/> styles-changed workflow]]
+    +[[./ordinal_scale_remove.svg <ordinal-scale/> remove workflow]]
+    ....
+    #[[./chromatic_scale_append.svg <chromatic-scale/> append workflow]]
+    #[[./chromatic_scale_styles_changed.svg <chromatic-scale/> styles-changed workflow]]
+    #[[./chromatic_scale_remove.svg <chromatic-scale/> remove workflow]]
+    --Classes--
+    +[[./classes.svg Classes diagram]]
+  }
+@enduml
+
+@startuml init_workflow
+  title Initial Workflow (observers)
+
+  actor User
+  participant Window
+  control robserver
+  control mobserver
+  control dispatchImmediate
+  control dispatchDelayed
+
+  group #b3e5fc Init
+    User -> Window: open
+
+    create dispatchDelayed
+    Window -> dispatchDelayed: creates
+
+    create dispatchImmediate
+    Window -> dispatchImmediate: creates
+
+    Window -> mobserver: enable
+    Window -> robserver: enable
+  end
+
+  group #b3e5fc Window Resized
+    User -> Window: resize
+    Window -> robserver: trigger
+    robserver -> dispatchImmediate: run
+    dispatchImmediate -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
+  end
+
+  group #b3e5fc Style Changed
+    User -> Window: interact
+    Window -> Window: change DOM-element style
+    Window -> mobserver: trigger
+    mobserver -> dispatchImmediate: run
+    dispatchImmediate -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
+  end
+
+  group #b3e5fc Class Changed
+    User -> Window: interact
+    Window -> Window: change DOM-element class
+    Window -> mobserver: trigger
+    mobserver -> dispatchDelayed: run
+    ==async==
+    dispatchDelayed -> Window: call dispatchEvent(<b>"styles-changed"</b>)
+    Window -> : dispatches <b>"styles-changed"</b>
+  end
+@enduml
+
+' ////////////////////////////////////////////////////////////////////
+
+@startuml hdml_view_append
+  title <hdml-view/> append workflow
+
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    participant AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  -> Window: append <hdml-view/>
+  Window -> HdmlViewElement: creates new HdmlViewElement()
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement <- HdmlViewElement: runs super()
+    Window <- AbstractChartElement: creates a shadow DOM
+    Window <- AbstractChartElement: attaches styles to a shadow DOM
+
+    group #039be5 connectedCallback
+      AbstractChartElement -> HdmlViewElement: runs this.connectedCallback()
+      AbstractChartElement <- HdmlViewElement: runs super.connectedCallback()
+      AbstractChartElement -> Window: runs addEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> HdmlViewElement: runs render()
+      AbstractChartElement <- HdmlViewElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 fistUpdated
+      AbstractChartElement -> HdmlViewElement: runs this.firstUpdated()
+      Window <- HdmlViewElement: render canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.firstUpdated()
+    end
+
+    group #039be5 updated
+      AbstractChartElement -> HdmlViewElement: runs this.updated()
+      Window <- HdmlViewElement: updates canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml hdml_view_styles_changed
+  title <hdml-view/> styles-changed workflow
+
+  actor User
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    participant AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  User -> Window: interact
+  Window -> : dispatches <b>"styles-changed"</b> event
+  AbstractChartElement <- : handle <b>"styles-changed"</b> event
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> HdmlViewElement: runs render()
+      AbstractChartElement <- HdmlViewElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 updated
+      AbstractChartElement -> HdmlViewElement: runs this.updated()
+      Window <- HdmlViewElement: updates canvas in the shadow tree
+      AbstractChartElement <- HdmlViewElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml hdml_view_remove
+  title <hdml-view/> remove workflow
+
+  participant Window
+
+  box <hdml-view/> #e0e0e0
+    participant AbstractChartElement
+    collections HdmlViewElement
+  end box
+
+  -> Window: remove <hdml-view/>
+
+  group #b3e5fc Pre-Update
+
+    group #039be5 disconnectedCallback
+      AbstractChartElement -> HdmlViewElement: runs this.disconnectedCallback()
+      AbstractChartElement <- HdmlViewElement: runs super.disconnectedCallback()
+      AbstractChartElement -> Window: runs removeEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+@enduml
+
+' ////////////////////////////////////////////////////////////////////
+
+@startuml cartesian_plane_append
+  title <cartesian-plane/> append workflow
+
+  participant Window
+
+  box <cartesian-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections CartesianPlaneElement
+  end box
+
+  -> Window: append <cartesian-plane/>
+  Window -> CartesianPlaneElement: creates new CartesianPlaneElement()
+
+  group #b3e5fc Pre-Update
+    AbstractPlaneElement <- CartesianPlaneElement: runs super()
+    AbstractChartElement <- AbstractPlaneElement: runs super()
+    Window <- AbstractChartElement: creates a shadow DOM
+    Window <- AbstractChartElement: attaches styles to a shadow DOM
+
+    group #039be5 connectedCallback
+      AbstractChartElement -> CartesianPlaneElement: runs this.connectedCallback()
+      AbstractPlaneElement <- CartesianPlaneElement: runs super.connectedCallback()
+      AbstractChartElement <- AbstractPlaneElement: runs super.connectedCallback()
+      AbstractChartElement -> Window: runs addEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> CartesianPlaneElement: runs render()
+      AbstractChartElement <- CartesianPlaneElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 fistUpdated
+      AbstractChartElement -> CartesianPlaneElement: runs this.firstUpdated()
+      AbstractPlaneElement <- CartesianPlaneElement: runs super.firstUpdated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.firstUpdated()
+    end
+
+    group #039be5 updated
+      AbstractChartElement -> CartesianPlaneElement: runs this.updated()
+      AbstractPlaneElement <- CartesianPlaneElement: runs super.updated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml cartesian_plane_styles_changed
+  title <cartesian-plane/> styles-changed workflow
+
+  actor User
+  participant Window
+
+  box <cartesian-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections CartesianPlaneElement
+  end box
+
+  User -> Window: interact
+  Window -> : dispatches <b>"styles-changed"</b> event
+  AbstractChartElement <- : handle <b>"styles-changed"</b> event
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> CartesianPlaneElement: runs render()
+      AbstractChartElement <- CartesianPlaneElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 updated
+      AbstractChartElement -> CartesianPlaneElement: runs this.updated()
+      AbstractPlaneElement <- CartesianPlaneElement: runs super.updated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml cartesian_plane_remove
+  title <cartesian-plane/> remove workflow
+
+  participant Window
+
+  box <cartesian-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections CartesianPlaneElement
+  end box
+
+  -> Window: remove <cartesian-plane/>
+
+  group #b3e5fc Pre-Update
+
+    group #039be5 disconnectedCallback
+      AbstractChartElement -> CartesianPlaneElement: runs this.disconnectedCallback()
+      AbstractPlaneElement <- CartesianPlaneElement: runs super.disconnectedCallback()
+      AbstractChartElement <- AbstractPlaneElement: runs super.disconnectedCallback()
+      AbstractChartElement -> Window: runs removeEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+@enduml
+
+' ////////////////////////////////////////////////////////////////////
+
+@startuml polar_plane_append
+  title <polar-plane/> append workflow
+
+  participant Window
+
+  box <polar-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections PolarPlaneElement
+  end box
+
+  -> Window: append <polar-plane/>
+  Window -> PolarPlaneElement: creates new PolarPlaneElement()
+
+  group #b3e5fc Pre-Update
+    AbstractPlaneElement <- PolarPlaneElement: runs super()
+    AbstractChartElement <- AbstractPlaneElement: runs super()
+    Window <- AbstractChartElement: creates a shadow DOM
+    Window <- AbstractChartElement: attaches styles to a shadow DOM
+
+    group #039be5 connectedCallback
+      AbstractChartElement -> PolarPlaneElement: runs this.connectedCallback()
+      AbstractPlaneElement <- PolarPlaneElement: runs super.connectedCallback()
+      AbstractChartElement <- AbstractPlaneElement: runs super.connectedCallback()
+      AbstractChartElement -> Window: runs addEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> PolarPlaneElement: runs render()
+      AbstractChartElement <- PolarPlaneElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 fistUpdated
+      AbstractChartElement -> PolarPlaneElement: runs this.firstUpdated()
+      AbstractPlaneElement <- PolarPlaneElement: runs super.firstUpdated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.firstUpdated()
+    end
+
+    group #039be5 updated
+      AbstractChartElement -> PolarPlaneElement: runs this.updated()
+      AbstractPlaneElement <- PolarPlaneElement: runs super.updated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml polar_plane_styles_changed
+  title <polar-plane/> styles-changed workflow
+
+  actor User
+  participant Window
+
+  box <polar-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections PolarPlaneElement
+  end box
+
+  User -> Window: interact
+  Window -> : dispatches <b>"styles-changed"</b> event
+  AbstractChartElement <- : handle <b>"styles-changed"</b> event
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> PolarPlaneElement: runs render()
+      AbstractChartElement <- PolarPlaneElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 updated
+      AbstractChartElement -> PolarPlaneElement: runs this.updated()
+      AbstractPlaneElement <- PolarPlaneElement: runs super.updated()
+      AbstractChartElement <- AbstractPlaneElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml polar_plane_remove
+  title <polar-plane/> remove workflow
+
+  participant Window
+
+  box <polar-plane/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractPlaneElement
+    collections PolarPlaneElement
+  end box
+
+  -> Window: remove <polar-plane/>
+
+  group #b3e5fc Pre-Update
+
+    group #039be5 disconnectedCallback
+      AbstractChartElement -> PolarPlaneElement: runs this.disconnectedCallback()
+      AbstractPlaneElement <- PolarPlaneElement: runs super.disconnectedCallback()
+      AbstractChartElement <- AbstractPlaneElement: runs super.disconnectedCallback()
+      AbstractChartElement -> Window: runs removeEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+@enduml
+
+' ////////////////////////////////////////////////////////////////////
+
+@startuml linear_scale_append
+  title <linear-scale/> append workflow
+
+  participant Window
+
+  box <linear-scale/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractScaleElement
+    collections LinearScaleElement
+  end box
+
+  -> Window: append <linear-scale/>
+  Window -> LinearScaleElement: creates new LinearScaleElement()
+
+  group #b3e5fc Pre-Update
+    AbstractScaleElement <- LinearScaleElement: runs super()
+    AbstractChartElement <- AbstractScaleElement: runs super()
+    Window <- AbstractChartElement: creates a shadow DOM
+    Window <- AbstractChartElement: attaches styles to a shadow DOM
+
+    group #039be5 connectedCallback
+      AbstractChartElement -> LinearScaleElement: runs this.connectedCallback()
+      AbstractScaleElement <- LinearScaleElement: runs super.connectedCallback()
+      AbstractChartElement <- AbstractScaleElement: runs super.connectedCallback()
+      AbstractChartElement -> Window: runs addEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    
+    group #039be5 shouldUpdate
+      AbstractChartElement -> LinearScaleElement: runs this.shouldUpdate()
+      AbstractChartElement <- LinearScaleElement: runs super.shouldUpdate()
+    end
+    
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> AbstractScaleElement: runs this.render()
+      AbstractChartElement <- AbstractScaleElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+
+    group #039be5 fistUpdated
+      AbstractChartElement -> LinearScaleElement: runs this.firstUpdated()
+      LinearScaleElement -> LinearScaleElement: sync attributes
+      AbstractScaleElement <- LinearScaleElement: runs super.firstUpdated()
+      AbstractChartElement <- AbstractScaleElement: runs super.firstUpdated()
+    end
+
+    group #039be5 updated
+      AbstractChartElement -> LinearScaleElement: runs this.updated()
+      AbstractScaleElement <- LinearScaleElement: runs super.updated()
+      AbstractChartElement <- AbstractScaleElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml linear_scale_styles_changed
+  title <linear-scale/> styles-changed workflow
+
+  actor User
+  participant Window
+
+  box <linear-scale/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractScaleElement
+    collections LinearScaleElement
+  end box
+
+  User -> Window: interact
+  Window -> : dispatches <b>"styles-changed"</b> event
+  AbstractChartElement <- : handle <b>"styles-changed"</b> event
+
+  group #b3e5fc Pre-Update
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+
+  ==async==
+
+  group #b3e5fc Update
+    AbstractChartElement -> AbstractChartElement: runs performUpdate()
+    AbstractChartElement -> AbstractChartElement: runs shouldUpdate()
+    AbstractChartElement -> AbstractChartElement: runs willUpdate()
+    AbstractChartElement -> AbstractChartElement: runs update()
+    
+    group #039be5 render
+      AbstractChartElement -> LinearScaleElement: runs render()
+      AbstractChartElement <- LinearScaleElement: returns template
+    end
+
+    Window <- AbstractChartElement: updates shadow tree
+  end
+
+  group #b3e5fc Post-Updated
+    group #039be5 updated
+      AbstractChartElement -> LinearScaleElement: runs this.updated()
+      AbstractScaleElement <- LinearScaleElement: runs super.updated()
+      AbstractChartElement <- AbstractScaleElement: runs super.updated()
+      AbstractChartElement -> : dispatches <b>"updated"</b> event
+    end
+
+    AbstractChartElement -> AbstractChartElement: resolves updateComplete
+  end
+@enduml
+
+@startuml linear_scale_remove
+  title <linear-scale/> remove workflow
+
+  participant Window
+
+  box <linear-scale/> #e0e0e0
+    participant AbstractChartElement
+    participant AbstractScaleElement
+    collections LinearScaleElement
+  end box
+
+  -> Window: remove <linear-scale/>
+
+  group #b3e5fc Pre-Update
+
+    group #039be5 disconnectedCallback
+      AbstractChartElement -> LinearScaleElement: runs this.disconnectedCallback()
+      AbstractScaleElement <- LinearScaleElement: runs super.disconnectedCallback()
+      AbstractChartElement <- AbstractScaleElement: runs super.disconnectedCallback()
+      AbstractChartElement -> Window: runs removeEventListener(<b>"styles-changed"</b>)
+    end
+
+    AbstractChartElement -> AbstractChartElement: runs requestUpdate()
+  end
+@enduml
+
+' ////////////////////////////////////////////////////////////////////
+
+@startuml classes
+  title AbstractChartElement
+
+  package "@hdml/elements" as hdml_elements_pkg {
+    class LitElement {
+      +updateComplete: Promise<void>
+      ....
+      +connectedCallback(): void
+      +disconnectedCallback(): void
+      +requestUpdate(): void
+      ....
+      +performUpdate(): any
+      +shouldUpdate(changedProperties: Map): true
+      +willUpdate(changedProperties: Map): void
+      +update(changedProperties: Map): void
+      +render(): TemplateResult
+      ....
+      +firstUpdated(changedProperties: Map): void
+      +updated(changedProperties: Map): void
+    }
+
+    class UnifiedElement {
+      +get uid(): string
+      ....
+      +verify(component: UnifiedElement): boolean
+      +queryHdmlChildren(tag: string): UnifiedElement[]
+    }
+    LitElement <|- UnifiedElement
+  }
+
+  class StyleChangedEvent {
+    +type: <b>styles-changed</b>
+    +cancelable: false
+    +composed: false
+    +bubbles: false
+  }
+
+  class UpdatedEvent {
+    +type: <b>updated</b>
+    +cancelable: false
+    +composed: false
+    +bubbles: false
+  }
+
+  abstract class AbstractChartElement {
+    -_view: null | HdmlViewElement
+    -_ssheet: CSSStyleSheet
+    -_styles: CSSStyleDeclaration
+    -_stored: TrackedStyles
+    ....
+    #{abstract} geometrySelector: string
+    ....
+    +get view(): null | HdmlViewElement
+    +get styles(): CSSStyleDeclaration
+    +get tracked(): TrackedStyles
+    +get stored(): TrackedStyles
+    ....
+    +connectedCallback(): void
+    +disconnectedCallback(): void
+    ....
+    +shouldUpdate(changedProperties: Map): boolean
+    ....
+    +firstUpdated(changedProperties: Map): void
+    +updated(changedProperties: Map): void
+    ....
+    #resetStylesheets(sheets: CSSStyleSheet[]): void
+    #updateStyles(): void
+    #{abstract} renderGeometry(): void
+    #{abstract} updateGeometry(): void
+    ....
+    -stylesChangedListener(): void
+    -getStaticStyles(): CSSResult
+  }
+  UnifiedElement <|- AbstractChartElement
+  StyleChangedEvent --> AbstractChartElement: listen for
+  UpdatedEvent <-- AbstractChartElement: dispatches
+
+  class HdmlViewElement {
+    +{static} styles: CSSResult
+    ....
+    -_svg: null | Selection<SVGSVGElement>
+    -_stylesheets: Set<CSSStyleSheet>
+    ....
+    #geometrySelector: string
+    ....
+    +get svg(): null | Selection<SVGSVGElement>
+    ....
+    +render(): TemplateResult
+    ....
+    +firstUpdated(changedProperties: Map): void
+    +updated(changedProperties: Map): void
+    ....
+    #renderGeometry(): void
+    #updateGeometry(): void
+    ....
+    +addStylesheet(stylesheet: CSSStyleSheet): void
+    +removeStylesheet(stylesheet: CSSStyleSheet): void
+  }
+  AbstractChartElement <|- HdmlViewElement
+  AbstractChartElement -> HdmlViewElement: has an access\nto through the\nview getter
+@enduml

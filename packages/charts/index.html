@@ -1,0 +1,224 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/charts.min.js"></script>
+    <link rel="stylesheet" href="/index.css" />
+  </head>
+    <body class="blue">
+      <br><br><br>
+      My charts:
+      <hdml-view>
+        <cartesian-plane class="first">
+          <linear-scale
+            min="0"
+            max="100">
+            <ordinal-scale
+              bandwidth="0"
+              values='["t0", "t1", "t2", "t3"]'
+              rest='null'>
+
+              <!-- X-axis -->
+              <horizontal-axis
+                dimension="x"
+                position="bottom">
+              </horizontal-axis>
+              <horizontal-axis-tick
+                dimension="x"
+                position="bottom"
+                count="11">
+              </horizontal-axis-tick>
+
+              <!-- Y-axis -->
+              <vertical-axis
+                dimension="y"
+                position="left">
+              </vertical-axis>
+              <vertical-axis-tick
+                dimension="y"
+                position="left"
+                values='["t0", "t1", "t2", "t3"]'>
+              </vertical-axis-tick>
+
+              <!-- Dataset visualization -->
+              <data-area
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y0='["t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0"]'
+                y1='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-area>
+              <data-line
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-line>
+              <data-point
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-point>
+
+            </ordinal-scale>
+          </linear-scale>
+        </cartesian-plane>
+
+        <cartesian-plane class="second">
+          <ordinal-scale
+              bandwidth="0"
+              values='["t1", "t2", "t3"]'
+              rest='null'>
+              <linear-scale
+                min="0"
+                max="100">
+  
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x"
+                  position="top">
+                </horizontal-axis>
+                <horizontal-axis-tick
+                  dimension="x"
+                  position="top"
+                  values='["t1", "t2", "t3"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y"
+                  position="right">
+                </vertical-axis>
+                <vertical-axis-tick
+                  dimension="y"
+                  position="right"
+                  count="3">
+                </vertical-axis-tick>
+
+                <!-- Dataset visualization -->
+                <data-area
+                  x='["t1", "t2", "t3"]'
+                  y0="[25, 15, 30]"
+                  y1="[75, 54, 90]">
+                </data-area>
+                <data-line
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-line>
+                <data-point
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-point>
+
+              </linear-scale>
+          </ordinal-scale>
+        </cartesian-plane>
+      </hdml-view>
+
+      <br><br><br>
+      My charts:
+      <hdml-view>
+        <cartesian-plane class="first">
+          <linear-scale
+            min="0"
+            max="100">
+            <ordinal-scale
+              bandwidth="0"
+              values='["t0", "t1", "t2", "t3"]'
+              rest='null'>
+
+              <!-- X-axis -->
+              <horizontal-axis
+                dimension="x"
+                position="bottom">
+              </horizontal-axis>
+              <horizontal-axis-tick
+                dimension="x"
+                position="bottom"
+                count="11">
+              </horizontal-axis-tick>
+
+              <!-- Y-axis -->
+              <vertical-axis
+                dimension="y"
+                position="left">
+              </vertical-axis>
+              <vertical-axis-tick
+                dimension="y"
+                position="left"
+                values='["t0", "t1", "t2", "t3"]'>
+              </vertical-axis-tick>
+
+              <!-- Dataset visualization -->
+              <data-area
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y0='["t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0", "t0"]'
+                y1='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-area>
+              <data-line
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-line>
+              <data-point
+                x="[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]"
+                y='["t1", "t2", "t2", "t3", "t3", "t2", "t2", "t1", "t1", "t3", "t2"]'>
+              </data-point>
+
+            </ordinal-scale>
+          </linear-scale>
+        </cartesian-plane>
+
+        <cartesian-plane class="second">
+          <ordinal-scale
+              bandwidth="0"
+              values='["t1", "t2", "t3"]'
+              rest='null'>
+              <linear-scale
+                min="0"
+                max="100">
+  
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x"
+                  position="top">
+                </horizontal-axis>
+                <horizontal-axis-tick
+                  dimension="x"
+                  position="top"
+                  values='["t1", "t2", "t3"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y"
+                  position="right">
+                </vertical-axis>
+                <vertical-axis-tick
+                  dimension="y"
+                  position="right"
+                  count="3">
+                </vertical-axis-tick>
+
+                <!-- Dataset visualization -->
+                <data-area
+                  x='["t1", "t2", "t3"]'
+                  y0="[25, 15, 30]"
+                  y1="[75, 54, 90]">
+                </data-area>
+                <data-line
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-line>
+                <data-point
+                  x='["t1", "t2", "t3"]'
+                  y="[75, 54, 90]">
+                </data-point>
+
+              </linear-scale>
+          </ordinal-scale>
+        </cartesian-plane>
+      </hdml-view>
+
+      <script src="/index.js"></script>
+    </body>
+</html>
