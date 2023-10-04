@@ -78,6 +78,10 @@
     "build:devtools": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
     "debug:devtools": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
 
+    "build:monolith": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/monolith/Dockerfile -t imazzine/hdml.io:latest",
+    "debug:monolith": "clear && docker run --network host -v ./hdml.io:/var/lib/hdml -v ./hdml.io/.catalog:/etc/trino/catalog -it imazzine/hdml.io:latest /bin/sh",
+    "exec:monolith": "clear && docker run --network host -p 8080:8080 -p 9090:9090 -p 6650:6650 -p 8888:8888 -p 8887:8887 -v ./hdml.io:/var/lib/hdml -v ./hdml.io/.catalog:/etc/trino/catalog imazzine/hdml.io:latest",
+    
     "build:gateway": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/services/Dockerfile.gateway -t imazzine/hdml.io-gateway:latest",
     "debug:gateway": "clear && docker run --network host -p 8888:8888 -v ./hdml.io:/var/lib/hdml.io -it imazzine/hdml.io-gateway:latest /bin/sh",
     "exec:gateway": "clear && docker run --network host -p 8888:8888 -v ./hdml.io:/var/lib/hdml.io imazzine/hdml.io-gateway:latest",

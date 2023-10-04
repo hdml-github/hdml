@@ -1,0 +1,27 @@
+# SQL functions
+/trino/plugin/ml
+/trino/plugin/teradata-functions
+/trino/plugin/geospatial
+
+# SQL connectors
+/trino/plugin/elasticsearch
+/trino/plugin/kafka
+/trino/plugin/postgresql
+/trino/plugin/prometheus
+/trino/plugin/oracle
+/trino/plugin/redis
+/trino/plugin/mongodb
+/trino/plugin/sqlserver
+/trino/plugin/singlestore
+/trino/plugin/mysql
+/trino/plugin/clickhouse
+/trino/plugin/druid
+/trino/plugin/accumulo
+/trino/plugin/google-sheets
+/trino/plugin/bigquery
+/trino/plugin/kinesis
+/trino/plugin/ignite
+/trino/plugin/mariadb
+/trino/plugin/kudu
+/trino/plugin/redshift
+/trino/plugin/cassandra
