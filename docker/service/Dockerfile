@@ -55,7 +55,7 @@ RUN rm -rf \
   /downloads/trino-server-427/plugin/tpcds \
   /downloads/trino-server-427/plugin/tpch
 RUN mv /downloads/trino-server-427/* /trino/
-COPY ./docker/monolith/conf/trino/* /trino/etc/
+COPY ./docker/service/conf/trino/* /trino/etc/
 
 
 # Pulsar image.
@@ -64,7 +64,7 @@ RUN mkdir -p /downloads && mkdir -p /pulsar
 RUN wget -P /downloads https://archive.apache.org/dist/pulsar/pulsar-3.1.0/apache-pulsar-3.1.0-bin.tar.gz
 RUN tar -xf /downloads/apache-pulsar-3.1.0-bin.tar.gz -C /downloads/
 RUN mv /downloads/apache-pulsar-3.1.0/* /pulsar/
-COPY ./docker/monolith/conf/pulsar/standalone.conf /pulsar/conf/
+COPY ./docker/service/conf/pulsar/standalone.conf /pulsar/conf/
 
 
 # Monolith image
@@ -78,6 +78,6 @@ RUN ln -s /usr/lib/node_modules/@hdml/io.querier/cjs/querier.js /usr/local/bin/q
 RUN chmod +x /usr/lib/node_modules/@hdml/io.gateway/cjs/gateway.js
 RUN chmod +x /usr/lib/node_modules/@hdml/io.querier/cjs/querier.js
 RUN chmod +x /usr/lib/node_modules/@hdml/io.gateway/cjs/hideway.js
-COPY ./docker/monolith/conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY ./docker/service/conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 EXPOSE 8888 8887 8080 9090 6650
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
