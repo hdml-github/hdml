@@ -5,10 +5,10 @@
 version: "2.2"
 services:
 
-  # hdml.io:testing
+  # hdml.io:production
   hdml:
     container_name: hdml.io
-    image: imazzine/hdml.io:testing
+    image: imazzine/hdml.io:production
     ports:
       - "8887:8887" # hideway
       - "8888:8888" # gateway

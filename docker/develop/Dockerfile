@@ -55,7 +55,7 @@ RUN rm -rf \
   /downloads/trino-server-427/plugin/tpcds \
   /downloads/trino-server-427/plugin/tpch
 RUN mv /downloads/trino-server-427/* /trino/
-COPY ./docker/service/conf/trino/* /trino/etc/
+COPY ./docker/develop/conf/trino/* /trino/etc/
 
 
 # Pulsar image.
@@ -64,47 +64,13 @@ RUN mkdir -p /downloads && mkdir -p /pulsar
 RUN wget -P /downloads https://archive.apache.org/dist/pulsar/pulsar-3.1.0/apache-pulsar-3.1.0-bin.tar.gz
 RUN tar -xf /downloads/apache-pulsar-3.1.0-bin.tar.gz -C /downloads/
 RUN mv /downloads/apache-pulsar-3.1.0/* /pulsar/
-COPY ./docker/service/conf/pulsar/standalone.conf /pulsar/conf/
+COPY ./docker/develop/conf/pulsar/standalone.conf /pulsar/conf/
 
 
-# Image configured for the build process
-FROM base AS build-env
-RUN apt-get -y install --no-install-recommends git cmake gcc g++ build-essential
-RUN mkdir flatc
-RUN git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git flatc
-RUN cd flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
-RUN ln -s /flatc/flatc /usr/local/bin/flatc
-RUN chmod +x /flatc/flatc
-RUN npx playwright install-deps
-RUN mkdir -p /hdml
-COPY ./package-lock.json /hdml
-COPY ./package.json /hdml
-RUN cd /hdml && npm install
-
-
-# Image with built hdml modules
-FROM build-env AS build
-COPY ./packages/ /hdml/packages/
-COPY ./tsconfig /hdml/tsconfig/
-COPY ./.eslintrc.js /hdml
-COPY ./.jestrc.js /hdml
-COPY ./.rollup.config.js /hdml
-COPY ./.test.config.js /hdml
-COPY ./lerna.json /hdml
-RUN cd /hdml && npm run bootstrap
-RUN cd /hdml && npm run build
-RUN ln -s /hdml/packages/io.gateway/cjs/gateway.js /usr/local/bin/gateway
-RUN ln -s /hdml/packages/io.gateway/cjs/hideway.js /usr/local/bin/hideway
-RUN ln -s /hdml/packages/io.querier/cjs/querier.js /usr/local/bin/querier
-RUN chmod +x /hdml/packages/io.gateway/cjs/gateway.js
-RUN chmod +x /hdml/packages/io.gateway/cjs/hideway.js
-RUN chmod +x /hdml/packages/io.querier/cjs/querier.js
-
-
-# Standalone image
-FROM build AS standalone
-RUN apt-get install -y supervisor
+# Monolith image
+FROM base AS standalone
 COPY --from=trino /trino /trino
 COPY --from=pulsar /pulsar /pulsar
-COPY ./docker/testing/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-CMD ["/usr/bin/supervisord"]
+COPY ./docker/develop/conf/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+EXPOSE 8080 9090 6650
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

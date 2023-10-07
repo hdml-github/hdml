@@ -75,25 +75,29 @@
     "build": "lerna run build",
     "publish": "./node_modules/.bin/lerna publish from-package --yes --no-verify-access --no-git-reset",
 
-    "build:devtools": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
-    "debug:devtools": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
-
-    "build:service": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/service/Dockerfile -t imazzine/hdml.io:latest",
-    "debug:service": "clear && docker run --network host -v ./.project:/var/lib/hdml -v ./.project/.catalog:/etc/trino/catalog -it imazzine/hdml.io:latest /bin/sh",
-    "exec:service": "clear && docker run --network host -p 8080:8080 -p 9090:9090 -p 6650:6650 -p 8888:8888 -p 8887:8887 -v ./.project:/var/lib/hdml -v ./.project/.catalog:/etc/trino/catalog imazzine/hdml.io:latest",
+    "devtools:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
+    "devtools:debug": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
     
-    "build:testing": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
-    "debug:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./.project:/var/lib/hdml -v ./.project/.catalog:/etc/trino/catalog -it imazzine/hdml.io:testing /bin/sh",
-    "exec:testing": "clear && docker run --network host -p 8887:8887 -p 8888:8888 -v ./.project:/var/lib/hdml -v ./.project/.catalog:/etc/trino/catalog imazzine/hdml.io:testing",
+    "develop:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/develop/Dockerfile -t imazzine/hdml.io:develop",
+    "develop:debug": "clear && docker run --network host -v ./.project:/var/lib/hdml -it imazzine/hdml.io:develop /bin/sh",
+    "develop:image": "clear && docker run --network host -v ./.project:/var/lib/hdml imazzine/hdml.io:develop",
+    "develop:down": "clear && docker compose -f ./.project/compose:develop.yaml down",
+    "develop:up": "rm -rf ./.project/.log/*.log && clear && docker compose -f ./.project/compose:develop.yaml up -d",
+    
+    "testing:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
+    "testing:debug": "clear && docker run --network host -v ./.project:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh",
+    "testing:image": "clear && docker run --network host -v ./.project:/var/lib/hdml imazzine/hdml.io:testing",
+    "testing:down": "clear && docker compose -f ./.project/compose:testing.yaml down",
+    "testing:up": "rm -rf ./.project/.log/*.log && clear && docker compose -f ./.project/compose:testing.yaml up -d",
 
-    "up:develop": "clear && docker compose -f ./.project/compose:develop.yaml up -d",
-    "down:develop": "clear && docker compose -f ./.project/compose:develop.yaml down",
+    "production:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/production/Dockerfile -t imazzine/hdml.io:production",
+    "production:debug": "clear && docker run --network host -v ./.project:/var/lib/hdml -it imazzine/hdml.io:production /bin/sh",
+    "production:image": "clear && docker run --network host -v ./.project:/var/lib/hdml imazzine/hdml.io:production",
+    "production:down": "clear && docker compose -f ./.project/compose:production.yaml down",
+    "production:up": "rm -rf ./.project/.log/*.log && clear && docker compose -f ./.project/compose:production.yaml up -d",
 
-    "up:testing": "rm -rf ./.project/.log/*.log && clear && docker compose -f ./.project/compose:testing.yaml up -d",
-    "down:testing": "clear && docker compose -f ./.project/compose:testing.yaml down",
-
-    "up:cluster": "minikube start && supervisord -c ./deploy/k8s/minikube/supervisord.conf",
-    "down:cluster": "minikube stop",
+    "cluster:down": "minikube stop",
+    "cluster:up": "minikube start && supervisord -c ./deploy/k8s/minikube/supervisord.conf",
 
     "cleanup:orphans": "docker rmi -f $(docker images --filter \"dangling=true\" -q --no-trunc)",
     "cleanup:all": "docker system prune -a -f"
