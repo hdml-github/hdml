@@ -9,6 +9,9 @@
   "dependencies": {
     "@nestjs/common": "^10.2.7",
     "@nestjs/config": "^3.1.1",
+    "@nestjs/platform-fastify": "^10.2.1",
+    "@nestjs/terminus": "^10.1.1",
+    "commander": "^11.0.0",
     "pulsar-client": "^1.9.0"
   },
   "scripts": {
