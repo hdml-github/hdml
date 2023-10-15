@@ -11,6 +11,7 @@ import { status } from "../controllers/api/v0/status";
 import { Config } from "../services/Config";
 import { Status } from "../services/Status";
 import { Thread } from "../services/Thread";
+import { Workdir } from "../services/Workdir";
 import { getCliOpts } from "./getCliOpts";
 
 const common = {
@@ -26,14 +27,14 @@ const common = {
         Config.Querier,
         Config.Engine,
         Config.Queue,
-        Config.FileStruct,
+        Config.Workdir,
         Config.JWE,
       ],
     }),
     TerminusModule,
   ],
   controllers: [status],
-  providers: [Config, Status, Thread],
+  providers: [Config, Status, Thread, Workdir],
 };
 
 /**

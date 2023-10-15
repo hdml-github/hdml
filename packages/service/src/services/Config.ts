@@ -58,8 +58,8 @@ type Queue = {
 /**
  * Service file structure configuration.
  */
-type FileStruct = {
-  PROJECT_PATH: string;
+type Workdir = {
+  PATH: string;
   HOOKS_PATH: string;
   KEYS_PATH: string;
   HDML_PATH: string;
@@ -88,7 +88,7 @@ type ConfigSet =
   | Record<"Querier", Querier>
   | Record<"Engine", Engine>
   | Record<"Queue", Queue>
-  | Record<"FileStruct", FileStruct>;
+  | Record<"Workdir", Workdir>;
 
 /**
  * Configuration service.
@@ -157,17 +157,17 @@ export class Config {
   /**
    * File structure config namespace.
    */
-  public static get FileStruct(): (() => FileStruct) &
-    ConfigFactoryKeyHost<FileStruct> {
-    return registerAs("FileStruct", () => ({
-      PROJECT_PATH: process.env.FS_PROJECT_PATH || ".",
-      HOOKS_PATH: process.env.FS_HOOKS_PATH || "hooks",
-      KEYS_PATH: process.env.FS_KEYS_PATH || "keys",
-      HDML_PATH: process.env.FS_HDML_PATH || "hdml",
-      HDML_EXT: process.env.FS_HDML_EXT || "html",
-      ENV_FILE: process.env.FS_ENV_FILE || ".env",
-      KEY_FILE: process.env.FS_KEY_FILE || "key",
-      PUB_FILE: process.env.FS_PUB_FILE || "key.pub",
+  public static get Workdir(): (() => Workdir) &
+    ConfigFactoryKeyHost<Workdir> {
+    return registerAs("Workdir", () => ({
+      PATH: process.env.WORKDIR_PATH || ".",
+      HOOKS_PATH: process.env.WORKDIR_HOOKS_PATH || "hooks",
+      KEYS_PATH: process.env.WORKDIR_KEYS_PATH || "keys",
+      HDML_PATH: process.env.WORKDIR_HDML_PATH || "hdml",
+      HDML_EXT: process.env.WORKDIR_HDML_EXT || "html",
+      ENV_FILE: process.env.WORKDIR_ENV_FILE || ".env",
+      KEY_FILE: process.env.WORKDIR_KEY_FILE || "key",
+      PUB_FILE: process.env.WORKDIR_PUB_FILE || "key.pub",
     }));
   }
 
@@ -304,67 +304,67 @@ export class Config {
   }
 
   /**
-   * Service project path. Can be configured via the `FS_PROJECT_PATH`
+   * Service project path. Can be configured via the `WORKDIR_PATH`
    * environment variable.
    */
-  public get fsProjectPath(): string {
-    return this._conf.get<FileStruct>("FileStruct").PROJECT_PATH;
+  public get workdirPath(): string {
+    return this._conf.get<Workdir>("Workdir").PATH;
   }
 
   /**
-   * Tenants hooks path. Can be configured via the `FS_HOOKS_PATH`
-   * environment variable.
+   * Tenants hooks path. Can be configured via the
+   * `WORKDIR_HOOKS_PATH` environment variable.
    */
-  public get fsHooksPath(): string {
-    return this._conf.get<FileStruct>("FileStruct").HOOKS_PATH;
+  public get workdirHooksPath(): string {
+    return this._conf.get<Workdir>("Workdir").HOOKS_PATH;
   }
 
   /**
    * Tenants encription keys path. Can be configured via the
-   * `FS_KEYS_PATH` environment variable.
+   * `WORKDIR_KEYS_PATH` environment variable.
    */
-  public get fsKeysPath(): string {
-    return this._conf.get<FileStruct>("FileStruct").KEYS_PATH;
+  public get workdirKeysPath(): string {
+    return this._conf.get<Workdir>("Workdir").KEYS_PATH;
   }
 
   /**
    * Tenants `hdml` documents path. Can be configured via the
-   * `FS_HDML_PATH` environment variable.
+   * `WORKDIR_HDML_PATH` environment variable.
    */
-  public get fsHdmlPath(): string {
-    return this._conf.get<FileStruct>("FileStruct").HDML_PATH;
+  public get workdirHdmlPath(): string {
+    return this._conf.get<Workdir>("Workdir").HDML_PATH;
   }
 
   /**
    * Tenants `hdml` document file extension. Can be configured via the
-   * `FS_HDML_EXT` environment variable.
+   * `WORKDIR_HDML_EXT` environment variable.
    */
-  public get fsHdmlExt(): string {
-    return this._conf.get<FileStruct>("FileStruct").HDML_EXT;
+  public get workdirHdmlExt(): string {
+    return this._conf.get<Workdir>("Workdir").HDML_EXT;
   }
 
   /**
    * Tenants environment file name. Can be configured via the
-   * `FS_ENV_FILE` environment variable.
+   * `WORKDIR_ENV_FILE` environment variable.
    */
-  public get fsEnvFile(): string {
-    return this._conf.get<FileStruct>("FileStruct").ENV_FILE;
+  public get workdirEnvFile(): string {
+    return this._conf.get<Workdir>("Workdir").ENV_FILE;
   }
 
   /**
    * Tenants private key file name. Can be configured via the
-   * `FS_KEY_FILE` environment variable.
+   * `WORKDIR_KEY_FILE` environment variable.
    */
-  public get fsKeyFile(): string {
-    return this._conf.get<FileStruct>("FileStruct").KEY_FILE;
+  public get workdirKeyFile(): string {
+    return this._conf.get<Workdir>("Workdir").KEY_FILE;
   }
 
   /**
    * Tenants public key file name. Can be configured via the
-   * `FS_PUB_FILE` environment variable.
+   * `WORKDIR_PUB_FILE` environment variable.
    */
-  public get fsPubFile(): string {
-    return this._conf.get<FileStruct>("FileStruct").PUB_FILE;
+  public get workdirPubFile(): string {
+    return this._conf.get<Workdir>("Workdir").PUB_FILE;
   }
 
   /**

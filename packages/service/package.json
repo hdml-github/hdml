@@ -7,6 +7,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@hdml/elements": "0.0.0-alpha.12",
     "@nestjs/common": "^10.2.7",
     "@nestjs/config": "^3.1.1",
     "@nestjs/platform-fastify": "^10.2.1",

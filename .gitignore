@@ -1,7 +1,7 @@
 /dev.environment/.data
-/.project/.data
-/.project/.log
-/.project/.vanila
+/.workdir/.data
+/.workdir/.log
+/.workdir/.vanila
 /integration/videos
 /integration/screenshots
 /packages_/
