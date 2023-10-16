@@ -16,7 +16,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
-import { getModuleHost, getModulePort } from "./helpers/getModule";
+import { getModuleHost, getModulePort } from "./helpers/getModOpts";
 import { Config } from "./services/Config";
 import { IoModule } from "./IoModule";
 

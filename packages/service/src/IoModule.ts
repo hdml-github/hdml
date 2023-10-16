@@ -5,7 +5,7 @@
  */
 
 import { Module, MiddlewareConsumer } from "@nestjs/common";
-import { getModuleMetadata } from "./helpers/getModule";
+import { getModuleMetadata } from "./helpers/getModOpts";
 import { HttpThread } from "./middlewares/HttpThread";
 import { Config } from "./services/Config";
 

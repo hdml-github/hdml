@@ -9,6 +9,7 @@ import { ConfigModule } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
 import { status } from "../controllers/api/v0/status";
 import { Config } from "../services/Config";
+import { Stats } from "../services/Stats";
 import { Status } from "../services/Status";
 import { Thread } from "../services/Thread";
 import { Workdir } from "../services/Workdir";
@@ -25,16 +26,17 @@ const common = {
         Config.Gateway,
         Config.Hideway,
         Config.Querier,
+        Config.Workdir,
         Config.Engine,
         Config.Queue,
-        Config.Workdir,
+        Config.Stats,
         Config.JWE,
       ],
     }),
     TerminusModule,
   ],
   controllers: [status],
-  providers: [Config, Status, Thread, Workdir],
+  providers: [Config, Stats, Status, Thread, Workdir],
 };
 
 /**

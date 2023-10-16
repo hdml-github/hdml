@@ -12,6 +12,20 @@ import {
 } from "@nestjs/config";
 
 /**
+ * Service workdir file structure configuration.
+ */
+type Workdir = {
+  PATH: string;
+  HOOKS_PATH: string;
+  KEYS_PATH: string;
+  HDML_PATH: string;
+  HDML_EXT: string;
+  ENV_FILE: string;
+  KEY_FILE: string;
+  PUB_FILE: string;
+};
+
+/**
  * Gateway server configuration.
  */
 type Gateway = {
@@ -56,17 +70,12 @@ type Queue = {
 };
 
 /**
- * Service file structure configuration.
+ * Statistic service configuration.
  */
-type Workdir = {
-  PATH: string;
-  HOOKS_PATH: string;
-  KEYS_PATH: string;
-  HDML_PATH: string;
-  HDML_EXT: string;
-  ENV_FILE: string;
-  KEY_FILE: string;
-  PUB_FILE: string;
+type Stats = {
+  HOST: string;
+  PORT: number;
+  MOCK: boolean;
 };
 
 /**
@@ -83,18 +92,37 @@ type JWE = {
 };
 
 type ConfigSet =
+  | Record<"Workdir", Workdir>
   | Record<"Gateway", Gateway>
   | Record<"Hideway", Hideway>
   | Record<"Querier", Querier>
   | Record<"Engine", Engine>
   | Record<"Queue", Queue>
-  | Record<"Workdir", Workdir>;
+  | Record<"Stats", Stats>
+  | Record<"JWE", JWE>;
 
 /**
  * Configuration service.
  */
 @Injectable()
 export class Config {
+  /**
+   * File structure config namespace.
+   */
+  public static get Workdir(): (() => Workdir) &
+    ConfigFactoryKeyHost<Workdir> {
+    return registerAs("Workdir", () => ({
+      PATH: process.env.WORKDIR_PATH || ".",
+      HOOKS_PATH: process.env.WORKDIR_HOOKS_PATH || "hooks",
+      KEYS_PATH: process.env.WORKDIR_KEYS_PATH || "keys",
+      HDML_PATH: process.env.WORKDIR_HDML_PATH || "hdml",
+      HDML_EXT: process.env.WORKDIR_HDML_EXT || "html",
+      ENV_FILE: process.env.WORKDIR_ENV_FILE || ".env",
+      KEY_FILE: process.env.WORKDIR_KEY_FILE || "key",
+      PUB_FILE: process.env.WORKDIR_PUB_FILE || "key.pub",
+    }));
+  }
+
   /**
    * Gateway server config namespace.
    */
@@ -155,19 +183,14 @@ export class Config {
   }
 
   /**
-   * File structure config namespace.
+   * Statistic service config namespace.
    */
-  public static get Workdir(): (() => Workdir) &
-    ConfigFactoryKeyHost<Workdir> {
-    return registerAs("Workdir", () => ({
-      PATH: process.env.WORKDIR_PATH || ".",
-      HOOKS_PATH: process.env.WORKDIR_HOOKS_PATH || "hooks",
-      KEYS_PATH: process.env.WORKDIR_KEYS_PATH || "keys",
-      HDML_PATH: process.env.WORKDIR_HDML_PATH || "hdml",
-      HDML_EXT: process.env.WORKDIR_HDML_EXT || "html",
-      ENV_FILE: process.env.WORKDIR_ENV_FILE || ".env",
-      KEY_FILE: process.env.WORKDIR_KEY_FILE || "key",
-      PUB_FILE: process.env.WORKDIR_PUB_FILE || "key.pub",
+  public static get Stats(): (() => Stats) &
+    ConfigFactoryKeyHost<Stats> {
+    return registerAs("Stats", () => ({
+      HOST: process.env.STATS_HOST || "0.0.0.0",
+      PORT: parseInt(process.env.STATS_PORT || "8125"),
+      MOCK: process.env.STATS_MOCK === "true",
     }));
   }
 
@@ -365,6 +388,30 @@ export class Config {
    */
   public get workdirPubFile(): string {
     return this._conf.get<Workdir>("Workdir").PUB_FILE;
+  }
+
+  /**
+   * Statistic server host. Can be configured via the `STATS_HOST`
+   * environment variable.
+   */
+  public get statsHost(): string {
+    return this._conf.get<Stats>("Stats").HOST;
+  }
+
+  /**
+   * Statistic server port. Can be configured via the `STATS_PORT`
+   * environment variable.
+   */
+  public get statsPort(): number {
+    return this._conf.get<Stats>("Stats").PORT;
+  }
+
+  /**
+   * Statistic server mock flag. Can be configured via the
+   * `STATS_MOCK` environment variable.
+   */
+  public get statsMock(): boolean {
+    return this._conf.get<Stats>("Stats").MOCK;
   }
 
   /**
