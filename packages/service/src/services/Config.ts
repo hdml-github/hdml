@@ -202,7 +202,7 @@ export class Config {
       IMP: process.env.JWE_IMP || "ES256",
       ALG: process.env.JWE_ALG || "RSA-OAEP-256",
       ENC: process.env.JWE_ENC || "A256GCM",
-      ISS: process.env.JWE_ISS || "TokensSvc",
+      ISS: process.env.JWE_ISS || "hdml.io",
       SUB: process.env.JWE_SUB || "Access Token",
       SES: process.env.JWE_SES || "Session Token",
       TTL: parseInt(process.env.JWE_TTL || "86400"),

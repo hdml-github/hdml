@@ -27,7 +27,7 @@ export class status {
 
   @Get()
   @HealthCheck()
-  status(): Promise<HealthCheckResult> {
+  getStatus(): Promise<HealthCheckResult> {
     return this._checker.check([
       () => this._status.isQueueHealthy(),
       () => this._status.isQuerierHealthy(),

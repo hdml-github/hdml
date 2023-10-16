@@ -7,11 +7,14 @@
 import { ModuleMetadata } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
+import { sessions } from "../controllers/api/v0/sessions";
 import { status } from "../controllers/api/v0/status";
+import { tokens } from "../controllers/api/v0/tokens";
 import { Config } from "../services/Config";
 import { Stats } from "../services/Stats";
 import { Status } from "../services/Status";
 import { Thread } from "../services/Thread";
+import { Tokens } from "../services/Tokens";
 import { Workdir } from "../services/Workdir";
 import { getCliOpts } from "./getCliOpts";
 
@@ -36,7 +39,7 @@ const common = {
     TerminusModule,
   ],
   controllers: [status],
-  providers: [Config, Stats, Status, Thread, Workdir],
+  providers: [Config, Stats, Status, Tokens, Thread, Workdir],
 };
 
 /**
@@ -45,9 +48,15 @@ const common = {
 export function getModuleMetadata(): ModuleMetadata {
   switch (getCliOpts().mode) {
     case "gateway":
-      return { ...common };
+      return {
+        ...common,
+        controllers: [...common.controllers, sessions],
+      };
     case "hideway":
-      return { ...common };
+      return {
+        ...common,
+        controllers: [...common.controllers, tokens],
+      };
     case "querier":
       return { ...common };
   }
