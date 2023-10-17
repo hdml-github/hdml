@@ -25,9 +25,9 @@ import { Config } from "./Config";
 @Injectable()
 export class Tokens {
   /**
-   * Class constructor.
+   * @constructor
    */
-  constructor(private readonly _conf: Config) {}
+  constructor(private _conf: Config) {}
 
   /**
    * Returns a `KeyLike` object for the private key `content`.

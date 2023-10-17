@@ -16,7 +16,9 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "fastify": "^4.23.2",
+    "isolated-vm": "^4.6.0",
     "jose": "^4.15.4",
+    "jsdom": "^22.1.0",
     "hot-shots": "^10.0.0",
     "pulsar-client": "^1.9.0",
     "uuid": "^9.0.1"

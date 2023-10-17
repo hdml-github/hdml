@@ -9,7 +9,9 @@ import { ConfigModule } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
 import { sessions } from "../controllers/api/v0/sessions";
 import { status } from "../controllers/api/v0/status";
+import { tests } from "../controllers/api/v0/tests";
 import { tokens } from "../controllers/api/v0/tokens";
+import { Compiler } from "../services/Compiler";
 import { Config } from "../services/Config";
 import { Stats } from "../services/Stats";
 import { Status } from "../services/Status";
@@ -39,7 +41,15 @@ const common = {
     TerminusModule,
   ],
   controllers: [status],
-  providers: [Config, Stats, Status, Tokens, Thread, Workdir],
+  providers: [
+    Compiler,
+    Config,
+    Stats,
+    Status,
+    Tokens,
+    Thread,
+    Workdir,
+  ],
 };
 
 /**
@@ -55,7 +65,7 @@ export function getModuleMetadata(): ModuleMetadata {
     case "hideway":
       return {
         ...common,
-        controllers: [...common.controllers, tokens],
+        controllers: [...common.controllers, tests, tokens, sessions],
       };
     case "querier":
       return { ...common };
