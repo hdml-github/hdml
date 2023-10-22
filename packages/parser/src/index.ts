@@ -24,3 +24,5 @@ export {
   parse,
   valid,
 };
+
+export default parse;

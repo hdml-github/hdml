@@ -1,13 +1,10 @@
-import { object } from "./object";
+export function hook(dom) {
+  log(HDML_TENANT_NAME);
+  // log(fetch(OPEN_URL));
+  
+  dom
+    .querySelector("hdml-model[name='model']")
+    .setAttribute("name", "patched_model");
 
-export async function hook(scope, window) {
-  const connective = window.document.querySelector(
-    "hdml-frame[name=query] > hdml-filter-by > hdml-connective",
-  );
-  if (connective) {
-    const filter = window.document.createElement("hdml-filter");
-    filter.setAttribute("type", "expr");
-    filter.setAttribute("clause", `\`catalog\` != '${object.sub}'`);
-    connective.appendChild(filter);
-  }
-}
+  return dom;
+};

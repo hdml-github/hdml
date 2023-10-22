@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@hdml/elements": "0.0.0-alpha.12",
+    "@hdml/parser": "0.0.0-alpha.12",
     "@nestjs/common": "^10.2.7",
     "@nestjs/config": "^3.1.1",
     "@nestjs/platform-fastify": "^10.2.1",
@@ -15,6 +16,7 @@
     "commander": "^11.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "dotenv": "^16.3.1",
     "fastify": "^4.23.2",
     "isolated-vm": "^4.6.0",
     "jose": "^4.15.4",

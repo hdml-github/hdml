@@ -17,7 +17,8 @@ import { Logger } from "./Logger";
 @Injectable()
 export class Workdir {
   private _logger: Logger;
-  private _script: null | string = null;
+  private _elementsScript: null | string = null;
+  private _parserScript: null | string = null;
 
   /**
    * @constructor
@@ -33,8 +34,8 @@ export class Workdir {
    * Returns the `@hdml/elements` bundle content.
    */
   public async getElementsScript(): Promise<string> {
-    if (!this._script) {
-      this._script = await this.openFile(
+    if (!this._elementsScript) {
+      this._elementsScript = await this.openFile(
         resolve(
           __dirname,
           "..",
@@ -47,7 +48,28 @@ export class Workdir {
         ),
       );
     }
-    return this._script;
+    return this._elementsScript;
+  }
+
+  /**
+   * Returns the `@hdml/parser` bundle content.
+   */
+  public async getParserScript(): Promise<string> {
+    if (!this._parserScript) {
+      this._parserScript = await this.openFile(
+        resolve(
+          __dirname,
+          "..",
+          "..",
+          "node_modules",
+          "@hdml",
+          "parser",
+          "bin",
+          "parser.min.js",
+        ),
+      );
+    }
+    return this._parserScript;
   }
 
   /**

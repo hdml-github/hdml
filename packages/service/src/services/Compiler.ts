@@ -1,19 +1,31 @@
-/* eslint-disable max-len */
 /**
  * @author Artem Lytvynov
  * @copyright Artem Lytvynov
  * @license Apache-2.0
  */
 
-import { IoElement } from "@hdml/elements";
+import { IoElement, ElementsDef } from "@hdml/elements";
 import { Injectable } from "@nestjs/common";
-import { Isolate } from "isolated-vm";
-import { JSDOM, DOMWindow } from "jsdom";
+import * as dotenv from "dotenv";
+import {
+  Isolate,
+  ExternalCopy,
+  Reference,
+  Context,
+} from "isolated-vm";
+import { JSDOM } from "jsdom";
 import { TextEncoder, TextDecoder } from "util";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
 import { Thread } from "./Thread";
 import { Workdir } from "./Workdir";
+
+/**
+ * Takes an `html` fragment with the `hdml` markup and convert it to
+ * the `ElementsDef` object. This function applies user defined `hook`
+ * function on the incomming fragment.
+ */
+type CompileFn = (fragment: string) => Promise<ElementsDef>;
 
 /**
  * Compiler service.
@@ -34,49 +46,112 @@ export class Compiler {
   }
 
   /**
-   *
+   * Evaluates and returns `CompileFn` function for the specified
+   * `tenant`.
    */
-  public async test(): Promise<void> {
-    const dom = await this.getDOM(this.getFragment());
-    const io = <IoElement>(
-      dom.window.document.querySelector("hdml-io")
-    );
-    const data = await io.getElementsDef();
-    dom.window.close();
-
+  public async getCompileFn(tenant: string): Promise<CompileFn> {
     const isolate = new Isolate();
+
+    // initializing context:
     const context = await isolate.createContext();
-    await context.global.set("window", dom.window);
-    const code = `
-      export default async function() {
-        return Promise.resolve("hook");
-      };
-    `;
-    const module = await isolate.compileModule(code);
+    const global = context.global;
+    const env = dotenv.parse<Record<string, string>>(
+      await this._workdir.openEnv(tenant),
+    );
+    for (const name in env) {
+      await global.set(name, env[name]);
+    }
+    await global.set("globalThis", global.derefInto());
 
-    // @ts-ignore
-    await module.instantiate(context, () => {});
-    await module.evaluate();
-
-    const reference = module.namespace;
-    const hook = await reference.get("default", { reference: true });
-    const v = await hook.apply(null, [], {
-      result: {
-        promise: true,
+    // attaching `log` function:
+    await global.set(
+      "log",
+      (message: unknown, ...args: unknown[]) => {
+        this._logger.debug(message, ...args);
       },
-    });
-    this._logger.log(JSON.stringify(v, undefined, 2));
+    );
+
+    // attaching `fetch` function:
+    await global.set(
+      "_fetch",
+      new Reference(async function (
+        input: RequestInfo | URL,
+        init?: RequestInit,
+      ) {
+        const result = await fetch(input, init);
+        const data = await result.text();
+        return new ExternalCopy(data);
+      }),
+    );
+    await this.getMOD(
+      isolate,
+      context,
+      `globalThis.fetch = function fetch(url) {
+        const page = _fetch.applySyncPromise(
+          undefined,
+          [url],
+          {},
+        );
+        return page.copy();
+      };`,
+    );
+
+    // attaching `parse` function:
+    await this.getMOD(
+      isolate,
+      context,
+      `${await this._workdir.getParserScript()};
+      globalThis.parse = globalThis["@hdml/parser"].parse;`,
+    );
+
+    // attaching `hook` function:
+    await this.getMOD(
+      isolate,
+      context,
+      `${await this._workdir.loadHook(tenant)}
+      globalThis.hook = hook;`,
+    );
+
+    // attaching `execute` function:
+    const execute = await this.getMOD(
+      isolate,
+      context,
+      `export default function execute(html) {
+        const dom = parse(html);
+        const hooked = hook(dom);
+        return hooked.toString();
+      };`,
+    );
+
+    return async (fragment: string) => {
+      const hooked = <string>(
+        await execute.apply(null, [fragment], {})
+      );
+      const dom = await this.getDOM(hooked);
+      const io = <IoElement>(
+        dom.window.document.querySelector("hdml-io")
+      );
+      const data = await io.getElementsDef();
+      dom.window.close();
+      return data;
+    };
   }
 
-  public async testScript(): Promise<void> {
-    const isolate = new Isolate();
-    const context = await isolate.createContext();
-    const code = `(async function() {
-      return Promise.resolve("hook");
-    })();`;
-    const script = await isolate.compileScript(code);
-    const v = await script.run(context, { promise: true });
-    this._logger.log(JSON.stringify(v, undefined, 2));
+  /**
+   * Initialize and evaluates module inside the specified `isolate`.
+   * Returns initialized module's `default` export.
+   */
+  private async getMOD(
+    isolate: Isolate,
+    context: Context,
+    script: string,
+  ): Promise<Reference> {
+    const mod = await isolate.compileModule(script);
+    await mod.instantiate(context, () => mod);
+    await mod.evaluate();
+    const ns = mod.namespace;
+    const def = await ns.get("default", { reference: true });
+    return def;
   }
 
   /**
@@ -139,120 +214,5 @@ export class Compiler {
         </body>
       </html>
     `;
-  }
-
-  private getFragment(): string {
-    return `
-      <hdml-model
-        name="model">
-        <hdml-table
-          name="tables"
-          type="table"
-          source="\`tenant_postgres\`.\`information_schema\`.\`tables\`">
-          <hdml-field
-            name="catalog"
-            origin="table_catalog">
-          </hdml-field>
-          <hdml-field
-            name="schema"
-            origin="table_schema">
-          </hdml-field>
-          <hdml-field
-            name="table"
-            origin="table_name">
-          </hdml-field>
-          <hdml-field
-            name="full"
-            clause="concat(\`table_catalog\`, '-', \`table_schema\`, '-', \`table_name\`)">
-          </hdml-field>
-          <hdml-field
-            name="hash"
-            clause="concat(\`table_catalog\`, '-', \`table_schema\`, '-', \`table_name\`)"
-            type="binary">
-          </hdml-field>
-          <hdml-field
-            name="type"
-            origin="table_type">
-          </hdml-field>
-        </hdml-table>
-      
-        <hdml-table
-          name="columns"
-          type="query"
-          source="select * from \`tenant_postgres\`.\`information_schema\`.\`columns\`">
-          <hdml-field
-            name="catalog"
-            origin="table_catalog">
-          </hdml-field>
-          <hdml-field
-            name="schema"
-            origin="table_schema">
-          </hdml-field>
-          <hdml-field
-            name="table"
-            origin="table_name">
-          </hdml-field>
-          <hdml-field
-            name="column"
-            origin="column_name">
-          </hdml-field>
-          <hdml-field
-            name="position"
-            origin="ordinal_position"
-            type="int-32">
-          </hdml-field>
-          <hdml-field
-            name="default"
-            origin="column_default">
-          </hdml-field>
-          <hdml-field
-            name="nullable"
-            origin="is_nullable">
-          </hdml-field>
-          <hdml-field
-            name="type"
-            origin="data_type">
-          </hdml-field>
-        </hdml-table>
-      
-        <hdml-join
-          type="inner"
-          left="tables"
-          right="columns">
-          <hdml-connective
-            operator="and">
-      
-            <hdml-filter
-              type="keys"
-              left="catalog"
-              right="catalog">
-            </hdml-filter>
-            
-            <hdml-filter
-              type="keys"
-              left="schema"
-              right="schema">
-            </hdml-filter>
-            
-            <hdml-filter
-              type="keys"
-              left="table"
-              right="table">
-            </hdml-filter>            
-            
-            <hdml-connective
-              operator="or">
-              <hdml-filter
-                type="expr"
-                clause="\`columns\`.\`table\` = 'applicable_roles'">
-              </hdml-filter>
-              <hdml-filter
-                type="expr"
-                clause="\`columns\`.\`table\` = 'tables'">
-              </hdml-filter>
-            </hdml-connective>
-          </hdml-connective>
-        </hdml-join>
-      </hdml-model>`;
   }
 }
