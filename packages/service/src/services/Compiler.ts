@@ -37,15 +37,46 @@ export class Compiler {
    *
    */
   public async test(): Promise<void> {
-    // const isolate = new Isolate();
     const dom = await this.getDOM(this.getFragment());
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );
     const data = await io.getElementsDef();
     dom.window.close();
-    this._logger.log(JSON.stringify(data, undefined, 2));
-    // return data;
+
+    const isolate = new Isolate();
+    const context = await isolate.createContext();
+    await context.global.set("window", dom.window);
+    const code = `
+      export default async function() {
+        return Promise.resolve("hook");
+      };
+    `;
+    const module = await isolate.compileModule(code);
+
+    // @ts-ignore
+    await module.instantiate(context, () => {});
+    await module.evaluate();
+
+    const reference = module.namespace;
+    const hook = await reference.get("default", { reference: true });
+    const v = await hook.apply(null, [], {
+      result: {
+        promise: true,
+      },
+    });
+    this._logger.log(JSON.stringify(v, undefined, 2));
+  }
+
+  public async testScript(): Promise<void> {
+    const isolate = new Isolate();
+    const context = await isolate.createContext();
+    const code = `(async function() {
+      return Promise.resolve("hook");
+    })();`;
+    const script = await isolate.compileScript(code);
+    const v = await script.run(context, { promise: true });
+    this._logger.log(JSON.stringify(v, undefined, 2));
   }
 
   /**

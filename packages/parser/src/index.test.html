@@ -1,0 +1,26 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<html>
+  <head>
+    <script type="module" src="/bin/parser.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { runTests } from '@web/test-runner-mocha';
+      import { expect } from "@esm-bundle/chai";
+      const { parse } = window["@hdml/parser"];
+      
+      runTests(async () => {
+        describe("`@hdml/parser` package", () => {
+          it("must export `parse` function", () => {
+            expect(parse).not.to.be.undefined;
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

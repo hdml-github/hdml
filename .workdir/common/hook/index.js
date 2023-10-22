@@ -1,6 +1,6 @@
-const object = require("./object");
+import { object } from "./object";
 
-module.exports = async function(scope, window) {
+export async function hook(scope, window) {
   const connective = window.document.querySelector(
     "hdml-frame[name=query] > hdml-filter-by > hdml-connective",
   );

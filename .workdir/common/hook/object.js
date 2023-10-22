@@ -1,6 +1,6 @@
 /**
  * Context object.
  */
-module.exports = {
+export const object = {
   sub: "value",
 };
