@@ -91,12 +91,21 @@ type JWE = {
   TTL: number;
 };
 
+/**
+ * Tenants cache configuration.
+ */
+type Cache = {
+  MAX: number;
+  TTL: number;
+};
+
 type ConfigSet =
   | Record<"Workdir", Workdir>
   | Record<"Gateway", Gateway>
   | Record<"Hideway", Hideway>
   | Record<"Querier", Querier>
   | Record<"Engine", Engine>
+  | Record<"Cache", Cache>
   | Record<"Queue", Queue>
   | Record<"Stats", Stats>
   | Record<"JWE", JWE>;
@@ -164,6 +173,17 @@ export class Config {
     return registerAs("Engine", () => ({
       HOST: process.env.ENGINE_HOST || "0.0.0.0",
       PORT: parseInt(process.env.ENGINE_PORT || "8080"),
+    }));
+  }
+
+  /**
+   * Tenants cache config namespace.
+   */
+  public static get Cache(): (() => Cache) &
+    ConfigFactoryKeyHost<Cache> {
+    return registerAs("Cache", () => ({
+      MAX: parseInt(process.env.CACHE_MAX || "50"),
+      TTL: parseInt(process.env.CACHE_TTL || "30"),
     }));
   }
 
@@ -276,6 +296,22 @@ export class Config {
    */
   public get enginePort(): number {
     return this._conf.get<Engine>("Engine").PORT;
+  }
+
+  /**
+   * Tenants cache maximum number of items. Can be configured via the
+   * `CACHE_MAX` environment variable.
+   */
+  public get cacheMax(): number {
+    return this._conf.get<Cache>("Cache").MAX;
+  }
+
+  /**
+   * Tenants cache max time to live for items in minutes. Can be
+   * configured via the `CACHE_TTL` environment variable.
+   */
+  public get cacheTtl(): number {
+    return this._conf.get<Cache>("Cache").TTL;
   }
 
   /**

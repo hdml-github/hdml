@@ -5,8 +5,8 @@
  */
 
 import { Controller, Get, Query } from "@nestjs/common";
+import { Tenants } from "../../../services/Tenants";
 import { Tokens } from "../../../services/Tokens";
-import { Workdir } from "../../../services/Workdir";
 
 /**
  * The `api/v0/tokens` endpoint controller.
@@ -17,8 +17,8 @@ export class tokens {
    * @constructor
    */
   constructor(
+    private readonly _tenants: Tenants,
     private readonly _tokens: Tokens,
-    private readonly _workdir: Workdir,
   ) {}
 
   /**
@@ -34,9 +34,7 @@ export class tokens {
     scope?: string,
   ): Promise<string> {
     return this._tokens.getAccessToken(
-      await this._tokens.getPublicKey(
-        await this._workdir.loadPub(tenant),
-      ),
+      await this._tenants.getPublicKey(tenant),
       ttl,
       scope,
     );

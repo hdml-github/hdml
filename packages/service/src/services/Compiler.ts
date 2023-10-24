@@ -6,7 +6,7 @@
 
 import { IoElement, ElementsDef } from "@hdml/elements";
 import { Injectable } from "@nestjs/common";
-import * as dotenv from "dotenv";
+// import * as dotenv from "dotenv";
 import {
   Isolate,
   ExternalCopy,
@@ -28,36 +28,53 @@ import { Workdir } from "./Workdir";
 type CompileFn = (fragment: string) => Promise<ElementsDef>;
 
 /**
- * Compiler service.
+ * Disposes off all resources allocated for the `Isolated` instance.
+ */
+type ReleaseFn = () => void;
+
+/**
+ * Compiler object.
+ */
+export type Compiler = {
+  compile: CompileFn;
+  release: ReleaseFn;
+};
+
+/**
+ * Compiler factory.
  */
 @Injectable()
-export class Compiler {
+export class CompilerFactory {
   private _logger: Logger;
 
   /**
    * @constructor
    */
-  constructor(
+  public constructor(
     private _conf: Config,
     private _thread: Thread,
     private _workdir: Workdir,
   ) {
-    this._logger = new Logger("Compiler", this._thread);
+    this._logger = new Logger("CompilerFactory", this._thread);
   }
 
   /**
-   * Evaluates and returns `CompileFn` function for the specified
+   * Evaluates and returns the `Compiler` object for the specified
    * `tenant`.
    */
-  public async getCompileFn(tenant: string): Promise<CompileFn> {
+  public async getCompiler(
+    tenant: string,
+    env: Record<string, string>,
+  ): Promise<Compiler> {
     const isolate = new Isolate();
 
     // initializing context:
     const context = await isolate.createContext();
     const global = context.global;
-    const env = dotenv.parse<Record<string, string>>(
-      await this._workdir.openEnv(tenant),
-    );
+    // const env = dotenv.parse<Record<string, string>>(
+    //   await this._workdir.openEnv(tenant),
+    // );
+    // const env = await this._tenants.getEnvironment(tenant);
     for (const name in env) {
       await global.set(name, env[name]);
     }
@@ -83,7 +100,7 @@ export class Compiler {
         return new ExternalCopy(data);
       }),
     );
-    await this.getMOD(
+    const _fetch = await this.getMOD(
       isolate,
       context,
       `globalThis.fetch = function fetch(url) {
@@ -97,7 +114,7 @@ export class Compiler {
     );
 
     // attaching `parse` function:
-    await this.getMOD(
+    const _parse = await this.getMOD(
       isolate,
       context,
       `${await this._workdir.getParserScript()};
@@ -105,7 +122,7 @@ export class Compiler {
     );
 
     // attaching `hook` function:
-    await this.getMOD(
+    const _hook = await this.getMOD(
       isolate,
       context,
       `${await this._workdir.loadHook(tenant)}
@@ -113,7 +130,7 @@ export class Compiler {
     );
 
     // attaching `execute` function:
-    const execute = await this.getMOD(
+    const _execute = await this.getMOD(
       isolate,
       context,
       `export default function execute(html) {
@@ -123,17 +140,28 @@ export class Compiler {
       };`,
     );
 
-    return async (fragment: string) => {
-      const hooked = <string>(
-        await execute.apply(null, [fragment], {})
-      );
-      const dom = await this.getDOM(hooked);
-      const io = <IoElement>(
-        dom.window.document.querySelector("hdml-io")
-      );
-      const data = await io.getElementsDef();
-      dom.window.close();
-      return data;
+    return {
+      compile: async (fragment: string) => {
+        const hooked = <string>(
+          await _execute.apply(null, [fragment], {})
+        );
+        const dom = await this.getDOM(hooked);
+        const io = <IoElement>(
+          dom.window.document.querySelector("hdml-io")
+        );
+        const data = await io.getElementsDef();
+        dom.window.close();
+        return data;
+      },
+      release: () => {
+        _fetch.release();
+        _parse.release();
+        _hook.release();
+        _execute.release();
+        global.release();
+        context.release();
+        isolate.dispose();
+      },
     };
   }
 

@@ -5,7 +5,7 @@
  */
 
 import { Controller, Get } from "@nestjs/common";
-import { Compiler } from "../../../services/Compiler";
+import { Tenants } from "../../../services/Tenants";
 import { Logger } from "../../../services/Logger";
 import { Thread } from "../../../services/Thread";
 
@@ -19,14 +19,14 @@ export class tests {
   /**
    * Class constructor.
    */
-  constructor(private _compiler: Compiler, private _thread: Thread) {
+  constructor(private _tenants: Tenants, private _thread: Thread) {
     this._logger = new Logger("api/v0/tests", this._thread);
   }
 
   @Get()
   async run(): Promise<void> {
-    const compile = await this._compiler.getCompileFn("common");
-    const value = await compile(this.getFragment());
+    const compiler = await this._tenants.getCompiler("common");
+    const value = await compiler.compile(this.getFragment());
     this._logger.log(value);
     return;
   }

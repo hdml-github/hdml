@@ -5,8 +5,8 @@
  */
 
 import { Controller, Get, Query } from "@nestjs/common";
+import { Tenants } from "../../../services/Tenants";
 import { Tokens } from "../../../services/Tokens";
-import { Workdir } from "../../../services/Workdir";
 
 /**
  * The `api/v0/sessions` endpoint controller.
@@ -17,8 +17,8 @@ export class sessions {
    * @constructor
    */
   constructor(
+    private readonly _tenants: Tenants,
     private readonly _tokens: Tokens,
-    private readonly _workdir: Workdir,
   ) {}
 
   /**
@@ -32,12 +32,8 @@ export class sessions {
     token?: string,
   ): Promise<string> {
     return this._tokens.getSessionToken(
-      await this._tokens.getPublicKey(
-        await this._workdir.loadPub(tenant),
-      ),
-      await this._tokens.getPrivateKey(
-        await this._workdir.loadKey(tenant),
-      ),
+      await this._tenants.getPublicKey(tenant),
+      await this._tenants.getPrivateKey(tenant),
       token,
     );
   }

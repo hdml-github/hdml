@@ -11,10 +11,11 @@ import { sessions } from "../controllers/api/v0/sessions";
 import { status } from "../controllers/api/v0/status";
 import { tests } from "../controllers/api/v0/tests";
 import { tokens } from "../controllers/api/v0/tokens";
-import { Compiler } from "../services/Compiler";
+import { CompilerFactory } from "../services/Compiler";
 import { Config } from "../services/Config";
 import { Stats } from "../services/Stats";
 import { Status } from "../services/Status";
+import { Tenants } from "../services/Tenants";
 import { Thread } from "../services/Thread";
 import { Tokens } from "../services/Tokens";
 import { Workdir } from "../services/Workdir";
@@ -33,6 +34,7 @@ const common = {
         Config.Querier,
         Config.Workdir,
         Config.Engine,
+        Config.Cache,
         Config.Queue,
         Config.Stats,
         Config.JWE,
@@ -42,10 +44,11 @@ const common = {
   ],
   controllers: [status],
   providers: [
-    Compiler,
+    CompilerFactory,
     Config,
     Stats,
     Status,
+    Tenants,
     Tokens,
     Thread,
     Workdir,

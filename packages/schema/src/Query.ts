@@ -21,6 +21,7 @@ export type QueryDef = {
 
 /**
  * Query helper class.
+ * QueryBuf/QueryDef
  */
 export class Query {
   private _builder: Builder;
