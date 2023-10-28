@@ -6,7 +6,6 @@
 
 import { IoElement, ElementsDef } from "@hdml/elements";
 import { Injectable } from "@nestjs/common";
-// import * as dotenv from "dotenv";
 import {
   Isolate,
   ExternalCopy,

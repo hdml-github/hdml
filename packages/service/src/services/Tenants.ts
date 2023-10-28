@@ -5,7 +5,11 @@
  */
 
 import { QueryDef } from "@hdml/schema";
-import { Injectable } from "@nestjs/common";
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
 import * as dotenv from "dotenv";
 import { KeyLike } from "jose";
 import { LRUCache } from "lru-cache";
@@ -135,7 +139,10 @@ export class Tenants {
     depth = 0,
   ): Promise<QueryDef> {
     if (depth >= 25) {
-      throw new Error("Query definition depth exceeded");
+      throw new HttpException(
+        "Query definition depth exceeded",
+        HttpStatus.BAD_REQUEST,
+      );
     }
     const profile = this.getProfile(tenant);
     if (!profile.queries) {
@@ -186,7 +193,10 @@ export class Tenants {
       }
     }
     if (!profile.queries[uri]) {
-      throw new Error(`Invalid query URI: ${uri}`);
+      throw new HttpException(
+        `Invalid query URI: ${uri}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
     return profile.queries[uri];
   }

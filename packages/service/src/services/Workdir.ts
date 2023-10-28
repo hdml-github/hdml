@@ -4,7 +4,11 @@
  * @license Apache-2.0
  */
 
-import { Injectable } from "@nestjs/common";
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
 import { Dir, stat, opendir, readdir, readFile } from "fs";
 import { resolve } from "path";
 import { Config } from "./Config";
@@ -226,7 +230,10 @@ export class Workdir {
    */
   private async openFile(path: string): Promise<string> {
     if (!(await this.isFile(path))) {
-      throw new Error(`The ${path} file is not readable.`);
+      throw new HttpException(
+        `The ${path} file is not readable.`,
+        HttpStatus.MISDIRECTED,
+      );
     } else {
       return new Promise((resolve, reject) => {
         readFile(path, { encoding: "utf8" }, (err, data) => {
@@ -259,7 +266,10 @@ export class Workdir {
               } else if (await this.isFile(_path)) {
                 return [_path];
               } else {
-                throw new Error(`Invalid path type: ${_path}`);
+                throw new HttpException(
+                  `Invalid path type: ${_path}`,
+                  HttpStatus.MISDIRECTED,
+                );
               }
             },
           );
