@@ -29,6 +29,7 @@ const common = {
       isGlobal: true,
       cache: true,
       load: [
+        Config.Querydef,
         Config.Gateway,
         Config.Hideway,
         Config.Querier,

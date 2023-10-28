@@ -150,6 +150,24 @@ export class Workdir {
   }
 
   /**
+   * Returns `tenant`'s file with the `hdml` markup specified by the
+   * `path`.
+   */
+  public async loadHdml(
+    tenant: string,
+    path: string,
+  ): Promise<string> {
+    return await this.openFile(
+      resolve(
+        this._config.workdirPath,
+        tenant,
+        this._config.workdirHdmlPath,
+        `.${path}`,
+      ),
+    );
+  }
+
+  /**
    * Returns the hash map of the specified `tenant`'s `hdml` files.
    */
   public async loadHdmls(

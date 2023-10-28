@@ -25,7 +25,7 @@ type TenantProfile = {
   private?: KeyLike;
   public?: KeyLike;
   queries?: {
-    [path: string]: QueryDef;
+    [uri: string]: QueryDef;
   };
 };
 
@@ -41,8 +41,8 @@ export class Tenants {
    * @constructor
    */
   public constructor(
+    private _comp: CompilerFactory,
     private _conf: Config,
-    private _compiler: CompilerFactory,
     private _thread: Thread,
     private _tokens: Tokens,
     private _workdir: Workdir,
@@ -72,7 +72,7 @@ export class Tenants {
   public async getCompiler(tenant: string): Promise<Compiler> {
     const profile = this.getProfile(tenant);
     if (!profile.compiler) {
-      profile.compiler = await this._compiler.getCompiler(
+      profile.compiler = await this._comp.getCompiler(
         "common",
         await this.getEnvironment(tenant),
       );
@@ -123,6 +123,72 @@ export class Tenants {
       this._cache.set(tenant, profile);
     }
     return profile.public;
+  }
+
+  /**
+   * Returns the `QueryDef` object for the specified `tenant` by its
+   * `uri`.
+   */
+  public async getQueryDef(
+    tenant: string,
+    uri: string,
+    depth = 0,
+  ): Promise<QueryDef> {
+    if (depth >= 25) {
+      throw new Error("Query definition depth exceeded");
+    }
+    const profile = this.getProfile(tenant);
+    if (!profile.queries) {
+      profile.queries = {};
+      this._cache.set(tenant, profile);
+    }
+    if (!profile.queries[uri]) {
+      const url = new URL(uri, "hdml://");
+      const path = url.pathname;
+      const compiler = await this.getCompiler(tenant);
+      const fragment = await this._workdir.loadHdml(tenant, path);
+      const elements = await compiler.compile(fragment);
+      for (const name in elements.models) {
+        const _uri = `${path}?${this._conf.querydefModel}=${name}`;
+        const _model = elements.models[name];
+        if (!profile.queries[_uri]) {
+          profile.queries[_uri] = { model: _model };
+          this._cache.set(tenant, profile);
+        }
+      }
+      for (const name in elements.frames) {
+        const _uri = `${path}?${this._conf.querydefFrame}=${name}`;
+        const _frame = elements.frames[name];
+        if (!profile.queries[_uri]) {
+          profile.queries[_uri] = {
+            model: undefined,
+            frame: undefined,
+          };
+          this._cache.set(tenant, profile);
+          const _sourceUri =
+            _frame.source.indexOf("?") === 0
+              ? `${path}${_frame.source}`
+              : _frame.source;
+          const _parentQueryDef = await this.getQueryDef(
+            tenant,
+            _sourceUri,
+            depth++,
+          );
+          profile.queries[_uri] = {
+            model: _parentQueryDef.model,
+            frame: {
+              ..._frame,
+              parent: _parentQueryDef.frame,
+            },
+          };
+          this._cache.set(tenant, profile);
+        }
+      }
+    }
+    if (!profile.queries[uri]) {
+      throw new Error(`Invalid query URI: ${uri}`);
+    }
+    return profile.queries[uri];
   }
 
   /**

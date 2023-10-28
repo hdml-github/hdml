@@ -34,6 +34,8 @@ export interface DataDetail {
 /**
  * A definition of the `HDML` elements retrieved from the current
  * `HTML` document.
+ *
+ * TODO: ElementsDef -> FragmentDef
  */
 export type ElementsDef = {
   models: {

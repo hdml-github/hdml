@@ -25,6 +25,19 @@ export class tests {
 
   @Get()
   async run(): Promise<void> {
+    await this.loadQueryDef();
+  }
+
+  private async loadQueryDef(): Promise<void> {
+    const queryDef = await this._tenants.getQueryDef(
+      "common",
+      "/frames/query.html?hdml-frame=query",
+    );
+    this._logger.log(queryDef);
+    return;
+  }
+
+  private async compileFragment(): Promise<void> {
     const compiler = await this._tenants.getCompiler("common");
     const value = await compiler.compile(this.getFragment());
     this._logger.log(value);

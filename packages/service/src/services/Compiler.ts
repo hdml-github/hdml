@@ -71,10 +71,6 @@ export class CompilerFactory {
     // initializing context:
     const context = await isolate.createContext();
     const global = context.global;
-    // const env = dotenv.parse<Record<string, string>>(
-    //   await this._workdir.openEnv(tenant),
-    // );
-    // const env = await this._tenants.getEnvironment(tenant);
     for (const name in env) {
       await global.set(name, env[name]);
     }

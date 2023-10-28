@@ -99,7 +99,17 @@ type Cache = {
   TTL: number;
 };
 
+/**
+ * Query definition configuration.
+ */
+type Querydef = {
+  MODEL: string;
+  FRAME: string;
+  DEPTH: number;
+};
+
 type ConfigSet =
+  | Record<"Querydef", Querydef>
   | Record<"Workdir", Workdir>
   | Record<"Gateway", Gateway>
   | Record<"Hideway", Hideway>
@@ -115,6 +125,18 @@ type ConfigSet =
  */
 @Injectable()
 export class Config {
+  /**
+   * Query definition config namespace.
+   */
+  public static get Querydef(): (() => Querydef) &
+    ConfigFactoryKeyHost<Querydef> {
+    return registerAs("Querydef", () => ({
+      MODEL: process.env.QUERYDEF_MODEL || "hdml-model",
+      FRAME: process.env.QUERYDEF_FRAME || "hdml-frame",
+      DEPTH: parseInt(process.env.QUERYDEF_DEPTH || "25"),
+    }));
+  }
+
   /**
    * File structure config namespace.
    */
@@ -504,5 +526,29 @@ export class Config {
    */
   public get jweTtl(): number {
     return this._conf.get<JWE>("JWE").TTL;
+  }
+
+  /**
+   * Query definition model `uri` parameter. Can be configured via the
+   * `QUERYDEF_MODEL` environment variable.
+   */
+  public get querydefModel(): string {
+    return this._conf.get<Querydef>("Querydef").MODEL;
+  }
+
+  /**
+   * Query definition frame `uri` parameter. Can be configured via the
+   * `QUERYDEF_FRAME` environment variable.
+   */
+  public get querydefFrame(): string {
+    return this._conf.get<Querydef>("Querydef").FRAME;
+  }
+
+  /**
+   * Query definition depth value. Can be configured via the
+   * `QUERYDEF_DEPTH` environment variable.
+   */
+  public get querydefDepth(): number {
+    return this._conf.get<Querydef>("Querydef").DEPTH;
   }
 }
