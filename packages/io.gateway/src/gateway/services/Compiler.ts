@@ -11,7 +11,7 @@ import { Query } from "@hdml/schema";
 import {
   UnifiedElement,
   IoElement,
-  ElementsDef,
+  FragmentDef,
 } from "@hdml/elements";
 import { Options } from "./Options";
 
@@ -62,9 +62,9 @@ export class Compiler {
   }
 
   /**
-   * Compiles the provided `html` string into an `ElementsDef` object.
+   * Compiles the provided `html` string into an `FragmentDef` object.
    */
-  public async compile(html: string): Promise<ElementsDef> {
+  public async compile(html: string): Promise<FragmentDef> {
     const dom = this.getDOM(html);
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")

@@ -9,7 +9,7 @@ import {
   HttpException,
   HttpStatus,
 } from "@nestjs/common";
-import { Dir, stat, opendir, readdir, readFile } from "fs";
+import { Dir, stat, opendir, readFile } from "fs";
 import { resolve } from "path";
 import { Config } from "./Config";
 import { Thread } from "./Thread";
@@ -172,29 +172,6 @@ export class Workdir {
   }
 
   /**
-   * Returns the hash map of the specified `tenant`'s `hdml` files.
-   */
-  public async loadHdmls(
-    tenant: string,
-  ): Promise<Record<string, string>> {
-    const hdmls: Record<string, string> = {};
-    const _path = resolve(
-      this._config.workdirPath,
-      tenant,
-      this._config.workdirHdmlPath,
-    );
-    const files = (await this.listFiles(resolve(_path)))
-      .filter((f) => f.indexOf(`.${this._config.workdirHdmlExt}`) > 0)
-      .map((f) => f.split(_path)[1]);
-    await Promise.all(
-      files.map(async (f) => {
-        hdmls[f] = await this.openFile(resolve(_path, f));
-      }),
-    );
-    return hdmls;
-  }
-
-  /**
    * Determines if specified `path` is a directory or not.
    */
   private async isDir(path: string): Promise<boolean> {
@@ -245,44 +222,5 @@ export class Workdir {
         });
       });
     }
-  }
-
-  /**
-   * Returns an array of all files paths that are exists in the
-   * specified `path` and its sub folders.
-   */
-  private async listFiles(path: string): Promise<string[]> {
-    return new Promise((res, rej) => {
-      readdir(path, (err, paths) => {
-        if (err) {
-          rej(err);
-        } else {
-          let files: string[] = [];
-          const promises: Promise<string[]>[] = paths.map(
-            async (_path) => {
-              _path = resolve(path, _path);
-              if (await this.isDir(_path)) {
-                return await this.listFiles(_path);
-              } else if (await this.isFile(_path)) {
-                return [_path];
-              } else {
-                throw new HttpException(
-                  `Invalid path type: ${_path}`,
-                  HttpStatus.MISDIRECTED,
-                );
-              }
-            },
-          );
-          Promise.all(promises)
-            .then((pathsArray) => {
-              files = files.concat(...pathsArray);
-              res(files);
-            })
-            .catch((reason) => {
-              rej(reason);
-            });
-        }
-      });
-    });
   }
 }

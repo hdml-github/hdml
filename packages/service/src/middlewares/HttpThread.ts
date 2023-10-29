@@ -25,6 +25,6 @@ export class HttpThread implements NestMiddleware {
       : Array.isArray(req.headers["uid"])
       ? req.headers["uid"][0]
       : req.headers["uid"];
-    this._thread.start(uid, next);
+    this._thread.start({ uid }, next);
   }
 }

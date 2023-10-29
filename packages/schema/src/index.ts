@@ -32,7 +32,7 @@ import { TableDef } from "./helpers/TableHelper";
 import { JoinDef } from "./helpers/JoinHelper";
 import { ModelDef } from "./helpers/ModelHelper";
 import { FrameDef } from "./helpers/FrameHelper";
-import { Query, QueryDef } from "./Query";
+import { Query, QueryDef, QueryBuf } from "./Query";
 import { File, FileDef } from "./File";
 
 export {
@@ -47,6 +47,7 @@ export {
   FileDef,
   FileState,
   Query,
+  QueryBuf,
   QueryDef,
   CommonOptsDef,
   DecimalOptsDef,

@@ -44,58 +44,6 @@ export class Tokens {
   }
 
   /**
-   * Returns a token with the provided `sub`, `ttl` (in sec) and
-   * `scope`.
-   */
-  public async stringlify(
-    pub: KeyLike,
-    sub: string,
-    ttl: number,
-    scope: object,
-  ): Promise<string> {
-    const payload = Buffer.from(
-      JSON.stringify({
-        // with the following scope
-        ...scope,
-        // current service produced token
-        iss: this._conf.jweIss,
-        // for session initialization
-        sub,
-        // at
-        iat: Date.now() / 1000,
-        // which can be used from
-        nbf: Date.now() / 1000 - 1,
-        // up to
-        exp: Date.now() / 1000 + ttl,
-      }),
-      "utf8",
-    );
-    const ce = new CompactEncrypt(payload).setProtectedHeader({
-      alg: this._conf.jweAlg,
-      enc: this._conf.jweEnc,
-    });
-    return await ce.encrypt(pub);
-  }
-
-  /**
-   * Decrypts a `token` and returns its decripted payload.
-   */
-  public async parse(
-    key: KeyLike,
-    token: string,
-  ): Promise<JWTPayload> {
-    try {
-      const jwt = await jwtDecrypt(decodeURIComponent(token), key);
-      return jwt.payload;
-    } catch (error) {
-      throw new HttpException(
-        (<Error>error).message,
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-  }
-
-  /**
    * Returns access token.
    */
   public async getAccessToken(
@@ -194,7 +142,7 @@ export class Tokens {
     }
     const session = await this.stringlify(
       pub,
-      this._conf.jweSub,
+      this._conf.jweSes,
       this._conf.jweTtl,
       scope,
     );
@@ -207,7 +155,7 @@ export class Tokens {
   public async getContext(
     key: null | KeyLike,
     token?: string,
-  ): Promise<object> {
+  ): Promise<Record<string, unknown>> {
     if (!key) {
       throw new HttpException(
         "Bad request (invalid tenant or `key` is missing)",
@@ -229,7 +177,7 @@ export class Tokens {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    if (!payload.sub || payload.sub !== this._conf.jweSub) {
+    if (!payload.sub || payload.sub !== this._conf.jweSes) {
       throw new HttpException(
         "Bad request (`scope.sub` is missing or invalid)",
         HttpStatus.BAD_REQUEST,
@@ -238,5 +186,57 @@ export class Tokens {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { iss, sub, iat, nbf, exp, aud, jti, ...scope } = payload;
     return scope;
+  }
+
+  /**
+   * Returns a token with the provided `sub`, `ttl` (in sec) and
+   * `scope`.
+   */
+  public async stringlify(
+    pub: KeyLike,
+    sub: string,
+    ttl: number,
+    scope: object,
+  ): Promise<string> {
+    const payload = Buffer.from(
+      JSON.stringify({
+        // with the following scope
+        ...scope,
+        // current service produced token
+        iss: this._conf.jweIss,
+        // for session initialization
+        sub,
+        // at
+        iat: Date.now() / 1000,
+        // which can be used from
+        nbf: Date.now() / 1000 - 1,
+        // up to
+        exp: Date.now() / 1000 + ttl,
+      }),
+      "utf8",
+    );
+    const ce = new CompactEncrypt(payload).setProtectedHeader({
+      alg: this._conf.jweAlg,
+      enc: this._conf.jweEnc,
+    });
+    return await ce.encrypt(pub);
+  }
+
+  /**
+   * Decrypts a `token` and returns its decripted payload.
+   */
+  public async parse(
+    key: KeyLike,
+    token: string,
+  ): Promise<JWTPayload> {
+    try {
+      const jwt = await jwtDecrypt(decodeURIComponent(token), key);
+      return jwt.payload;
+    } catch (error) {
+      throw new HttpException(
+        (<Error>error).message,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 }

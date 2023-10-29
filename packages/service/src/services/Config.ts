@@ -19,7 +19,6 @@ type Workdir = {
   HOOKS_PATH: string;
   KEYS_PATH: string;
   HDML_PATH: string;
-  HDML_EXT: string;
   ENV_FILE: string;
   KEY_FILE: string;
   PUB_FILE: string;
@@ -108,6 +107,11 @@ type Querydef = {
   DEPTH: number;
 };
 
+type Auth = {
+  TENANT_PARAM: string;
+  SESSION_HEADER: string;
+};
+
 type ConfigSet =
   | Record<"Querydef", Querydef>
   | Record<"Workdir", Workdir>
@@ -118,6 +122,7 @@ type ConfigSet =
   | Record<"Cache", Cache>
   | Record<"Queue", Queue>
   | Record<"Stats", Stats>
+  | Record<"Auth", Auth>
   | Record<"JWE", JWE>;
 
 /**
@@ -125,6 +130,17 @@ type ConfigSet =
  */
 @Injectable()
 export class Config {
+  /**
+   * Authorization config namespace.
+   */
+  public static get Auth(): (() => Auth) &
+    ConfigFactoryKeyHost<Auth> {
+    return registerAs("Auth", () => ({
+      TENANT_PARAM: process.env.AUTH_TENANT_PARAM || "tenant",
+      SESSION_HEADER: process.env.AUTH_SESSION_HEADER || "session",
+    }));
+  }
+
   /**
    * Query definition config namespace.
    */
@@ -147,7 +163,6 @@ export class Config {
       HOOKS_PATH: process.env.WORKDIR_HOOKS_PATH || "hooks",
       KEYS_PATH: process.env.WORKDIR_KEYS_PATH || "keys",
       HDML_PATH: process.env.WORKDIR_HDML_PATH || "hdml",
-      HDML_EXT: process.env.WORKDIR_HDML_EXT || "html",
       ENV_FILE: process.env.WORKDIR_ENV_FILE || ".env",
       KEY_FILE: process.env.WORKDIR_KEY_FILE || "key",
       PUB_FILE: process.env.WORKDIR_PUB_FILE || "key.pub",
@@ -417,14 +432,6 @@ export class Config {
   }
 
   /**
-   * Tenants `hdml` document file extension. Can be configured via the
-   * `WORKDIR_HDML_EXT` environment variable.
-   */
-  public get workdirHdmlExt(): string {
-    return this._conf.get<Workdir>("Workdir").HDML_EXT;
-  }
-
-  /**
    * Tenants environment file name. Can be configured via the
    * `WORKDIR_ENV_FILE` environment variable.
    */
@@ -550,5 +557,21 @@ export class Config {
    */
   public get querydefDepth(): number {
     return this._conf.get<Querydef>("Querydef").DEPTH;
+  }
+
+  /**
+   * Tenant `uri` parameter to use for the authorization. Can be
+   * configured via the `AUTH_TENANT_PARAM` environment variable.
+   */
+  public get authTenantParam(): string {
+    return this._conf.get<Auth>("Auth").TENANT_PARAM;
+  }
+
+  /**
+   * Session header name to use for the authorization. Can be
+   * configured via the `AUTH_SESSION_HEADER` environment variable.
+   */
+  public get authSessionHeader(): string {
+    return this._conf.get<Auth>("Auth").SESSION_HEADER;
   }
 }

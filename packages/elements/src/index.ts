@@ -32,7 +32,7 @@ import {
   getSortByTag,
 } from "./helpers/elementsRegister";
 import { UnifiedElement } from "./components/UnifiedElement";
-import { IoElement, ElementsDef } from "./components/IoElement";
+import { IoElement, FragmentDef } from "./components/IoElement";
 import { ModelElement } from "./components/ModelElement";
 import { TableElement } from "./components/TableElement";
 import { FieldElement } from "./components/FieldElement";
@@ -76,7 +76,7 @@ export {
   getSortByTag,
   // elements
   UnifiedElement,
-  ElementsDef,
+  FragmentDef,
   IoElement,
   ModelElement,
   TableElement,

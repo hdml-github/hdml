@@ -7,10 +7,13 @@
 import { ModuleMetadata } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
+import { queries } from "../controllers/api/v0/queries";
 import { sessions } from "../controllers/api/v0/sessions";
 import { status } from "../controllers/api/v0/status";
 import { tests } from "../controllers/api/v0/tests";
 import { tokens } from "../controllers/api/v0/tokens";
+import { Auth } from "../guards/Auth";
+import { HttpThread } from "../middlewares/HttpThread";
 import { CompilerFactory } from "../services/Compiler";
 import { Config } from "../services/Config";
 import { Stats } from "../services/Stats";
@@ -38,6 +41,7 @@ const common = {
         Config.Cache,
         Config.Queue,
         Config.Stats,
+        Config.Auth,
         Config.JWE,
       ],
     }),
@@ -45,8 +49,10 @@ const common = {
   ],
   controllers: [status],
   providers: [
+    Auth,
     CompilerFactory,
     Config,
+    HttpThread,
     Stats,
     Status,
     Tenants,
@@ -64,12 +70,18 @@ export function getModuleMetadata(): ModuleMetadata {
     case "gateway":
       return {
         ...common,
-        controllers: [...common.controllers, sessions],
+        controllers: [...common.controllers, queries, sessions],
       };
     case "hideway":
       return {
         ...common,
-        controllers: [...common.controllers, tests, tokens, sessions],
+        controllers: [
+          ...common.controllers,
+          queries,
+          sessions,
+          tests,
+          tokens,
+        ],
       };
     case "querier":
       return { ...common };

@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import { type Query, type QueryDef } from "@hdml/schema";
+import { type QueryBuf, type QueryDef } from "@hdml/schema";
 import { getSQL } from "./sql/orchestrate";
 import { getHTML } from "./html/orchestrate";
 
@@ -14,7 +14,7 @@ import { getHTML } from "./html/orchestrate";
  * if the `query` object does not contain a `model` property.
  */
 export function orchestrate(
-  query: Query | QueryDef,
+  query: QueryBuf | QueryDef,
   toHtml = false,
 ): string {
   if (!toHtml) {

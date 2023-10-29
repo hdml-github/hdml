@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import { IoElement, ElementsDef } from "@hdml/elements";
+import { IoElement, FragmentDef } from "@hdml/elements";
 import { Injectable } from "@nestjs/common";
 import {
   Isolate,
@@ -21,10 +21,10 @@ import { Workdir } from "./Workdir";
 
 /**
  * Takes an `html` fragment with the `hdml` markup and convert it to
- * the `ElementsDef` object. This function applies user defined `hook`
+ * the `FragmentDef` object. This function applies user defined `hook`
  * function on the incomming fragment.
  */
-type CompileFn = (fragment: string) => Promise<ElementsDef>;
+type CompileFn = (fragment: string) => Promise<FragmentDef>;
 
 /**
  * Disposes off all resources allocated for the `Isolated` instance.
