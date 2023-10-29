@@ -16,6 +16,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from "@nestjs/platform-fastify";
+import * as rawbody from "raw-body";
 import { getModuleHost, getModulePort } from "./helpers/getModOpts";
 import { Config } from "./services/Config";
 import { IoModule } from "./IoModule";
@@ -48,9 +49,20 @@ import { IoModule } from "./IoModule";
     );
   });
 
+  const adapter = new FastifyAdapter();
+
+  adapter.getInstance().addContentTypeParser(
+    "application/octet-stream",
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async (_req, payload, _done) => {
+      const buf = await rawbody(payload);
+      return buf;
+    },
+  );
+
   const app = await NestFactory.create<NestFastifyApplication>(
     IoModule,
-    new FastifyAdapter(),
+    adapter,
   );
   const config = app.get(Config);
   // TODO: add CORS configuration.

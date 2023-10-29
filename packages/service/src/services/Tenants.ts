@@ -138,6 +138,12 @@ export class Tenants {
     uri: string,
     depth = 0,
   ): Promise<QueryDef> {
+    if (!uri) {
+      throw new HttpException(
+        "The `uri` parameter is required",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     if (depth >= 25) {
       throw new HttpException(
         "Query definition depth exceeded",
@@ -154,7 +160,7 @@ export class Tenants {
       const path = url.pathname;
       const compiler = await this.getCompiler(tenant);
       const fragment = await this._workdir.loadHdml(tenant, path);
-      const elements = await compiler.compile(fragment);
+      const elements = await compiler.compile(fragment, true);
       for (const name in elements.models) {
         const _uri = `${path}?${this._conf.querydefModel}=${name}`;
         const _model = elements.models[name];
@@ -199,29 +205,6 @@ export class Tenants {
       );
     }
     return profile.queries[uri];
-  }
-
-  /**
-   * Returns the `QueryDef` objects for the specified `tenant`.
-   */
-  public getQueriesDefinitions(
-    tenant: string,
-    uri?: string,
-  ): Record<string, QueryDef> {
-    const profile = this.getProfile(tenant);
-    if (!profile.queries) {
-      throw new HttpException(
-        "There are no queries definitions for the specified tenant",
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    if (uri && !profile.queries[uri]) {
-      throw new HttpException(
-        "There is no query definition for the specified tenant",
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return uri ? { [uri]: profile.queries[uri] } : profile.queries;
   }
 
   /**

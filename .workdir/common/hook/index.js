@@ -1,5 +1,5 @@
-export function hook(dom) {
-  log(HDML_TENANT_NAME);
+export function hook(dom, scope) {
+  log(HDML_TENANT_NAME, scope.uid);
   // log(fetch(OPEN_URL));
   
   // dom

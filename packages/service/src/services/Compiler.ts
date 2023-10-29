@@ -24,7 +24,10 @@ import { Workdir } from "./Workdir";
  * the `FragmentDef` object. This function applies user defined `hook`
  * function on the incomming fragment.
  */
-type CompileFn = (fragment: string) => Promise<FragmentDef>;
+type CompileFn = (
+  fragment: string,
+  ignoreHook?: boolean,
+) => Promise<FragmentDef>;
 
 /**
  * Disposes off all resources allocated for the `Isolated` instance.
@@ -95,7 +98,7 @@ export class CompilerFactory {
         return new ExternalCopy(data);
       }),
     );
-    const _fetch = await this.getMOD(
+    const _fetch = await this.getModule(
       isolate,
       context,
       `globalThis.fetch = function fetch(url) {
@@ -109,7 +112,7 @@ export class CompilerFactory {
     );
 
     // attaching `parse` function:
-    const _parse = await this.getMOD(
+    const _parse = await this.getModule(
       isolate,
       context,
       `${await this._workdir.getParserScript()};
@@ -117,7 +120,7 @@ export class CompilerFactory {
     );
 
     // attaching `hook` function:
-    const _hook = await this.getMOD(
+    const _hook = await this.getModule(
       isolate,
       context,
       `${await this._workdir.loadHook(tenant)}
@@ -125,26 +128,33 @@ export class CompilerFactory {
     );
 
     // attaching `execute` function:
-    const _execute = await this.getMOD(
+    const _execute = await this.getModule(
       isolate,
       context,
-      `export default function execute(html) {
+      `export default function execute(html, scope) {
         const dom = parse(html);
-        const hooked = hook(dom);
+        const hooked = hook(dom, scope.copy());
         return hooked.toString();
       };`,
     );
 
     return {
-      compile: async (fragment: string) => {
-        const hooked = <string>(
-          await _execute.apply(null, [fragment], {})
-        );
-        const dom = await this.getDOM(hooked);
-        const io = <IoElement>(
+      compile: async (fragment: string, ignore = false) => {
+        const scope = this._thread.getScope() || {};
+        if (!ignore) {
+          fragment = <string>(
+            await _execute.apply(
+              null,
+              [fragment, new ExternalCopy(scope)],
+              {},
+            )
+          );
+        }
+        const dom = await this.getDOM(fragment);
+        const ioe = <IoElement>(
           dom.window.document.querySelector("hdml-io")
         );
-        const data = await io.getElementsDef();
+        const data = await ioe.getElementsDef();
         dom.window.close();
         return data;
       },
@@ -164,7 +174,7 @@ export class CompilerFactory {
    * Initialize and evaluates module inside the specified `isolate`.
    * Returns initialized module's `default` export.
    */
-  private async getMOD(
+  private async getModule(
     isolate: Isolate,
     context: Context,
     script: string,
