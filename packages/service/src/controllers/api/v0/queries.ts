@@ -35,9 +35,25 @@ export class queries {
   }
 
   /**
-   * The `GET /definititions?tenant=:tenant&uri=:uri` endpoint.
+   * The `GET /?tenant=:tenant` endpoint.
    */
-  @Get("definititions")
+  @Get()
+  public getQueries(
+    @Query("tenant")
+    tenant: string,
+  ): { [uri: string]: QueryDef } {
+    try {
+      return this._tenants.getQueries(tenant);
+    } catch (err) {
+      this._logger.error(err);
+      throw err;
+    }
+  }
+
+  /**
+   * The `GET /definitition?tenant=:tenant&uri=:uri` endpoint.
+   */
+  @Get("definitition")
   public async getDefinitions(
     @Query("tenant")
     tenant: string,

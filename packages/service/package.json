@@ -9,6 +9,7 @@
   "dependencies": {
     "@fastify/multipart": "^8.0.0",
     "@hdml/elements": "0.0.0-alpha.12",
+    "@hdml/orchestrator": "0.0.0-alpha.12",
     "@hdml/parser": "0.0.0-alpha.12",
     "@hdml/schema": "^0.0.0-alpha.12",
     "@nestjs/common": "^10.2.7",

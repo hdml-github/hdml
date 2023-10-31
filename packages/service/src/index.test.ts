@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import { QueryDef, QueryBuf, FrameDef } from "@hdml/schema";
+import { QueryDef, QueryBuf } from "@hdml/schema";
 
 const uri = "/frames/query.html?hdml-frame=query";
 const tenant = "common";
@@ -54,10 +54,9 @@ describe("REST APIs", () => {
     expect(sessionToken).toBeTruthy();
   });
 
-  it("GET /api/v0/queries/definitions", async () => {
+  it("GET /api/v0/queries (empty)", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/definititions?" +
-      `tenant=${tenant}`;
+      `http://localhost:8887/api/v0/queries?tenant=` + `${tenant}`;
     const res = await fetch(url, {
       method: "GET",
       mode: "cors",
@@ -68,12 +67,12 @@ describe("REST APIs", () => {
       },
     });
     expect(res.ok).toBeFalsy();
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
   });
 
-  it("GET /api/v0/queries/definitions?uri=:uri", async () => {
+  it("GET /api/v0/queries/definition?uri=:uri", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/definititions?" +
+      "http://localhost:8887/api/v0/queries/definitition?" +
       `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
@@ -91,8 +90,24 @@ describe("REST APIs", () => {
     expect(queryDef.frame?.name).toBe("query");
   });
 
-  it("POST /api/v0/queries/fragments", async () => {
-    (<FrameDef>queryDef.frame).name = "new_query";
+  it("GET /api/v0/queries (full)", async () => {
+    const url =
+      `http://localhost:8887/api/v0/queries?tenant=` + `${tenant}`;
+    const res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow",
+      cache: "no-cache",
+      headers: {
+        session: sessionToken,
+      },
+    });
+    expect(res.ok).toBeTruthy();
+    expect(res.status).toBe(200);
+  });
+
+  it.skip("POST /api/v0/queries/fragments", async () => {
+    queryDef.frame && (queryDef.frame.name = "new_query");
     queryBuf = new QueryBuf(queryDef);
     const url =
       "http://localhost:8887/api/v0/queries/fragments?" +

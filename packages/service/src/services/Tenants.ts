@@ -4,7 +4,9 @@
  * @license Apache-2.0
  */
 
-import { QueryDef } from "@hdml/schema";
+import { FragmentDef } from "@hdml/elements";
+import { getHTML } from "@hdml/orchestrator";
+import { QueryDef, QueryBuf, FrameDef } from "@hdml/schema";
 import {
   Injectable,
   HttpException,
@@ -130,6 +132,64 @@ export class Tenants {
   }
 
   /**
+   * Returns the `QueryDef`s map for the specified `tenant`.
+   */
+  public getQueries(tenant: string): {
+    [uri: string]: QueryDef;
+  } {
+    const profile = this.getProfile(tenant);
+    if (profile.queries) {
+      return profile.queries;
+    } else {
+      throw new HttpException(
+        `No queries for the specified tenant: ${tenant}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+  }
+
+  /**
+   *
+   */
+  public async postQueryDef(
+    tenant: string,
+    query: QueryBuf,
+  ): Promise<void> {
+    if (!query.model && !query.frame) {
+      throw new HttpException(
+        "Invalid (empty) query",
+        HttpStatus.BAD_REQUEST,
+      );
+    } else {
+      let q: QueryDef;
+      if (query.model) {
+        q = query;
+      } else {
+        const frame = <FrameDef>query.frame;
+        let root = frame;
+        while (root.parent) {
+          root = root.parent;
+        }
+        const sourceDef = await this.getQueryDef(tenant, root.source);
+        if (!sourceDef.model) {
+          throw new HttpException(
+            `Model is missing for the query`,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+        root.parent = sourceDef.frame;
+        q = new QueryBuf({
+          model: sourceDef.model,
+          frame,
+        });
+      }
+      const html = getHTML(q);
+      const compiler = await this.getCompiler(tenant);
+      const queryBuf = await compiler.compile(html, true);
+    }
+  }
+
+  /**
    * Returns the `QueryDef` object for the specified `tenant` by its
    * `uri`.
    */
@@ -140,7 +200,7 @@ export class Tenants {
   ): Promise<QueryDef> {
     if (!uri) {
       throw new HttpException(
-        "The `uri` parameter is required",
+        "The uri parameter is required",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -159,48 +219,57 @@ export class Tenants {
       const url = new URL(uri, "hdml://");
       const path = url.pathname;
       const compiler = await this.getCompiler(tenant);
-      const fragment = await this._workdir.loadHdml(tenant, path);
-      const elements = await compiler.compile(fragment, true);
-      for (const name in elements.models) {
-        const _uri = `${path}?${this._conf.querydefModel}=${name}`;
-        const _model = elements.models[name];
-        if (!profile.queries[_uri]) {
-          profile.queries[_uri] = { model: _model };
-          this._cache.set(tenant, profile);
+      const content = await this._workdir.loadHdml(tenant, path);
+      const fragment = <null | FragmentDef>(
+        await compiler.compile(content)
+      );
+      if (!fragment) {
+        throw new HttpException(
+          `No hdml content: ${path}`,
+          HttpStatus.FAILED_DEPENDENCY,
+        );
+      } else {
+        for (const name in fragment.models) {
+          const _uri = `${path}?${this._conf.querydefModel}=${name}`;
+          const _model = fragment.models[name];
+          if (!profile.queries[_uri]) {
+            profile.queries[_uri] = { model: _model };
+            this._cache.set(tenant, profile);
+          }
         }
-      }
-      for (const name in elements.frames) {
-        const _uri = `${path}?${this._conf.querydefFrame}=${name}`;
-        const _frame = elements.frames[name];
-        if (!profile.queries[_uri]) {
-          profile.queries[_uri] = {
-            model: undefined,
-            frame: undefined,
-          };
-          this._cache.set(tenant, profile);
-          const _sourceUri =
-            _frame.source.indexOf("?") === 0
-              ? `${path}${_frame.source}`
-              : _frame.source;
-          const _parentQueryDef = await this.getQueryDef(
-            tenant,
-            _sourceUri,
-            depth++,
-          );
-          profile.queries[_uri] = {
-            model: _parentQueryDef.model,
-            frame: {
-              ..._frame,
-              parent: _parentQueryDef.frame,
-            },
-          };
-          this._cache.set(tenant, profile);
+        for (const name in fragment.frames) {
+          const _uri = `${path}?${this._conf.querydefFrame}=${name}`;
+          const _frame = fragment.frames[name];
+          if (!profile.queries[_uri]) {
+            profile.queries[_uri] = {
+              model: undefined,
+              frame: undefined,
+            };
+            this._cache.set(tenant, profile);
+            const _sourceUri =
+              _frame.source.indexOf("?") === 0
+                ? `${path}${_frame.source}`
+                : _frame.source;
+            const _parentQueryDef = await this.getQueryDef(
+              tenant,
+              _sourceUri,
+              depth++,
+            );
+            profile.queries[_uri] = {
+              model: _parentQueryDef.model,
+              frame: {
+                ..._frame,
+                parent: _parentQueryDef.frame,
+              },
+            };
+            this._cache.set(tenant, profile);
+          }
         }
       }
     }
     if (!profile.queries[uri]) {
       throw new HttpException(
-        `Invalid query URI: ${uri}`,
+        `Invalid query uri: ${uri}`,
         HttpStatus.BAD_REQUEST,
       );
     }

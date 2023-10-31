@@ -4,7 +4,12 @@
  * @license Apache-2.0
  */
 
-import { IoElement, FragmentDef } from "@hdml/elements";
+import {
+  UnifiedElement,
+  IoElement,
+  FragmentDef,
+} from "@hdml/elements";
+import { QueryBuf } from "@hdml/schema";
 import { Injectable } from "@nestjs/common";
 import {
   Isolate,
@@ -25,9 +30,9 @@ import { Workdir } from "./Workdir";
  * function on the incomming fragment.
  */
 type CompileFn = (
-  fragment: string,
-  ignoreHook?: boolean,
-) => Promise<FragmentDef>;
+  htmlContent: string,
+  isQuery?: boolean,
+) => Promise<null | FragmentDef | QueryBuf>;
 
 /**
  * Disposes off all resources allocated for the `Isolated` instance.
@@ -139,24 +144,31 @@ export class CompilerFactory {
     );
 
     return {
-      compile: async (fragment: string, ignore = false) => {
+      compile: async (htmlContent: string, isQuery?: boolean) => {
         const scope = this._thread.getScope() || {};
-        if (!ignore) {
-          fragment = <string>(
+        if (isQuery) {
+          htmlContent = <string>(
             await _execute.apply(
               null,
-              [fragment, new ExternalCopy(scope)],
+              [htmlContent, new ExternalCopy(scope)],
               {},
             )
           );
         }
-        const dom = await this.getDOM(fragment);
-        const ioe = <IoElement>(
-          dom.window.document.querySelector("hdml-io")
+        const { window } = await this.getDOM(htmlContent);
+        const io = <IoElement>(
+          window.document.querySelector("hdml-io")
         );
-        const data = await ioe.getElementsDef();
-        dom.window.close();
-        return data;
+        if (isQuery) {
+          const root = <UnifiedElement>(
+            window.document.querySelector("[root=root]")
+          );
+          return await io.getQuery(root.uid);
+        } else {
+          const fragmentDef = await io.getElementsDef();
+          window.close();
+          return fragmentDef;
+        }
       },
       release: () => {
         _fetch.release();
