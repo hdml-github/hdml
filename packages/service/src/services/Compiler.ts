@@ -9,8 +9,12 @@ import {
   IoElement,
   FragmentDef,
 } from "@hdml/elements";
-import { QueryBuf } from "@hdml/schema";
-import { Injectable } from "@nestjs/common";
+import { QueryDef } from "@hdml/schema";
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+} from "@nestjs/common";
 import {
   Isolate,
   ExternalCopy,
@@ -32,7 +36,7 @@ import { Workdir } from "./Workdir";
 type CompileFn = (
   htmlContent: string,
   isQuery?: boolean,
-) => Promise<null | FragmentDef | QueryBuf>;
+) => Promise<null | FragmentDef | QueryDef>;
 
 /**
  * Disposes off all resources allocated for the `Isolated` instance.
@@ -163,9 +167,19 @@ export class CompilerFactory {
           const root = <UnifiedElement>(
             window.document.querySelector("[root=root]")
           );
-          return await io.getQuery(root.uid);
+          const buf = await io.getQuery(root.uid);
+          if (!buf) {
+            throw new HttpException(
+              "Failed to compile query",
+              HttpStatus.BAD_REQUEST,
+            );
+          }
+          return {
+            model: buf.model,
+            frame: buf.frame,
+          };
         } else {
-          const fragmentDef = await io.getElementsDef();
+          const fragmentDef = await io.getFragmentDef();
           window.close();
           return fragmentDef;
         }

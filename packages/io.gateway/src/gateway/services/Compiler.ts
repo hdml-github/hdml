@@ -69,7 +69,7 @@ export class Compiler {
     const io = <IoElement>(
       dom.window.document.querySelector("hdml-io")
     );
-    const data = await io.getElementsDef();
+    const data = await io.getFragmentDef();
     dom.window.close();
     return data;
   }

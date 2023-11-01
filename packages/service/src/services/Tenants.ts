@@ -132,23 +132,6 @@ export class Tenants {
   }
 
   /**
-   * Returns the `QueryDef`s map for the specified `tenant`.
-   */
-  public getQueries(tenant: string): {
-    [uri: string]: QueryDef;
-  } {
-    const profile = this.getProfile(tenant);
-    if (profile.queries) {
-      return profile.queries;
-    } else {
-      throw new HttpException(
-        `No queries for the specified tenant: ${tenant}`,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-  }
-
-  /**
    *
    */
   public async postQueryDef(
@@ -185,7 +168,7 @@ export class Tenants {
       }
       const html = getHTML(q);
       const compiler = await this.getCompiler(tenant);
-      const queryBuf = await compiler.compile(html, true);
+      const queryDef = await compiler.compile(html, true);
     }
   }
 
@@ -274,6 +257,21 @@ export class Tenants {
       );
     }
     return profile.queries[uri];
+  }
+
+  /**
+   * Returns the parsed queries `uri`s for the specified `tenant`.
+   */
+  public getQueriesURIs(tenant: string): string[] {
+    const profile = this.getProfile(tenant);
+    if (profile.queries) {
+      return Object.keys(profile.queries);
+    } else {
+      throw new HttpException(
+        `No queries for the specified tenant: ${tenant}`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
   }
 
   /**

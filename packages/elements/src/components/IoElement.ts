@@ -360,11 +360,11 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Returns a definition of the `HDML` elements retrieved from the
+   * Returns a definition of the `HDML` fragment retrieved from the
    * current `HTML` document.
    * @throws
    */
-  public async getElementsDef(): Promise<FragmentDef> {
+  public async getFragmentDef(): Promise<FragmentDef> {
     await this._updates();
     const models: { [name: string]: ModelDef } = {};
     const frames: { [name: string]: FrameDef } = {};

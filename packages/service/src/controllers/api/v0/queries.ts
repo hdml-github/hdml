@@ -4,6 +4,7 @@
  * @license Apache-2.0
  */
 
+import { getHTML, getSQL } from "@hdml/orchestrator";
 import { QueryDef, QueryBuf } from "@hdml/schema";
 import {
   Controller,
@@ -35,15 +36,15 @@ export class queries {
   }
 
   /**
-   * The `GET /?tenant=:tenant` endpoint.
+   * The `GET /uris?tenant=:tenant` endpoint.
    */
-  @Get()
+  @Get("uris")
   public getQueries(
     @Query("tenant")
     tenant: string,
-  ): { [uri: string]: QueryDef } {
+  ): string[] {
     try {
-      return this._tenants.getQueries(tenant);
+      return this._tenants.getQueriesURIs(tenant);
     } catch (err) {
       this._logger.error(err);
       throw err;
@@ -53,8 +54,8 @@ export class queries {
   /**
    * The `GET /definitition?tenant=:tenant&uri=:uri` endpoint.
    */
-  @Get("definitition")
-  public async getDefinitions(
+  @Get("def")
+  public async getDef(
     @Query("tenant")
     tenant: string,
     @Query("uri")
@@ -62,6 +63,42 @@ export class queries {
   ): Promise<QueryDef> {
     try {
       return await this._tenants.getQueryDef(tenant, uri);
+    } catch (err) {
+      this._logger.error(err);
+      throw err;
+    }
+  }
+
+  /**
+   * The `GET /html?tenant=:tenant&uri=:uri` endpoint.
+   */
+  @Get("html")
+  public async getHtml(
+    @Query("tenant")
+    tenant: string,
+    @Query("uri")
+    uri: string,
+  ): Promise<string> {
+    try {
+      return getHTML(await this._tenants.getQueryDef(tenant, uri));
+    } catch (err) {
+      this._logger.error(err);
+      throw err;
+    }
+  }
+
+  /**
+   * The `GET /sql?tenant=:tenant&uri=:uri` endpoint.
+   */
+  @Get("sql")
+  public async getSql(
+    @Query("tenant")
+    tenant: string,
+    @Query("uri")
+    uri: string,
+  ): Promise<string> {
+    try {
+      return getSQL(await this._tenants.getQueryDef(tenant, uri));
     } catch (err) {
       this._logger.error(err);
       throw err;

@@ -54,9 +54,10 @@ describe("REST APIs", () => {
     expect(sessionToken).toBeTruthy();
   });
 
-  it("GET /api/v0/queries (empty)", async () => {
+  it("GET /api/v0/queries/uris (404)", async () => {
     const url =
-      `http://localhost:8887/api/v0/queries?tenant=` + `${tenant}`;
+      `http://localhost:8887/api/v0/queries/uris?tenant=` +
+      `${tenant}`;
     const res = await fetch(url, {
       method: "GET",
       mode: "cors",
@@ -70,9 +71,9 @@ describe("REST APIs", () => {
     expect(res.status).toBe(404);
   });
 
-  it("GET /api/v0/queries/definition?uri=:uri", async () => {
+  it("GET /api/v0/queries/def?uri=:uri", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/definitition?" +
+      "http://localhost:8887/api/v0/queries/def?" +
       `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
@@ -90,9 +91,10 @@ describe("REST APIs", () => {
     expect(queryDef.frame?.name).toBe("query");
   });
 
-  it("GET /api/v0/queries (full)", async () => {
+  it("GET /api/v0/queries/html?uri=:uri", async () => {
     const url =
-      `http://localhost:8887/api/v0/queries?tenant=` + `${tenant}`;
+      "http://localhost:8887/api/v0/queries/html?" +
+      `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
       mode: "cors",
@@ -102,8 +104,51 @@ describe("REST APIs", () => {
         session: sessionToken,
       },
     });
+    const html = await res.text();
     expect(res.ok).toBeTruthy();
     expect(res.status).toBe(200);
+    expect(html).toBeDefined();
+    expect(typeof html).toBe("string");
+  });
+
+  it("GET /api/v0/queries/sql?uri=:uri", async () => {
+    const url =
+      "http://localhost:8887/api/v0/queries/sql?" +
+      `tenant=${tenant}&uri=${uri}`;
+    const res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow",
+      cache: "no-cache",
+      headers: {
+        session: sessionToken,
+      },
+    });
+    const sql = await res.text();
+    expect(res.ok).toBeTruthy();
+    expect(res.status).toBe(200);
+    expect(sql).toBeDefined();
+    expect(typeof sql).toBe("string");
+  });
+
+  it("GET /api/v0/queries/uris", async () => {
+    const url =
+      `http://localhost:8887/api/v0/queries/uris?tenant=` +
+      `${tenant}`;
+    const res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow",
+      cache: "no-cache",
+      headers: {
+        session: sessionToken,
+      },
+    });
+    const queryUris = <string[]>await res.json();
+    expect(res.ok).toBeTruthy();
+    expect(res.status).toBe(200);
+    expect(queryUris).toBeDefined();
+    expect(Array.isArray(queryUris)).toBeTruthy();
   });
 
   it.skip("POST /api/v0/queries/fragments", async () => {
