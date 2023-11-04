@@ -7,14 +7,14 @@
 import { Injectable, NestMiddleware } from "@nestjs/common";
 import { FastifyRequest } from "fastify";
 import { getUid } from "../helpers/getUid";
-import { Thread } from "../services/Thread";
+import { Threads } from "../services/Threads";
 
 /**
  * The `http` thread middleware.
  */
 @Injectable()
 export class HttpThread implements NestMiddleware {
-  constructor(private _thread: Thread) {}
+  constructor(private _threads: Threads) {}
 
   /**
    * Runs async thread by saving `http` identifier.
@@ -25,6 +25,6 @@ export class HttpThread implements NestMiddleware {
       : Array.isArray(req.headers["uid"])
       ? req.headers["uid"][0]
       : req.headers["uid"];
-    this._thread.start({ uid }, next);
+    this._threads.start({ uid }, next);
   }
 }

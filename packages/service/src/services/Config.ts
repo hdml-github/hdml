@@ -65,6 +65,7 @@ type Queue = {
   REST: number;
   TENANT: string;
   NAMESPACE: string;
+  QUERIES: string;
   TTL: number;
 };
 
@@ -235,6 +236,7 @@ export class Config {
       REST: parseInt(process.env.QUEUE_REST || "9090"),
       TENANT: process.env.QUEUE_TENANT || "public",
       NAMESPACE: process.env.QUEUE_NAMESPACE || "default",
+      QUERIES: process.env.QUEUE_QUERIES || "queries",
       TTL: parseInt(process.env.QUEUE_TTL || "60"),
     }));
   }
@@ -389,6 +391,14 @@ export class Config {
    */
   public get queueNamespace(): string {
     return this._conf.get<Queue>("Queue").NAMESPACE;
+  }
+
+  /**
+   * Queries queue name to use. Can be configured via the
+   * `QUEUE_QUERIES` environment variable.
+   */
+  public get queueQueries(): string {
+    return this._conf.get<Queue>("Queue").QUERIES;
   }
 
   /**

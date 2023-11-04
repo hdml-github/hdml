@@ -13,7 +13,7 @@ import { FastifyRequest } from "fastify";
 import { Config } from "../services/Config";
 import { Logger } from "../services/Logger";
 import { Tenants } from "../services/Tenants";
-import { Thread } from "../services/Thread";
+import { Threads } from "../services/Threads";
 import { Tokens } from "../services/Tokens";
 
 /**
@@ -27,11 +27,11 @@ export class Auth implements CanActivate {
    */
   constructor(
     private _config: Config,
-    private _thread: Thread,
+    private _threads: Threads,
     private _tenants: Tenants,
     private _tokens: Tokens,
   ) {
-    this._logger = new Logger("Auth", this._thread);
+    this._logger = new Logger("Auth", this._threads);
   }
 
   /**
@@ -65,7 +65,7 @@ export class Auth implements CanActivate {
     } else {
       const key = await this._tenants.getPrivateKey(tenant);
       try {
-        return this._thread.setScope(
+        return this._threads.setScope(
           await this._tokens.getContext(key, token),
         );
       } catch (e) {

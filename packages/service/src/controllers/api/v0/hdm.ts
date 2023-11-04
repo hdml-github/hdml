@@ -18,33 +18,33 @@ import { FastifyRequest } from "fastify";
 import { Auth } from "../../../guards/Auth";
 import { Logger } from "../../../services/Logger";
 import { Tenants } from "../../../services/Tenants";
-import { Thread } from "../../../services/Thread";
+import { Threads } from "../../../services/Threads";
 
 /**
- * The `api/v0/queries` path controller.
+ * The `api/v0/hdml` path controller.
  */
-@Controller({ path: "api/v0/queries" })
+@Controller({ path: "api/v0/hdm" })
 @UseGuards(Auth)
-export class queries {
+export class hdm {
   private _logger: Logger;
 
   /**
    * @constructor
    */
-  constructor(private _tenants: Tenants, private _thread: Thread) {
-    this._logger = new Logger("api/v0/queries", this._thread);
+  constructor(private _tenants: Tenants, private _threads: Threads) {
+    this._logger = new Logger("api/v0/hdm", this._threads);
   }
 
   /**
    * The `GET /uris?tenant=:tenant` endpoint.
    */
   @Get("uris")
-  public getQueries(
+  public getUris(
     @Query("tenant")
     tenant: string,
   ): string[] {
     try {
-      return this._tenants.getQueriesURIs(tenant);
+      return this._tenants.getUris(tenant);
     } catch (err) {
       this._logger.error(err);
       throw err;
@@ -52,7 +52,7 @@ export class queries {
   }
 
   /**
-   * The `GET /definitition?tenant=:tenant&uri=:uri` endpoint.
+   * The `GET /def?tenant=:tenant&uri=:uri` endpoint.
    */
   @Get("def")
   public async getDef(
@@ -70,10 +70,10 @@ export class queries {
   }
 
   /**
-   * The `GET /html?tenant=:tenant&uri=:uri` endpoint.
+   * The `GET /htm?tenant=:tenant&uri=:uri` endpoint.
    */
-  @Get("html")
-  public async getHtml(
+  @Get("htm")
+  public async getHtm(
     @Query("tenant")
     tenant: string,
     @Query("uri")

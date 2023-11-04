@@ -5,22 +5,22 @@
  */
 
 import { Logger as BaseLogger } from "@nestjs/common";
-import { Thread } from "./Thread";
+import { Threads } from "./Threads";
 
 /**
  * Logger service.
  */
 export class Logger extends BaseLogger {
-  private _thread: Thread;
+  private _threads: Threads;
 
   /**
    * @constructor
    */
-  public constructor(context: string, thread: Thread) {
+  public constructor(context: string, thread: Threads) {
     super(context, {
       timestamp: true,
     });
-    this._thread = thread;
+    this._threads = thread;
   }
 
   /**

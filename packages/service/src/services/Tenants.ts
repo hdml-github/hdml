@@ -6,7 +6,7 @@
 
 import { FragmentDef } from "@hdml/elements";
 import { getHTML } from "@hdml/orchestrator";
-import { QueryDef, QueryBuf, FrameDef } from "@hdml/schema";
+import { QueryDef, FrameDef } from "@hdml/schema";
 import {
   Injectable,
   HttpException,
@@ -18,7 +18,7 @@ import { LRUCache } from "lru-cache";
 import { CompilerFactory, Compiler } from "./Compiler";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
-import { Thread } from "./Thread";
+import { Threads } from "./Threads";
 import { Tokens } from "./Tokens";
 import { Workdir } from "./Workdir";
 
@@ -49,11 +49,11 @@ export class Tenants {
   public constructor(
     private _comp: CompilerFactory,
     private _conf: Config,
-    private _thread: Thread,
+    private _threads: Threads,
     private _tokens: Tokens,
     private _workdir: Workdir,
   ) {
-    this._logger = new Logger("Tenants", this._thread);
+    this._logger = new Logger("Tenants", this._threads);
     this._cache = new LRUCache({
       allowStale: false,
       dispose: this.dispose,
@@ -136,7 +136,7 @@ export class Tenants {
    */
   public async postQueryDef(
     tenant: string,
-    query: QueryBuf,
+    query: QueryDef,
   ): Promise<void> {
     if (!query.model && !query.frame) {
       throw new HttpException(
@@ -146,7 +146,10 @@ export class Tenants {
     } else {
       let q: QueryDef;
       if (query.model) {
-        q = query;
+        q = {
+          model: query.model,
+          frame: query.frame,
+        };
       } else {
         const frame = <FrameDef>query.frame;
         let root = frame;
@@ -161,14 +164,15 @@ export class Tenants {
           );
         }
         root.parent = sourceDef.frame;
-        q = new QueryBuf({
+        q = {
           model: sourceDef.model,
           frame,
-        });
+        };
       }
       const html = getHTML(q);
       const compiler = await this.getCompiler(tenant);
-      const queryDef = await compiler.compile(html, true);
+      query = <QueryDef>await compiler.compile(html, true);
+      // const hashname = getHashname(JSON.stringify(query));
     }
   }
 
@@ -187,7 +191,7 @@ export class Tenants {
         HttpStatus.BAD_REQUEST,
       );
     }
-    if (depth >= 25) {
+    if (depth >= this._conf.querydefDepth) {
       throw new HttpException(
         "Query definition depth exceeded",
         HttpStatus.BAD_REQUEST,
@@ -262,7 +266,7 @@ export class Tenants {
   /**
    * Returns the parsed queries `uri`s for the specified `tenant`.
    */
-  public getQueriesURIs(tenant: string): string[] {
+  public getUris(tenant: string): string[] {
     const profile = this.getProfile(tenant);
     if (profile.queries) {
       return Object.keys(profile.queries);

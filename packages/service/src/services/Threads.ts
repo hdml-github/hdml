@@ -13,7 +13,7 @@ type ReqScope = Record<string, unknown> & { uid: string };
  * Async thread storage service.
  */
 @Injectable()
-export class Thread {
+export class Threads {
   private _storage = new AsyncLocalStorage<ReqScope>();
 
   /**

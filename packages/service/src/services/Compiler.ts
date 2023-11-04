@@ -25,7 +25,7 @@ import { JSDOM } from "jsdom";
 import { TextEncoder, TextDecoder } from "util";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
-import { Thread } from "./Thread";
+import { Threads } from "./Threads";
 import { Workdir } from "./Workdir";
 
 /**
@@ -63,10 +63,10 @@ export class CompilerFactory {
    */
   public constructor(
     private _conf: Config,
-    private _thread: Thread,
+    private _threads: Threads,
     private _workdir: Workdir,
   ) {
-    this._logger = new Logger("CompilerFactory", this._thread);
+    this._logger = new Logger("CompilerFactory", this._threads);
   }
 
   /**
@@ -149,7 +149,7 @@ export class CompilerFactory {
 
     return {
       compile: async (htmlContent: string, isQuery?: boolean) => {
-        const scope = this._thread.getScope() || {};
+        const scope = this._threads.getScope() || {};
         if (isQuery) {
           htmlContent = <string>(
             await _execute.apply(

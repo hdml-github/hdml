@@ -8,7 +8,7 @@ import { Injectable, OnApplicationShutdown } from "@nestjs/common";
 import { StatsD } from "hot-shots";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
-import { Thread } from "./Thread";
+import { Threads } from "./Threads";
 
 /**
  * Statistics service.
@@ -21,7 +21,10 @@ export class Stats implements OnApplicationShutdown {
   /**
    * @constructor
    */
-  public constructor(private _conf: Config, private _thread: Thread) {
+  public constructor(
+    private _conf: Config,
+    private _threads: Threads,
+  ) {
     this._client = new StatsD({
       host: this._conf.statsHost,
       port: this._conf.statsPort,
@@ -31,7 +34,7 @@ export class Stats implements OnApplicationShutdown {
       prefix: "hdml.io://",
       globalTags: ["hdml.io"],
     });
-    this._logger = new Logger("Stats", this._thread);
+    this._logger = new Logger("Stats", this._threads);
     this.dispatch("stats::constructed");
   }
 

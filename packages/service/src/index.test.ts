@@ -54,10 +54,9 @@ describe("REST APIs", () => {
     expect(sessionToken).toBeTruthy();
   });
 
-  it("GET /api/v0/queries/uris (404)", async () => {
+  it("GET /api/v0/hdm/uris?tenant=:tenant (404)", async () => {
     const url =
-      `http://localhost:8887/api/v0/queries/uris?tenant=` +
-      `${tenant}`;
+      `http://localhost:8887/api/v0/hdm/uris?tenant=` + `${tenant}`;
     const res = await fetch(url, {
       method: "GET",
       mode: "cors",
@@ -71,9 +70,9 @@ describe("REST APIs", () => {
     expect(res.status).toBe(404);
   });
 
-  it("GET /api/v0/queries/def?uri=:uri", async () => {
+  it("GET /api/v0/hdm/def?tenant=:tenant&uri=:uri", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/def?" +
+      "http://localhost:8887/api/v0/hdm/def?" +
       `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
@@ -91,9 +90,9 @@ describe("REST APIs", () => {
     expect(queryDef.frame?.name).toBe("query");
   });
 
-  it("GET /api/v0/queries/html?uri=:uri", async () => {
+  it("GET /api/v0/hdm/htm?tenant=:tenant&uri=:uri", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/html?" +
+      "http://localhost:8887/api/v0/hdm/htm?" +
       `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
@@ -111,9 +110,9 @@ describe("REST APIs", () => {
     expect(typeof html).toBe("string");
   });
 
-  it("GET /api/v0/queries/sql?uri=:uri", async () => {
+  it("GET /api/v0/hdm/sql?tenant=:tenant&uri=:uri", async () => {
     const url =
-      "http://localhost:8887/api/v0/queries/sql?" +
+      "http://localhost:8887/api/v0/hdm/sql?" +
       `tenant=${tenant}&uri=${uri}`;
     const res = await fetch(url, {
       method: "GET",
@@ -131,10 +130,9 @@ describe("REST APIs", () => {
     expect(typeof sql).toBe("string");
   });
 
-  it("GET /api/v0/queries/uris", async () => {
+  it("GET /api/v0/hdm/uris?tenant=:tenant", async () => {
     const url =
-      `http://localhost:8887/api/v0/queries/uris?tenant=` +
-      `${tenant}`;
+      `http://localhost:8887/api/v0/hdm/uris?tenant=` + `${tenant}`;
     const res = await fetch(url, {
       method: "GET",
       mode: "cors",

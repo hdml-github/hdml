@@ -12,7 +12,7 @@ import {
 import { Dir, stat, opendir, readFile } from "fs";
 import { resolve } from "path";
 import { Config } from "./Config";
-import { Thread } from "./Thread";
+import { Threads } from "./Threads";
 import { Logger } from "./Logger";
 
 /**
@@ -29,9 +29,9 @@ export class Workdir {
    */
   public constructor(
     private _config: Config,
-    private _thread: Thread,
+    private _threads: Threads,
   ) {
-    this._logger = new Logger("Workdir", this._thread);
+    this._logger = new Logger("Workdir", this._threads);
   }
 
   /**

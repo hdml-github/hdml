@@ -7,7 +7,7 @@
 import { Controller, Get } from "@nestjs/common";
 import { Tenants } from "../../../services/Tenants";
 import { Logger } from "../../../services/Logger";
-import { Thread } from "../../../services/Thread";
+import { Threads } from "../../../services/Threads";
 
 /**
  * The `api/v0/tests` endpoint controller.
@@ -19,8 +19,8 @@ export class tests {
   /**
    * Class constructor.
    */
-  constructor(private _tenants: Tenants, private _thread: Thread) {
-    this._logger = new Logger("api/v0/tests", this._thread);
+  constructor(private _tenants: Tenants, private _threads: Threads) {
+    this._logger = new Logger("api/v0/tests", this._threads);
   }
 
   @Get()
