@@ -2,9 +2,9 @@
 
 
 /**
- * Deprecated. Delete it.
+ * Posted query state enum.
  */
-export enum FileState {
+export enum QueryState {
   PROCESSING = 0,
   SCHEMA = 1,
   CHUNK = 2,

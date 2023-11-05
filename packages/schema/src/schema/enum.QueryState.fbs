@@ -6,9 +6,11 @@
 
 namespace enum;
 
-/// Query filter types enum.
-enum FilterType: byte {
-  Expr,
-  Keys,
-  Named,
+/// Posted query state enum.
+enum QueryState: byte {
+  PROCESSING,
+  SCHEMA,
+  CHUNK,
+  DONE,
+  FAIL,
 }

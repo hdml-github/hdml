@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query decimal data field bit width enum.
+ * Query decimal data field bit width enum.
  */
 export enum DecBitWidth {
   _128 = 0,

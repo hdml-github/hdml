@@ -172,7 +172,6 @@ export class Tenants {
       const html = getHTML(q);
       const compiler = await this.getCompiler(tenant);
       query = <QueryDef>await compiler.compile(html, true);
-      // const hashname = getHashname(JSON.stringify(query));
     }
   }
 

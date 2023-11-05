@@ -6,7 +6,7 @@
 
 namespace query;
 
-/// Deprecated. Delete me!
-table File {
-  name: string;
+/// Posted query path structure.
+table Path {
+  uri: string;
 }

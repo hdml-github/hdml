@@ -17,6 +17,7 @@ import {
   FilterType,
   FilterOperator,
   FileState,
+  QueryState,
 } from "./enums";
 import {
   CommonOptsDef,
@@ -34,6 +35,7 @@ import { ModelDef } from "./helpers/ModelHelper";
 import { FrameDef } from "./helpers/FrameHelper";
 import { Query, QueryDef, QueryBuf } from "./Query";
 import { File, FileDef } from "./File";
+import { QueryPathBuf, QueryPathDef } from "./QueryPath";
 
 export {
   TableType,
@@ -49,6 +51,9 @@ export {
   Query,
   QueryBuf,
   QueryDef,
+  QueryPathBuf,
+  QueryPathDef,
+  QueryState,
   CommonOptsDef,
   DecimalOptsDef,
   DateOptsDef,

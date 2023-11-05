@@ -10,39 +10,39 @@ include "./enum.FilterOperator.fbs";
 
 namespace query;
 
-/// `HDML` network protocol query filter clause structure.
+/// Query filter clause structure.
 table FilterClause {
   type: enum.FilterOperator;
   filters: [Filter];
   children: [FilterClause];
 }
 
-/// `HDML` network protocol query expression filter options structure.
+/// Query expression filter options structure.
 table ExprOpts {
   clause: string;
 }
 
-/// `HDML` network protocol query keys (joins) filter options structure.
+/// Query keys (joins) filter options structure.
 table KeysOpts {
   left: string;
   right: string;
 }
 
-/// `HDML` network protocol query named filter options structure.
+/// Query named filter options structure.
 table NamedOpts {
   name: enum.FilterName;
   field: string;
   values: [string];
 }
 
-/// `HDML` network protocol query filter options union.
+/// Query filter options union.
 union FilterOpts {
   ExprOpts,
   KeysOpts,
   NamedOpts,
 }
 
-/// `HDML` network protocol query filter structure.
+/// Query filter structure.
 table Filter {
   type: enum.FilterType;
   options: FilterOpts;

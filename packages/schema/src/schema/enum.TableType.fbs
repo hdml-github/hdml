@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query table types enum.
+/// Query table types enum.
 enum TableType: byte {
   Json,
   Csv,

@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol response file state enum.
+/// Deprecated. Delete it.
 enum FileState: byte {
   PROCESSING,
   SCHEMA,

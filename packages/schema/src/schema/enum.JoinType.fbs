@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query join types enum.
+/// Query join types enum.
 enum JoinType: byte {
   Cross,
   Inner,

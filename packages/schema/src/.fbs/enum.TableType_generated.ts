@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query table types enum.
+ * Query table types enum.
  */
 export enum TableType {
   Json = 0,

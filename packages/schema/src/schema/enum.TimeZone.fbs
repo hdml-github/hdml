@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query time zone enum.
+/// Query time zone enum.
 enum TimeZone: short {
   Africa_Algiers,
   Atlantic_Cape_Verde,

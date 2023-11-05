@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query filter oprators enum.
+/// Query filter oprators enum.
 enum FilterOperator: byte {
   Or,
   And,

@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query filter types enum.
+ * Query filter types enum.
  */
 export enum FilterType {
   Expr = 0,

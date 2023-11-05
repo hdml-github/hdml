@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query time unit enum.
+ * Query time unit enum.
  */
 export enum TimeUnit {
   second = 0,
