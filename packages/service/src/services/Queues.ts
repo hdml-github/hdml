@@ -27,6 +27,7 @@ import {
 } from "pulsar-client";
 import { PassThrough } from "stream";
 import { getCliOpts } from "../helpers/getCliOpts";
+import { getUid } from "../helpers/getUid";
 import { Dataset } from "../querier/Dataset";
 import { Config } from "./Config";
 import { Logger } from "./Logger";
@@ -38,7 +39,7 @@ import { Threads } from "./Threads";
 @Injectable()
 export class Queues implements OnModuleInit {
   private _uri: string;
-  private _mode: "gateway" | "hideway" | "querier";
+  private _mode: "gateway" | "hideway" | "querier" | "singleton";
   private _logger: Logger;
   private _client: Client;
   private _qonsumer: null | Consumer = null;
@@ -95,18 +96,38 @@ export class Queues implements OnModuleInit {
    * Module initialization callback.
    */
   public async onModuleInit(): Promise<void> {
-    await this.ensureTopic(this._conf.queueQueries);
-    if (this._mode === "querier") {
+    const exist = await this.ensureTopic(this._conf.queueQueries);
+    if (!exist) {
+      this._logger.verbose("No query topic");
+    }
+    if (this._mode === "singleton") {
+      // queries consumer
       this._qonsumer = await this._client.subscribe({
         topic: this._conf.queueQueries,
         subscription: "querier",
         subscriptionType: "Shared",
         listener: this.qonsumerListener.bind(this),
       });
+      this._logger.verbose("Qonsumer added");
+
+      // queries producer
+      this._qroducer = await this._client.createProducer({
+        topic: this._conf.queueQueries,
+      });
+      this._logger.verbose("Qroducer added");
+    } else if (this._mode === "querier") {
+      this._qonsumer = await this._client.subscribe({
+        topic: this._conf.queueQueries,
+        subscription: "querier",
+        subscriptionType: "Shared",
+        listener: this.qonsumerListener.bind(this),
+      });
+      this._logger.verbose("Qonsumer added");
     } else {
       this._qroducer = await this._client.createProducer({
         topic: this._conf.queueQueries,
       });
+      this._logger.verbose("Qroducer added");
     }
   }
 
@@ -120,12 +141,20 @@ export class Queues implements OnModuleInit {
   ): Promise<StreamableFile> {
     const exist = await this.ensureTopic(uri);
     if (!exist) {
-      await this.createTopic(uri);
-      await this._qroducer?.send({
-        data: Buffer.from(new QueryBuf(query).buffer),
-        properties: { uri },
-      });
+      throw new HttpException(
+        `Unable to create query topic: ${uri}`,
+        HttpStatus.FAILED_DEPENDENCY,
+      );
     }
+    const scope = this._threads.getScope();
+    await this._qroducer?.send({
+      properties: {
+        uid: scope?.uid || getUid(),
+        uri,
+      },
+      data: Buffer.from(new QueryBuf(query).buffer),
+    });
+    this._logger.verbose(`Query posted: ${uri}`);
     return new StreamableFile(new QueryPathBuf({ uri }).buffer);
   }
 
@@ -135,14 +164,11 @@ export class Queues implements OnModuleInit {
    */
   public async streamResults(uri: string): Promise<StreamableFile> {
     const read = async (stream: PassThrough) => {
+      this._logger.verbose(`Starting results stream: ${uri}`);
+
       const exist = await this.assertTopic(uri);
       if (!exist) {
-        stream.destroy(
-          new HttpException(
-            `Topic does not exists: ${uri}`,
-            HttpStatus.FAILED_DEPENDENCY,
-          ),
-        );
+        stream.destroy(new Error(`Topic does not exists: ${uri}`));
       } else {
         const reader = await this._client.createReader({
           topic: uri,
@@ -207,9 +233,6 @@ export class Queues implements OnModuleInit {
       cache: "no-cache",
     });
     if (!response.ok) {
-      this._logger.error(
-        `${response.status} - ${response.statusText}`,
-      );
       return false;
     }
     return true;
@@ -257,7 +280,7 @@ export class Queues implements OnModuleInit {
    * Returns the array of the existing topics.
    */
   private async listTopics(): Promise<string[]> {
-    const uri = `${this._uri}/topics?mode=PERSISTENT`;
+    const uri = this._uri;
     const response = await fetch(uri, {
       method: "GET",
       cache: "no-cache",
@@ -279,28 +302,34 @@ export class Queues implements OnModuleInit {
     message: Message,
     qonsumer: Consumer,
   ): void {
-    this.inboundQueryHandler(message, qonsumer).catch(
-      this._logger.error,
-    );
+    const uid = message.getProperties().uid;
+    const uri = message.getProperties().uri;
+    const buf = message.getData();
+
+    this._logger.verbose(`Inbound query handled: ${uri}`);
+    this.inboundQueryHandler(uri, buf)
+      .catch(this._logger.error)
+      .finally(() => {
+        qonsumer.acknowledge(message).catch(this._logger.error);
+      });
   }
 
   /**
    * Inbound query message handler.
    */
   private async inboundQueryHandler(
-    message: Message,
-    qonsumer: Consumer,
+    uri: string,
+    buf: Buffer,
   ): Promise<void> {
-    const uri = message.getProperties().uri;
     const exist = await this.assertTopic(uri);
     if (!exist) {
       this._logger.error(`Topic does not exists: ${uri}`);
-      await qonsumer.acknowledge(message);
     } else {
       const producer = await this._client.createProducer({
         topic: uri,
       });
-      const dataset = new Dataset(new QueryBuf(message.getData()), {
+      const def = new QueryBuf(buf);
+      const dataset = new Dataset(def, {
         host: this._conf.querierHost,
         port: this._conf.querierPort,
       });
@@ -317,7 +346,6 @@ export class Queues implements OnModuleInit {
         });
       }
       await producer.close();
-      await qonsumer.acknowledge(message);
     }
   }
 }

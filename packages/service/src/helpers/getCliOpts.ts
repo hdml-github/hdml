@@ -13,7 +13,7 @@ type CliOpts = {
   /**
    * Service mode.
    */
-  mode: "gateway" | "hideway" | "querier";
+  mode: "gateway" | "hideway" | "querier" | "singleton";
 
   /**
    * Path to the `.env` file.
@@ -24,7 +24,8 @@ type CliOpts = {
 // CLI configuration.
 program.addOption(
   new Option("--mode <mode>")
-    .choices(["gateway", "hideway", "querier"])
+    .choices(["gateway", "hideway", "querier", "singleton"])
+    .default("singleton")
     .makeOptionMandatory(),
 );
 program.option("--envpath <envpath>");

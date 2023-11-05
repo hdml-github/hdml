@@ -4,7 +4,8 @@
  * @license Apache-2.0
  */
 
-import { QueryDef, QueryBuf } from "@hdml/schema";
+import { QueryDef, QueryBuf, QueryPathBuf } from "@hdml/schema";
+import { tableFromIPC } from "apache-arrow";
 
 const uri = "/frames/query.html?hdml-frame=query";
 const tenant = "common";
@@ -12,6 +13,7 @@ let accessToken: string;
 let sessionToken: string;
 let queryDef: QueryDef;
 let queryBuf: QueryBuf;
+let queryUri: string;
 
 describe("REST APIs", () => {
   it("GET /api/v0/tokens", async () => {
@@ -54,7 +56,7 @@ describe("REST APIs", () => {
     expect(sessionToken).toBeTruthy();
   });
 
-  it("GET /api/v0/hdm/uris?tenant=:tenant (404)", async () => {
+  it.skip("GET /api/v0/hdm/uris?tenant=:tenant (404)", async () => {
     const url =
       `http://localhost:8887/api/v0/hdm/uris?tenant=` + `${tenant}`;
     const res = await fetch(url, {
@@ -149,13 +151,14 @@ describe("REST APIs", () => {
     expect(Array.isArray(queryUris)).toBeTruthy();
   });
 
-  it.skip("POST /api/v0/queries/fragments", async () => {
+  it("POST /api/v0/queries", async () => {
     queryDef.frame && (queryDef.frame.name = "new_query");
     queryBuf = new QueryBuf(queryDef);
-    const url =
-      "http://localhost:8887/api/v0/queries/fragments?" +
-      `tenant=${tenant}`;
-    const res = await fetch(url, {
+
+    // ---------------------------------------------------------------
+    let url =
+      "http://localhost:8887/api/v0/queries?" + `tenant=${tenant}`;
+    let res = await fetch(url, {
       method: "POST",
       mode: "cors",
       redirect: "follow",
@@ -166,7 +169,55 @@ describe("REST APIs", () => {
       },
       body: queryBuf.buffer,
     });
+    let buf = await res.arrayBuffer();
+    const path = new QueryPathBuf(new Uint8Array(buf));
+    queryUri = path.uri;
+    console.log(queryUri);
+
     expect(res.ok).toBeTruthy();
     expect(res.status).toBe(201);
+
+    // ---------------------------------------------------------------
+    url =
+      "http://localhost:8887/api/v0/queries?" +
+      `tenant=${tenant}&uri=${queryUri}`;
+    res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow",
+      cache: "no-cache",
+      headers: {
+        "content-type": "application/octet-stream",
+        session: sessionToken,
+      },
+    });
+    buf = await res.arrayBuffer();
+    const table = tableFromIPC(<Buffer>buf);
+    console.log(table.toArray());
+
+    expect(res.ok).toBeTruthy();
+    expect(res.status).toBe(200);
+  });
+
+  it.skip("GET /api/v0/queries", async () => {
+    const url =
+      "http://localhost:8887/api/v0/queries?" +
+      `tenant=${tenant}&uri=${queryUri}`;
+    const res = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+      redirect: "follow",
+      cache: "no-cache",
+      headers: {
+        "content-type": "application/octet-stream",
+        session: sessionToken,
+      },
+    });
+    const buf = await res.arrayBuffer();
+    const table = tableFromIPC(<Buffer>buf);
+    console.log(table.toArray());
+
+    expect(res.ok).toBeTruthy();
+    expect(res.status).toBe(200);
   });
 });

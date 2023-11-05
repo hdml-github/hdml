@@ -8,6 +8,7 @@ import { ModuleMetadata } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TerminusModule } from "@nestjs/terminus";
 import { hdm } from "../controllers/api/v0/hdm";
+import { queries } from "../controllers/api/v0/queries";
 import { sessions } from "../controllers/api/v0/sessions";
 import { status } from "../controllers/api/v0/status";
 import { tests } from "../controllers/api/v0/tests";
@@ -21,6 +22,7 @@ import { Status } from "../services/Status";
 import { Tenants } from "../services/Tenants";
 import { Threads } from "../services/Threads";
 import { Tokens } from "../services/Tokens";
+import { Queues } from "../services/Queues";
 import { Workdir } from "../services/Workdir";
 import { getCliOpts } from "./getCliOpts";
 
@@ -56,8 +58,9 @@ const common = {
     Stats,
     Status,
     Tenants,
-    Tokens,
     Threads,
+    Tokens,
+    Queues,
     Workdir,
   ],
 };
@@ -70,7 +73,7 @@ export function getModuleMetadata(): ModuleMetadata {
     case "gateway":
       return {
         ...common,
-        controllers: [...common.controllers, hdm, sessions],
+        controllers: [...common.controllers, hdm, sessions, queries],
       };
     case "hideway":
       return {
@@ -81,10 +84,23 @@ export function getModuleMetadata(): ModuleMetadata {
           sessions,
           tests,
           tokens,
+          queries,
         ],
       };
     case "querier":
       return { ...common };
+    case "singleton":
+      return {
+        ...common,
+        controllers: [
+          ...common.controllers,
+          hdm,
+          sessions,
+          tests,
+          tokens,
+          queries,
+        ],
+      };
   }
 }
 
@@ -96,6 +112,7 @@ export function getModuleHost(conf: Config): string {
     case "gateway":
       return conf.gatewayHost;
     case "hideway":
+    case "singleton":
       return conf.hidewayHost;
     case "querier":
       return conf.querierHost;
@@ -110,6 +127,7 @@ export function getModulePort(conf: Config): number {
     case "gateway":
       return conf.gatewayPort;
     case "hideway":
+    case "singleton":
       return conf.hidewayPort;
     case "querier":
       return conf.querierPort;

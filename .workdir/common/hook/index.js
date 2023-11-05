@@ -1,9 +1,9 @@
 export function hook(dom, scope) {
-  log(HDML_TENANT_NAME, scope.uid);
-  
-  const elm = dom.querySelector("hdml-model[name='model']");
+  // log(`Tenant ${HDML_TENANT_NAME} hook, uid = ${scope.uid}`);
+
+  const elm = dom.querySelector("hdml-frame[name='frame']");
   if (elm) {
-    elm.setAttribute("name", "hooked_model");
+    elm.setAttribute("offset", "100");
   }
   return dom;
 };

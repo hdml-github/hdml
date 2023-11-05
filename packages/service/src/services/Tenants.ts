@@ -178,6 +178,8 @@ export class Tenants {
   /**
    * Returns the `QueryDef` object for the specified `tenant` by its
    * `uri`.
+   *
+   * @throws `HttpException`
    */
   public async getQueryDef(
     tenant: string,
