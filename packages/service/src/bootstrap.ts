@@ -54,9 +54,8 @@ import { IoModule } from "./IoModule";
   adapter.getInstance().addContentTypeParser(
     "application/octet-stream",
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async (_req, payload, _done) => {
-      const buf = await rawbody(payload);
-      return buf;
+    async (_request, _payload, _done) => {
+      return await rawbody(_payload);
     },
   );
 

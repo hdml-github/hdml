@@ -193,12 +193,7 @@ export class Queues implements OnModuleInit {
           state = message.getProperties().state;
         }
         if (state === QueryState.FAIL.toString()) {
-          stream.destroy(
-            new HttpException(
-              message.getProperties().error,
-              HttpStatus.FAILED_DEPENDENCY,
-            ),
-          );
+          stream.destroy(new Error(message.getProperties().error));
         } else {
           stream.end();
         }
@@ -306,12 +301,18 @@ export class Queues implements OnModuleInit {
     const uri = message.getProperties().uri;
     const buf = message.getData();
 
-    this._logger.verbose(`Inbound query handled: ${uri}`);
-    this.inboundQueryHandler(uri, buf)
-      .catch(this._logger.error)
-      .finally(() => {
-        qonsumer.acknowledge(message).catch(this._logger.error);
-      });
+    this._threads.start({ uid }, () => {
+      this._logger.verbose(`Inbound query handled: ${uri}`);
+      this.inboundQueryHandler(uri, buf)
+        .catch((reason) => {
+          this._logger.error(reason);
+        })
+        .finally(() => {
+          qonsumer.acknowledge(message).catch((reason) => {
+            this._logger.error(reason);
+          });
+        });
+    });
   }
 
   /**
@@ -325,27 +326,32 @@ export class Queues implements OnModuleInit {
     if (!exist) {
       this._logger.error(`Topic does not exists: ${uri}`);
     } else {
-      const producer = await this._client.createProducer({
-        topic: uri,
-      });
-      const def = new QueryBuf(buf);
-      const dataset = new Dataset(def, {
-        host: this._conf.querierHost,
-        port: this._conf.querierPort,
-      });
-      for await (const batch of dataset) {
-        const properties: Record<string, string> = {
-          state: JSON.stringify(batch.state),
-        };
-        if (batch.error) {
-          properties.error = batch.error;
-        }
-        await producer.send({
-          data: Buffer.from(batch.data ? batch.data : ""),
-          properties,
+      try {
+        const producer = await this._client.createProducer({
+          topic: uri,
         });
+        const def = new QueryBuf(buf);
+        const dataset = new Dataset(def, {
+          host: this._conf.querierHost,
+          port: this._conf.querierPort,
+        });
+        for await (const batch of dataset) {
+          const properties: Record<string, string> = {
+            state: JSON.stringify(batch.state),
+          };
+          if (batch.error) {
+            properties.error = batch.error;
+          }
+          await producer.send({
+            data: Buffer.from(batch.data ? batch.data : ""),
+            properties,
+          });
+        }
+        await producer.close();
+      } catch (err) {
+        this._logger.error(err);
+        throw err;
       }
-      await producer.close();
     }
   }
 }

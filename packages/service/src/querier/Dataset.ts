@@ -36,11 +36,12 @@ export type Chunk = {
  * published query.
  */
 export class Dataset implements AsyncIterable<Chunk> {
-  private _client: Client;
+  private _client: null | Client = null;
   private _state: QueryState = QueryState.PROCESSING;
   private _promise: null | Promise<DataResponse> = null;
   private _next: null | string = null;
   private _schema: null | Schema = null;
+  private _error: null | Error = null;
 
   /**
    * Class constructor.
@@ -49,16 +50,21 @@ export class Dataset implements AsyncIterable<Chunk> {
     query: QueryBuf,
     conf: { host: string; port: number },
   ) {
-    this._client = new Client({
-      engine: "trino",
-      host: conf.host,
-      port: conf.port,
-      catalog: undefined,
-      schema: undefined,
-      user: "hdml",
-      source: "Dataset",
-    });
-    this._promise = this._client.post(getSQL(query), {});
+    try {
+      this._client = new Client({
+        engine: "trino",
+        host: conf.host,
+        port: conf.port,
+        catalog: undefined,
+        schema: undefined,
+        user: "hdml",
+        source: "Dataset",
+      });
+      this._promise = this._client.post(getSQL(query), {});
+    } catch (error) {
+      this._state = QueryState.FAIL;
+      this._error = <Error>error;
+    }
   }
 
   /**
@@ -66,46 +72,56 @@ export class Dataset implements AsyncIterable<Chunk> {
    */
   public async *[Symbol.asyncIterator](): AsyncGenerator<Chunk> {
     let res: DataResponse;
-    if (this._promise) {
-      res = await this._promise;
-      const [next, state] = this.responseHandler(res);
-      this._promise = null;
-      this._next = next;
-      this._state = state;
-      yield { state: this._state };
-    }
-    while (this._next) {
-      res = await this._client.fetch(this._next);
-      const [next, state, schema, chunk] = this.responseHandler(res);
-      this._next = next;
-      this._state = state;
-      if (!this._schema && schema) {
-        this._state = QueryState.SCHEMA;
-        this._schema = schema;
-        yield {
-          state: this._state,
-          data: this.parseSchemaChunk(this._schema),
-        };
-      }
-      if (chunk) {
-        this._state = QueryState.CHUNK;
-        yield {
-          state: this._state,
-          data: chunk,
-        };
-      }
-      if (state === QueryState.DONE) {
+    if (this._error) {
+      const error =
+        `Type: "n/a"\n` +
+        `Name: "n/a"\n` +
+        `Code: "n/a"\n` +
+        `Message: ${this._error.message || "n/a"}`;
+      yield { state: this._state, error };
+    } else {
+      if (this._promise) {
+        res = await this._promise;
+        const [next, state] = this.responseHandler(res);
+        this._promise = null;
+        this._next = next;
         this._state = state;
         yield { state: this._state };
       }
-      if (state === QueryState.FAIL) {
+      while (this._client && this._next) {
+        res = await this._client.fetch(this._next);
+        const [next, state, schema, chunk] =
+          this.responseHandler(res);
+        this._next = next;
         this._state = state;
-        const error =
-          `Type: ${res.error?.errorType || "n/a"}\n` +
-          `Name: ${res.error?.errorName || "n/a"}\n` +
-          `Code: ${res.error?.errorCode || "n/a"}\n` +
-          `Message: ${res.error?.message || "n/a"}`;
-        yield { state: this._state, error };
+        if (!this._schema && schema) {
+          this._state = QueryState.SCHEMA;
+          this._schema = schema;
+          yield {
+            state: this._state,
+            data: this.parseSchemaChunk(this._schema),
+          };
+        }
+        if (chunk) {
+          this._state = QueryState.CHUNK;
+          yield {
+            state: this._state,
+            data: chunk,
+          };
+        }
+        if (state === QueryState.DONE) {
+          this._state = state;
+          yield { state: this._state };
+        }
+        if (state === QueryState.FAIL) {
+          this._state = state;
+          const error =
+            `Type: ${res.error?.errorType || "n/a"}\n` +
+            `Name: ${res.error?.errorName || "n/a"}\n` +
+            `Code: ${res.error?.errorCode || "n/a"}\n` +
+            `Message: ${res.error?.message || "n/a"}`;
+          yield { state: this._state, error };
+        }
       }
     }
   }

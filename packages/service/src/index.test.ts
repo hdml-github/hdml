@@ -191,6 +191,7 @@ describe("REST APIs", () => {
         session: sessionToken,
       },
     });
+    console.log(res);
     buf = await res.arrayBuffer();
     const table = tableFromIPC(<Buffer>buf);
     console.log(table.toArray());
