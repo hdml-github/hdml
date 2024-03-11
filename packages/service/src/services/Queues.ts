@@ -256,7 +256,7 @@ export class Queues implements OnModuleInit {
    * Deletes the specified persistent non-partitioned `topic`. Returns
    * true if the topic was successfuly deleted, false otherwise.
    */
-  private async deleteDelete(topic: string): Promise<boolean> {
+  private async deleteTopic(topic: string): Promise<boolean> {
     const uri = `${this._uri}/${topic}`;
     const response = await fetch(uri, {
       method: "DELETE",

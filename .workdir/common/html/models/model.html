@@ -1,9 +1,11 @@
 <hdml-model
   name="model">
+
   <hdml-table
     name="tables"
     type="table"
-    source="`tenant_postgres`.`information_schema`.`tables`">
+    source="`tenant_postgres`.`information_schema`.`tables`"
+    connectors="/connections/postgres.html?hdml-connector=tenant_postgres">
     <hdml-field
       name="catalog"
       origin="table_catalog">
@@ -34,7 +36,8 @@
   <hdml-table
     name="columns"
     type="query"
-    source="select * from `tenant_postgres`.`information_schema`.`columns`">
+    source="select * from `tenant_postgres`.`information_schema`.`columns`"
+    connectors="/connections/postgres.html?hdml-connector=tenant_postgres">
     <hdml-field
       name="catalog"
       origin="table_catalog">
