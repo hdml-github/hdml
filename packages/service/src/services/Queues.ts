@@ -332,8 +332,8 @@ export class Queues implements OnModuleInit {
         });
         const def = new QueryBuf(buf);
         const dataset = new Dataset(def, {
-          host: this._conf.querierHost,
-          port: this._conf.querierPort,
+          host: this._conf.engineHost,
+          port: this._conf.enginePort,
         });
         for await (const batch of dataset) {
           const properties: Record<string, string> = {

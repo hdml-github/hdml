@@ -108,8 +108,8 @@ export class Client {
     try {
       const response = await this.fetch({
         method: "GET",
-        api: "session",
-        params: { token: this._token },
+        api: "sessions",
+        params: { tenant: this._tenant, token: this._token },
       });
       this._initialized = true;
       sessionToken = await response.text();
@@ -128,7 +128,8 @@ export class Client {
   ): Promise<string> {
     const resp = await this.fetch({
       method: "POST",
-      api: "query",
+      api: "queries",
+      params: { tenant: this._tenant },
       signal,
       body,
     });
@@ -150,8 +151,8 @@ export class Client {
   ): Promise<Table> {
     const response = await this.fetch({
       method: "GET",
-      api: "query",
-      path: `/${name}`,
+      api: "queries",
+      params: { tenant: this._tenant, uri: name },
       signal,
     });
     const buffer = await response.arrayBuffer();
@@ -167,7 +168,7 @@ export class Client {
    */
   private async fetch(config: {
     method: "GET" | "POST" | "PUT" | "DELETE";
-    api: "session" | "query";
+    api: "sessions" | "queries";
     path?: string;
     params?: Record<string, string>;
     signal?: AbortSignal;
@@ -178,8 +179,7 @@ export class Client {
       ? `?${new URLSearchParams(params).toString()}`
       : "";
     const url =
-      `${this._url}/${this._tenant}/api/v0` +
-      `/${api}${path ? path : ""}${query}`;
+      `${this._url}/api/v0` + `/${api}${path ? path : ""}${query}`;
     const response = await fetch(url, {
       method,
       mode: "cors",
@@ -187,6 +187,7 @@ export class Client {
       cache: "no-cache",
       headers: {
         Session: sessionToken || "",
+        "content-type": "application/octet-stream",
       },
       signal,
       body,

@@ -17,10 +17,10 @@ export function hook(dom, scope) {
   /**
    * @type {Element}
    */
-  const frm = dom.querySelector("hdml-frame[name='frame']");
-  if (frm) {
-    frm.setAttribute("offset", "100");
-  }
+  // const frm = dom.querySelector("hdml-frame[name='frame']");
+  // if (frm) {
+  //   frm.setAttribute("offset", "100");
+  // }
 
   return dom;
 };

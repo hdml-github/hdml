@@ -23,103 +23,135 @@
       name="hdml.io"
       host="http://localhost:8887"
       tenant="common"
-      token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.gguXqF0mXeahk38uasRvY-sx4dKbnulbBV_c37IGENl8ZJQBqVGegJQZ90h18Y_QySNoWCEzOAbI6O6zEYcnt6Y7_RtNxEv2PQ6QW3lykCvN6-8heX-9CNmChgUquhx3ldQjKI1BQe83b8emNSJ63hqdorU3efVUJa8vW2d_rLwF3z03I05m8TjQz1PCOIwrZG6VnX86gRjWuCwgHxZDYIUP1hZDwppjQ_drfQYdtEWsVd1qKds9YhNuPlIgyDEXoYPhEwMiosSyNctz5iW1n33xwWRIOrZTFhkU7MkFmsM7XchjTZIhJiqTeZCazt4jqosyusfvcf91B-tBii1eD34Cvx4rr7aZUW9r_AAAYTmSVcI7wYxDpLvgxQzmx8b_ofadn28IOl5EPTm5wlKr4-uNURB35OMdwcHMUSQRySZJcit2F2zqWv6WsIwy4_vWuVT2msR6FkxE1GDaEptRWxl_o4nW6jIY7BBzqLxgQwWNBr7VFwp8NOEoav_FmhZn.YzizI2Z1zAZ_gaeM.0ionBXKCx6h8EfUPBhvGIvDW6CLaCZ8sUXLI0oL5Pn5FcIcaNiVKq4-gCp0o8B6VQVQbZTTXZAw9Bv0ItGVKWgWCtVP-M2XRYzlHw6l8poGtezBAqwmnVPp7N804Fw2xSKf-I20SnPI879Cv6jVDz2OdndY.cxnx1s9yOVFhDIghKXlrMA">
+      token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.bgJ0557egxd9ylApMN9_l-lPSPZ7Z8UJiD2mBeLpl5nCP5SPVvdNz62aNReR63QxMBlfrkAniv9LcK1yA-aApRtqT709Hqve4UR4OVnV9KGgotGogxndXC4xmfKLXZvIJrZSLv7UJaC6wJqi_aiiXYxbiPtEKmHD6X09YNPIv5zc7qZgP1t_SGLtfOiveamhQOSqsweZT7L9oMf9kzYRXTLLIORWH0DlqShTSpTfVbn_iZTaoU4mhJVGzSCenSe7ERPyjGSE2vti5bsPImnSibkeN_vwhRCA0kau322XhZd-HV3dU-tcVVz9w_qrxojbN66oS-Tw4dCEmLFxwbFFo_gVBVOU_DtdChgRFK8-TLIBviKQSbBEVQkGjT8q7tF90B6Y22t0tlBVjepIoVhTGz17AwvE88ohTp53JAVh4n3uVbPLRPCJRkMMrEtrH8-COklQAXyHgpJBGUc_ZPk6IL6Vc0pDnlH6ggHtg8eUbMb2CeQ8kxXGDvxzlRD0IyOq.2TpsAg9A_1kkrZEW.xYDg8ECr4yb27n3e-nwIG_czb6Cd2Suu8hw6wlr3tYUFdTKRfkhxliUZMkdUNNA-_q13S5Z9hK5NHK-GsW8EjLqv9GbHLQJHNSml-siNVm9NUIUMObNt4MyHwxDG2LkI8tDH9ich4J_TbD-aGTi2Wjl6IaI.OGp3Qzlx0e-2uz4AWdf_-A">
     </hdml-io>
 
-    <!-- Data model -->
-    <hdml-model id="query" name="maang_stock">
-      <!-- Amazon stock table -->
-      <hdml-table name="amazon" type="table" source="`tenant_postgres`.`public`.`amazon_stock`">
-          <hdml-field name="open"/>
-          <hdml-field name="high"/>
-          <hdml-field name="low"/>
-          <hdml-field name="close"/>
-          <hdml-field name="adj_close"/>
-          <hdml-field name="volume"/>
-          <hdml-field name="date"/>
+    <!-- Query -->
+    <hdml-model
+      name="model">
+
+      <hdml-table
+        name="tables"
+        type="table"
+        source="`tenant_postgres`.`information_schema`.`tables`">
+        <hdml-field
+          name="catalog"
+          origin="table_catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema"
+          origin="table_schema">
+        </hdml-field>
+        <hdml-field
+          name="table"
+          origin="table_name">
+        </hdml-field>
+        <hdml-field
+          name="full"
+          clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)">
+        </hdml-field>
+        <hdml-field
+          name="hash"
+          clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"
+          type="binary">
+        </hdml-field>
+        <hdml-field
+          name="type"
+          origin="table_type">
+        </hdml-field>
       </hdml-table>
-   
-      <!-- Apple stock table -->
-      <hdml-table name="apple" type="table" source="`tenant_postgres`.`public`.`apple_stock`">
-          <hdml-field name="open"/>
-          <hdml-field name="high"/>
-          <hdml-field name="low"/>
-          <hdml-field name="close"/>
-          <hdml-field name="adj_close"/>
-          <hdml-field name="volume"/>
-          <hdml-field name="date"/>
+
+      <hdml-table
+        name="columns"
+        type="query"
+        source="select * from `tenant_postgres`.`information_schema`.`columns`">
+        <hdml-field
+          name="catalog"
+          origin="table_catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema"
+          origin="table_schema">
+        </hdml-field>
+        <hdml-field
+          name="table"
+          origin="table_name">
+        </hdml-field>
+        <hdml-field
+          name="column"
+          origin="column_name">
+        </hdml-field>
+        <hdml-field
+          name="position"
+          origin="ordinal_position"
+          type="int-32">
+        </hdml-field>
+        <hdml-field
+          name="default"
+          origin="column_default">
+        </hdml-field>
+        <hdml-field
+          name="nullable"
+          origin="is_nullable">
+        </hdml-field>
+        <hdml-field
+          name="type"
+          origin="data_type">
+        </hdml-field>
       </hdml-table>
-   
-      <!-- Google stock table -->
-      <hdml-table name="google" type="table" source="`tenant_postgres`.`public`.`google_stock`">
-          <hdml-field name="open"/>
-          <hdml-field name="high"/>
-          <hdml-field name="low"/>
-          <hdml-field name="close"/>
-          <hdml-field name="adj_close"/>
-          <hdml-field name="volume"/>
-          <hdml-field name="date"/>
-      </hdml-table>
-   
-      <!-- Microsoft stock table -->
-      <hdml-table name="microsoft" type="table" source="`tenant_postgres`.`public`.`microsoft_stock`">
-          <hdml-field name="open"/>
-          <hdml-field name="high"/>
-          <hdml-field name="low"/>
-          <hdml-field name="close"/>
-          <hdml-field name="adj_close"/>
-          <hdml-field name="volume"/>
-          <hdml-field name="date"/>
-      </hdml-table>
-   
-      <!-- Netflix stock table -->
-      <hdml-table name="netflix" type="table" source="`tenant_postgres`.`public`.`netflix_stock`">
-          <hdml-field name="open"/>
-          <hdml-field name="high"/>
-          <hdml-field name="low"/>
-          <hdml-field name="close"/>
-          <hdml-field name="adj_close"/>
-          <hdml-field name="volume"/>
-          <hdml-field name="date"/>
-      </hdml-table>
-   
-      <!-- Join amazon with apple -->
-      <hdml-join type="inner" left="amazon" right="apple">
-          <hdml-connective operator="and">
-              <hdml-filter type="keys" left="date" right="date"/>
+
+      <hdml-join
+        type="inner"
+        left="tables"
+        right="columns">
+
+        <hdml-connective
+          operator="and">
+
+          <hdml-filter
+            type="keys"
+            left="catalog"
+            right="catalog">
+          </hdml-filter>
+          
+          <hdml-filter
+            type="keys"
+            left="schema"
+            right="schema">
+          </hdml-filter>
+          
+          <hdml-filter
+            type="keys"
+            left="table"
+            right="table">
+          </hdml-filter>            
+          
+          <hdml-connective
+            operator="or">
+
+            <hdml-filter
+              type="expr"
+              clause="`columns`.`table` = 'applicable_roles'">
+            </hdml-filter>
+
+            <hdml-filter
+              type="expr"
+              clause="`columns`.`table` = 'tables'">
+            </hdml-filter>
+
           </hdml-connective>
+
+        </hdml-connective>
       </hdml-join>
-   
-      <!-- Join google with apple -->
-      <hdml-join type="inner" left="google" right="apple">
-          <hdml-connective operator="and">
-              <hdml-filter type="keys" left="date" right="date"/>
-          </hdml-connective>
-      </hdml-join>
-   
-      <!-- Join google with microsoft -->
-      <hdml-join type="inner" left="google" right="microsoft">
-          <hdml-connective operator="and">
-              <hdml-filter type="keys" left="date" right="date"/>
-          </hdml-connective>
-      </hdml-join>
-   
-      <!-- Join microsoft with netflix -->
-      <hdml-join type="inner" left="microsoft" right="netflix">
-          <hdml-connective operator="and">
-              <hdml-filter type="keys" left="date" right="date"/>
-          </hdml-connective>
-      </hdml-join>
-   </hdml-model>
-   
+    </hdml-model>
 
     <script>
-      const q = document.getElementById("query");
-      q.addEventListener("hdml-data", (event) => {
-        window.res = event.detail.table;
-        console.log(event.detail.table);
-      });
-      q.query();
+      // const q = document.querySelector("hdml-model[name=model]");
+      // q.addEventListener("hdml-data", (event) => {
+      //   window.res = event.detail.table;
+      //   console.log(event.detail.table);
+      // });
+      // q.query();
     </script>
 
     <!-- Charts -->

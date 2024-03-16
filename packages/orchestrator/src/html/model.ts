@@ -50,7 +50,7 @@ export function getModelHTML(
       html +
       model.joins
         .map((join, i) => getModelJoinHTML(path, join, i, level + 1))
-        .join();
+        .join("");
   }
   html = html + "</hdml-model>\n";
   return html;

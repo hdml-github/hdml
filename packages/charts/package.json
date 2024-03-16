@@ -32,7 +32,7 @@
     "test": "npm run test_web",
     "clear": "rm -rf tst && rm -rf bin && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
-    "web": "clear && npm run compile_esm -- -w & npm run compile_bin -- -w & ../../node_modules/.bin/web-dev-server --watch --config ../../.web.config.js"
+    "web": "clear && npm run compile_esm -- -w & npm run compile_bin -- -w & ../../node_modules/.bin/web-dev-server --watch --config ../../.web.config.js --app-index ./example.html --open"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",

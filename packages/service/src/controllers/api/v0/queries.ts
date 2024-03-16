@@ -8,6 +8,7 @@ import { getHTML } from "@hdml/orchestrator";
 import { QueryDef, QueryBuf, FrameDef } from "@hdml/schema";
 import {
   Controller,
+  Header,
   UseGuards,
   Get,
   Post,
@@ -51,6 +52,7 @@ export class queries {
    * `POST ?tenant=:tenant` endpoint.
    */
   @Post()
+  @Header("Access-Control-Allow-Origin", "*")
   public async postQueries(
     @Query("tenant")
     tenant: string,

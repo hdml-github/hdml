@@ -166,7 +166,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadTenants(): Promise<void> {
     const project = await new Promise<Dir>((resolve, reject) => {
-      opendir(this._options.getProjectPath(), (err, dir) => {
+      opendir(this._options.getWorkdir(), (err, dir) => {
         if (err) {
           reject(err);
         } else {
@@ -202,7 +202,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadEnv(tenant: string): Promise<string> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantEnvName(),
     );
@@ -214,7 +214,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadKey(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantKeysPath(),
       this._options.getTenantPrivateKeyName(),
@@ -229,7 +229,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadPub(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantKeysPath(),
       this._options.getTenantPublicKeyName(),
@@ -242,7 +242,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadHook(tenant: string): Promise<HookFn> {
     const hookPath = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantHookPath(),
     );
@@ -278,7 +278,7 @@ export class Tenants implements OnModuleInit {
     tenant: string,
   ): Promise<{ [dir: string]: FragmentDef }> {
     const root = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantDocumentsPath(),
     );
@@ -319,7 +319,7 @@ export class Tenants implements OnModuleInit {
     const datas = await Promise.all<FragmentDef>(promises);
     files.forEach((file, i) => {
       const key = file.split(
-        path.resolve(this._options.getProjectPath(), tenant, root),
+        path.resolve(this._options.getWorkdir(), tenant, root),
       )[1];
       defs[key] = datas[i];
     });
