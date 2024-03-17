@@ -55,6 +55,8 @@
     </form>
 
     <!-- Server -->
+
+    <!-- No security scope -->
     <hdml-io
       name="hdml.io"
       host="http://localhost:8887"
@@ -62,25 +64,27 @@
       token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.ZsYF11lNJ7RQWuT-dFSR9IRpFp1BjfFTq7X1Iyk-0mND9T65baoDbj11xlWm103H6kAVQPyTFGOa3PHxOzjD_6EXklJ-Jhd5eBBwzj95h_0UCd8fnJjxJF-_p9CR0JBGGUrtgTcJvtQrE8JWSsX7cvH71WvkYmxyQiONT5zMfc9mHDBG0xbWRUiIo9Ha43xf1KGL-H179QRT2JW-ictbssxUDeaOcjNIfegZ-URJ5Rhxx03S08cgOVjEi8zA4qVSzCxRIs0TeNBiex7NheutR5nuSw8eLcT5LlTA13DjAs49vHQO4zHv5HItM0VGDIyki6oZ1FLa3ErcN1ccBkEpKE3LLcgT54Tay0SNVLo0GwcqMhTUJVtdkPDRTxGvC3tNxbWB2whiBTAYDUqUr8ikJKtEql8DklLQLvnm_6dDdWzFO5cG65U6e0GVQskhTpTatSvDDyQgi3FU3EwI5qpHXYA0CXA6FD-7yK5jbDA2d4oLgSbk0uHKlTiTC7BuBl-y.EiqeIU4IFMc9z48t.pvRR664uRbh5OH-UCGV7ld93KnregSxMP7MWH4-XZhXdv8MDeL8XQI0RUzTlBd27FrhMW32W_H6XwMmUP_LJwhCNu-OZXOn2M5udUMjKl3TTjkLRJSWsCs2WMi7hXVWmhfYgXBnPPC5hPI1fxqn_-3s_W9o.dGgZk2suZDFoEcY-_c93mQ">
     </hdml-io>
 
+
+    <!-- Security scope ("years": [2005, 2006, 2007, 2008]) -->
+    <!-- <hdml-io
+      name="hdml.io"
+      host="http://localhost:8887"
+      tenant="common"
+      token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.GqqGoRUufQbynN2tVYvxQADV4nYtBbJON4XnAQweCHmf9ziimEf40LF16dCSP0sNno9nAj61vtv_UeBs80GQdqRDHkRi_XrhHlCxgC4KHnUcpqjGVsX4smDHBEcIniQiBcNjUF_G66gr1bzYkCf7SfJOEOXrjOOy1RZvUbEsKIo_KEq3uES9_oq6anO3qAKfct5rQqNST0VPJ-rxieEnuYkzyDqxvE_pEIs5opVYUtHVNpZmZGk4fPvBQKahqBpr5wvXaX7D9iaao30qhUXN_PBlmN3zXknz4g6_GhsUPT8Xz_C_6iE7JNa3454V9ZM2tRc8FLYIAZ6EjcT6oKv_ee9yxmvj8YOYSs9PVjamQzEdr0AjDuX2rHhpinZ8LYj3XI7WTpRi6RZNKVe_FDEnZ6--BLBDYC4q7V2jlkiStvYD2uFjLxcIlExiwK0osbrh_hq4feN6jGH2DAuOJM4T1sAp0MOYsJvor34XywmDkV8bUOmtRKlvcpU-hWahq-7o.AE8j4xlCOsYSenES.WXEsvMXuZL6T-VWJHSZjRdbPD6up89QHpuGqvzLbPm4y_irwO67neKtPOZPKfX6v6uRTCOXe_feJygK17HpriD3hj3gCzrBhkZIYPTZhn5f7WFjACr-_Pof2ca64aVsQUd4lkE-vJgq9CcPvv_JfKOpLi45PyNOzOm9Ib_D5fzMUu5D8VyCpRysXH2PZVxY.wZvX3XSZUOeq7cSLLlHnbA">
+    </hdml-io> -->
+
     <hdml-frame
       id="query"
       name="maang_stock_grouped"
-      source="/frames/maang_stock.html?hdml-frame=maang_stock">
+      source="/maang/frame.html?hdml-frame=maang_stock">
 
       <!-- dimensions -->
-
       <hdml-field
         name="label"
-        clause="concat(`year`, '-', `month`, '-', `day`)">
+        clause="cast(`year` as varchar)">
       </hdml-field>
       <hdml-field
         name="year">
-      </hdml-field>
-      <hdml-field
-        name="month">
-      </hdml-field>
-      <hdml-field
-        name="day">
       </hdml-field>
 
       <!-- measures -->
@@ -110,32 +114,23 @@
         agg="avg">
       </hdml-field>
 
+      <!-- grouping -->
       <hdml-group-by>
         <hdml-field name="year"></hdml-field>
-        <hdml-field name="month"></hdml-field>
-        <hdml-field name="day"></hdml-field>
       </hdml-group-by>
 
+      <!-- sorting -->
       <hdml-sort-by>
         <hdml-field name="year" asc="true"></hdml-field>
-        <hdml-field name="month" asc="true"></hdml-field>
-        <hdml-field name="day" asc="true"></hdml-field>
       </hdml-sort-by>
 
+      <!-- filtering -->
       <hdml-filter-by>
         <hdml-connective
           operator="and">
-          <!-- <hdml-filter
-            type="expr"
-            clause="`year` >= '2004'">
-          </hdml-filter> -->
           <hdml-filter
             type="expr"
-            clause="`year` in ('2005')">
-          </hdml-filter>
-          <hdml-filter
-            type="expr"
-            clause="`month` in ('05')">
+            clause="`year` >= 2004">
           </hdml-filter>
         </hdml-connective>
       </hdml-filter-by>
@@ -165,44 +160,37 @@
 
             <ordinal-scale
               bandwidth="0"
-              values='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'>
+              values='["2000-01", "2000-02", "2000-03"]'>
               
               <linear-scale
                 min="0"
                 max="1000000000">
 
-                <!-- Area -->
-                <!-- <data-area
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
-                  y1="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
-                </data-area> -->
-
                 <!-- Lines -->
                 <data-line
                   class="amazon"
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
+                  x='["2000-01", "2000-02", "2000-03"]'
+                  y="[0, 0, 0]">
                 </data-line>
                 <data-line
                   class="apple"
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
+                  x='["2000-01", "2000-02", "2000-03"]'
+                  y="[0, 0, 0]">
                 </data-line>
                 <data-line
                   class="google"
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
+                  x='["2000-01", "2000-02", "2000-03"]'
+                  y="[0, 0, 0]">
                 </data-line>
                 <data-line
                   class="microsoft"
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
+                  x='["2000-01", "2000-02", "2000-03"]'
+                  y="[0, 0, 0]">
                 </data-line>
                 <data-line
                   class="netflix"
-                  x='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'
-                  y="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]">
+                  x='["2000-01", "2000-02", "2000-03"]'
+                  y="[0, 0, 0]">
                 </data-line>
 
                 <!-- Point -->
@@ -265,16 +253,17 @@
                 </horizontal-axis>
                 <horizontal-axis-grid
                   dimension="x"
-                  values='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'>
+                  values='["2000-01", "2000-02", "2000-03"]'>
                 </horizontal-axis-grid>
                 <horizontal-axis-tick
+                  class="tick year"
                   dimension="x"
-                  values='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'>
+                  values='["2000-01", "2000-02", "2000-03"]'>
                 </horizontal-axis-tick>
                 <horizontal-axis-tick
-                  class="labels"
+                  class="labels year"
                   dimension="x"
-                  values='["2000-01", "2000-02", "2000-03", "2000-04", "2000-05", "2000-06", "2000-07", "2000-08", "2000-09", "2000-10", "2000-11", "2000-12"]'>
+                  values='["2000-01", "2000-02", "2000-03"]'>
                 </horizontal-axis-tick>
 
                 <!-- Y-axis -->

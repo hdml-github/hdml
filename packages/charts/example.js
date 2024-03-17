@@ -1,6 +1,8 @@
-const q = window.q = document.getElementById("query");
-q.query();
-q.addEventListener("hdml-data", (event) => {
+const frame = window.q = document.getElementById("query");
+const axis = document.querySelector("horizontal-axis-tick.tick[dimension=x]");
+
+frame.query();
+frame.addEventListener("hdml-data", (event) => {
   window.res = event.detail.table;
 
   const numRows = event.detail.table.numRows;
@@ -210,4 +212,133 @@ q.addEventListener("hdml-data", (event) => {
     document
       .querySelector("hdml-view data-point.labels.netflix")
       .setAttribute("y", `[${max.avgNetflixVolume}]`);
+});
+
+axis.addEventListener("click",  (evt) => {
+  if (evt.target.classList.contains("year")) {
+    const year = +evt.datum;
+    evt
+      .target
+      .classList
+      .replace("year", "month");
+    
+    frame
+      .querySelector("hdml-field[name=label]")
+      .setAttribute(
+        "clause",
+        "concat(cast(`year` as varchar), '-', cast(`month` as varchar))",
+      );
+    
+    frame
+      .querySelector("hdml-field[name=year]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"month\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-group-by > hdml-field[name=year]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"month\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-sort-by > hdml-field[name=year]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"month\" asc=\"true\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-filter-by > hdml-connective")
+      .insertAdjacentHTML(
+        "beforeend",
+        `<hdml-filter class="year" type=\"expr\" clause="\`year\` = ${year}"></hdml-filter>`,
+      );
+
+    frame.query();
+  } else if (evt.target.classList.contains("month")) {
+    const month = evt.datum.split("-")[1];
+    evt
+      .target
+      .classList
+      .replace("month", "day");
+    
+    frame
+      .querySelector("hdml-field[name=label]")
+      .setAttribute(
+        "clause",
+        "concat(cast(`year` as varchar), '-', cast(`month` as varchar), '-', cast(`day` as varchar))",
+      );
+    
+    frame
+      .querySelector("hdml-field[name=month]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"day\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-group-by > hdml-field[name=month]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"day\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-sort-by > hdml-field[name=month]")
+      .insertAdjacentHTML(
+        "afterend",
+        "<hdml-field name=\"day\" asc=\"true\"></hdml-field>",
+      );
+
+    frame
+      .querySelector("hdml-filter-by > hdml-connective")
+      .insertAdjacentHTML(
+        "beforeend",
+        `<hdml-filter class="month" type=\"expr\" clause="\`month\` = ${month}"></hdml-filter>`,
+      );
+
+    frame.query();
+  } else if (evt.target.classList.contains("day")) {
+    evt
+      .target
+      .classList
+      .replace("day", "year");
+    
+    frame
+      .querySelector("hdml-field[name=label]")
+      .setAttribute(
+        "clause",
+        "cast(`year` as varchar)",
+      );
+    
+    frame
+      .querySelector("hdml-field[name=month]")
+      .remove();
+    frame
+      .querySelector("hdml-field[name=day]")
+      .remove();
+    frame
+      .querySelector("hdml-group-by > hdml-field[name=month]")
+      .remove();
+    frame
+      .querySelector("hdml-group-by > hdml-field[name=day]")
+      .remove();
+    frame
+      .querySelector("hdml-sort-by > hdml-field[name=month]")
+      .remove();
+    frame
+      .querySelector("hdml-sort-by > hdml-field[name=day]")
+      .remove();
+    frame
+      .querySelector("hdml-filter-by > hdml-connective > hdml-filter.year")
+      .remove();
+    frame
+      .querySelector("hdml-filter-by > hdml-connective > hdml-filter.month")
+      .remove();
+
+    frame.query();
+  }
 });
