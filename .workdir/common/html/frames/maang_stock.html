@@ -1,0 +1,149 @@
+<hdml-frame
+  name="maang_stock"
+  source="/models/maang_stock.html?hdml-model=maang_stock">
+
+  <!-- hdml-field elements for dates -->
+  <hdml-field
+    name="year"
+    clause="date_format(coalesce(`amazon_date`, `apple_date`, `google_date`, `microsoft_date`, `netflix_date`), '%Y')">
+  </hdml-field>
+  <hdml-field
+    name="month"
+    clause="date_format(coalesce(`amazon_date`, `apple_date`, `google_date`, `microsoft_date`, `netflix_date`), '%m')">
+  </hdml-field>
+  <hdml-field
+    name="day"
+    clause="date_format(coalesce(`amazon_date`, `apple_date`, `google_date`, `microsoft_date`, `netflix_date`), '%d')">
+  </hdml-field>
+
+  <!-- hdml-field elements for amazon table -->
+  <hdml-field
+    name="amazon_open"
+    origin="amazon_open">
+  </hdml-field>
+  <hdml-field
+    name="amazon_high"
+    origin="amazon_high">
+  </hdml-field>
+  <hdml-field
+    name="amazon_low"
+    origin="amazon_low">
+  </hdml-field>
+  <hdml-field
+    name="amazon_close"
+    origin="amazon_close">
+  </hdml-field>
+  <hdml-field
+    name="amazon_adj_close"
+    origin="amazon_adj_close">
+  </hdml-field>
+  <hdml-field
+    name="amazon_volume"
+    origin="amazon_volume">
+  </hdml-field>
+
+  <!-- hdml-field elements for apple table -->
+  <hdml-field
+    name="apple_open"
+    origin="apple_open">
+  </hdml-field>
+  <hdml-field
+    name="apple_high"
+    origin="apple_high">
+  </hdml-field>
+  <hdml-field
+    name="apple_low"
+    origin="apple_low">
+  </hdml-field>
+  <hdml-field
+    name="apple_close"
+    origin="apple_close">
+  </hdml-field>
+  <hdml-field
+    name="apple_adj_close"
+    origin="apple_adj_close">
+  </hdml-field>
+  <hdml-field
+    name="apple_volume"
+    origin="apple_volume">
+  </hdml-field>
+
+  <!-- hdml-field elements for google table -->
+  <hdml-field
+    name="google_open"
+    origin="google_open">
+  </hdml-field>
+  <hdml-field
+    name="google_high"
+    origin="google_high">
+  </hdml-field>
+  <hdml-field
+    name="google_low"
+    origin="google_low">
+  </hdml-field>
+  <hdml-field
+    name="google_close"
+    origin="google_close">
+  </hdml-field>
+  <hdml-field
+    name="google_adj_close"
+    origin="google_adj_close">
+  </hdml-field>
+  <hdml-field
+    name="google_volume"
+    origin="google_volume">
+  </hdml-field>
+
+  <!-- hdml-field elements for microsoft table -->
+  <hdml-field
+    name="microsoft_open"
+    origin="microsoft_open">
+  </hdml-field>
+  <hdml-field
+    name="microsoft_high"
+    origin="microsoft_high">
+  </hdml-field>
+  <hdml-field
+    name="microsoft_low"
+    origin="microsoft_low">
+  </hdml-field>
+  <hdml-field
+    name="microsoft_close"
+    origin="microsoft_close">
+  </hdml-field>
+  <hdml-field
+    name="microsoft_adj_close"
+    origin="microsoft_adj_close">
+  </hdml-field>
+  <hdml-field
+    name="microsoft_volume"
+    origin="microsoft_volume">
+  </hdml-field>
+
+  <!-- hdml-field elements for netflix table -->
+  <hdml-field
+    name="netflix_open"
+    origin="netflix_open">
+  </hdml-field>
+  <hdml-field
+    name="netflix_high"
+    origin="netflix_high">
+  </hdml-field>
+  <hdml-field
+    name="netflix_low"
+    origin="netflix_low">
+  </hdml-field>
+  <hdml-field
+    name="netflix_close"
+    origin="netflix_close">
+  </hdml-field>
+  <hdml-field
+    name="netflix_adj_close"
+    origin="netflix_adj_close">
+  </hdml-field>
+  <hdml-field
+    name="netflix_volume"
+    origin="netflix_volume">
+  </hdml-field>
+
+</hdml-frame>

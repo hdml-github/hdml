@@ -54,38 +54,51 @@ body.bold {
 body {
   color: var(--theme-line-color);
 }
+table {
+  width: 100%;
+}
+table, thead, td {
+  border: var(--theme-line-width) solid;
+  border-collapse: collapse;
+}
+thead {
+  font-weight: bold;
+  background-color: var(--theme-area-fill);
+}
 div.container {
   display: block;
   position: absolute;
   float: left;
-  width: 100%;
+  width: 95%;
   height: 300%;
 }
 div.block {
   display: block;
   position: relative;
   width: 100%;
-  height: 600px;
+  height: 12.5%;
 }
 
 /* HDML VIEW */
-hdml-view {
+hdml-view.all-together,
+hdml-view.all-together-independent {
   width: 100%;
   height: calc(100% - 80px);
 }
 
 /* HDML PLANE */
-hdml-view cartesian-plane {
-  width: 100%;
-  height: 100%;
-  padding: 30px 100px 30px 100px;
+hdml-view.all-together cartesian-plane {
+  padding: 15px 25px;
+}
+hdml-view.all-together-independent cartesian-plane {
+  padding: 8px 25px 30px 35px;
 }
 
 /* HDML SCALE */
-hdml-view ordinal-scale {
+hdml-view.all-together ordinal-scale {
   padding: 0 0 0 40px;
 }
-hdml-view linear-scale {
+hdml-view.all-together linear-scale {
   --hdml-padding: 15px 0;
   --hdml-padding-hover: 25px 0;
   --hdml-padding-active: 25px 0;
@@ -93,8 +106,10 @@ hdml-view linear-scale {
 }
 
 /* HDML AXIS */
-hdml-view horizontal-axis,
-hdml-view vertical-axis {
+hdml-view.all-together horizontal-axis,
+hdml-view.all-together vertical-axis,
+hdml-view.all-together-independent horizontal-axis,
+hdml-view.all-together-independent vertical-axis {
   --hdml-line-width: var(--theme-line-width);
   --hdml-line-width_active: var(--theme-line-width-bold);
   --hdml-line-width_focus: var(--theme-line-width-bold);
@@ -118,12 +133,14 @@ vertical-axis.center {
 }
 
 /* HDML AXIS GRID */
-hdml-view horizontal-axis-grid,
-hdml-view vertical-axis-grid {
-  --hdml-line-width: 1px;
-  --hdml-line-width_active: 2px;
-  --hdml-line-width_focus: 2px;
-  --hdml-line-width_hover: 2px;
+hdml-view.all-together horizontal-axis-grid,
+hdml-view.all-together vertical-axis-grid,
+hdml-view.all-together-independent horizontal-axis-grid,
+hdml-view.all-together-independent vertical-axis-grid {
+  --hdml-line-width: var(--theme-line-width);
+  --hdml-line-width_active: var(--theme-line-width-bold);
+  --hdml-line-width_focus: var(--theme-line-width-bold);
+  --hdml-line-width_hover: var(--theme-line-width-bold);
 
   --hdml-line-color: var(--theme-area-line);
   --hdml-line-color_active: var(--theme-area-line-bold);
@@ -131,11 +148,16 @@ hdml-view vertical-axis-grid {
   --hdml-line-color_hover: var(--theme-area-line-bold);
 
   --hdml-line-style: dashed;
+  --hdml-line-style_active: solid;
+  --hdml-line-style_focus: solid;
+  --hdml-line-style_hover: solid;
 }
 
 /* HDML AXIS TICK */
-hdml-view horizontal-axis-tick,
-hdml-view vertical-axis-tick {
+hdml-view.all-together horizontal-axis-tick,
+hdml-view.all-together vertical-axis-tick,
+hdml-view.all-together-independent horizontal-axis-tick,
+hdml-view.all-together-independent vertical-axis-tick {
   --hdml-tick-style: var(--theme-tick-style);
   --hdml-tick-width: var(--theme-tick-width);
   --hdml-tick-height: var(--theme-tick-height);
@@ -168,8 +190,10 @@ vertical-axis-tick.center {
 }
 
 /* HDML AXIS TICK LABELS */
-hdml-view horizontal-axis-tick.labels,
-hdml-view vertical-axis-tick.labels {
+hdml-view.all-together horizontal-axis-tick.labels,
+hdml-view.all-together vertical-axis-tick.labels,
+hdml-view.all-together-independent horizontal-axis-tick.labels,
+hdml-view.all-together-independent vertical-axis-tick.labels {
   --hdml-tick-style: text;
 
   --hdml-font-family: var(--theme-font-family);
@@ -197,16 +221,22 @@ hdml-view vertical-axis-tick.labels {
   --hdml-fill-color_focus: var(--theme-line-color-bold);
   --hdml-fill-color_hover: var(--theme-line-color-bold);
 }
-hdml-view horizontal-axis-tick.labels {
-  top: calc(100% + 20px);
-}
-hdml-view vertical-axis-tick.labels {
-  left: -50px;
-}
-hdml-view horizontal-axis-tick.labels.center {
+hdml-view.all-together horizontal-axis-tick.labels {
   top: calc(50% + 20px);
 }
-hdml-view vertical-axis-tick.labels.center {
+hdml-view.all-together vertical-axis-tick.labels {
+  left: 25px;
+}
+hdml-view.all-together-independent horizontal-axis-tick.labels {
+  top: calc(100% + 20px);
+}
+hdml-view.all-together-independent vertical-axis-tick.labels {
+  left: -25px;
+}
+hdml-view.all-together-independent horizontal-axis-tick.labels.center {
+  top: calc(50% + 20px);
+}
+hdml-view.all-together-independent vertical-axis-tick.labels.center {
   left: calc(50% - 25px);
 }
 
@@ -229,103 +259,6 @@ data-line {
   --hdml-line-style_active: solid;
   --hdml-line-style_focus: solid;
   --hdml-line-style_hover: solid;
-}
-
-
-/* Stock colors */
-td.amazon {
-  padding: 5px;
-  color: #fff;
-  background-color: #ff9100;
-}
-data-line.amazon,
-data-point.amazon {
-  --hdml-line-color: #ff9100;
-  --hdml-line-color_active: #ff9100;
-  --hdml-line-color_focus: #ff9100;
-  --hdml-line-color_hover: #ff9100;
-}
-data-point.labels.amazon {
-  --hdml-fill-color: #ff9100;
-  --hdml-fill-color_active: #ff9100;
-  --hdml-fill-color_focus: #ff9100;
-  --hdml-fill-color_hover: #ff9100;
-}
-
-td.apple {
-  padding: 5px;
-  color: #fff;
-  background-color: #737b8b;
-}
-data-line.apple,
-data-point.apple {
-  --hdml-line-color: #737b8b;
-  --hdml-line-color_active: #737b8b;
-  --hdml-line-color_focus: #737b8b;
-  --hdml-line-color_hover: #737b8b;
-}
-data-point.labels.apple {
-  --hdml-fill-color: #737b8b;
-  --hdml-fill-color_active: #737b8b;
-  --hdml-fill-color_focus: #737b8b;
-  --hdml-fill-color_hover: #737b8b;
-}
-
-td.google {
-  padding: 5px;
-  color: #fff;
-  background-color: #56b3f5;
-}
-data-line.google,
-data-point.google {
-  --hdml-line-color: #56b3f5;
-  --hdml-line-color_active: #56b3f5;
-  --hdml-line-color_focus: #56b3f5;
-  --hdml-line-color_hover: #56b3f5;
-}
-data-point.labels.google {
-  --hdml-fill-color: #56b3f5;
-  --hdml-fill-color_active: #56b3f5;
-  --hdml-fill-color_focus: #56b3f5;
-  --hdml-fill-color_hover: #56b3f5;
-}
-
-td.microsoft {
-  padding: 5px;
-  color: #fff;
-  background-color: #1ca335;
-}
-data-line.microsoft,
-data-point.microsoft {
-  --hdml-line-color: #1ca335;
-  --hdml-line-color_active: #1ca335;
-  --hdml-line-color_focus: #1ca335;
-  --hdml-line-color_hover: #1ca335;
-}
-data-point.labels.microsoft {
-  --hdml-fill-color: #1ca335;
-  --hdml-fill-color_active: #1ca335;
-  --hdml-fill-color_focus: #1ca335;
-  --hdml-fill-color_hover: #1ca335;
-}
-
-td.netflix {
-  padding: 5px;
-  color: #fff;
-  background-color: #d7112f;
-}
-data-line.netflix,
-data-point.netflix {
-  --hdml-line-color: #d7112f;
-  --hdml-line-color_active: #d7112f;
-  --hdml-line-color_focus: #d7112f;
-  --hdml-line-color_hover: #d7112f;
-}
-data-point.labels.netflix {
-  --hdml-fill-color: #d7112f;
-  --hdml-fill-color_active: #d7112f;
-  --hdml-fill-color_focus: #d7112f;
-  --hdml-fill-color_hover: #d7112f;
 }
 
 /* HDML AREAS */
