@@ -4,33 +4,42 @@
 ## Setting up
 
 ```bash
-# create the project catalog
-mkdir ~/hdml-github
-cd ~/hdml-github
+# install node-gyp
+npm install -g node-gyp
 
-# clone repo
-git clone git@github.com:hdml-github/hdml.git
-cd hdml
-
-# configure ssh key to the repository (optional)
-git config core.sshCommand "$(which ssh) -i ~/.ssh/privatekey"
-git config user.name "username"
-git config user.email "username@gmail.com"
-
-# install dependencies
-npm i
-
-# install Flatbuffers (cmake required: `brew install cmake`)
+# install flatbuffers (cmake required: `brew install cmake`)
+cd /
 mkdir flatc
 git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git flatc
 cd flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
 ln -s /flatc/flatc /usr/local/bin/flatc
 chmod +x /flatc/flatc
 
+# generate ssh key for the project and add it to the Github account
+ssh-keygen -t ed25519 -C "hdml.github@gmail.com" -f ~/.ssh/hdml.github -N ""
+
+# create the project catalog
+mkdir ~/hdml-github
+cd ~/hdml-github
+
+# clone and configure repo
+curl -o- https://raw.githubusercontent.com/hdml-github/hdml/chore/packages/git.init.sh | bash
+
+# manually (optional)
+# git clone git@github.com:hdml-github/hdml.git
+# cd hdml
+# git config core.sshCommand "$(which ssh) -i ~/.ssh/privatekey"
+# git config user.name "username"
+# git config user.email "username@gmail.com"
+
+# install dependencies
+npm i
+
 # build project locally
-npm run compile_all
+npm run build
 npm run develop:build
-cp ~/hdml-github/hdml/packages/elements/bin/ ~/hdml-github/hdml/packages/charts/bin
+cp ~/hdml-github/hdml/packages/elements/bin/* ~/hdml-github/hdml/packages/charts/bin
+mkdir ~/hdml-github/hdml/.workdir/.log
 ```
 
 ## Run development environment

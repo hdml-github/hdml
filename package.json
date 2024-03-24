@@ -7,9 +7,6 @@
     "packages/parser",
     "packages/charts",
     "packages/elements",
-    "packages/io.common",
-    "packages/io.gateway",
-    "packages/io.querier",
     "packages/service"
   ],
   "private": true,
