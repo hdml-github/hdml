@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query filter types enum.
+/// Query filter types enum.
 enum FilterType: byte {
   Expr,
   Keys,

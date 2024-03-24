@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query decimal data field bit width enum.
+/// Query decimal data field bit width enum.
 enum DecBitWidth: byte {
   _128,
   _256,

@@ -89,6 +89,9 @@ export abstract class BaseQueue {
     return status;
   }
 
+  // List: /admin/v2/namespaces/{tenant}/{namespace}/topics
+  //       ?mode=PERSISTENT
+
   /**
    * Creates the specified persistent non-partitioned `topic`.
    *

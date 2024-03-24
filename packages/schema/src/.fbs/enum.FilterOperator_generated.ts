@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query filter oprators enum.
+ * Query filter oprators enum.
  */
 export enum FilterOperator {
   Or = 0,

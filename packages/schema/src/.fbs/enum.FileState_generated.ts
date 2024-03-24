@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol response file state enum.
+ * Deprecated. Delete it.
  */
 export enum FileState {
   PROCESSING = 0,

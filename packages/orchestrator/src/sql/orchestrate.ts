@@ -4,7 +4,7 @@
  * @license Apache-2.0
  */
 
-import { type Query, type QueryDef } from "@hdml/schema";
+import { type QueryBuf, type QueryDef } from "@hdml/schema";
 import { getModelSQL } from "./model";
 import { getFrameSQL } from "./frame";
 
@@ -12,7 +12,7 @@ import { getFrameSQL } from "./frame";
  * Converts the specified `query` to an `SQL` string. Throws if the
  * `query` object does not contain a `model` property.
  */
-export function getSQL(query: Query | QueryDef): string {
+export function getSQL(query: QueryBuf | QueryDef): string {
   if (!query.model) {
     throw new Error("Model is missing.");
   }

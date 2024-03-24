@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query date units enum.
+/// Query date units enum.
 enum DateUnit: byte {
   second,
   millisecond,

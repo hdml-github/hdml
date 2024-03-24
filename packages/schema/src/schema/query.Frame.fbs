@@ -9,7 +9,7 @@ include "./query.FilterClause.fbs";
 
 namespace query;
 
-/// `HDML` network protocol query data-frame structure.
+/// Query data-frame structure.
 table Frame {
   name: string;
   source: string;

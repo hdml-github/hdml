@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query time unit enum.
+/// Query time unit enum.
 enum TimeUnit: byte {
   second,
   millisecond,

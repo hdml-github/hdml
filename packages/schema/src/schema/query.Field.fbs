@@ -13,12 +13,12 @@ include "./enum.TimeZone.fbs";
 
 namespace query;
 
-/// `HDML` network protocol query data field common type options structure.
+/// Query data field common type options structure.
 struct CommonOpts {
   nullable: bool;
 }
 
-/// `HDML` network protocol query data field decimal type options structure.
+/// Query data field decimal type options structure.
 struct DecimalOpts {
   nullable: bool;
   scale: ushort;
@@ -26,26 +26,26 @@ struct DecimalOpts {
   bit_width: enum.DecBitWidth;
 }
 
-///  `HDML` network protocol query data field date type options structure.
+/// Query data field date type options structure.
 struct DateOpts {
   nullable: bool;
   unit: enum.DateUnit;
 }
 
-/// `HDML` network protocol query data field time type options structure.
+/// Query data field time type options structure.
 struct TimeOpts {
   nullable: bool;
   unit: enum.TimeUnit;
 }
 
-/// `HDML` network protocol query data field timestamp type options structure.
+/// Query data field timestamp type options structure.
 struct TimestampOpts {
   nullable: bool;
   unit: enum.TimeUnit;
   timezone: enum.TimeZone;
 }
 
-/// `HDML` network protocol query data field type options union.
+/// Query data field type options union.
 union TypeOpts {
   CommonOpts,
   DecimalOpts,
@@ -54,13 +54,13 @@ union TypeOpts {
   TimestampOpts,
 }
 
-/// `HDML` network protocol query data field type structure.
+/// Query data field type structure.
 table Type {
   type: enum.DataType;
   options: TypeOpts;
 }
 
-/// `HDML` network protocol query data field structure.
+/// Query data field structure.
 table Field {
   description: string;
   origin: string;

@@ -10,7 +10,7 @@ import {TimeUnit as TimeUnit} from './enum.TimeUnit_generated.js';
 import {TimeZone as TimeZone} from './enum.TimeZone_generated.js';
 
 /**
- * `HDML` network protocol query data field type options union.
+ * Query data field type options union.
  */
 export enum TypeOpts {
   NONE = 0,
@@ -53,7 +53,7 @@ export function unionListToTypeOpts(
 }
 
 /**
- * `HDML` network protocol query data field common type options structure.
+ * Query data field common type options structure.
  */
 export class CommonOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -81,7 +81,7 @@ static createCommonOpts(builder:flatbuffers.Builder, nullable: boolean):flatbuff
 }
 
 /**
- * `HDML` network protocol query data field decimal type options structure.
+ * Query data field decimal type options structure.
  */
 export class DecimalOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -126,7 +126,7 @@ static createDecimalOpts(builder:flatbuffers.Builder, nullable: boolean, scale: 
 }
 
 /**
- *  `HDML` network protocol query data field date type options structure.
+ * Query data field date type options structure.
  */
 export class DateOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -159,7 +159,7 @@ static createDateOpts(builder:flatbuffers.Builder, nullable: boolean, unit: Date
 }
 
 /**
- * `HDML` network protocol query data field time type options structure.
+ * Query data field time type options structure.
  */
 export class TimeOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -192,7 +192,7 @@ static createTimeOpts(builder:flatbuffers.Builder, nullable: boolean, unit: Time
 }
 
 /**
- * `HDML` network protocol query data field timestamp type options structure.
+ * Query data field timestamp type options structure.
  */
 export class TimestampOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -230,7 +230,7 @@ static createTimestampOpts(builder:flatbuffers.Builder, nullable: boolean, unit:
 }
 
 /**
- * `HDML` network protocol query data field type structure.
+ * Query data field type structure.
  */
 export class Type {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -296,7 +296,7 @@ static createType(builder:flatbuffers.Builder, type:DataType, optionsType:TypeOp
 }
 
 /**
- * `HDML` network protocol query data field structure.
+ * Query data field structure.
  */
 export class Field {
   bb: flatbuffers.ByteBuffer|null = null;

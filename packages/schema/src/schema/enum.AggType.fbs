@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query aggregations enum.
+/// Query aggregations enum.
 enum AggType: byte {
   None = 0,
   Count,

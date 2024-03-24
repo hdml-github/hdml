@@ -8,7 +8,7 @@ import "whatwg-fetch";
 import { html, TemplateResult } from "lit";
 import { debounce } from "throttle-debounce";
 import { Table } from "apache-arrow";
-import { Query, QueryDef, ModelDef, FrameDef } from "@hdml/schema";
+import { QueryBuf, QueryDef, ModelDef, FrameDef } from "@hdml/schema";
 import {
   IO_NAME_REGEXP,
   IO_HOST_REGEXP,
@@ -35,7 +35,7 @@ export interface DataDetail {
  * A definition of the `HDML` elements retrieved from the current
  * `HTML` document.
  */
-export type ElementsDef = {
+export type FragmentDef = {
   models: {
     [name: string]: ModelDef;
   };
@@ -131,7 +131,7 @@ export class IoElement extends UnifiedElement {
   /**
    * Queries map.
    */
-  private _queries: Map<string, Query> = new Map();
+  private _queries: Map<string, QueryBuf> = new Map();
 
   /**
    * Promises that resolve after all updates to `ModelElement` or
@@ -360,11 +360,11 @@ export class IoElement extends UnifiedElement {
   }
 
   /**
-   * Returns a definition of the `HDML` elements retrieved from the
+   * Returns a definition of the `HDML` fragment retrieved from the
    * current `HTML` document.
    * @throws
    */
-  public async getElementsDef(): Promise<ElementsDef> {
+  public async getFragmentDef(): Promise<FragmentDef> {
     await this._updates();
     const models: { [name: string]: ModelDef } = {};
     const frames: { [name: string]: FrameDef } = {};
@@ -412,12 +412,12 @@ export class IoElement extends UnifiedElement {
    * (`ModelElement` or `FrameElement`) whose identifier is specified
    * in the `uid` parameter.
    */
-  public async getQuery(uid: string): Promise<null | Query> {
+  public async getQuery(uid: string): Promise<null | QueryBuf> {
     await this._updates();
     if (!this._queries.has(uid)) {
       return null;
     } else {
-      return <Query>this._queries.get(uid);
+      return <QueryBuf>this._queries.get(uid);
     }
   }
 
@@ -680,9 +680,9 @@ export class IoElement extends UnifiedElement {
   private async _handleQuery(uid: string): Promise<void> {
     await this._updates();
     if (!this._queries.has(uid)) {
-      throw new Error(`Query is missing: ${uid}`);
+      throw new Error(`QueryBuf is missing: ${uid}`);
     } else {
-      const query = <Query>this._queries.get(uid);
+      const query = <QueryBuf>this._queries.get(uid);
       if (!this._client) {
         throw new Error("Client is missing");
       } else {
@@ -722,7 +722,7 @@ export class IoElement extends UnifiedElement {
       const queryDef: QueryDef = {
         model: model.data,
       };
-      this._queries.set(model.uid, new Query(queryDef));
+      this._queries.set(model.uid, new QueryBuf(queryDef));
     });
     this._updatesPromises.model.resolve &&
       this._updatesPromises.model.resolve();
@@ -770,7 +770,7 @@ export class IoElement extends UnifiedElement {
           throw new Error(`Invalid \`source\` value: ${source}`);
         }
       }
-      this._queries.set(frame.uid, new Query(queryDef));
+      this._queries.set(frame.uid, new QueryBuf(queryDef));
     });
     this._updatesPromises.frame.resolve &&
       this._updatesPromises.frame.resolve();

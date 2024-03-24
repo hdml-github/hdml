@@ -9,7 +9,7 @@ include "./query.Frame.fbs";
 
 namespace query;
 
-/// `HDML` network protocol query structure.
+/// Query structure.
 table Query {
   model: query.Model;
   frame: query.Frame;

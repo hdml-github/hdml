@@ -73,7 +73,7 @@ export function getModelSQL(model: ModelDef, level = 0): string {
       sql +
       model.joins
         .map((join, i) => getModelJoinSQL(path, join, i, level))
-        .join();
+        .join("");
   }
 
   return sql;

@@ -6,7 +6,7 @@ import {Field as Field} from './query.Field_generated.js';
 import {FilterClause as FilterClause} from './query.FilterClause_generated.js';
 
 /**
- * `HDML` network protocol query data-frame structure.
+ * Query data-frame structure.
  */
 export class Frame {
   bb: flatbuffers.ByteBuffer|null = null;

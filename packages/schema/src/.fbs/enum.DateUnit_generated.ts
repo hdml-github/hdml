@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query date units enum.
+ * Query date units enum.
  */
 export enum DateUnit {
   second = 0,

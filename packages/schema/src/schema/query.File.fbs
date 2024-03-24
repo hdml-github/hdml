@@ -6,7 +6,7 @@
 
 namespace query;
 
-/// `HDML` network protocol file structure.
+/// Deprecated. Delete me!
 table File {
   name: string;
 }

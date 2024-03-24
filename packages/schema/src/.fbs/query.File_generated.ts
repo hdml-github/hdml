@@ -4,7 +4,7 @@ import * as flatbuffers from 'flatbuffers';
 
 
 /**
- * `HDML` network protocol file structure.
+ * Deprecated. Delete me!
  */
 export class File {
   bb: flatbuffers.ByteBuffer|null = null;

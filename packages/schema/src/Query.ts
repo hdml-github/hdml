@@ -12,14 +12,6 @@ import { ModelHelper, ModelDef } from "./helpers/ModelHelper";
 import { FrameHelper, FrameDef } from "./helpers/FrameHelper";
 
 /**
- * An object for defining query.
- */
-export type QueryDef = {
-  model?: ModelDef;
-  frame?: FrameDef;
-};
-
-/**
  * Query helper class.
  */
 export class Query {
@@ -78,3 +70,16 @@ export class Query {
     }
   }
 }
+
+/**
+ * Parsed `hdml` query.
+ */
+export type QueryDef = {
+  model?: ModelDef;
+  frame?: FrameDef;
+};
+
+/**
+ * Bufferized `hdml` query.
+ */
+export class QueryBuf extends Query {}

@@ -1,0 +1,16 @@
+/**
+ * @author Artem Lytvynov
+ * @copyright Artem Lytvynov
+ * @license Apache2.0
+ */
+
+namespace enum;
+
+/// Posted query state enum.
+enum QueryState: byte {
+  PROCESSING,
+  SCHEMA,
+  CHUNK,
+  DONE,
+  FAIL,
+}

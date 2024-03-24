@@ -8,7 +8,7 @@ import {Field as Field} from './query.Field_generated.js';
 import {FilterClause as FilterClause} from './query.FilterClause_generated.js';
 
 /**
- * `HDML` network protocol query data-model structure.
+ * Query data-model structure.
  */
 export class Model {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -110,7 +110,7 @@ static createModel(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset, t
 }
 
 /**
- * `HDML` network protocol query data-table structure.
+ * Query data-table structure.
  */
 export class Table {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -207,7 +207,7 @@ static createTable(builder:flatbuffers.Builder, nameOffset:flatbuffers.Offset, t
 }
 
 /**
- * `HDML` network protocol query data-tables join structure.
+ * Query data-tables join structure.
  */
 export class Join {
   bb: flatbuffers.ByteBuffer|null = null;

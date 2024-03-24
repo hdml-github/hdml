@@ -7,7 +7,7 @@ import {FilterOperator as FilterOperator} from './enum.FilterOperator_generated.
 import {FilterType as FilterType} from './enum.FilterType_generated.js';
 
 /**
- * `HDML` network protocol query filter options union.
+ * Query filter options union.
  */
 export enum FilterOpts {
   NONE = 0,
@@ -44,7 +44,7 @@ export function unionListToFilterOpts(
 }
 
 /**
- * `HDML` network protocol query filter clause structure.
+ * Query filter clause structure.
  */
 export class FilterClause {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -144,7 +144,7 @@ static createFilterClause(builder:flatbuffers.Builder, type:FilterOperator, filt
 }
 
 /**
- * `HDML` network protocol query expression filter options structure.
+ * Query expression filter options structure.
  */
 export class ExprOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -192,7 +192,7 @@ static createExprOpts(builder:flatbuffers.Builder, clauseOffset:flatbuffers.Offs
 }
 
 /**
- * `HDML` network protocol query keys (joins) filter options structure.
+ * Query keys (joins) filter options structure.
  */
 export class KeysOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -252,7 +252,7 @@ static createKeysOpts(builder:flatbuffers.Builder, leftOffset:flatbuffers.Offset
 }
 
 /**
- * `HDML` network protocol query named filter options structure.
+ * Query named filter options structure.
  */
 export class NamedOpts {
   bb: flatbuffers.ByteBuffer|null = null;
@@ -339,7 +339,7 @@ static createNamedOpts(builder:flatbuffers.Builder, name:FilterName, fieldOffset
 }
 
 /**
- * `HDML` network protocol query filter structure.
+ * Query filter structure.
  */
 export class Filter {
   bb: flatbuffers.ByteBuffer|null = null;

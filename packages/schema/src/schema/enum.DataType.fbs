@@ -6,7 +6,7 @@
 
 namespace enum;
 
-/// `HDML` network protocol query data types enum.
+/// Query data types enum.
 enum DataType: byte {
   Int8,
   Int16,

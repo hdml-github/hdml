@@ -1,0 +1,1061 @@
+<!--
+  @author Artem Lytvynov
+  @copyright Artem Lytvynov
+  @license Apache-2.0
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="/bin/charts.min.js"></script>
+    <script src="/bin/elements.min.js"></script>
+    <script>
+      const hdml = window['@hdml/elements'];
+      (async () => {await hdml.defineDefaults();})();
+    </script>
+    <link rel="stylesheet" href="/_example.css" />
+    <title>Example of HDML Charts Capabilities</title>
+  </head>
+  <body>
+
+    <!-- Server -->
+    <hdml-io
+      name="hdml.io"
+      host="http://localhost:8887"
+      tenant="common"
+      token="eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.bgJ0557egxd9ylApMN9_l-lPSPZ7Z8UJiD2mBeLpl5nCP5SPVvdNz62aNReR63QxMBlfrkAniv9LcK1yA-aApRtqT709Hqve4UR4OVnV9KGgotGogxndXC4xmfKLXZvIJrZSLv7UJaC6wJqi_aiiXYxbiPtEKmHD6X09YNPIv5zc7qZgP1t_SGLtfOiveamhQOSqsweZT7L9oMf9kzYRXTLLIORWH0DlqShTSpTfVbn_iZTaoU4mhJVGzSCenSe7ERPyjGSE2vti5bsPImnSibkeN_vwhRCA0kau322XhZd-HV3dU-tcVVz9w_qrxojbN66oS-Tw4dCEmLFxwbFFo_gVBVOU_DtdChgRFK8-TLIBviKQSbBEVQkGjT8q7tF90B6Y22t0tlBVjepIoVhTGz17AwvE88ohTp53JAVh4n3uVbPLRPCJRkMMrEtrH8-COklQAXyHgpJBGUc_ZPk6IL6Vc0pDnlH6ggHtg8eUbMb2CeQ8kxXGDvxzlRD0IyOq.2TpsAg9A_1kkrZEW.xYDg8ECr4yb27n3e-nwIG_czb6Cd2Suu8hw6wlr3tYUFdTKRfkhxliUZMkdUNNA-_q13S5Z9hK5NHK-GsW8EjLqv9GbHLQJHNSml-siNVm9NUIUMObNt4MyHwxDG2LkI8tDH9ich4J_TbD-aGTi2Wjl6IaI.OGp3Qzlx0e-2uz4AWdf_-A">
+    </hdml-io>
+
+    <!-- Query -->
+    <hdml-model
+      name="model">
+
+      <hdml-table
+        name="tables"
+        type="table"
+        source="`tenant_postgres`.`information_schema`.`tables`">
+        <hdml-field
+          name="catalog"
+          origin="table_catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema"
+          origin="table_schema">
+        </hdml-field>
+        <hdml-field
+          name="table"
+          origin="table_name">
+        </hdml-field>
+        <hdml-field
+          name="full"
+          clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)">
+        </hdml-field>
+        <hdml-field
+          name="hash"
+          clause="concat(`table_catalog`, '-', `table_schema`, '-', `table_name`)"
+          type="binary">
+        </hdml-field>
+        <hdml-field
+          name="type"
+          origin="table_type">
+        </hdml-field>
+      </hdml-table>
+
+      <hdml-table
+        name="columns"
+        type="query"
+        source="select * from `tenant_postgres`.`information_schema`.`columns`">
+        <hdml-field
+          name="catalog"
+          origin="table_catalog">
+        </hdml-field>
+        <hdml-field
+          name="schema"
+          origin="table_schema">
+        </hdml-field>
+        <hdml-field
+          name="table"
+          origin="table_name">
+        </hdml-field>
+        <hdml-field
+          name="column"
+          origin="column_name">
+        </hdml-field>
+        <hdml-field
+          name="position"
+          origin="ordinal_position"
+          type="int-32">
+        </hdml-field>
+        <hdml-field
+          name="default"
+          origin="column_default">
+        </hdml-field>
+        <hdml-field
+          name="nullable"
+          origin="is_nullable">
+        </hdml-field>
+        <hdml-field
+          name="type"
+          origin="data_type">
+        </hdml-field>
+      </hdml-table>
+
+      <hdml-join
+        type="inner"
+        left="tables"
+        right="columns">
+
+        <hdml-connective
+          operator="and">
+
+          <hdml-filter
+            type="keys"
+            left="catalog"
+            right="catalog">
+          </hdml-filter>
+          
+          <hdml-filter
+            type="keys"
+            left="schema"
+            right="schema">
+          </hdml-filter>
+          
+          <hdml-filter
+            type="keys"
+            left="table"
+            right="table">
+          </hdml-filter>            
+          
+          <hdml-connective
+            operator="or">
+
+            <hdml-filter
+              type="expr"
+              clause="`columns`.`table` = 'applicable_roles'">
+            </hdml-filter>
+
+            <hdml-filter
+              type="expr"
+              clause="`columns`.`table` = 'tables'">
+            </hdml-filter>
+
+          </hdml-connective>
+
+        </hdml-connective>
+      </hdml-join>
+    </hdml-model>
+
+    <script>
+      // const q = document.querySelector("hdml-model[name=model]");
+      // q.addEventListener("hdml-data", (event) => {
+      //   window.res = event.detail.table;
+      //   console.log(event.detail.table);
+      // });
+      // q.query();
+    </script>
+
+    <!-- Charts -->
+    <h1>Test Dataset</h1>
+    <table class="dataset">
+      <thead>
+        <tr>
+          <td>X0</td>
+          <td>X1</td>
+          <td>X2</td>
+          <td>X1^2</td>
+          <td>X2^3</td>
+          <td>Random</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Val_1</td>
+          <td>0</td>
+          <td>-5</td>
+          <td>0</td>
+          <td>-125</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>Val_2</td>
+          <td>1</td>
+          <td>-4</td>
+          <td>1</td>
+          <td>-64</td>
+          <td>-5</td>
+        </tr>
+        <tr>
+          <td>Val_3</td>
+          <td>2</td>
+          <td>-3</td>
+          <td>4</td>
+          <td>-27</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>Val_4</td>
+          <td>3</td>
+          <td>-2</td>
+          <td>9</td>
+          <td>-8</td>
+          <td>-27</td>
+        </tr>
+        <tr>
+          <td>Val_5</td>
+          <td>4</td>
+          <td>-1</td>
+          <td>16</td>
+          <td>-1</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Val_6</td>
+          <td>5</td>
+          <td>0</td>
+          <td>25</td>
+          <td>0</td>
+          <td>-1</td>
+        </tr>
+        <tr>
+          <td>Val_7</td>
+          <td>6</td>
+          <td>1</td>
+          <td>36</td>
+          <td>1</td>
+          <td>25</td>
+        </tr>
+        <tr>
+          <td>Val_8</td>
+          <td>7</td>
+          <td>2</td>
+          <td>49</td>
+          <td>8</td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td>Val_9</td>
+          <td>8</td>
+          <td>3</td>
+          <td>64</td>
+          <td>27</td>
+          <td>7</td>
+        </tr>
+        <tr>
+          <td>Val_10</td>
+          <td>9</td>
+          <td>4</td>
+          <td>81</td>
+          <td>64</td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td>Val_11</td>
+          <td>10</td>
+          <td>5</td>
+          <td>100</td>
+          <td>125</td>
+          <td>81</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h1>Theme config</h1>
+    <form>
+      <input type="radio" id="Black" name="color" value="black" checked>
+      <label for="Black">Black color</label>
+  
+      <input type="radio" id="Blue" name="color" value="blue">
+      <label for="Blue">Blue color</label>
+  
+      <input type="radio" id="Green" name="color" value="green">
+      <label for="Green">Green color</label>
+      <br>
+  
+      <input type="radio" id="Normal" name="line" value="normal" checked>
+      <label for="Normal">Normal lines</label>
+  
+      <input type="radio" id="Bold" name="line" value="bold">
+      <label for="Bold">Bold lines</label>
+  
+      <script>
+        function colorListener(event) {
+          const cls = event.target.value;
+          document.body.classList.remove("blue", "green");
+          if (cls !== "black") document.body.classList.add(cls);
+        }
+        function lineListener(event) {
+          const cls = event.target.value;
+          document.body.classList.remove("bold");
+          if (cls !== "normal") document.body.classList.add(cls);
+        }
+        window.document.getElementById("Black").addEventListener("change", colorListener);
+        window.document.getElementById("Blue").addEventListener("change", colorListener);
+        window.document.getElementById("Green").addEventListener("change", colorListener);
+        window.document.getElementById("Normal").addEventListener("change", lineListener);
+        window.document.getElementById("Bold").addEventListener("change", lineListener);
+      </script>
+    </form>
+
+    <div class="container">
+      <div class="block">
+        <h1>All together in one view in one Cartesian plane</h1>
+        <hdml-view class="all-together">
+          <cartesian-plane>
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="-150"
+                max="150">
+    
+                <!-- Lines -->
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-line>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-line>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-line>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-line>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-line>
+    
+                <!-- X-axis -->
+                <horizontal-axis
+                  class="center"
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  class="center"
+                  dimension="x"
+                  count="11">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="center labels"
+                  dimension="x"
+                  count="11">
+                </horizontal-axis-tick>
+      
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="5">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="5">
+                </vertical-axis-tick>
+    
+              </linear-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>All together in one view in independent Cartesian planes</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 20%; height: 100%; left: 0%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="0"
+                max="10">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+
+          <cartesian-plane style="width: 20%; height: 100%; left: 20%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="-5"
+                max="5">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+
+          <cartesian-plane style="width: 20%; height: 100%; left: 40%;">
+            <linear-scale
+              min="0"
+              max="10">
+              <linear-scale
+                min="0"
+                max="100">
+
+                <!-- Lines -->
+                <data-area
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-area>
+                <data-line
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-line>
+                <data-point
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+
+          <cartesian-plane style="width: 20%; height: 100%; left: 60%;">
+            <linear-scale
+              min="-5"
+              max="5">
+              <linear-scale
+                min="-140"
+                max="140">
+
+                <!-- Lines -->
+                <data-area
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-area>
+                <data-line
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-line>
+                <data-point
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+
+          <cartesian-plane style="width: 20%; height: 100%; left: 80%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="-30"
+                max="90">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>Independent view</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 100%; height: 100%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="0"
+                max="10">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]">
+                </data-point>
+                <data-point
+                  class="labels"
+                  x='["Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10"]'
+                  y="[1, 2, 3, 4, 5, 6, 7, 8, 9]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  values='["Val_2", "Val_4", "Val_6", "Val_8", "Val_10"]'>
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="7">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>Independent view</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 100%; height: 100%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="-5"
+                max="5">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]">
+                </data-point>
+                <data-point
+                  class="labels"
+                  x='["Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10"]'
+                  y="[-4, -3, -2, -1, 0, 1, 2, 3, 4]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>Independent view</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 100%; height: 100%;">
+            <linear-scale
+              min="0"
+              max="10">
+              <linear-scale
+                min="0"
+                max="100">
+
+                <!-- Lines -->
+                <data-area
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-area>
+                <data-line
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-line>
+                <data-point
+                  x="[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]"
+                  y="[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]">
+                </data-point>
+                <data-point
+                  class="labels"
+                  x="[1, 2, 3, 4, 5, 6, 7, 8, 9]"
+                  y="[1, 4, 9, 16, 25, 36, 49, 64, 81]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>Independent view</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 100%; height: 100%;">
+            <linear-scale
+              min="-5"
+              max="5">
+              <linear-scale
+                min="-140"
+                max="140">
+
+                <!-- Lines -->
+                <data-area
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-area>
+                <data-line
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-line>
+                <data-point
+                  x="[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5]"
+                  y="[-125, -64, -27, -8, -1, 0, 1, 8, 27, 64, 125]">
+                </data-point>
+                <data-point
+                  class="labels"
+                  x="[-5, -4, -3, -2, -1, 1, 2, 3, 4]"
+                  y="[-125, -64, -27, -8, -1, 1, 8, 27, 64]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  class="center"
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  class="center"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  class="center"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="center labels"
+                  dimension="x"
+                  count="5">
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  class="center"
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  class="center"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  class="center"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="center labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+
+      <div class="block">
+        <h1>Independent view</h1>
+        <hdml-view class="all-together-independent">
+          <cartesian-plane style="width: 100%; height: 100%;">
+            <ordinal-scale
+              bandwidth="0"
+              values='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'>
+              <linear-scale
+                min="-30"
+                max="90">
+
+                <!-- Lines -->
+                <data-area
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y0="[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]"
+                  y1="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-area>
+                <data-line
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-line>
+                <data-point
+                  x='["Val_1", "Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10", "Val_11"]'
+                  y="[10, -5, 1, -27, 3, -1, 25, 1, 7, 3, 81]">
+                </data-point>
+                <data-point
+                  class="labels"
+                  x='["Val_2", "Val_3", "Val_4", "Val_5", "Val_6", "Val_7", "Val_8", "Val_9", "Val_10"]'
+                  y="[-5, 1, -27, 3, -1, 25, 1, 7, 3]">
+                </data-point>
+
+                <!-- X-axis -->
+                <horizontal-axis
+                  dimension="x">
+                </horizontal-axis>
+                <horizontal-axis-grid
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-grid>
+                <horizontal-axis-tick
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+                <horizontal-axis-tick
+                  class="labels"
+                  dimension="x"
+                  values='["Val_1", "Val_6", "Val_11"]'>
+                </horizontal-axis-tick>
+
+                <!-- Y-axis -->
+                <vertical-axis
+                  dimension="y">
+                </vertical-axis>
+                <vertical-axis-grid
+                  dimension="y"
+                  count="11">
+                </vertical-axis-grid>
+                <vertical-axis-tick
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+                <vertical-axis-tick
+                  class="labels"
+                  dimension="y"
+                  count="11">
+                </vertical-axis-tick>
+
+              </linear-scale>
+            </ordinal-scale>
+          </cartesian-plane>
+        </hdml-view>
+      </div>
+    </div>
+  </body>
+</html>

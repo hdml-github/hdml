@@ -55,7 +55,7 @@ RUN rm -rf \
   /downloads/trino-server-427/plugin/tpcds \
   /downloads/trino-server-427/plugin/tpch
 RUN mv /downloads/trino-server-427/* /trino/
-COPY ./docker/service/conf/trino/* /trino/etc/
+COPY ./docker/testing/trino/* /trino/etc/
 
 
 # Pulsar image.
@@ -64,7 +64,7 @@ RUN mkdir -p /downloads && mkdir -p /pulsar
 RUN wget -P /downloads https://archive.apache.org/dist/pulsar/pulsar-3.1.0/apache-pulsar-3.1.0-bin.tar.gz
 RUN tar -xf /downloads/apache-pulsar-3.1.0-bin.tar.gz -C /downloads/
 RUN mv /downloads/apache-pulsar-3.1.0/* /pulsar/
-COPY ./docker/service/conf/pulsar/standalone.conf /pulsar/conf/
+COPY ./docker/testing/pulsar/standalone.conf /pulsar/conf/
 
 
 # Image configured for the build process

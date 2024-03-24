@@ -2,7 +2,7 @@
 
 
 /**
- * `HDML` network protocol query filter names enum.
+ * `Query filter names enum.
  */
 export enum FilterName {
   Equals = 0,

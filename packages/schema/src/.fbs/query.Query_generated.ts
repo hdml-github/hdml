@@ -6,7 +6,7 @@ import {Frame as Frame} from './query.Frame_generated.js';
 import {Model as Model} from './query.Model_generated.js';
 
 /**
- * `HDML` network protocol query structure.
+ * Query structure.
  */
 export class Query {
   bb: flatbuffers.ByteBuffer|null = null;

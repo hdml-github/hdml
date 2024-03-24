@@ -11,7 +11,7 @@ import { KeyLike } from "jose";
 import { NodeVM, VMScript } from "vm2";
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { ModelDef, FrameDef, QueryDef } from "@hdml/schema";
-import { ElementsDef } from "@hdml/elements";
+import { FragmentDef } from "@hdml/elements";
 import { Options } from "./Options";
 import { Tokens } from "./Tokens";
 import { HookFn, Compiler } from "./Compiler";
@@ -166,7 +166,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadTenants(): Promise<void> {
     const project = await new Promise<Dir>((resolve, reject) => {
-      opendir(this._options.getProjectPath(), (err, dir) => {
+      opendir(this._options.getWorkdir(), (err, dir) => {
         if (err) {
           reject(err);
         } else {
@@ -202,7 +202,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadEnv(tenant: string): Promise<string> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantEnvName(),
     );
@@ -214,7 +214,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadKey(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantKeysPath(),
       this._options.getTenantPrivateKeyName(),
@@ -229,7 +229,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadPub(tenant: string): Promise<KeyLike> {
     const file = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantKeysPath(),
       this._options.getTenantPublicKeyName(),
@@ -242,7 +242,7 @@ export class Tenants implements OnModuleInit {
    */
   private async loadHook(tenant: string): Promise<HookFn> {
     const hookPath = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantHookPath(),
     );
@@ -276,9 +276,9 @@ export class Tenants implements OnModuleInit {
    */
   private async loadFragmentsDefs(
     tenant: string,
-  ): Promise<{ [dir: string]: ElementsDef }> {
+  ): Promise<{ [dir: string]: FragmentDef }> {
     const root = path.resolve(
-      this._options.getProjectPath(),
+      this._options.getWorkdir(),
       tenant,
       this._options.getTenantDocumentsPath(),
     );
@@ -295,18 +295,18 @@ export class Tenants implements OnModuleInit {
   }
 
   /**
-   * Loads specified `files`, compiles them to the `ElementsDef` and
+   * Loads specified `files`, compiles them to the `FragmentDef` and
    * returns a hash map with the keys equal to the file path and the
-   * value equal to the file `ElementsDef`.
+   * value equal to the file `FragmentDef`.
    */
   private async loadFilesDefs(
     tenant: string,
     root: string,
     files: string[],
-  ): Promise<{ [dir: string]: ElementsDef }> {
-    const defs: { [dir: string]: ElementsDef } = {};
+  ): Promise<{ [dir: string]: FragmentDef }> {
+    const defs: { [dir: string]: FragmentDef } = {};
     const promises = files.map((file) => {
-      return new Promise<ElementsDef>((resolve, reject) => {
+      return new Promise<FragmentDef>((resolve, reject) => {
         readFile(file, { encoding: "utf8" }, (err, hdml) => {
           if (err) {
             reject(err);
@@ -316,10 +316,10 @@ export class Tenants implements OnModuleInit {
         });
       });
     });
-    const datas = await Promise.all<ElementsDef>(promises);
+    const datas = await Promise.all<FragmentDef>(promises);
     files.forEach((file, i) => {
       const key = file.split(
-        path.resolve(this._options.getProjectPath(), tenant, root),
+        path.resolve(this._options.getWorkdir(), tenant, root),
       )[1];
       defs[key] = datas[i];
     });
@@ -414,7 +414,7 @@ export class Tenants implements OnModuleInit {
    * Completes the `html` fragments definitions by resolving the
    * `source` attributes of the `FrameElement` elements.
    */
-  private completeDefs(defs: { [path: string]: ElementsDef }): {
+  private completeDefs(defs: { [path: string]: FragmentDef }): {
     [path: string]: QueryDef;
   } {
     const completed: {
@@ -458,7 +458,7 @@ export class Tenants implements OnModuleInit {
    * specified `fragment`.
    */
   private lookupModel(
-    defs: { [path: string]: ElementsDef },
+    defs: { [path: string]: FragmentDef },
     current: string,
     source: string,
   ): ModelDef {
@@ -490,7 +490,7 @@ export class Tenants implements OnModuleInit {
    * specified `fragments`.
    */
   private assertSource(
-    defs: { [path: string]: ElementsDef },
+    defs: { [path: string]: FragmentDef },
     current: string,
     source: string,
   ): void {
