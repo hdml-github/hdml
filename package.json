@@ -71,7 +71,6 @@
     "whatwg-url": "^14.0.0"
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap",
     "dev": "lerna run dev",
     "lint": "lerna run lint",
     "docs": "lerna run docs",

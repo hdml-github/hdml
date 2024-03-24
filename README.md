@@ -19,7 +19,13 @@ git config user.email "username@gmail.com"
 
 # install dependencies
 npm i
-npm run bootstrap
+
+# install Flatbuffers (cmake required: `brew install cmake`)
+mkdir flatc
+git clone --depth 1 --branch v23.1.4 https://github.com/google/flatbuffers.git flatc
+cd flatc && cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release && make
+ln -s /flatc/flatc /usr/local/bin/flatc
+chmod +x /flatc/flatc
 
 # build project locally
 npm run compile_all
