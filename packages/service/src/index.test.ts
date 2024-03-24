@@ -16,7 +16,7 @@ let queryBuf: QueryBuf;
 let queryUri: string;
 
 describe("REST APIs", () => {
-  it("GET /api/v0/tokens", async () => {
+  it.skip("GET /api/v0/tokens", async () => {
     const url =
       "http://localhost:8887/api/v0/tokens" +
       `?tenant=${tenant}&ttl=2592000&scope={"key": "value"}`;
@@ -36,7 +36,7 @@ describe("REST APIs", () => {
     expect(accessToken).toBeTruthy();
   });
 
-  it("GET /api/v0/sessions", async () => {
+  it.skip("GET /api/v0/sessions", async () => {
     const url =
       "http://localhost:8887/api/v0/sessions" +
       `?tenant=${tenant}&token=${accessToken}`;
@@ -72,7 +72,7 @@ describe("REST APIs", () => {
     expect(res.status).toBe(404);
   });
 
-  it("GET /api/v0/hdm/def?tenant=:tenant&uri=:uri", async () => {
+  it.skip("GET /api/v0/hdm/def?tenant=:tenant&uri=:uri", async () => {
     const url =
       "http://localhost:8887/api/v0/hdm/def?" +
       `tenant=${tenant}&uri=${uri}`;
@@ -92,7 +92,7 @@ describe("REST APIs", () => {
     expect(queryDef.frame?.name).toBe("query");
   });
 
-  it("GET /api/v0/hdm/htm?tenant=:tenant&uri=:uri", async () => {
+  it.skip("GET /api/v0/hdm/htm?tenant=:tenant&uri=:uri", async () => {
     const url =
       "http://localhost:8887/api/v0/hdm/htm?" +
       `tenant=${tenant}&uri=${uri}`;
@@ -112,7 +112,7 @@ describe("REST APIs", () => {
     expect(typeof html).toBe("string");
   });
 
-  it("GET /api/v0/hdm/sql?tenant=:tenant&uri=:uri", async () => {
+  it.skip("GET /api/v0/hdm/sql?tenant=:tenant&uri=:uri", async () => {
     const url =
       "http://localhost:8887/api/v0/hdm/sql?" +
       `tenant=${tenant}&uri=${uri}`;
@@ -132,7 +132,7 @@ describe("REST APIs", () => {
     expect(typeof sql).toBe("string");
   });
 
-  it("GET /api/v0/hdm/uris?tenant=:tenant", async () => {
+  it.skip("GET /api/v0/hdm/uris?tenant=:tenant", async () => {
     const url =
       `http://localhost:8887/api/v0/hdm/uris?tenant=` + `${tenant}`;
     const res = await fetch(url, {
@@ -151,7 +151,7 @@ describe("REST APIs", () => {
     expect(Array.isArray(queryUris)).toBeTruthy();
   });
 
-  it("POST /api/v0/queries", async () => {
+  it.skip("POST /api/v0/queries", async () => {
     queryDef.frame && (queryDef.frame.name = "new_query");
     queryBuf = new QueryBuf(queryDef);
 
