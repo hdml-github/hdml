@@ -40,16 +40,7 @@ export class Workdir {
   public async getElementsScript(): Promise<string> {
     if (!this._elementsScript) {
       this._elementsScript = await this.openFile(
-        resolve(
-          __dirname,
-          "..",
-          "..",
-          "node_modules",
-          "@hdml",
-          "elements",
-          "bin",
-          "elements.min.js",
-        ),
+        resolve(this._config.workdirElementsPath),
       );
     }
     return this._elementsScript;
@@ -61,16 +52,7 @@ export class Workdir {
   public async getParserScript(): Promise<string> {
     if (!this._parserScript) {
       this._parserScript = await this.openFile(
-        resolve(
-          __dirname,
-          "..",
-          "..",
-          "node_modules",
-          "@hdml",
-          "parser",
-          "bin",
-          "parser.min.js",
-        ),
+        resolve(this._config.workdirParserPath),
       );
     }
     return this._parserScript;

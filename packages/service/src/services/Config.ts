@@ -16,6 +16,8 @@ import {
  */
 type Workdir = {
   PATH: string;
+  ELEMENTS_PATH: string;
+  PARSER_PATH: string;
   HOOKS_PATH: string;
   KEYS_PATH: string;
   HDML_PATH: string;
@@ -161,6 +163,8 @@ export class Config {
     ConfigFactoryKeyHost<Workdir> {
     return registerAs("Workdir", () => ({
       PATH: process.env.WORKDIR_PATH || ".",
+      ELEMENTS_PATH: process.env.WORKDIR_ELEMENTS_PATH || ".",
+      PARSER_PATH: process.env.WORKDIR_PARSER_PATH || ".",
       HOOKS_PATH: process.env.WORKDIR_HOOKS_PATH || "hooks",
       KEYS_PATH: process.env.WORKDIR_KEYS_PATH || "keys",
       HDML_PATH: process.env.WORKDIR_HDML_PATH || "hdml",
@@ -415,6 +419,22 @@ export class Config {
    */
   public get workdirPath(): string {
     return this._conf.get<Workdir>("Workdir").PATH;
+  }
+
+  /**
+   * Elements Javascript path. Can be configured via the
+   * `WORKDIR_ELEMENTS_PATH` environment variable.
+   */
+  public get workdirElementsPath(): string {
+    return this._conf.get<Workdir>("Workdir").ELEMENTS_PATH;
+  }
+
+  /**
+   * Parser Javascript path. Can be configured via the
+   * `WORKDIR_PARSER_PATH` environment variable.
+   */
+  public get workdirParserPath(): string {
+    return this._conf.get<Workdir>("Workdir").PARSER_PATH;
   }
 
   /**

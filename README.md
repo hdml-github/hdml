@@ -7,6 +7,9 @@
 # install node-gyp
 npm install -g node-gyp
 
+# install playwright dependencies
+npx playwright install
+
 # install flatbuffers (cmake required: `brew install cmake`)
 cd /
 mkdir flatc

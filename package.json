@@ -83,31 +83,25 @@
     "clear": "lerna run clear",
     "build": "lerna run build",
     "publish": "./node_modules/.bin/lerna publish from-package --yes --no-verify-access --no-git-reset",
-
     "devtools:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/devtools/Dockerfile -t imazzine/hdml.io-devtools",
     "devtools:debug": "clear && docker run --network host  -v .:/var/lib/hdml -it imazzine/hdml.io-devtools /bin/sh",
-    
     "develop:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/develop/Dockerfile -t imazzine/hdml.io:develop",
     "develop:debug": "clear && docker run --network host -v ./.workdir:/var/lib/hdml -it imazzine/hdml.io:develop /bin/sh",
     "develop:image": "clear && docker run --network host -v ./.workdir:/var/lib/hdml imazzine/hdml.io:develop",
     "develop:down": "clear && docker compose -f ./.workdir/compose:develop.yaml down",
     "develop:up": "rm -rf ./.workdir/.log/*.log && clear && docker compose -f ./.workdir/compose:develop.yaml up -d",
-    
     "testing:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/testing/Dockerfile -t imazzine/hdml.io:testing",
     "testing:debug": "clear && docker run --network host -v ./.workdir:/var/lib/hdml -it imazzine/hdml.io:testing /bin/sh",
     "testing:image": "clear && docker run --network host -v ./.workdir:/var/lib/hdml imazzine/hdml.io:testing",
     "testing:down": "clear && docker compose -f ./.workdir/compose:testing.yaml down",
     "testing:up": "rm -rf ./.workdir/.log/*.log && clear && docker compose -f ./.workdir/compose:testing.yaml up -d",
-
     "production:build": "clear && export DOCKER_BUILDKIT=1 && docker build . -f ./docker/production/Dockerfile -t imazzine/hdml.io:production",
     "production:debug": "clear && docker run --network host -v ./.workdir:/var/lib/hdml -it imazzine/hdml.io:production /bin/sh",
     "production:image": "clear && docker run --network host -v ./.workdir:/var/lib/hdml imazzine/hdml.io:production",
     "production:down": "clear && docker compose -f ./.workdir/compose:production.yaml down",
     "production:up": "rm -rf ./.workdir/.log/*.log && clear && docker compose -f ./.workdir/compose:production.yaml up -d",
-
     "cluster:down": "minikube stop",
     "cluster:up": "minikube start && supervisord -c ./deploy/k8s/minikube/supervisord.conf",
-
     "cleanup:orphans": "docker rmi -f $(docker images --filter \"dangling=true\" -q --no-trunc)",
     "cleanup:all": "docker system prune -a -f"
   }

@@ -48,10 +48,10 @@
     "clear": "rm -rf tst && rm -rf cjs && rm -rf coverage && rm -rf docs && rm -rf dts && rm -rf esm && rm -rf tsconfig/*.tsbuildinfo",
     "build": "npm run clear && npm run lint && npm run compile_all && npm run test -- --coverage && npm run docs",
     "web": "",
-    "hideway": "node ./cjs/bootstrap.js --mode hideway --envpath /home/buntarb/Projects/hdml-github/hdml/.workdir/.env",
-    "gateway": "node ./cjs/bootstrap.js --mode gateway --envpath /home/buntarb/Projects/hdml-github/hdml/.workdir/.env",
-    "querier": "node ./cjs/bootstrap.js --mode querier --envpath /home/buntarb/Projects/hdml-github/hdml/.workdir/.env",
-    "singleton": "node --no-node-snapshot ./cjs/bootstrap.js --mode singleton --envpath /Users/buntarb/Projects/hdml-github/hdml/.workdir/.env"
+    "hideway": "node --no-node-snapshot ./cjs/bootstrap.js --mode hideway --envpath ../../.workdir/.env",
+    "gateway": "node --no-node-snapshot ./cjs/bootstrap.js --mode gateway --envpath ../../.workdir/.env",
+    "querier": "node --no-node-snapshot ./cjs/bootstrap.js --mode querier --envpath ../../.workdir/.env",
+    "singleton": "node --no-node-snapshot ./cjs/bootstrap.js --mode singleton --envpath ../../.workdir/.env"
   },
   "types": "dts/index.d.ts",
   "module": "esm/index.js",
